@@ -1,0 +1,12 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Feature-first / Clean Architecture convention for this project:
+    # nothing project-specific added yet in P-001 — later parts may extend
+    # this as core/ and features/ gain real implementation.
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"

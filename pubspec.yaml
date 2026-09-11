@@ -1,0 +1,31 @@
+name: social_commerce_app
+description: "Social Commerce Discovery Platform — mobile app (Customer / Trader-Factory / Admin surfaces share this codebase per Section 12)."
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+  flutter: ">=3.27.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management (mandated by architecture — Riverpod, not Bloc/Provider)
+  flutter_riverpod: 3.3.2
+
+  # HTTP client for future networking layer (lib/core/network)
+  dio: ^5.11.0
+
+  # Encrypted local storage for future auth-token persistence (lib/core/storage)
+  flutter_secure_storage: ^10.3.1
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
