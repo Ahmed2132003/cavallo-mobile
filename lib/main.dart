@@ -2,45 +2,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/config/app_theme.dart';
+import 'routing/app_router.dart';
 
 /// Composition root for the app.
 ///
-/// Wrapped in ProviderScope since P-001 — even though no providers exist
-/// yet — so that later parts (P-010 onward) never have to retrofit
-/// Riverpod into the widget tree. [AppTheme] was applied app-wide in
-/// P-006. Routing, networking, and storage wiring are still out of
-/// scope here and land in their own later parts.
+/// Wrapped in ProviderScope since P-001. [AppTheme] was applied app-wide
+/// in P-006. As of P-007, navigation goes through the single [GoRouter]
+/// instance exposed by [appRouterProvider] — [SocialCommerceApp] is now a
+/// [ConsumerWidget] so it can watch that provider and pass it to
+/// [MaterialApp.router]. No feature should build a separate `Navigator`.
 void main() {
   runApp(const ProviderScope(child: SocialCommerceApp()));
 }
 
-class SocialCommerceApp extends StatelessWidget {
+class SocialCommerceApp extends ConsumerWidget {
   const SocialCommerceApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
+
+    return MaterialApp.router(
       title: 'Social Commerce Discovery Platform',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
-      home: const _PlaceholderHome(),
-    );
-  }
-}
-
-class _PlaceholderHome extends StatelessWidget {
-  const _PlaceholderHome();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text(
-          'Social Commerce Discovery Platform',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-        ),
-      ),
+      routerConfig: router,
     );
   }
 }

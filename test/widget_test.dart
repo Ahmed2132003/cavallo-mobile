@@ -4,9 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:social_commerce_app/main.dart';
 
 void main() {
-  testWidgets('Placeholder screen shows app title', (WidgetTester tester) async {
+  testWidgets('App boots at the splash route', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: SocialCommerceApp()));
+    await tester.pumpAndSettle();
 
-    expect(find.text('Social Commerce Discovery Platform'), findsOneWidget);
+    expect(find.text('Route: splash'), findsOneWidget);
   });
 }
