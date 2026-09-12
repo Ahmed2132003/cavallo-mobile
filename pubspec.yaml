@@ -20,6 +20,14 @@ dependencies:
   # Encrypted local storage for future auth-token persistence (lib/core/storage)
   flutter_secure_storage: ^10.3.1
 
+  # Non-sensitive local cache backing for CacheStorage (lib/core/storage) —
+  # tokens never use this, see secure_token_storage.dart. Pinned to 2.5.3:
+  # shared_preferences 2.5.4+ requires Flutter >=3.35.0, which is newer
+  # than this project's validated Flutter 3.29.3 — the resolver would
+  # otherwise silently pick a version that fails to resolve on this SDK,
+  # the same class of issue P-001 hit with flutter_riverpod.
+  shared_preferences: ^2.5.3
+
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
