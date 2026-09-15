@@ -9,6 +9,7 @@ import 'package:social_commerce_app/core/config/app_theme.dart';
 import 'package:social_commerce_app/core/error_reporting.dart';
 import 'package:social_commerce_app/core/network/dio_client.dart';
 import 'package:social_commerce_app/core/storage/secure_token_storage.dart';
+import 'package:social_commerce_app/features/auth/presentation/login_screen.dart';
 import 'package:social_commerce_app/routing/app_router.dart';
 
 /// Part P-009 scope: the "do the pieces actually fit together" checkpoint
@@ -118,6 +119,15 @@ void main() {
   });
 
   group('P-009: AppTheme + AppRouter combined via MaterialApp.router', () {
+    setUp(() {
+      // SessionNotifier.build() (Part P-021a) reads SecureTokenStorage the
+      // moment the router's redirect callback first reads sessionProvider.
+      // Mock the plugin channel to "no token" so this test resolves to a
+      // deterministic signed-out session instead of depending on whichever
+      // group happened to call setMockInitialValues before it.
+      FlutterSecureStorage.setMockInitialValues({});
+    });
+
     testWidgets(
       'renders together without conflict or exception, and the theme '
       'actually reaches the router screens (not just the default '
@@ -144,10 +154,19 @@ void main() {
         // combined tree.
         expect(tester.takeException(), isNull);
 
-        // Router resolved to its initial route as usual (same assertion
-        // P-007's own suite makes) — proves the router half of the tree
-        // isn't broken by having a real theme attached this time.
-        expect(find.text('Route: splash'), findsOneWidget);
+        // Router resolved its initial location as usual — proves the
+        // router half of the tree isn't broken by having a real theme
+        // attached this time.
+        //
+        // Updated in Part P-021c: this used to assert `Route: splash`,
+        // written when P-007's `redirect` was still a no-op stub. Since
+        // Part P-021b that stub is a real auth guard, and `/` (splash) is
+        // no longer a terminal destination: with no token in secure
+        // storage the session resolves to signed-out, so the guard bounces
+        // `/` straight to `/login`. Landing on LoginScreen IS the router
+        // resolving correctly now — asserting it instead of weakening the
+        // check.
+        expect(find.byType(LoginScreen), findsOneWidget);
 
         // Confirm AppTheme's colors actually reached the rendered screen,
         // rather than the tree silently falling back to MaterialApp's own
