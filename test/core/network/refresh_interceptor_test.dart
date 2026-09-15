@@ -49,6 +49,89 @@ ResponseBody _jsonResponse(int statusCode, Map<String, dynamic> data) {
   );
 }
 
+/// Part P-022C (Tests D and E) — main-client adapter for the concurrency
+/// cases.
+///
+/// Answers **401 to anything that is not carrying the post-refresh access
+/// token**, and 200 once it is. That is what lets a single adapter serve N
+/// concurrent requests that must each 401 first and then succeed on their
+/// own retry — [_SequencedAdapter] above can't, because it hands out one
+/// fixed reply per call *in order*, which says nothing about which request
+/// is being answered.
+class _TokenAwareAdapter implements HttpClientAdapter {
+  /// Every call that reached the "server", initial 401s and retries alike.
+  int requestCount = 0;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    requestCount++;
+    final authHeader =
+        options.headers['Authorization'] ?? options.headers['authorization'];
+
+    if (authHeader == 'Bearer new-access') {
+      return _jsonResponse(200, {'ok': true, 'path': options.path});
+    }
+
+    return _jsonResponse(401, {
+      'error': {'code': 'UNAUTHENTICATED', 'message': 'Token expired'},
+    });
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+/// Part P-022C (Tests D and E) — refresh-client adapter that **counts** how
+/// many times `/api/v1/auth/refresh/` was actually called.
+///
+/// That call count is the whole point of Test D: the single-flight lock is
+/// only proven by asserting it stayed at 1 while five requests 401'd at
+/// once. [delay] holds the refresh call open long enough that the other
+/// four 401s are guaranteed to land while it is still in flight.
+class _CountingRefreshAdapter implements HttpClientAdapter {
+  _CountingRefreshAdapter({this.delay = Duration.zero});
+
+  final Duration delay;
+
+  /// Number of calls made to [RefreshInterceptor.refreshPath].
+  int refreshCallCount = 0;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    if (options.path != RefreshInterceptor.refreshPath) {
+      // Same spirit as the deliberately-unregistered routes in Tests B/C:
+      // anything other than the refresh endpoint arriving on the refresh
+      // client is a bug, and should be loudly wrong rather than silently OK.
+      return _jsonResponse(404, {
+        'error': {
+          'code': 'NOT_FOUND',
+          'message': 'unexpected route on refresh client: ${options.path}',
+        },
+      });
+    }
+
+    refreshCallCount++;
+    if (delay > Duration.zero) {
+      await Future<void>.delayed(delay);
+    }
+    return _jsonResponse(200, {
+      'access': 'new-access',
+      'refresh': 'new-refresh',
+    });
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -269,6 +352,131 @@ void main() {
       expect(await storage.getAccessToken(), isNull);
       expect(await storage.getRefreshToken(), isNull);
       expect(invalidateSessionCallCount, 1);
+    },
+  );
+
+  test(
+    '5 concurrent requests against an expired token trigger exactly ONE '
+    'refresh call, and all 5 original requests succeed after that single '
+    'refresh (Test D — Part P-022C)',
+    () async {
+      final storage = SecureTokenStorage();
+      await storage.saveTokens(access: 'old-access', refresh: 'old-refresh');
+
+      var invalidateSessionCallCount = 0;
+
+      final dio = Dio(BaseOptions(baseUrl: 'https://api.test'));
+      final mainAdapter = _TokenAwareAdapter();
+      dio.httpClientAdapter = mainAdapter;
+
+      final refreshDio = Dio(BaseOptions(baseUrl: 'https://api.test'));
+      // The 50ms hold guarantees the other four 401s arrive while this one
+      // refresh is still in flight — i.e. the exact stampede window.
+      final refreshAdapter = _CountingRefreshAdapter(
+        delay: const Duration(milliseconds: 50),
+      );
+      refreshDio.httpClientAdapter = refreshAdapter;
+
+      dio.interceptors.add(
+        RefreshInterceptor(
+          dio: dio,
+          tokenStorage: storage,
+          refreshDio: refreshDio,
+          invalidateSession: () async {
+            invalidateSessionCallCount++;
+          },
+        ),
+      );
+
+      final responses = await Future.wait(
+        List.generate(
+          5,
+          (index) => dio.get<Map<String, dynamic>>(
+            '/some/protected/endpoint/$index',
+            options: Options(
+              headers: {'Authorization': 'Bearer old-access'},
+            ),
+          ),
+        ),
+      );
+
+      // THE assertion this part exists for: no refresh stampede.
+      expect(
+        refreshAdapter.refreshCallCount,
+        1,
+        reason: 'concurrent 401s must share a single refresh call',
+      );
+
+      // All five original requests still succeed, each with its own result.
+      expect(responses.length, 5);
+      for (var index = 0; index < responses.length; index++) {
+        expect(responses[index].statusCode, 200);
+        expect(responses[index].data?['ok'], true);
+        expect(
+          responses[index].data?['path'],
+          '/some/protected/endpoint/$index',
+        );
+      }
+
+      // 5 initial 401s + 5 retries — every waiter really did retry, rather
+      // than being resolved with someone else's response.
+      expect(mainAdapter.requestCount, 10);
+
+      // The single refresh's token pair is what got persisted.
+      expect(await storage.getAccessToken(), 'new-access');
+      expect(await storage.getRefreshToken(), 'new-refresh');
+
+      // Nothing failed, so the session was never invalidated.
+      expect(invalidateSessionCallCount, 0);
+    },
+  );
+
+  test(
+    'a later, independent 401 starts a FRESH single-flight cycle instead of '
+    'reusing the already-completed one (Test E — Part P-022C lock reset)',
+    () async {
+      final storage = SecureTokenStorage();
+      await storage.saveTokens(access: 'old-access', refresh: 'old-refresh');
+
+      final dio = Dio(BaseOptions(baseUrl: 'https://api.test'));
+      final mainAdapter = _TokenAwareAdapter();
+      dio.httpClientAdapter = mainAdapter;
+
+      final refreshDio = Dio(BaseOptions(baseUrl: 'https://api.test'));
+      final refreshAdapter = _CountingRefreshAdapter();
+      refreshDio.httpClientAdapter = refreshAdapter;
+
+      dio.interceptors.add(
+        RefreshInterceptor(
+          dio: dio,
+          tokenStorage: storage,
+          refreshDio: refreshDio,
+        ),
+      );
+
+      // Cycle 1.
+      final first = await dio.get<Map<String, dynamic>>(
+        '/some/protected/endpoint/first',
+        options: Options(headers: {'Authorization': 'Bearer old-access'}),
+      );
+      expect(first.statusCode, 200);
+      expect(refreshAdapter.refreshCallCount, 1);
+
+      // Cycle 2 — a completely separate request, later in time, carrying a
+      // token the server rejects again. If the completed completer from
+      // cycle 1 were still held, this request would either hang forever or
+      // retry without refreshing at all; instead it must start its own
+      // refresh.
+      final second = await dio.get<Map<String, dynamic>>(
+        '/some/protected/endpoint/second',
+        options: Options(headers: {'Authorization': 'Bearer stale-again'}),
+      );
+      expect(second.statusCode, 200);
+      expect(
+        refreshAdapter.refreshCallCount,
+        2,
+        reason: 'the lock must reset once a refresh cycle ends',
+      );
     },
   );
 }

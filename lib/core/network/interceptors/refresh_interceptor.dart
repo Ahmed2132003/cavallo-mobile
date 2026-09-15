@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 
 import '../../storage/secure_token_storage.dart';
@@ -19,8 +21,10 @@ import '../api_failure.dart';
 typedef SessionInvalidator = Future<void> Function();
 
 /// Part P-022A: silent token refresh + transparent retry (happy path).
-/// Part P-022B (this part): what happens when the refresh call itself
-/// fails — the refresh token has also expired/is invalid.
+/// Part P-022B: what happens when the refresh call itself fails — the
+/// refresh token has also expired/is invalid (session invalidation).
+/// Part P-022C (this part): concurrency hardening — a single-flight lock so
+/// that N simultaneous 401s produce exactly **one** refresh call.
 ///
 /// On a 401 for any request *other than* the refresh endpoint itself, this
 /// interceptor:
@@ -31,12 +35,35 @@ typedef SessionInvalidator = Future<void> Function();
 ///   3a. on success: saves the returned token pair, retries the original
 ///       request with the new access token, and resolves the caller with
 ///       that result, so the caller never sees the intermediate 401;
-///   3b. on failure (this part's scope): clears [SecureTokenStorage],
-///       invalidates the session via [_invalidateSession], and rejects the
-///       caller with an [AuthFailure] — see [_handleRefreshFailure].
+///   3b. on failure: clears [SecureTokenStorage], invalidates the session
+///       via [_invalidateSession], and rejects the caller with an
+///       [AuthFailure] — see [_handleRefreshFailure].
 ///
-/// Explicitly NOT handled here (by design, see the part spec):
-///   * concurrent 401s / single-flight lock → Part P-022C
+/// ### Single-flight lock (Part P-022C)
+/// Steps 1–3 above are guarded by [_refreshCompleter], an instance-level
+/// `Completer<bool>?`:
+///   * the first 401 to arrive while no refresh is in flight **owns** the
+///     cycle: it creates the completer and runs the P-022A/P-022B logic
+///     unchanged;
+///   * every other 401 arriving while that completer is non-null simply
+///     `await`s it, then either retries with whatever token the single
+///     refresh produced (`true`) or receives the same [AuthFailure]
+///     (`false`) — it never starts a refresh of its own, and never
+///     re-clears storage / re-invalidates the session, so a failed refresh
+///     still invalidates exactly once no matter how many requests were
+///     waiting;
+///   * the completer is reset to `null` the moment it resolves, so a later,
+///     independent 401 (after this cycle is over) starts a **fresh** cycle
+///     instead of reusing a stale, already-completed one.
+///
+/// This lock only works if a single [RefreshInterceptor] **instance** is
+/// registered once on the shared client — which is exactly what
+/// `dioClientProvider` (`dio_client.dart`) does: it constructs the
+/// interceptor once per Dio instance, and `dioClientProvider` itself is a
+/// cached Riverpod `Provider`, so every concurrent request in the app goes
+/// through the same instance and therefore observes the same in-flight
+/// completer. Constructing a new interceptor per request would silently
+/// defeat it.
 class RefreshInterceptor extends Interceptor {
   RefreshInterceptor({
     required Dio dio,
@@ -85,6 +112,19 @@ class RefreshInterceptor extends Interceptor {
   /// this part's new failure-path tests (Test B) pass a real one in.
   final SessionInvalidator _invalidateSession;
 
+  /// Part P-022C — the single-flight lock itself.
+  ///
+  /// Non-null exactly while one refresh cycle is in flight. Completes with
+  /// `true` when that refresh produced a usable access token (already
+  /// persisted to [SecureTokenStorage] by the time waiters wake up), and
+  /// `false` when it failed (storage already cleared and the session already
+  /// invalidated exactly once, by the owner).
+  ///
+  /// Never `await`ed while holding it across a gap without also resetting it
+  /// in [_completeRefreshCycle] — see that method for the ordering rule that
+  /// keeps a completed completer from ever being reused.
+  Completer<bool>? _refreshCompleter;
+
   /// User-facing message for the [AuthFailure] a caller receives once a
   /// refresh has genuinely failed and the session has been invalidated.
   static const _refreshFailedMessage =
@@ -102,10 +142,10 @@ class RefreshInterceptor extends Interceptor {
     }
 
     // Recursion guard #1: the refresh endpoint itself must never trigger
-    // another refresh. Untouched by Part P-022B on purpose (see the part's
-    // own architecture rule): a 401 on `/auth/refresh/` itself is this
-    // guard's job, not the new failure-handling path below — it just lets
-    // the original 401 propagate exactly as P-022A left it.
+    // another refresh. Untouched by Part P-022B/P-022C on purpose (see both
+    // parts' architecture rules): a 401 on `/auth/refresh/` itself is this
+    // guard's job — it runs *before* the single-flight lock below, so the
+    // refresh path never takes, waits on, or completes the lock.
     if (_isRefreshPath(err.requestOptions.path)) {
       handler.next(err);
       return;
@@ -120,44 +160,139 @@ class RefreshInterceptor extends Interceptor {
       return;
     }
 
-    final refreshToken = await _tokenStorage.getRefreshToken();
-    if (refreshToken == null || refreshToken.isEmpty) {
-      // Nothing to refresh with — functionally identical to a failed
-      // refresh from the caller's point of view.
-      await _handleRefreshFailure(err, handler);
+    // ---- Part P-022C: single-flight lock ---------------------------------
+    // Someone else is already refreshing: wait for their result instead of
+    // starting a second refresh call (the "refresh stampede" this part
+    // exists to prevent). Read synchronously, before any `await`, so two
+    // 401s landing in the same event-loop turn can never both see `null`.
+    final inFlight = _refreshCompleter;
+    if (inFlight != null) {
+      bool refreshed;
+      try {
+        refreshed = await inFlight.future;
+      } catch (_) {
+        refreshed = false;
+      }
+
+      if (!refreshed) {
+        // The single shared refresh failed. The owner has already cleared
+        // storage and invalidated the session exactly once — waiters must
+        // NOT repeat either, only surface the same final AuthFailure.
+        handler.reject(_authFailureFor(err));
+        return;
+      }
+
+      await _retryWithStoredToken(err, handler);
       return;
     }
 
+    // Nobody is refreshing — this request owns the cycle. The completer is
+    // published here, synchronously, *before* the first `await` below.
+    final completer = Completer<bool>();
+    _refreshCompleter = completer;
+    // ----------------------------------------------------------------------
+
     try {
-      final refreshResponse = await _refreshDio.post<Map<String, dynamic>>(
-        refreshPath,
-        data: <String, dynamic>{'refresh': refreshToken},
-      );
-
-      final data = refreshResponse.data;
-      final newAccess = data?['access'] as String?;
-      final newRefresh = data?['refresh'] as String? ?? refreshToken;
-
-      if (newAccess == null || newAccess.isEmpty) {
-        // The refresh endpoint responded, but not with a usable access
-        // token — treat this the same as a failed refresh call.
+      final refreshToken = await _tokenStorage.getRefreshToken();
+      if (refreshToken == null || refreshToken.isEmpty) {
+        // Nothing to refresh with — functionally identical to a failed
+        // refresh from the caller's point of view.
+        _completeRefreshCycle(completer, false);
         await _handleRefreshFailure(err, handler);
         return;
       }
 
-      await _tokenStorage.saveTokens(access: newAccess, refresh: newRefresh);
+      try {
+        final refreshResponse = await _refreshDio.post<Map<String, dynamic>>(
+          refreshPath,
+          data: <String, dynamic>{'refresh': refreshToken},
+        );
 
-      final retryOptions =
-          err.requestOptions
-            ..headers['Authorization'] = 'Bearer $newAccess'
-            ..extra[_retriedFlag] = true;
+        final data = refreshResponse.data;
+        final newAccess = data?['access'] as String?;
+        final newRefresh = data?['refresh'] as String? ?? refreshToken;
 
+        if (newAccess == null || newAccess.isEmpty) {
+          // The refresh endpoint responded, but not with a usable access
+          // token — treat this the same as a failed refresh call.
+          _completeRefreshCycle(completer, false);
+          await _handleRefreshFailure(err, handler);
+          return;
+        }
+
+        await _tokenStorage.saveTokens(access: newAccess, refresh: newRefresh);
+
+        // Release the waiters as soon as the new token pair is persisted —
+        // deliberately *before* this request's own retry, so all the queued
+        // requests retry in parallel rather than serially behind the owner,
+        // and so a failure of *this* request's retry (its own concern) can
+        // never be mistaken for a failure of the shared refresh.
+        _completeRefreshCycle(completer, true);
+
+        final retryOptions =
+            err.requestOptions
+              ..headers['Authorization'] = 'Bearer $newAccess'
+              ..extra[_retriedFlag] = true;
+
+        final retried = await _dio.fetch<dynamic>(retryOptions);
+        handler.resolve(retried);
+      } on DioException catch (_) {
+        // The refresh call itself failed (e.g. the refresh token has also
+        // expired/is invalid) — this is Part P-022B's core scenario.
+        // No-op if the cycle was already completed with `true` above (i.e.
+        // it was the retry, not the refresh, that threw).
+        _completeRefreshCycle(completer, false);
+        await _handleRefreshFailure(err, handler);
+      }
+    } finally {
+      // Safety net: whatever path was taken (including an unexpected throw),
+      // the lock is never left held and no waiter is ever left hanging.
+      _completeRefreshCycle(completer, false);
+    }
+  }
+
+  /// Part P-022C — ends the single-flight cycle owned by [completer].
+  ///
+  /// Order matters: the instance-level lock is released **first**, so that a
+  /// waiter woken by `complete` (or any brand-new 401 arriving afterwards)
+  /// can never observe an already-completed completer and wait forever on
+  /// it. Both operations are idempotent, so this is safe to call more than
+  /// once on the same completer (the `finally` safety net in [onError] does
+  /// exactly that).
+  void _completeRefreshCycle(Completer<bool> completer, bool refreshed) {
+    if (identical(_refreshCompleter, completer)) {
+      _refreshCompleter = null;
+    }
+    if (!completer.isCompleted) {
+      completer.complete(refreshed);
+    }
+  }
+
+  /// Part P-022C — retry path for a request that *waited* on someone else's
+  /// refresh. Mirrors the owner's own retry (same `Authorization` header
+  /// rewrite, same [_retriedFlag]) but reads the freshly-persisted token
+  /// from [SecureTokenStorage] rather than from a local variable, since the
+  /// refresh call that produced it happened in another request's stack.
+  Future<void> _retryWithStoredToken(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    final accessToken = await _tokenStorage.getAccessToken();
+
+    final retryOptions = err.requestOptions..extra[_retriedFlag] = true;
+    if (accessToken != null && accessToken.isNotEmpty) {
+      retryOptions.headers['Authorization'] = 'Bearer $accessToken';
+    }
+
+    try {
       final retried = await _dio.fetch<dynamic>(retryOptions);
       handler.resolve(retried);
-    } on DioException catch (_) {
-      // The refresh call itself failed (e.g. the refresh token has also
-      // expired/is invalid) — this is Part P-022B's core scenario.
-      await _handleRefreshFailure(err, handler);
+    } on DioException catch (retryErr) {
+      // The shared refresh succeeded but *this* request still failed — that
+      // is this request's own error, not a session problem, so it is passed
+      // down the chain (to `ErrorInterceptor`) for normal mapping rather
+      // than being turned into an AuthFailure here.
+      handler.next(retryErr);
     }
   }
 
@@ -170,6 +305,12 @@ class RefreshInterceptor extends Interceptor {
   ///       letting the raw 401 fall through to `ErrorInterceptor` — this
   ///       guarantees a clear, consistent message regardless of what the
   ///       original endpoint's own 401 body happened to contain.
+  ///
+  /// Part P-022C note: only ever reached by the request that **owns** the
+  /// refresh cycle (or by a request the lock never applied to, i.e. an
+  /// already-retried one). Waiters get the same [AuthFailure] via
+  /// [_authFailureFor] directly, without re-running (a) or (b) — that is
+  /// what keeps "clear + invalidate exactly once" true under concurrency.
   Future<void> _handleRefreshFailure(
     DioException originalErr,
     ErrorInterceptorHandler handler,
