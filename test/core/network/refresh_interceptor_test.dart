@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
+import 'package:social_commerce_app/core/network/api_failure.dart';
 import 'package:social_commerce_app/core/network/interceptors/refresh_interceptor.dart';
 import 'package:social_commerce_app/core/storage/secure_token_storage.dart';
 
@@ -157,4 +158,117 @@ void main() {
     expect(await storage.getAccessToken(), 'old-access');
     expect(await storage.getRefreshToken(), 'old-refresh');
   });
+
+  test(
+    'refresh call itself returns 401 → SecureTokenStorage is cleared, the '
+    'session is invalidated, and the original caller receives an '
+    'AuthFailure (Test B — Part P-022B)',
+    () async {
+      final storage = SecureTokenStorage();
+      await storage.saveTokens(access: 'old-access', refresh: 'old-refresh');
+
+      var invalidateSessionCallCount = 0;
+
+      final dio = Dio(BaseOptions(baseUrl: 'https://api.test'));
+      final adapter = DioAdapter(dio: dio);
+      dio.httpClientAdapter = adapter;
+      adapter.onGet(
+        '/some/protected/endpoint',
+        (server) => server.reply(401, {
+          'error': {'code': 'UNAUTHENTICATED', 'message': 'Token expired'},
+        }),
+      );
+
+      final refreshDio = Dio(BaseOptions(baseUrl: 'https://api.test'));
+      final refreshAdapter = DioAdapter(dio: refreshDio);
+      refreshDio.httpClientAdapter = refreshAdapter;
+      refreshAdapter.onPost(
+        '/api/v1/auth/refresh/',
+        (server) => server.reply(401, {
+          'error': {
+            'code': 'UNAUTHENTICATED',
+            'message': 'Refresh token invalid',
+          },
+        }),
+        data: {'refresh': 'old-refresh'},
+      );
+
+      dio.interceptors.add(
+        RefreshInterceptor(
+          dio: dio,
+          tokenStorage: storage,
+          refreshDio: refreshDio,
+          invalidateSession: () async {
+            invalidateSessionCallCount++;
+          },
+        ),
+      );
+
+      try {
+        await dio.get<Map<String, dynamic>>('/some/protected/endpoint');
+        fail('Expected a DioException to be thrown');
+      } on DioException catch (e) {
+        expect(e.error, isA<AuthFailure>());
+        expect(
+          (e.error as AuthFailure).message,
+          'Your session has expired. Please log in again.',
+        );
+      }
+
+      // (a) SecureTokenStorage is cleared.
+      expect(await storage.getAccessToken(), isNull);
+      expect(await storage.getRefreshToken(), isNull);
+
+      // (b) the session was invalidated exactly once.
+      expect(invalidateSessionCallCount, 1);
+    },
+  );
+
+  test(
+    'no refresh token stored → treated the same as a failed refresh: '
+    'storage cleared, session invalidated, AuthFailure propagated',
+    () async {
+      final storage = SecureTokenStorage(); // never saved any tokens
+      var invalidateSessionCallCount = 0;
+
+      final dio = Dio(BaseOptions(baseUrl: 'https://api.test'));
+      final adapter = DioAdapter(dio: dio);
+      dio.httpClientAdapter = adapter;
+      adapter.onGet(
+        '/some/protected/endpoint',
+        (server) => server.reply(401, {
+          'error': {'code': 'UNAUTHENTICATED', 'message': 'Token expired'},
+        }),
+      );
+
+      final refreshDio = Dio(BaseOptions(baseUrl: 'https://api.test'));
+      final refreshAdapter = DioAdapter(dio: refreshDio);
+      refreshDio.httpClientAdapter = refreshAdapter;
+      // No route registered: if the interceptor ever tried to call the
+      // refresh endpoint without a refresh token, this would throw an
+      // "unmocked route" error instead of the AuthFailure asserted below.
+
+      dio.interceptors.add(
+        RefreshInterceptor(
+          dio: dio,
+          tokenStorage: storage,
+          refreshDio: refreshDio,
+          invalidateSession: () async {
+            invalidateSessionCallCount++;
+          },
+        ),
+      );
+
+      try {
+        await dio.get<Map<String, dynamic>>('/some/protected/endpoint');
+        fail('Expected a DioException to be thrown');
+      } on DioException catch (e) {
+        expect(e.error, isA<AuthFailure>());
+      }
+
+      expect(await storage.getAccessToken(), isNull);
+      expect(await storage.getRefreshToken(), isNull);
+      expect(invalidateSessionCallCount, 1);
+    },
+  );
 }

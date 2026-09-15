@@ -61,6 +61,18 @@ void main() {
           final tokenStorage = ref.watch(secureTokenStorageProvider);
           return () => tokenStorage.getAccessToken();
         }),
+        // Part P-022B: closes the equivalent gap for session invalidation.
+        // [RefreshInterceptor] has no [Ref] of its own (it isn't a
+        // widget/provider), so it depends on the plain
+        // `SessionInvalidator` callback via `sessionInvalidatorProvider`
+        // (default no-op in `dio_client.dart`) — wired here, in the
+        // composition root, to the real `SessionNotifier.invalidateSession`,
+        // exactly mirroring the `authTokenGetterProvider` override above.
+        sessionInvalidatorProvider.overrideWith((ref) {
+          return () async {
+            ref.read(sessionProvider.notifier).invalidateSession();
+          };
+        }),
       ],
       child: const SocialCommerceApp(),
     ),

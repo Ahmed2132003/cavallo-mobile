@@ -64,6 +64,19 @@ void main() {
     },
   );
 
+  test(
+    'sessionInvalidatorProvider (P-022B) defaults to a no-op that '
+    'completes without throwing',
+    () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final invalidateSession = container.read(sessionInvalidatorProvider);
+
+      await expectLater(invalidateSession(), completes);
+    },
+  );
+
   test('RefreshInterceptor (P-022A) is wired in after ErrorInterceptor, '
       'the last interceptor in the chain', () {
     final container = ProviderContainer();

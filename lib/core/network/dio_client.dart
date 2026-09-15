@@ -28,6 +28,22 @@ final authTokenGetterProvider = Provider<AuthTokenGetter>((ref) {
   return () async => null;
 });
 
+/// Placeholder session-invalidation callback until the composition root
+/// (`main.dart`, Part P-022B) wires up the real one.
+///
+/// Mirrors [authTokenGetterProvider]'s exact pattern from Part P-004: a
+/// feature-agnostic placeholder lives here in `core/network` (a no-op, so
+/// [RefreshInterceptor] is always safe to construct with zero feature code
+/// present), and `main.dart` overrides it with a callback that reads
+/// `sessionProvider`'s notifier and invalidates the session — see that
+/// file for the real wiring. `core/network` itself never imports
+/// `sessionProvider` directly: that would both violate the
+/// feature-agnostic-core rule and create a circular dependency
+/// (`sessionProvider` → `authRepositoryProvider` → `dioClientProvider`).
+final sessionInvalidatorProvider = Provider<SessionInvalidator>((ref) {
+  return () async {};
+});
+
 /// The shared Dio instance for the whole app.
 ///
 /// A `Provider` (not a singleton/global) specifically so it can be
@@ -61,11 +77,17 @@ final dioClientProvider = Provider<Dio>((ref) {
   final getToken = ref.watch(authTokenGetterProvider);
   final tokenStorage = ref.watch(secureTokenStorageProvider);
 
+  final invalidateSession = ref.watch(sessionInvalidatorProvider);
+
   dio.interceptors.addAll([
     LoggingInterceptor(),
     AuthInterceptor(getToken: getToken),
     ErrorInterceptor(),
-    RefreshInterceptor(dio: dio, tokenStorage: tokenStorage),
+    RefreshInterceptor(
+      dio: dio,
+      tokenStorage: tokenStorage,
+      invalidateSession: invalidateSession,
+    ),
   ]);
 
   return dio;

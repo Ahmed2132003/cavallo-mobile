@@ -247,4 +247,37 @@ void main() {
       expect(container.read(sessionProvider).value, isNull);
     });
   });
+
+  group('SessionNotifier.invalidateSession (Part P-022B)', () {
+    test(
+      'synchronously resets state to unauthenticated (null), without '
+      'calling AuthRepository at all',
+      () async {
+        FlutterSecureStorage.setMockInitialValues({});
+        final tokenStorage = SecureTokenStorage();
+        await tokenStorage.saveTokens(access: 'a', refresh: 'r');
+        final fakeAuth = FakeAuthRepository();
+        final container = ProviderContainer(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeAuth),
+            secureTokenStorageProvider.overrideWithValue(tokenStorage),
+          ],
+        );
+        addTearDown(container.dispose);
+        // Resolve the cold-start restore first, landing authenticated
+        // (a token is stored) — this is the state a real failed-refresh
+        // scenario would be invalidating away from.
+        await container.read(sessionProvider.future);
+        expect(container.read(sessionProvider).value, isNotNull);
+
+        container.read(sessionProvider.notifier).invalidateSession();
+
+        expect(container.read(sessionProvider).value, isNull);
+        // Confirms this method is a pure local state reset, not a wrapper
+        // around AuthRepository.logout() (which would have incremented
+        // this counter).
+        expect(fakeAuth.logoutCallCount, 0);
+      },
+    );
+  });
 }

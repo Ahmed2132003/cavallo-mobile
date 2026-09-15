@@ -164,6 +164,25 @@ class SessionNotifier extends AsyncNotifier<User?> {
     }
   }
 
+  /// Part P-022B: the "minimal invalidation entrypoint" a non-widget
+  /// context (namely `RefreshInterceptor`, via `SessionInvalidator` /
+  /// `sessionInvalidatorProvider` in `core/network/dio_client.dart`) needs
+  /// when a token refresh definitively fails.
+  ///
+  /// Synchronously resets [state] to unauthenticated (`null`) — the same
+  /// end state [logout] reaches, minus the backend call and the local
+  /// `AsyncLoading` transition, since by the time this is invoked the
+  /// caller (`RefreshInterceptor`) has already decided the session is
+  /// unrecoverable and is about to reject the in-flight request with an
+  /// `AuthFailure`. Deliberately does **not** touch [SecureTokenStorage]
+  /// itself — the caller is expected to have already cleared it (or to do
+  /// so independently); this method's only job is to flip in-memory state
+  /// so the router's redirect guard (Part P-021b) reacts immediately and
+  /// sends the user to `/login`.
+  void invalidateSession() {
+    state = const AsyncValue.data(null);
+  }
+
   /// Builds the fake-but-clearly-labeled "authenticated" placeholder
   /// described in this class's docstring. [email] is genuinely accurate
   /// when the caller just typed it into a login form ([login]); left at
