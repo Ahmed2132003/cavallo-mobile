@@ -1,9 +1,11 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/config/app_theme.dart';
 import 'core/error_reporting.dart';
+import 'core/network/dio_client.dart';
+import 'core/storage/secure_token_storage.dart';
 import 'features/auth/presentation/session_provider.dart';
 import 'routing/app_router.dart';
 
@@ -44,7 +46,25 @@ void main() {
     return true;
   };
 
-  runApp(const ProviderScope(child: SocialCommerceApp()));
+  runApp(
+    ProviderScope(
+      overrides: [
+        // Closes a gap flagged during P-022A: [authTokenGetterProvider]'s
+        // own default (in dio_client.dart) is intentionally a no-op
+        // returning null — that default is asserted directly by
+        // dio_client_test.dart and must stay that way. The *real* app
+        // needs the real getter, so it's wired here in the composition
+        // root instead, reading through the same [secureTokenStorageProvider]
+        // that [RefreshInterceptor] (Part P-022A) already writes new
+        // tokens into after a silent refresh.
+        authTokenGetterProvider.overrideWith((ref) {
+          final tokenStorage = ref.watch(secureTokenStorageProvider);
+          return () => tokenStorage.getAccessToken();
+        }),
+      ],
+      child: const SocialCommerceApp(),
+    ),
+  );
 }
 
 class SocialCommerceApp extends ConsumerStatefulWidget {
