@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/business_profile_repository_impl.dart';
 import '../domain/business_profile_entity.dart';
+import '../domain/business_profile_repository.dart';
 
 /// Part P-028A scope: `businessProfileProvider` — the single source of
 /// truth for "does the signed-in Business account have a profile yet,
@@ -51,8 +52,34 @@ import '../domain/business_profile_entity.dart';
 ///   `fields['phone_number']`, etc.) — exactly how `RegisterScreen`
 ///   already uses `SessionNotifier.register`/`login` (Part P-021c).
 ///
-/// `updateProfile` (the edit-screen flow) is deliberately **not** added
-/// here — that stays Part P-028C's job, per the same handoff note.
+/// ### Part P-028C2 addition — `updateProfile()` / `refreshProfile()`
+///
+/// P-028A's and P-028B's handoff notes both deferred the edit flow to
+/// "Part P-028C" ("using `Patchable` for the clearable fields, exactly
+/// as `BusinessProfileRepository.updateProfile`'s own interface already
+/// expects"). The original P-028C spec was later split in two: P-028C1
+/// took the router gate, and this — the edit screen's own
+/// provider-level flow — is Part P-028C2's job. [updateProfile] below is
+/// that addition, and follows [createProfile]'s exact convention (which
+/// itself mirrors `SessionNotifier.login`, Part P-021a) rather than
+/// inventing a second one: `AsyncValue.loading()` synchronously, then
+/// `AsyncData(updatedProfile)` on success, or `AsyncError` **plus** a
+/// rethrow of the original exception on failure so
+/// `BusinessProfileEditScreen` can map a `ValidationFailure`'s
+/// `fields` onto its own form fields inline.
+///
+/// [refreshProfile] re-runs the same `GET /api/v1/businesses/me/` call
+/// `build()` makes, without rebuilding the notifier — the "perform a
+/// fresh fetch and confirm the change persisted" half of Part P-028C2's
+/// own acceptance criteria, and the retry action for the [AsyncError]
+/// state on the edit screen. It deliberately does **not** use
+/// `ref.invalidateSelf()`: this provider is NOT `.autoDispose` (see
+/// [businessProfileProvider]'s own note below) and is subscribed to by
+/// `app_router.dart`'s `_SessionRefreshListenable` (Part P-028C1), so
+/// invalidating it would tear down and rebuild the exact notifier
+/// instance that listener is bridged to. Re-running the fetch and
+/// assigning `state` keeps one stable notifier for the app's lifetime,
+/// which is what the router gate's subscription assumes.
 class BusinessProfileNotifier extends AsyncNotifier<BusinessProfile?> {
   @override
   Future<BusinessProfile?> build() {
@@ -97,6 +124,79 @@ class BusinessProfileNotifier extends AsyncNotifier<BusinessProfile?> {
       state = AsyncValue.error(error, stackTrace);
       rethrow;
     }
+  }
+
+  /// Calls `BusinessProfileRepository.updateProfile` — the edit-screen
+  /// "change my existing profile" call (`PATCH /api/v1/businesses/me/`,
+  /// Part P-026) — and transitions [state] to the result. See this
+  /// class's docstring for the exact loading/success/failure contract
+  /// (identical to [createProfile]'s).
+  ///
+  /// Parameters mirror `BusinessProfileRepository.updateProfile`
+  /// **exactly**, including its `Patchable` tri-state for the three
+  /// nullable-on-the-backend fields — this method deliberately does not
+  /// flatten them into plain nullables, which would silently lose the
+  /// "explicitly clear this field" case the interface was built to
+  /// express (see `business_profile_repository.dart`'s own docstring).
+  ///
+  /// The `AsyncData` assigned on success holds the **backend's own
+  /// response body**, not a locally-patched copy of the previous
+  /// profile: the backend normalizes values on write (most visibly
+  /// `phone_number` → E.164, Part P-027), so anything reading
+  /// [businessProfileProvider] straight after a successful PATCH sees
+  /// exactly what a fresh `GET` would return, not this app's guess at
+  /// it. That's what makes the router gate (Part P-028C1) and the edit
+  /// screen's own pre-filled fields agree with the server without an
+  /// extra round trip.
+  Future<void> updateProfile({
+    String? businessName,
+    BusinessType? businessType,
+    String? country,
+    String? city,
+    Patchable<String> description = const Patchable.unset(),
+    Patchable<int> categoryId = const Patchable.unset(),
+    Patchable<String> phoneNumber = const Patchable.unset(),
+  }) async {
+    state = const AsyncValue<BusinessProfile?>.loading();
+    try {
+      final profile = await ref
+          .read(businessProfileRepositoryProvider)
+          .updateProfile(
+            businessName: businessName,
+            businessType: businessType,
+            country: country,
+            city: city,
+            description: description,
+            categoryId: categoryId,
+            phoneNumber: phoneNumber,
+          );
+      state = AsyncValue.data(profile);
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Re-runs the same `GET /api/v1/businesses/me/` call [build] makes
+  /// and assigns the result to [state], without disposing/rebuilding
+  /// this notifier (see this class's docstring for why
+  /// `ref.invalidateSelf()` is deliberately not used here).
+  ///
+  /// Unlike [createProfile]/[updateProfile] this never rethrows: a
+  /// failed refresh is a non-destructive, retryable condition (the last
+  /// known profile is still whatever the previous successful call
+  /// returned), so it settles into [AsyncError] via [AsyncValue.guard]
+  /// and lets whatever is watching decide how to present a retry. A 404
+  /// still maps to `AsyncData(null)` exactly as in [build] — that
+  /// mapping lives in `BusinessProfileRepositoryImpl.fetchMyProfile`,
+  /// not here, so "the profile was deleted server-side" correctly
+  /// re-arms Part P-028C1's onboarding redirect rather than showing an
+  /// error.
+  Future<void> refreshProfile() async {
+    state = const AsyncValue<BusinessProfile?>.loading();
+    state = await AsyncValue.guard<BusinessProfile?>(
+      () => ref.read(businessProfileRepositoryProvider).fetchMyProfile(),
+    );
   }
 }
 

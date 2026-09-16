@@ -22,6 +22,15 @@
 /// route (`'businessOnboarding'` / `'/onboarding'`) inside its own test
 /// only, explicitly flagged as not the real permanent one — this is the
 /// real one.
+///
+/// ### Part P-028C2 addition — [businessProfileEdit] / [businessProfileEditPath]
+///
+/// The other half of the same handoff note, added now by the part that
+/// actually builds the screen behind it (`BusinessProfileEditScreen`).
+/// Nothing above it changed: P-028C1's two constants, and every
+/// pre-existing P-007 constant, are untouched — this is a purely
+/// additive edit, per this project's "don't redesign a prior part's
+/// work unless the real backend contract forces it" convention.
 class RouteNames {
   RouteNames._();
 
@@ -45,6 +54,20 @@ class RouteNames {
   /// `app_router.dart`'s redirect guard.
   static const String businessOnboarding = 'businessOnboarding';
 
+  /// Part P-028C2: the authenticated Business user's own profile EDIT
+  /// screen (`BusinessProfileEditScreen`) — the entry P-028B's handoff
+  /// note named ("RouteNames has no businessOnboarding/
+  /// businessProfileEdit entries yet") and P-028C1 deliberately left
+  /// unadded, since it owns only the onboarding half of the original
+  /// P-028C scope.
+  ///
+  /// Distinct from [businessProfile], which is the PUBLIC, customer-
+  /// facing "view some business by id" screen (Part P-029) — this one
+  /// takes no id at all: the backend resolves "my own profile" strictly
+  /// from `request.user` (Part P-026's IDOR-safe `/businesses/me/`
+  /// endpoint), so there is deliberately no id to put in the path.
+  static const String businessProfileEdit = 'businessProfileEdit';
+
   // --- Route paths (used inside GoRoute(path: ...)) ---
   static const String splashPath = '/';
   static const String loginPath = '/login';
@@ -61,6 +84,17 @@ class RouteNames {
 
   /// Part P-028C1 — see [businessOnboarding]/this class's docstring.
   static const String businessOnboardingPath = '/business-onboarding';
+
+  /// Part P-028C2 — see [businessProfileEdit].
+  ///
+  /// Kept on its own top-level segment rather than under
+  /// [businessProfilePath] (`/business/:id`): that route is the public
+  /// by-id screen, and hanging `/business/edit` off it would make
+  /// `edit` indistinguishable from an id path-parameter value to
+  /// `go_router`'s matcher. `/business-profile/edit` is unambiguous and
+  /// still kebab-case, consistent with [businessConsolePath] and
+  /// [businessOnboardingPath].
+  static const String businessProfileEditPath = '/business-profile/edit';
 
   /// Path-parameter key shared by [businessProfilePath], [productDetailPath]
   /// and [chatThreadPath].

@@ -9,6 +9,7 @@ import '../features/auth/presentation/session_provider.dart';
 import '../features/auth/presentation/splash_screen.dart';
 import '../features/business_console/presentation/business_console_screen.dart';
 import '../features/business_profile/presentation/business_onboarding_screen.dart';
+import '../features/business_profile/presentation/business_profile_edit_screen.dart';
 import '../features/business_profile/presentation/business_profile_provider.dart';
 import '../features/business_profile/presentation/business_profile_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
@@ -36,8 +37,9 @@ import 'route_names.dart';
 ///   while signed out.
 /// * **Protected** (everything else — `home`, `discover`, `search`,
 ///   `businessProfile`, `productDetail`, `chatList`, `chatThread`,
-///   `notifications`, `businessConsole`, and — since Part P-028C1 —
-///   `businessOnboarding`): reachable only while signed in.
+///   `notifications`, `businessConsole`, `businessOnboarding` (Part
+///   P-028C1) and — since Part P-028C2 — `businessProfileEdit`):
+///   reachable only while signed in.
 ///
 /// `splash` (`/`) is deliberately in neither list — see the dedicated note
 /// further down, on the `redirect` callback itself.
@@ -86,6 +88,32 @@ import 'route_names.dart';
 /// a real device. See this feature's `PROJECT_PROGRESS.md` entry for
 /// Part P-028C1 for the full note and the options left for Ahmed to
 /// decide on.
+///
+/// ## Part P-028C2 — what changed here, and what deliberately did NOT
+///
+/// P-028C2 adds exactly one thing to this file: the [GoRoute] for
+/// [RouteNames.businessProfileEditPath] →
+/// `BusinessProfileEditScreen`. The `redirect` callback, the
+/// Business-account gate above, [_SessionRefreshListenable]'s
+/// conditional-subscription mechanism, and the base P-021b auth gate are
+/// all **unchanged** — per P-028C1's own handoff note ("do not redesign
+/// or replace the router-gate logic ... unless real-machine validation
+/// surfaces an actual bug in them"), and per P-028C2's own acceptance
+/// criterion that the onboarding redirect must remain intact after the
+/// edit route is added.
+///
+/// The edit route needs no gate clause of its own: it is a protected
+/// route like any other, so a signed-out user is already bounced to
+/// `/login` by the base gate, and a Business user with no profile is
+/// already bounced to onboarding by the P-028C1 gate above *before* the
+/// edit route can ever render — the gate runs on `matchedLocation` for
+/// every navigation, not just on cold start.
+///
+/// Still NOT implemented, unchanged from P-028C1 and flagged again
+/// rather than silently added: an already-onboarded Business user who
+/// navigates directly to `/business-onboarding` is not bounced to
+/// `/home`. Only the no-profile → onboarding direction exists, which is
+/// the only direction either part's acceptance criteria asked for.
 ///
 /// ## ⚠️ Corrected after real-device testing — `refreshListenable`, not `ref.watch`
 ///
@@ -226,6 +254,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.businessOnboardingPath,
         name: RouteNames.businessOnboarding,
         builder: (context, state) => const BusinessOnboardingScreen(),
+      ),
+      GoRoute(
+        // Part P-028C2. Placed next to the onboarding route on purpose:
+        // the two screens are the same feature's two halves (create
+        // once, then edit), and both are "my own profile," distinct from
+        // the public `businessProfile` (`/business/:id`) route further
+        // down, which is Part P-029's customer-facing screen.
+        path: RouteNames.businessProfileEditPath,
+        name: RouteNames.businessProfileEdit,
+        builder: (context, state) => const BusinessProfileEditScreen(),
       ),
       GoRoute(
         path: RouteNames.homePath,

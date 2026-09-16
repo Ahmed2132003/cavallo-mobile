@@ -5,6 +5,7 @@ import 'package:social_commerce_app/features/auth/presentation/login_screen.dart
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_onboarding_screen.dart';
+import 'package:social_commerce_app/features/business_profile/presentation/business_profile_edit_screen.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_provider.dart';
 import 'package:social_commerce_app/features/feed/presentation/home_screen.dart';
 import 'package:social_commerce_app/main.dart';
@@ -26,6 +27,12 @@ import 'package:social_commerce_app/routing/route_names.dart';
 /// `BusinessProfileRepository` two layers down, since these tests only
 /// need to control the two providers' *state*, not exercise their real
 /// `build()` HTTP-calling bodies at all.
+///
+/// ### Part P-028C2 addition — 2 new cases at the end of the group
+///
+/// The edit route's own reachability, and confirmation that adding it
+/// did not disturb the P-028C1 gate above it. See those two tests'
+/// own descriptions for what each proves.
 void main() {
   group('app_router.dart — Business-account gate (Part P-028C1)', () {
     testWidgets('regression: an unauthenticated user is still handled by the '
@@ -220,6 +227,98 @@ void main() {
 
       expect(find.byType(BusinessOnboardingScreen), findsOneWidget);
     });
+
+    // --- Part P-028C2 additions below — see this file's module ---
+    // --- docstring for what each proves.                        ---
+
+    testWidgets(
+      'the business profile edit route is directly reachable for a '
+      'Business-type user WITH a BusinessProfile (Part P-028C2)',
+      (tester) async {
+        const profile = BusinessProfile(
+          id: 5,
+          businessName: 'Reachable Co.',
+          businessType: BusinessType.trader,
+          country: 'Egypt',
+          city: 'Cairo',
+          isVerified: true,
+        );
+        final container = ProviderContainer(
+          overrides: [
+            sessionProvider.overrideWith(
+              () => _FakeSessionNotifier(
+                const User(
+                  id: 5,
+                  email: 'edit@example.com',
+                  accountType: AccountType.business,
+                ),
+              ),
+            ),
+            businessProfileProvider.overrideWith(
+              () => _FakeBusinessProfileNotifier(profile),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: const SocialCommerceApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        container
+            .read(appRouterProvider)
+            .goNamed(RouteNames.businessProfileEdit);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(BusinessProfileEditScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'a Business-type user with NO profile who navigates directly to '
+      'the edit route is redirected to onboarding instead — the '
+      'P-028C1 gate stays intact after the edit route was added '
+      '(Part P-028C2)',
+      (tester) async {
+        final container = ProviderContainer(
+          overrides: [
+            sessionProvider.overrideWith(
+              () => _FakeSessionNotifier(
+                const User(
+                  id: 6,
+                  email: 'noprofile2@example.com',
+                  accountType: AccountType.business,
+                ),
+              ),
+            ),
+            businessProfileProvider.overrideWith(
+              () => _FakeBusinessProfileNotifier(null),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: const SocialCommerceApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        container
+            .read(appRouterProvider)
+            .goNamed(RouteNames.businessProfileEdit);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(BusinessOnboardingScreen), findsOneWidget);
+        expect(find.byType(BusinessProfileEditScreen), findsNothing);
+      },
+    );
   });
 }
 
