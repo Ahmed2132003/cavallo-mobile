@@ -27,10 +27,13 @@ class BusinessProfileScreen extends StatelessWidget {
             const SizedBox(height: 16),
             AppButton(
               label: 'Open sample product detail',
-              onPressed: () => context.goNamed(
-                RouteNames.productDetail,
-                pathParameters: const {RouteNames.idParam: 'sample-product-1'},
-              ),
+              onPressed:
+                  () => context.goNamed(
+                    RouteNames.productDetail,
+                    pathParameters: const {
+                      RouteNames.idParam: 'sample-product-1',
+                    },
+                  ),
             ),
           ],
         ),
