@@ -18,7 +18,7 @@ import '../domain/business_profile_entity.dart';
 ///   `BusinessProfileRepositoryImpl.fetchMyProfile()`). This is a valid,
 ///   expected state per the part spec's own scope note — the Business
 ///   account exists but hasn't completed onboarding — and is never
-///   surfaced as an error. Part P-028B's router guard/onboarding screen
+///   surfaced as an error. Part P-028C's router guard/onboarding screen
 ///   should treat this as "route to onboarding," not as a failure.
 /// * `AsyncData(BusinessProfile(...))` — a profile exists.
 /// * `AsyncError` — a genuine failure fetching the profile (network,
@@ -26,28 +26,77 @@ import '../domain/business_profile_entity.dart';
 ///   `BusinessProfileRepositoryImpl`'s module docstring), distinct from
 ///   "no profile yet."
 ///
-/// ### Scope note — what this file deliberately does NOT include yet
+/// ### Part P-028B addition — `createProfile()`
 ///
-/// The part spec's own "Scope" bullet for this file says exactly one
-/// thing: "fetches on build()." `BusinessProfileRepository` (this
-/// part's data layer) already exposes `createProfile`/`updateProfile`
-/// for the onboarding/edit flow, but wiring those into this notifier's
-/// `state` (so a screen can call e.g. `ref.read(businessProfileProvider.
-/// notifier).createProfile(...)` and see `state` update reactively) is
-/// exactly the "onboarding screen and its POST/create flow" the
-/// EXECUTION PROMPT's HANDOFF TO P-028B note explicitly assigns to that
-/// next part. Adding those methods here now — beyond what this part's
-/// own scope bullet asks for — would be the same kind of
-/// scope-creep this project's own convention repeatedly flags rather
-/// than silently does (see e.g. `AuthRepository`'s and
-/// `SessionNotifier`'s own module docstrings). P-028B should ADD to this
-/// class (new methods calling `ref.read(businessProfileRepositoryProvider)`
-/// and updating `state`), never redesign or replace `build()` itself,
-/// per the handoff note's own instruction.
+/// P-028A's own scope bullet for this file said exactly one thing:
+/// "fetches on build()." Its own handoff note to this part was explicit
+/// that adding the onboarding/create flow here — not redesigning
+/// `build()` — is Part P-028B's job: "P-028B should ADD to this class
+/// (new methods calling
+/// `ref.read(businessProfileRepositoryProvider)` and updating `state`),
+/// never redesign or replace `build()` itself." [createProfile] below is
+/// exactly that addition, and mirrors `SessionNotifier.login`'s exact
+/// loading → data/rethrow convention (Part P-021a) rather than
+/// inventing a new one:
+/// * `state` is set to [AsyncValue.loading] the instant the call starts.
+/// * On success, `state` becomes `AsyncData` holding the newly created
+///   [BusinessProfile] — so anything watching [businessProfileProvider]
+///   (a future router guard, Part P-028C) reacts immediately, with no
+///   extra re-fetch needed.
+/// * On failure, `state` becomes [AsyncError] **and** the original
+///   exception is rethrown to the caller — so
+///   `BusinessOnboardingScreen` (Part P-028B) can both react to `state`
+///   reactively and catch the thrown `ApiFailure` (Part P-004) directly
+///   for inline, per-field form errors (a `ValidationFailure`'s
+///   `fields['phone_number']`, etc.) — exactly how `RegisterScreen`
+///   already uses `SessionNotifier.register`/`login` (Part P-021c).
+///
+/// `updateProfile` (the edit-screen flow) is deliberately **not** added
+/// here — that stays Part P-028C's job, per the same handoff note.
 class BusinessProfileNotifier extends AsyncNotifier<BusinessProfile?> {
   @override
   Future<BusinessProfile?> build() {
     return ref.watch(businessProfileRepositoryProvider).fetchMyProfile();
+  }
+
+  /// Calls `BusinessProfileRepository.createProfile` — the onboarding
+  /// "create my profile for the first time" call (`POST
+  /// /api/v1/businesses/me/`, Part P-026) — and transitions [state] to
+  /// the result. See this class's docstring for the exact
+  /// loading/success/failure contract.
+  ///
+  /// Parameters mirror `BusinessProfileRepository.createProfile`
+  /// exactly: [businessName]/[businessType]/[country]/[city] are
+  /// required by the backend; [description]/[categoryId]/[phoneNumber]
+  /// are optional and omitted from the request body entirely when left
+  /// `null` (see `BusinessProfileRepositoryImpl`'s own docstring).
+  Future<void> createProfile({
+    required String businessName,
+    required BusinessType businessType,
+    required String country,
+    required String city,
+    String? description,
+    int? categoryId,
+    String? phoneNumber,
+  }) async {
+    state = const AsyncValue<BusinessProfile?>.loading();
+    try {
+      final profile = await ref
+          .read(businessProfileRepositoryProvider)
+          .createProfile(
+            businessName: businessName,
+            businessType: businessType,
+            country: country,
+            city: city,
+            description: description,
+            categoryId: categoryId,
+            phoneNumber: phoneNumber,
+          );
+      state = AsyncValue.data(profile);
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+      rethrow;
+    }
   }
 }
 

@@ -38,6 +38,22 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
+  # International phone number input for the Business onboarding/edit
+  # forms (Part P-028B), producing an E.164-formattable value to match
+  # P-027's backend validation exactly. Pinned to 3.2.0, the current
+  # latest on pub.dev at authoring time. ⚠️ Flagged (see
+  # business_onboarding_screen.dart's own class docstring, point 4):
+  # this package's last real release was published in 2023 and it is
+  # not under active development, though it is NOT marked discontinued
+  # on pub.dev and has no dependencies beyond the Flutter SDK itself. If
+  # `flutter pub get`/`flutter analyze` surface a real incompatibility
+  # against this project's pinned flutter_riverpod: 3.3.2 / Flutter
+  # >=3.27.0 floor on the real machine, `intl_phone_field_v2` (an
+  # actively-maintained fork with the same widget API) is a drop-in
+  # replacement — swap this line and the import only, no other files
+  # need to change.
+  intl_phone_field: ^3.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
