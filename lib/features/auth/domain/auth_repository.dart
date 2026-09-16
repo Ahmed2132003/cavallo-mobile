@@ -29,17 +29,25 @@ import 'user_entity.dart';
 /// decode the JWT for a bare `user_id` claim and guess the rest — both
 /// are "guessing field names/values," which the spec explicitly forbids.
 /// Instead:
-/// * [register] is the only method that returns a [User], because it's
-///   the only endpoint that actually returns user fields.
+/// * [register] is the only method that returns a [User] directly from
+///   its own response, because it's the only endpoint that actually
+///   returns user fields in the same call.
 /// * [login] and [refresh] return `Future<void>` — they only persist the
-///   token pair. A future part (P-021 or a dedicated "me" endpoint) is
-///   the right place to fetch/display the logged-in user's profile after
-///   [login], not this data layer.
+///   token pair. Real user identity after either call comes from
+///   [fetchMe], below.
 ///
-/// This is flagged here (and in PROJECT_PROGRESS.md) exactly as the
-/// backend side flags its own scope decisions, per this project's
-/// convention — pending review if a future part wants to change it
-/// (e.g. by adding a `/me/` endpoint on the backend).
+/// ### `fetchMe()` — the accountType placeholder fix
+///
+/// Part P-021a originally had to fabricate a placeholder `User`
+/// (`id: -1`, `accountType: AccountType.customer`) after [login]/restore,
+/// since no `/me/`-style endpoint existed yet — flagged explicitly at the
+/// time as "nothing should ever branch on this until a real fix lands."
+/// `GET /api/v1/auth/me/` now exists on the backend (returns
+/// `{id, email, account_type}` for the authenticated user, confirmed
+/// against `accounts/views.py`'s `MeView`), so [fetchMe] replaces that
+/// placeholder with real data. `SessionNotifier` (presentation layer)
+/// calls this after [login] succeeds and during session restore instead
+/// of fabricating anything.
 abstract class AuthRepository {
   /// Calls `POST /api/v1/auth/register/`. Does NOT persist any tokens
   /// (the backend issues none on this endpoint — see this file's
@@ -57,7 +65,8 @@ abstract class AuthRepository {
   /// Calls `POST /api/v1/auth/login/`. On success, persists the returned
   /// `access`/`refresh` pair via `SecureTokenStorage.saveTokens` before
   /// returning. Returns nothing else — see this file's docstring for
-  /// why there is no `User` to return here.
+  /// why there is no `User` to return here; call [fetchMe] afterward for
+  /// real identity data.
   Future<void> login({required String email, required String password});
 
   /// Calls `POST /api/v1/auth/refresh/` using the currently stored
@@ -91,4 +100,16 @@ abstract class AuthRepository {
   /// No-ops (clears local state, makes no network call) if there is no
   /// refresh token currently stored — there is nothing to blacklist.
   Future<void> logout();
+
+  /// Calls `GET /api/v1/auth/me/` — requires a valid access token
+  /// (attached automatically by `AuthInterceptor`, same as [logout]).
+  /// Returns the authenticated user's real `id`/`email`/`accountType`.
+  ///
+  /// Does NOT catch/re-wrap `DioException`, matching every other method
+  /// on this interface — a 401 (expired/invalid token) surfaces to the
+  /// caller exactly like any other `ApiFailure`, with `.error` already
+  /// typed as `AuthFailure` (Part P-004). `SessionNotifier` is the layer
+  /// that decides what a 401 here means for session state, not this
+  /// repository.
+  Future<User> fetchMe();
 }

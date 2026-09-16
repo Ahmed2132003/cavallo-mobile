@@ -7,6 +7,7 @@ import '../domain/auth_repository.dart';
 import '../domain/user_entity.dart';
 import 'dtos/login_request_dto.dart';
 import 'dtos/logout_request_dto.dart';
+import 'dtos/me_response_dto.dart';
 import 'dtos/register_request_dto.dart';
 import 'dtos/register_response_dto.dart';
 import 'dtos/token_pair_dto.dart';
@@ -24,6 +25,9 @@ import 'dtos/token_pair_dto.dart';
 /// `dioClientProvider`'s interceptor chain) — callers should catch
 /// [DioException] and read `.error`, exactly as `AuthRepository`'s
 /// per-method docs describe.
+///
+/// [fetchMe] (the accountType placeholder fix) follows this exact same
+/// convention — see `AuthRepository`'s module docstring.
 ///
 /// See `AuthRepository`'s module docstring for the two places this
 /// implementation deliberately diverges from the original P-020 part
@@ -43,6 +47,7 @@ class AuthRepositoryImpl implements AuthRepository {
   static const _loginPath = '/api/v1/auth/login/';
   static const _refreshPath = '/api/v1/auth/refresh/';
   static const _logoutPath = '/api/v1/auth/logout/';
+  static const _mePath = '/api/v1/auth/me/';
 
   @override
   Future<User> register({
@@ -142,6 +147,17 @@ class AuthRepositoryImpl implements AuthRepository {
       // unmodified.
       await _tokenStorage.clear();
     }
+  }
+
+  @override
+  Future<User> fetchMe() async {
+    final response = await _dio.get<Map<String, dynamic>>(_mePath);
+    final dto = MeResponseDto.fromJson(response.data!);
+    return User(
+      id: dto.id,
+      email: dto.email,
+      accountType: AccountType.fromWire(dto.accountType),
+    );
   }
 }
 

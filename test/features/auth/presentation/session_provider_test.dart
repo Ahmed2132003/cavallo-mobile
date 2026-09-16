@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:social_commerce_app/core/network/api_failure.dart';
 import 'package:social_commerce_app/core/storage/secure_token_storage.dart';
 import 'package:social_commerce_app/features/auth/data/auth_repository_impl.dart';
 import 'package:social_commerce_app/features/auth/domain/auth_repository.dart';
@@ -21,6 +23,23 @@ class FakeAuthRepository implements AuthRepository {
   int logoutCallCount = 0;
   int registerCallCount = 0;
   Map<String, Object?>? lastRegisterArgs;
+
+  /// When non-null, [fetchMe] throws this instead of returning
+  /// [fetchMeResult]. Tests use a real [DioException] with `.error` set
+  /// to the specific [ApiFailure] subtype they want to exercise, since
+  /// that's exactly the shape `SessionNotifier` pattern-matches on.
+  Object? fetchMeError;
+  int fetchMeCallCount = 0;
+
+  /// The real user [fetchMe] returns on success — deliberately NOT the
+  /// old placeholder's `id: -1`/`accountType: customer`, so any test
+  /// asserting on this value is asserting on genuine `fetchMe()` data,
+  /// not a fabricated one.
+  User fetchMeResult = const User(
+    id: 7,
+    email: 'fetched@example.com',
+    accountType: AccountType.business,
+  );
 
   final User registerResult = const User(
     id: 42,
@@ -66,6 +85,25 @@ class FakeAuthRepository implements AuthRepository {
       throw Exception('fake logout failure');
     }
   }
+
+  @override
+  Future<User> fetchMe() async {
+    fetchMeCallCount++;
+    if (fetchMeError != null) {
+      throw fetchMeError!;
+    }
+    return fetchMeResult;
+  }
+}
+
+/// Builds a [DioException] shaped exactly like what `ErrorInterceptor`
+/// (Part P-004) attaches to `.error` — the same shape `SessionNotifier`
+/// pattern-matches on in `_restoreSession`.
+DioException _dioFailure(ApiFailure failure) {
+  return DioException(
+    requestOptions: RequestOptions(path: '/api/v1/auth/me/'),
+    error: failure,
+  );
 }
 
 void main() {
@@ -73,12 +111,65 @@ void main() {
 
   group('SessionNotifier.build (restoreSession)', () {
     test(
-      'resolves to null (unauthenticated) when no access token is stored',
+      'resolves to null (unauthenticated) when no access token is stored, '
+      'and never calls fetchMe',
       () async {
         FlutterSecureStorage.setMockInitialValues({});
+        final fakeAuth = FakeAuthRepository();
+        final container = ProviderContainer(
+          overrides: [authRepositoryProvider.overrideWithValue(fakeAuth)],
+        );
+        addTearDown(container.dispose);
+
+        final result = await container.read(sessionProvider.future);
+
+        expect(result, isNull);
+        expect(fakeAuth.fetchMeCallCount, 0);
+      },
+    );
+
+    test(
+      'resolves to the real User from fetchMe() when an access token is '
+      'already stored',
+      () async {
+        FlutterSecureStorage.setMockInitialValues({});
+        final tokenStorage = SecureTokenStorage();
+        await tokenStorage.saveTokens(
+          access: 'seeded-access-token',
+          refresh: 'seeded-refresh-token',
+        );
+        final fakeAuth = FakeAuthRepository();
         final container = ProviderContainer(
           overrides: [
-            authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
+            authRepositoryProvider.overrideWithValue(fakeAuth),
+            secureTokenStorageProvider.overrideWithValue(tokenStorage),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final result = await container.read(sessionProvider.future);
+
+        expect(result, fakeAuth.fetchMeResult);
+        expect(result!.accountType, AccountType.business);
+        expect(fakeAuth.fetchMeCallCount, 1);
+      },
+    );
+
+    test(
+      'resolves to null and clears the stored token when fetchMe fails '
+      'with AuthFailure (expired/invalid token)',
+      () async {
+        FlutterSecureStorage.setMockInitialValues({});
+        final tokenStorage = SecureTokenStorage();
+        await tokenStorage.saveTokens(access: 'stale-access', refresh: 'r');
+        final fakeAuth = FakeAuthRepository()
+          ..fetchMeError = _dioFailure(
+            const AuthFailure(message: 'Unauthorized'),
+          );
+        final container = ProviderContainer(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeAuth),
+            secureTokenStorageProvider.overrideWithValue(tokenStorage),
           ],
         );
         addTearDown(container.dispose);
@@ -86,57 +177,67 @@ void main() {
         final result = await container.read(sessionProvider.future);
 
         expect(result, isNull);
+        expect(await tokenStorage.getAccessToken(), isNull);
       },
     );
 
-    test('resolves to a placeholder authenticated User when an access token '
-        'is already stored', () async {
-      FlutterSecureStorage.setMockInitialValues({});
-      final tokenStorage = SecureTokenStorage();
-      await tokenStorage.saveTokens(
-        access: 'seeded-access-token',
-        refresh: 'seeded-refresh-token',
-      );
-      final container = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
-          secureTokenStorageProvider.overrideWithValue(tokenStorage),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'surfaces as AsyncError (does not silently sign out) when fetchMe '
+      'fails with a non-auth failure',
+      () async {
+        FlutterSecureStorage.setMockInitialValues({});
+        final tokenStorage = SecureTokenStorage();
+        await tokenStorage.saveTokens(access: 'a', refresh: 'r');
+        final fakeAuth = FakeAuthRepository()
+          ..fetchMeError = _dioFailure(
+            const ServerFailure(message: 'boom'),
+          );
+        final container = ProviderContainer(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeAuth),
+            secureTokenStorageProvider.overrideWithValue(tokenStorage),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      final result = await container.read(sessionProvider.future);
-
-      expect(result, isNotNull);
-      // Deliberately NOT asserting on id/accountType here — they are
-      // documented placeholders, not real data (see session_provider.dart).
-      expect(result!.email, isEmpty);
-    });
+        await expectLater(
+          () => container.read(sessionProvider.future),
+          throwsA(isA<DioException>()),
+        );
+        expect(container.read(sessionProvider).hasError, isTrue);
+        // The stored token must NOT have been cleared — this was not a
+        // confirmed-invalid-token case, just a transient failure.
+        expect(await tokenStorage.getAccessToken(), 'a');
+      },
+    );
   });
 
   group('SessionNotifier.login', () {
-    test('transitions state to an authenticated placeholder User on success, '
-        'using the real email that was passed in', () async {
-      FlutterSecureStorage.setMockInitialValues({});
-      final fakeAuth = FakeAuthRepository();
-      final container = ProviderContainer(
-        overrides: [authRepositoryProvider.overrideWithValue(fakeAuth)],
-      );
-      addTearDown(container.dispose);
-      await container.read(sessionProvider.future); // let build() settle
+    test(
+      'transitions state to the real User from fetchMe() on success',
+      () async {
+        FlutterSecureStorage.setMockInitialValues({});
+        final fakeAuth = FakeAuthRepository();
+        final container = ProviderContainer(
+          overrides: [authRepositoryProvider.overrideWithValue(fakeAuth)],
+        );
+        addTearDown(container.dispose);
+        await container.read(sessionProvider.future); // let build() settle
 
-      await container
-          .read(sessionProvider.notifier)
-          .login(email: 'user@example.com', password: 'correct-password');
+        await container
+            .read(sessionProvider.notifier)
+            .login(email: 'user@example.com', password: 'correct-password');
 
-      final state = container.read(sessionProvider);
-      expect(state.value, isNotNull);
-      expect(state.value!.email, 'user@example.com');
-      expect(fakeAuth.lastLoginEmail, 'user@example.com');
-      expect(fakeAuth.lastLoginPassword, 'correct-password');
-    });
+        final state = container.read(sessionProvider);
+        expect(state.value, fakeAuth.fetchMeResult);
+        expect(fakeAuth.lastLoginEmail, 'user@example.com');
+        expect(fakeAuth.lastLoginPassword, 'correct-password');
+        expect(fakeAuth.fetchMeCallCount, 1);
+      },
+    );
 
-    test('transitions state to AsyncError and rethrows on failure', () async {
+    test('transitions state to AsyncError and rethrows when login() itself '
+        'fails', () async {
       FlutterSecureStorage.setMockInitialValues({});
       final fakeAuth = FakeAuthRepository()..loginShouldThrow = true;
       final container = ProviderContainer(
@@ -150,6 +251,29 @@ void main() {
             .read(sessionProvider.notifier)
             .login(email: 'user@example.com', password: 'wrong-password'),
         throwsA(isA<Exception>()),
+      );
+
+      expect(container.read(sessionProvider).hasError, isTrue);
+      // login() itself failed, so fetchMe() should never have been called.
+      expect(fakeAuth.fetchMeCallCount, 0);
+    });
+
+    test('transitions state to AsyncError and rethrows when login() '
+        'succeeds but the follow-up fetchMe() call fails', () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      final fakeAuth = FakeAuthRepository()
+        ..fetchMeError = _dioFailure(const ServerFailure(message: 'boom'));
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWithValue(fakeAuth)],
+      );
+      addTearDown(container.dispose);
+      await container.read(sessionProvider.future);
+
+      await expectLater(
+        () => container
+            .read(sessionProvider.notifier)
+            .login(email: 'user@example.com', password: 'correct-password'),
+        throwsA(isA<DioException>()),
       );
 
       expect(container.read(sessionProvider).hasError, isTrue);
@@ -183,29 +307,8 @@ void main() {
       // The whole point being verified: register() must NOT flip the
       // session to authenticated, since no tokens were ever issued.
       expect(container.read(sessionProvider).value, isNull);
+      expect(fakeAuth.fetchMeCallCount, 0);
     });
-
-    test(
-      'propagates failures directly without touching session state',
-      () async {
-        FlutterSecureStorage.setMockInitialValues({});
-        final fakeAuth = FakeAuthRepository();
-        final container = ProviderContainer(
-          overrides: [authRepositoryProvider.overrideWithValue(fakeAuth)],
-        );
-        addTearDown(container.dispose);
-        await container.read(sessionProvider.future);
-
-        // register() has no failure toggle on the fake by design (it never
-        // throws in this suite), so this test instead documents the
-        // contract: whatever register() does, it never assigns `state`.
-        // (A dedicated throwing fake isn't needed since the notifier method
-        // itself contains no try/catch around the call — see
-        // session_provider.dart — so failure propagation is structural,
-        // not behavior worth re-testing with a second fake.)
-        expect(container.read(sessionProvider).value, isNull);
-      },
-    );
   });
 
   group('SessionNotifier.logout', () {
