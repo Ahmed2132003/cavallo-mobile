@@ -18,7 +18,11 @@ import 'package:social_commerce_app/routing/route_names.dart';
 /// Exercises both [register] and [login], since RegisterScreen (Part
 /// P-021c) chains the two.
 class _FakeAuthRepository implements AuthRepository {
-  _FakeAuthRepository({this.registerBehavior, this.loginBehavior});
+  _FakeAuthRepository({
+    this.registerBehavior,
+    this.loginBehavior,
+    this.fetchMeBehavior,
+  });
 
   /// Invoked by [register]. Return the [User] to "create," or `throw` an
   /// [ApiFailure] to simulate a backend rejection. `null` (the default)
@@ -30,8 +34,16 @@ class _FakeAuthRepository implements AuthRepository {
   /// default) completes successfully with no extra behavior.
   final Future<void> Function()? loginBehavior;
 
+  /// Invoked by [fetchMe]. `SessionNotifier.login` (session_provider.dart)
+  /// calls [fetchMe] immediately after the chained [login] succeeds, to
+  /// resolve the real authenticated user — genuinely exercised by every
+  /// test here where both register and the chained login succeed. `null`
+  /// (the default) returns a fixed successful [User].
+  final Future<User> Function()? fetchMeBehavior;
+
   int registerCallCount = 0;
   int loginCallCount = 0;
+  int fetchMeCallCount = 0;
   String? lastEmail;
   String? lastPassword;
   String? lastPasswordConfirm;
@@ -76,6 +88,15 @@ class _FakeAuthRepository implements AuthRepository {
   @override
   Future<void> logout() =>
       throw UnimplementedError('Not exercised by register_screen_test.dart');
+
+  @override
+  Future<User> fetchMe() async {
+    fetchMeCallCount++;
+    if (fetchMeBehavior != null) {
+      return fetchMeBehavior!();
+    }
+    return _defaultUser;
+  }
 }
 
 /// Plain [MaterialApp] harness — enough for every test that never expects

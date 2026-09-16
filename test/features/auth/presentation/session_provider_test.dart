@@ -197,13 +197,37 @@ void main() {
             authRepositoryProvider.overrideWithValue(fakeAuth),
             secureTokenStorageProvider.overrideWithValue(tokenStorage),
           ],
+          // Riverpod 3.x automatically retries a provider whose build()
+          // throws, with a real (non-mocked) exponential backoff of up
+          // to 6.4s per attempt — see
+          // https://riverpod.dev/docs/concepts2/retry. That retried
+          // `_restoreSession()` was the actual cause of this test's 30s
+          // timeout, not the assertion style. Disabling retry here
+          // matches Riverpod's own documented recommendation for
+          // asserting error behavior in unit tests.
+          retry: (retryCount, error) => null,
         );
-        addTearDown(container.dispose);
 
-        await expectLater(
-          () => container.read(sessionProvider.future),
-          throwsA(isA<DioException>()),
-        );
+        // `sessionProvider.future` here is the initial-build future (the
+        // very first read of this provider on this container). Both the
+        // closure form (`() => container.read(...)`) and passing the
+        // Future directly to `expectLater(..., throwsA(...))` were
+        // observed to leave this specific rejection unobserved by the
+        // matcher — the test hung until the 30s timeout and only then
+        // surfaced a Riverpod dispose-during-loading StateError instead
+        // of the real DioException. A plain `await` inside `try/catch`
+        // sidesteps that matcher/AsyncNotifierProvider interaction
+        // entirely and matches the directly-awaited pattern the two
+        // tests above already use successfully.
+        Object? caughtError;
+        try {
+          await container.read(sessionProvider.future);
+          fail('Expected sessionProvider.future to throw a DioException.');
+        } catch (error) {
+          caughtError = error;
+        }
+
+        expect(caughtError, isA<DioException>());
         expect(container.read(sessionProvider).hasError, isTrue);
         // The stored token must NOT have been cleared — this was not a
         // confirmed-invalid-token case, just a transient failure.

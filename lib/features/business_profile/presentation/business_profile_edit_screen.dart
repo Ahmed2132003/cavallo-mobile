@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../routing/route_names.dart';
 import '../domain/business_profile_entity.dart';
 import '../domain/business_profile_repository.dart';
 import 'business_profile_provider.dart';
@@ -85,6 +87,14 @@ import 'business_profile_provider.dart';
 /// 6. **No navigation on success.** Unlike the onboarding screen, which
 ///    must move the user on to `/home`, staying here is the point: the
 ///    user sees the saved values re-render from the server response.
+/// 7. **Explicit "back to home" AppBar action, added post-P-028C2.**
+///    This route (`RouteNames.businessProfileEditPath`) is reached from
+///    a plain [context.goNamed] call on `HomeScreen`'s "Edit business
+///    profile" button (Part P-028), not a `push`, so there is no
+///    guaranteed back-stack entry for `go_router`'s own automatic
+///    back button to pop to. An explicit leading [IconButton] that
+///    always goes to [RouteNames.home] via `goNamed` removes any
+///    ambiguity, regardless of how this route was reached.
 class BusinessProfileEditScreen extends ConsumerStatefulWidget {
   const BusinessProfileEditScreen({super.key});
 
@@ -119,7 +129,17 @@ class _BusinessProfileEditScreenState
     final seed = _seed;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Business profile')),
+      appBar: AppBar(
+        title: const Text('Business profile'),
+        // See this screen's docstring, point 7 — always goes to /home,
+        // regardless of whether this route has a back-stack entry to
+        // pop to.
+        leading: IconButton(
+          icon: const Icon(Icons.home),
+          tooltip: 'Back to home',
+          onPressed: () => context.goNamed(RouteNames.home),
+        ),
+      ),
       body: SafeArea(
         child: switch ((seed, state)) {
           (final BusinessProfile profile, _) => _BusinessProfileEditForm(

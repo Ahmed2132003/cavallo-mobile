@@ -13,19 +13,33 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Hand-rolled fake, matching this project's existing test convention
 /// (no mockito/mocktail anywhere — confirmed by Part P-021a's own test
-/// file). Only [login] is exercised by this screen; the other three
-/// methods are never called here.
+/// file). Only [login] is exercised by this screen; the other methods
+/// are never called here.
 class _FakeAuthRepository implements AuthRepository {
-  _FakeAuthRepository({this.loginBehavior});
+  _FakeAuthRepository({this.loginBehavior, this.fetchMeBehavior});
 
   /// Invoked by [login]. Return normally for a successful login, or
   /// `throw` an [ApiFailure] to simulate a backend failure. `null` (the
   /// default) completes successfully with no extra behavior.
   final Future<void> Function()? loginBehavior;
 
+  /// Invoked by [fetchMe]. `SessionNotifier.login` (session_provider.dart)
+  /// calls [fetchMe] immediately after a successful [login] to resolve
+  /// the real authenticated user — it is genuinely exercised by every
+  /// test here whose login succeeds, not just a stub to satisfy the
+  /// interface. `null` (the default) returns a fixed successful [User].
+  final Future<User> Function()? fetchMeBehavior;
+
   int loginCallCount = 0;
+  int fetchMeCallCount = 0;
   String? lastEmail;
   String? lastPassword;
+
+  static const _defaultUser = User(
+    id: 1,
+    email: 'user@example.com',
+    accountType: AccountType.customer,
+  );
 
   @override
   Future<void> login({required String email, required String password}) async {
@@ -52,6 +66,15 @@ class _FakeAuthRepository implements AuthRepository {
   @override
   Future<void> logout() =>
       throw UnimplementedError('Not exercised by login_screen_test.dart');
+
+  @override
+  Future<User> fetchMe() async {
+    fetchMeCallCount++;
+    if (fetchMeBehavior != null) {
+      return fetchMeBehavior!();
+    }
+    return _defaultUser;
+  }
 }
 
 Widget _wrap(AuthRepository fakeRepository) {
