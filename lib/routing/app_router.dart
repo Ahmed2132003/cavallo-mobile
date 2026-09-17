@@ -11,7 +11,7 @@ import '../features/business_console/presentation/business_console_screen.dart';
 import '../features/business_profile/presentation/business_onboarding_screen.dart';
 import '../features/business_profile/presentation/business_profile_edit_screen.dart';
 import '../features/business_profile/presentation/business_profile_provider.dart';
-import '../features/business_profile/presentation/business_profile_screen.dart';
+import '../features/business_profile/presentation/business_profile_public_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_thread_screen.dart';
 import '../features/discover/presentation/discover_screen.dart';
@@ -281,11 +281,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SearchScreen(),
       ),
       GoRoute(
+        // Part P-029: replaces P-007's placeholder. The public,
+        // customer-facing "view a business by id" screen — distinct
+        // from businessProfileEdit ("my own profile"), see that
+        // route's own comment above.
         path: RouteNames.businessProfilePath,
         name: RouteNames.businessProfile,
         builder: (context, state) {
           final id = state.pathParameters[RouteNames.idParam]!;
-          return BusinessProfileScreen(businessId: id);
+          return BusinessProfilePublicScreen(businessId: id);
         },
       ),
       GoRoute(

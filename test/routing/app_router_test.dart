@@ -8,6 +8,7 @@ import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/login_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/register_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
+import 'package:social_commerce_app/features/business_profile/presentation/business_profile_public_screen.dart';
 import 'package:social_commerce_app/routing/app_router.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
 
@@ -185,21 +186,38 @@ void main() {
       },
     );
 
-    testWidgets(
-      'businessProfile route resolves with its :id path parameter (signed in)',
-      (tester) async {
-        final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+    testWidgets('businessProfile route resolves to the real public screen — '
+        'non-numeric id shows not-found (signed in)', (tester) async {
+      // Part P-029 replaced P-007's placeholder screen for this
+      // route. `_fakeUser` here is a Customer (see `_fakeUser`'s own
+      // definition above), so only the base auth gate applies — the
+      // P-028C1 business-account gate never engages for this
+      // session, exactly like every other test in this file.
+      //
+      // 'sample-business-1' is not a valid id under the real backend
+      // route (`<int:pk>/`, `businesses/urls.py`), and
+      // BusinessProfilePublicScreen parses the `:id` string itself
+      // (see that screen's own docstring) — a non-numeric id
+      // resolves to the not-found state without ever calling the
+      // repository. This test therefore needs no repository
+      // override, unlike a real numeric-id case (covered in
+      // test/features/business_profile/presentation/
+      // business_profile_public_screen_test.dart, Part P-029's own
+      // widget tests).
+      final router = await _pumpRouter(tester, sessionValue: _fakeUser);
 
-        router.goNamed(
-          RouteNames.businessProfile,
-          pathParameters: {RouteNames.idParam: 'sample-business-1'},
-        );
-        await tester.pumpAndSettle();
+      router.goNamed(
+        RouteNames.businessProfile,
+        pathParameters: {RouteNames.idParam: 'sample-business-1'},
+      );
+      await tester.pumpAndSettle();
 
-        expect(find.text('Route: businessProfile'), findsOneWidget);
-        expect(find.text('id param: sample-business-1'), findsOneWidget);
-      },
-    );
+      expect(find.byType(BusinessProfilePublicScreen), findsOneWidget);
+      expect(
+        find.text('Business not found.\nIt may have been removed.'),
+        findsOneWidget,
+      );
+    });
 
     testWidgets(
       'productDetail route resolves with its :id path parameter (signed in)',

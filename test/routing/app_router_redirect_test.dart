@@ -4,6 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
+import 'package:social_commerce_app/features/business_profile/data/business_profile_public_repository.dart';
+import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
+import 'package:social_commerce_app/features/business_profile/domain/business_profile_public_repository.dart';
 import 'package:social_commerce_app/routing/app_router.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
 
@@ -24,6 +27,46 @@ class _FakeSessionNotifier extends SessionNotifier {
   Future<User?> build() async => _fixedValue;
 }
 
+/// Part P-029 addition: a hand-rolled fake for
+/// [BusinessProfilePublicRepository], matching this project's established
+/// convention of hand-rolled fakes over mockito/mocktail (see e.g.
+/// `business_profile_provider_test.dart`'s `FakeBusinessProfileRepository`).
+///
+/// ### Why this file needs one now
+///
+/// Before Part P-029, `RouteNames.businessProfile` (`/business/:id`)
+/// resolved to P-007's placeholder screen — a bare `Scaffold` with no
+/// network calls. This file's "a parameterized protected route is
+/// directly reachable" test only ever asserted the resolved *path*
+/// (`_currentPath(router)`), never the screen's content, so it never
+/// needed to know or care what the screen rendered.
+///
+/// Part P-029 replaced that placeholder with the real
+/// `BusinessProfilePublicScreen`, which watches
+/// `businessProfilePublicProvider(id)` the moment it builds — and that
+/// provider calls through `businessProfilePublicRepositoryProvider` to
+/// the real [Dio] client by default. Without overriding it, this test
+/// silently started firing a real `GET /api/v1/businesses/42/` against
+/// whatever backend happens to be reachable at `localhost:8095` during
+/// `flutter test` — non-deterministic (depends on that server being up,
+/// reachable, and returning something), and not something this test's
+/// own assertion (the router *path*, not the screen's content) has any
+/// business depending on. Overriding the repository with this fake
+/// removes the network dependency entirely; Part P-029's own widget
+/// tests (`business_profile_public_screen_test.dart`) are the ones that
+/// actually exercise real found/not-found/error content states.
+///
+/// Always resolves to `null` ("business not found") rather than throwing
+/// or hanging — the simplest fixed outcome that lets
+/// `BusinessProfilePublicScreen` settle into a definite state
+/// (`AsyncData(null)`) without any external dependency, which is all
+/// this file's path-only assertion needs.
+class _FakeBusinessProfilePublicRepository
+    implements BusinessProfilePublicRepository {
+  @override
+  Future<BusinessProfile?> fetchPublicProfile(int id) async => null;
+}
+
 const _fakeUser = User(
   id: 1,
   email: 'test@example.com',
@@ -34,6 +77,14 @@ const _fakeUser = User(
 /// [MaterialApp.router], with [sessionProvider] overridden to resolve
 /// immediately to [sessionValue]. Returns the [GoRouter] so tests can
 /// drive further navigation and inspect the resulting location.
+///
+/// [businessProfilePublicRepositoryProvider] is overridden unconditionally
+/// here — not only for the one test that visits `/business/:id` — since
+/// doing so has no effect on any other test in this file (nothing else
+/// ever builds `businessProfilePublicProvider`) and keeps this function's
+/// signature and every call site unchanged, matching the "add the
+/// override where the risk is, don't special-case individual tests"
+/// approach already used for `sessionProvider` itself.
 Future<GoRouter> _pumpRouter(
   WidgetTester tester, {
   required User? sessionValue,
@@ -41,6 +92,9 @@ Future<GoRouter> _pumpRouter(
   final container = ProviderContainer(
     overrides: [
       sessionProvider.overrideWith(() => _FakeSessionNotifier(sessionValue)),
+      businessProfilePublicRepositoryProvider.overrideWithValue(
+        _FakeBusinessProfilePublicRepository(),
+      ),
     ],
   );
   addTearDown(container.dispose);
