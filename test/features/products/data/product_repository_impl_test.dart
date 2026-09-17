@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,6 +15,27 @@ import 'package:social_commerce_app/features/products/domain/product_entity.dart
 /// contract (P-032 + P-032B, confirmed via `PROJECT_PROGRESS.md` — not
 /// guessed). Mirrors `business_profile_repository_impl_test.dart`'s
 /// exact setup: a real `ErrorInterceptor` attached to a mocked adapter.
+///
+/// ### Why the FormData test does NOT use `DioAdapter.onPost`
+///
+/// Confirmed by reproducing the raw error directly (not assumed):
+/// `http_mock_adapter`'s route matching compares the registered `data`
+/// value against the actual request body using plain `==` equality —
+/// it does NOT special-case a `Matcher` (passing `data: anything` was
+/// tried and still failed with the same
+/// `AssertionError: "Could not find mocked route matching request ...
+/// data: Instance of 'FormData' ..."`). `FormData` has no custom `==`,
+/// so no value registered via `onPost`'s `data:` parameter can ever
+/// equal a real `FormData` instance. This is a genuine limitation of
+/// the mocking library for multipart bodies, not a bug in
+/// [ProductRepositoryImpl]. So for that one test, [_FakeJsonAdapter]
+/// (a minimal hand-written [HttpClientAdapter], defined at the bottom
+/// of this file) is swapped in as `dio.httpClientAdapter` instead —
+/// it always returns the canned response regardless of body shape.
+/// The actual verification of what was sent (fields + image) still
+/// happens exactly as before, via the `capturedRequestData` list
+/// populated by the request interceptor below, which is unaffected by
+/// which `HttpClientAdapter` is in use.
 void main() {
   late Dio dio;
   late DioAdapter adapter;
@@ -114,13 +137,9 @@ void main() {
     test('sends a FormData with every field + image when a file is given', () async {
       final tempFile = await _writeTempPng();
 
-      adapter.onPost(
-        '/api/v1/products/',
-        (server) => server.reply(201, fullJson),
-        // No `data:` matcher here — FormData can't be matched by exact
-        // Map equality. The captured-request-data interceptor above
-        // does the real verification instead, below.
-      );
+      // See the class-level doc comment above for why `DioAdapter.onPost`
+      // is not used here: it cannot match a FormData body by equality.
+      dio.httpClientAdapter = _FakeJsonAdapter(fullJson, statusCode: 201);
 
       await repository.createProduct(
         categoryId: 3,
@@ -210,4 +229,46 @@ Future<File> _writeTempPng() async {
   );
   await file.writeAsBytes(pngBytes);
   return file;
+}
+
+/// Minimal hand-written [HttpClientAdapter] used ONLY by the
+/// FormData-body test above, in place of `http_mock_adapter`'s
+/// `DioAdapter` — see the class-level doc comment for why. It ignores
+/// the request body entirely (this test verifies the body separately,
+/// via `capturedRequestData`) and always returns [statusCode] with
+/// [jsonBody] as the response payload, regardless of method or path —
+/// deliberately not doing any route matching, since this adapter is
+/// scoped to a single test that only ever makes one request.
+class _FakeJsonAdapter implements HttpClientAdapter {
+  _FakeJsonAdapter(this.jsonBody, {required this.statusCode});
+
+  final Map<String, dynamic> jsonBody;
+  final int statusCode;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    // Must fully drain the request stream (which reads the image file
+    // off disk as part of encoding the FormData) before returning.
+    // Otherwise, on Windows, the file's read handle is never released,
+    // and a later `tempFile.delete()` in the test fails with
+    // `PathAccessException: ... being used by another process` —
+    // confirmed by reproducing exactly that error before this fix.
+    await requestStream?.drain<void>();
+
+    final bytes = utf8.encode(jsonEncode(jsonBody));
+    return ResponseBody.fromBytes(
+      bytes,
+      statusCode,
+      headers: {
+        Headers.contentTypeHeader: [Headers.jsonContentType],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
 }
