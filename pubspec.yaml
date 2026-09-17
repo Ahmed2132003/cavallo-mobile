@@ -54,6 +54,18 @@ dependencies:
   # need to change.
   intl_phone_field: ^3.2.0
 
+  # Image selection for the Business-console product create/edit form
+  # (Part P-033) — the first content-creation screen in this app to
+  # need an image upload; no prior multipart-upload precedent exists
+  # anywhere else in this repo. Pinned to 1.2.1, current stable on
+  # pub.dev at authoring time. Its own CHANGELOG bumps the minimum
+  # supported SDK to Flutter 3.29/Dart 3.7 — above this project's
+  # stated pubspec floor (Flutter >=3.27.0) but already satisfied by
+  # the real validated machine (Flutter 3.29.3/Dart 3.7.2, confirmed
+  # since Part P-001) — same situation already flagged for go_router's
+  # own pinned version above.
+  image_picker: ^1.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
