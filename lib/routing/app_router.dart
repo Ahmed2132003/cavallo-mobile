@@ -17,7 +17,10 @@ import '../features/chat/presentation/chat_thread_screen.dart';
 import '../features/discover/presentation/discover_screen.dart';
 import '../features/feed/presentation/home_screen.dart';
 import '../features/notifications/presentation/notifications_screen.dart';
+import '../features/products/domain/product_entity.dart';
 import '../features/products/presentation/product_detail_screen.dart';
+import '../features/products/presentation/product_form_screen.dart';
+import '../features/products/presentation/product_list_screen.dart';
 import '../features/search/presentation/search_screen.dart';
 import 'route_names.dart';
 
@@ -38,8 +41,9 @@ import 'route_names.dart';
 /// * **Protected** (everything else — `home`, `discover`, `search`,
 ///   `businessProfile`, `productDetail`, `chatList`, `chatThread`,
 ///   `notifications`, `businessConsole`, `businessOnboarding` (Part
-///   P-028C1) and — since Part P-028C2 — `businessProfileEdit`):
-///   reachable only while signed in.
+///   P-028C1), `businessProfileEdit` (Part P-028C2), and — since Part
+///   P-033 — `productList`/`productForm`): reachable only while signed
+///   in.
 ///
 /// `splash` (`/`) is deliberately in neither list — see the dedicated note
 /// further down, on the `redirect` callback itself.
@@ -114,6 +118,27 @@ import 'route_names.dart';
 /// navigates directly to `/business-onboarding` is not bounced to
 /// `/home`. Only the no-profile → onboarding direction exists, which is
 /// the only direction either part's acceptance criteria asked for.
+///
+/// ## Part P-033 — what changed here, and what deliberately did NOT
+///
+/// Adds exactly two [GoRoute]s — [RouteNames.productListPath] →
+/// `ProductListScreen` and [RouteNames.productFormPath] →
+/// `ProductFormScreen` — nested right after [RouteNames.businessConsolePath]
+/// in the table, matching their nested path segment. Neither needs a
+/// gate clause of its own, for the same reason [RouteNames.businessProfileEditPath]
+/// doesn't (see P-028C2's note immediately above): both are ordinary
+/// protected routes, already covered by the base auth gate.
+///
+/// `ProductListScreen`'s `onCreateNew`/`onEditProduct` callbacks (see
+/// that screen's own docstring for why it takes them instead of calling
+/// `context.goNamed` itself) are supplied HERE, in this route's own
+/// `builder:` — exactly the "one-line `builder:`" wiring that screen's
+/// docstring already anticipated, with zero changes needed to
+/// `product_list_screen.dart` itself. `onEditProduct` passes the full
+/// [Product] via `extra:`; `ProductFormScreen`'s own route reads it back
+/// via `state.extra as Product?` — `null` for the plain "Create New" tap,
+/// non-null for an edit tap, matching [RouteNames.productFormPath]'s own
+/// doc on why there's no `:id` path segment here.
 ///
 /// ## ⚠️ Corrected after real-device testing — `refreshListenable`, not `ref.watch`
 ///
@@ -322,6 +347,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.businessConsolePath,
         name: RouteNames.businessConsole,
         builder: (context, state) => const BusinessConsoleScreen(),
+      ),
+      GoRoute(
+        // Part P-033. See this provider's own "Part P-033" doc section
+        // above for why the navigation callbacks are wired here rather
+        // than inside `product_list_screen.dart` itself.
+        path: RouteNames.productListPath,
+        name: RouteNames.productList,
+        builder: (context, state) => ProductListScreen(
+          onCreateNew: () => context.pushNamed(RouteNames.productForm),
+          onEditProduct: (product) =>
+              context.pushNamed(RouteNames.productForm, extra: product),
+        ),
+      ),
+      GoRoute(
+        // Part P-033. `extra` is the full `Product` for edit mode, or
+        // `null` for create mode — see `RouteNames.productFormPath`'s
+        // own doc for why there's no `:id` path segment here instead.
+        path: RouteNames.productFormPath,
+        name: RouteNames.productForm,
+        builder: (context, state) =>
+            ProductFormScreen(existingProduct: state.extra as Product?),
       ),
     ],
   );

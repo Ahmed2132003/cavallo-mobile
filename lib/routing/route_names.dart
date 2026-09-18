@@ -31,6 +31,23 @@
 /// pre-existing P-007 constant, are untouched — this is a purely
 /// additive edit, per this project's "don't redesign a prior part's
 /// work unless the real backend contract forces it" convention.
+///
+/// ### Part P-033 addition — [productList] / [productForm]
+///
+/// This part's own spec: "Wire routes for this list/create/edit flow,
+/// reachable from the business console area (even though the full
+/// Business Console shell itself isn't built until Phase 14 — for now,
+/// reach these screens via a simple route the router exposes)." Both
+/// live under `/business-console/products...` — nested under the
+/// existing [businessConsolePath] segment rather than a new top-level
+/// one, since that's exactly where this part's spec says they belong
+/// once Phase 14 gives them a real navigational home; nesting the path
+/// now means Phase 14 only has to change how they're *reached*, not the
+/// paths themselves.
+///
+/// [productForm] deliberately has NO `:id` path parameter, unlike
+/// [productDetail]/[businessProfile]/[chatThread] — see this class's
+/// own [productFormPath] doc for why.
 class RouteNames {
   RouteNames._();
 
@@ -68,6 +85,15 @@ class RouteNames {
   /// endpoint), so there is deliberately no id to put in the path.
   static const String businessProfileEdit = 'businessProfileEdit';
 
+  /// Part P-033: the signed-in Business user's own product list
+  /// (`ProductListScreen`), backed by `ownProductsProvider`. Same "no id
+  /// — resolved from `request.user`" reasoning as [businessProfileEdit].
+  static const String productList = 'productList';
+
+  /// Part P-033: the shared create/edit product form (`ProductFormScreen`).
+  /// See [productFormPath]'s own doc for why this takes no `:id`.
+  static const String productForm = 'productForm';
+
   // --- Route paths (used inside GoRoute(path: ...)) ---
   static const String splashPath = '/';
   static const String loginPath = '/login';
@@ -95,6 +121,25 @@ class RouteNames {
   /// still kebab-case, consistent with [businessConsolePath] and
   /// [businessOnboardingPath].
   static const String businessProfileEditPath = '/business-profile/edit';
+
+  /// Part P-033 — see [productList].
+  static const String productListPath = '/business-console/products';
+
+  /// Part P-033 — see [productForm].
+  ///
+  /// No `:id` segment: unlike [productDetailPath] (the PUBLIC,
+  /// customer-facing "view this exact product" screen, Part P-034,
+  /// looked up fresh by id), this is "my own product form," reached
+  /// only from [productListPath]'s own screen, which already holds the
+  /// full [Product] object in memory (`ownProductsProvider`) — there is
+  /// nothing to look up. Edit mode is signalled by passing that
+  /// `Product` as `context.pushNamed(...)`'s `extra:` argument instead
+  /// (read back via `GoRouterState.extra` in `app_router.dart`); `extra`
+  /// being absent/null means create mode. See `ProductFormScreen`'s own
+  /// docstring for why this screen takes no `RouteNames` dependency of
+  /// its own at all — the caller (this route's own builder) supplies
+  /// navigation.
+  static const String productFormPath = '/business-console/products/form';
 
   /// Path-parameter key shared by [businessProfilePath], [productDetailPath]
   /// and [chatThreadPath].

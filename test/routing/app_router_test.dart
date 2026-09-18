@@ -1,14 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:social_commerce_app/core/network/paginated_response.dart';
 import 'package:social_commerce_app/core/widgets/app_button.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/login_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/register_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_public_screen.dart';
+import 'package:social_commerce_app/features/categories/data/category_repository_impl.dart';
+import 'package:social_commerce_app/features/categories/domain/category_entity.dart';
+import 'package:social_commerce_app/features/categories/domain/category_repository.dart';
+import 'package:social_commerce_app/features/products/data/product_repository_impl.dart';
+import 'package:social_commerce_app/features/products/domain/product_entity.dart';
+import 'package:social_commerce_app/features/products/domain/product_repository.dart';
+import 'package:social_commerce_app/features/products/presentation/product_form_screen.dart';
+import 'package:social_commerce_app/features/products/presentation/product_list_screen.dart';
 import 'package:social_commerce_app/routing/app_router.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
 
@@ -32,6 +43,54 @@ const _fakeUser = User(
   accountType: AccountType.customer,
 );
 
+/// Hand-rolled test double for [ProductRepository] — Part P-033's
+/// `productList`/`productForm` routes both watch `ownProductsProvider`
+/// on build, which would otherwise hit the real network the instant
+/// either route resolves in a test (no `flutter test` environment ever
+/// has real backend connectivity). Scoped to exactly what rendering
+/// (not submitting) needs: an immediately-resolving, empty
+/// `fetchOwnProducts()`.
+class _FakeProductRepository implements ProductRepository {
+  @override
+  Future<PaginatedResponse<Product>> fetchOwnProducts() async =>
+      const PaginatedResponse<Product>(results: [], next: null, previous: null);
+
+  @override
+  Future<Product> createProduct({
+    required int categoryId,
+    required String name,
+    required String description,
+    required String price,
+    required Currency currency,
+    File? imageFile,
+    bool isActive = true,
+  }) => throw UnimplementedError('Not exercised by app_router_test.dart');
+
+  @override
+  Future<Product> updateProduct({
+    required int productId,
+    int? categoryId,
+    String? name,
+    String? description,
+    String? price,
+    Currency? currency,
+    File? imageFile,
+    bool? isActive,
+  }) => throw UnimplementedError('Not exercised by app_router_test.dart');
+
+  @override
+  Future<void> deleteProduct(int productId) async {}
+}
+
+/// Hand-rolled test double for [CategoryRepository] — `ProductFormScreen`
+/// watches `categoryTreeProvider` on build for the same reason above.
+class _FakeCategoryRepository implements CategoryRepository {
+  @override
+  Future<List<CategoryNode>> fetchCategoryTree({
+    bool forceRefresh = false,
+  }) async => const [];
+}
+
 /// ## Part P-021b update — why every test here now overrides [sessionProvider]
 ///
 /// Before P-021b, this file's `setUp` built [appRouterProvider] from a
@@ -54,13 +113,35 @@ const _fakeUser = User(
 /// `SecureTokenStorage`'s test behavior ever changes) and every failure
 /// it causes is confusing to debug. So every test below now explicitly
 /// says whether it means "signed in" or "signed out."
+///
+/// ### Part P-033 addition — [extraOverrides]
+///
+/// Purely additive: every pre-existing call site (none of which passes
+/// this parameter) behaves exactly as before, since it defaults to an
+/// empty list. Added only so the two new `productList`/`productForm`
+/// tests below can override `productRepositoryProvider`/
+/// `categoryRepositoryProvider` without duplicating this entire helper.
+/// Typed `List<dynamic>`, not `List<Override>` — see this parameter's
+/// own inline comment for why.
 Future<GoRouter> _pumpRouter(
   WidgetTester tester, {
   required User? sessionValue,
+  // `dynamic`, not `Override`: `Override` isn't a name either
+  // `flutter_riverpod` or `riverpod` re-exports publicly under this
+  // project's pinned version (confirmed on the real machine — both
+  // attempts failed with "doesn't export a member with the shown
+  // name"). Spreading a `List<dynamic>` into the `overrides:` list
+  // literal below still type-checks fine: the literal's element type
+  // is inferred as `Override` from `ProviderContainer`'s own parameter
+  // type, and a `dynamic`-typed spread is allowed into it (an implicit,
+  // runtime-checked cast) — this avoids needing the type's name at all,
+  // rather than hunting for whichever internal path actually exports it.
+  List<dynamic> extraOverrides = const [],
 }) async {
   final container = ProviderContainer(
     overrides: [
       sessionProvider.overrideWith(() => _FakeSessionNotifier(sessionValue)),
+      ...extraOverrides,
     ],
   );
   addTearDown(container.dispose);
@@ -248,6 +329,76 @@ void main() {
 
         expect(find.text('Route: chatThread'), findsOneWidget);
         expect(find.text('id param: sample-thread-1'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Part P-033: productList route resolves to the real ProductListScreen '
+      '(signed in)',
+      (tester) async {
+        final router = await _pumpRouter(
+          tester,
+          sessionValue: _fakeUser,
+          extraOverrides: [
+            productRepositoryProvider.overrideWithValue(
+              _FakeProductRepository(),
+            ),
+          ],
+        );
+
+        router.goNamed(RouteNames.productList);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ProductListScreen), findsOneWidget);
+        expect(find.text('My Products'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Part P-033: productForm route resolves to ProductFormScreen in '
+      'create mode when no extra is passed (signed in)',
+      (tester) async {
+        final router = await _pumpRouter(
+          tester,
+          sessionValue: _fakeUser,
+          extraOverrides: [
+            productRepositoryProvider.overrideWithValue(
+              _FakeProductRepository(),
+            ),
+            categoryRepositoryProvider.overrideWith(
+              (ref) async => _FakeCategoryRepository(),
+            ),
+          ],
+        );
+
+        router.goNamed(RouteNames.productForm);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ProductFormScreen), findsOneWidget);
+        expect(find.text('Create product'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Part P-033: the business console "My Products" button pushes the '
+      'productList route (signed in)',
+      (tester) async {
+        final router = await _pumpRouter(
+          tester,
+          sessionValue: _fakeUser,
+          extraOverrides: [
+            productRepositoryProvider.overrideWithValue(
+              _FakeProductRepository(),
+            ),
+          ],
+        );
+        router.goNamed(RouteNames.businessConsole);
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.widgetWithText(AppButton, 'My Products'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ProductListScreen), findsOneWidget);
       },
     );
   });
