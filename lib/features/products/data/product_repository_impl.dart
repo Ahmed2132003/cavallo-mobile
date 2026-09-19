@@ -37,6 +37,26 @@ import 'dtos/product_response_dto.dart';
 ///   shapes on the same view, so this is a client-side optimization
 ///   (skip multipart when there's nothing to attach), not a backend
 ///   requirement either way.
+///
+/// ### Manual-testing note — MinIO internal hostname (not a P-033 bug)
+///
+/// During this part's own manual verification, a created product's
+/// image appeared as the "no image" placeholder in `ProductListScreen`
+/// despite a successful 201 create. A temporary debug print (since
+/// removed) confirmed the backend's own response carries a fully
+/// correct `image` URL — the create request, the DTO parsing, and the
+/// list screen's rendering are all correct end to end. The URL itself
+/// simply isn't reachable from outside the backend's Docker network in
+/// this local dev environment (its host segment is the internal
+/// container hostname `minio`, e.g.
+/// `http://minio:9000/scd-dev-media/...`), which no device outside that
+/// Docker network — including the Android emulator — can resolve. This
+/// is a local backend/infra configuration matter (the MinIO
+/// public/presigned-URL endpoint needs to be set to a host reachable
+/// from outside its container network), entirely outside this part's
+/// and this file's scope. No Flutter-side change is needed or
+/// appropriate here — once the backend serves a reachable URL, this
+/// same code renders it with no changes required.
 class ProductRepositoryImpl implements ProductRepository {
   ProductRepositoryImpl({required Dio dio}) : _dio = dio;
 

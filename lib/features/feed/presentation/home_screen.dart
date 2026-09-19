@@ -52,6 +52,26 @@ import '../../business_profile/presentation/business_profile_provider.dart';
 ///   router gate is about to bounce this user to onboarding anyway) or
 ///   `AsyncError` (a genuine fetch failure), the button stays hidden
 ///   rather than risk linking into an edit screen with nothing to edit.
+///
+/// ### Part P-033 addition — "Business Console (debug)" button
+///
+/// P-007's original debug navigation chain (Home → Discover → Search →
+/// ChatList → Notifications → Business Console → back to splash) is how
+/// `businessConsole` was meant to be manually reachable, but that chain
+/// is broken somewhere past the Search screen as of this part (a later,
+/// unrelated part changed a screen along that chain without preserving
+/// its "next" button — out of scope for P-033 to fix). Rather than
+/// leave P-033's own acceptance criterion ("manual run against the real
+/// backend") unreachable, this one temporary debug button jumps
+/// straight from Home to `businessConsole` — the screen `BusinessConsoleScreen`
+/// (Part P-033, STEP 10) already puts its real "My Products" entry
+/// point on. Shown only when the signed-in user is a Business account,
+/// mirroring "Edit business profile" above, since Product management is
+/// a business-only surface.
+///
+/// **Remove this button once a real Home/Profile screen (or a real
+/// Business Console shell, Phase 14) makes it reachable through proper
+/// navigation — it should not ship as-is.**
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -62,9 +82,10 @@ class HomeScreen extends ConsumerWidget {
       AsyncData(:final value) => value,
       _ => null,
     };
+    final isBusinessUser =
+        user != null && user.accountType == AccountType.business;
     final isOnboardedBusinessUser =
-        user != null &&
-        user.accountType == AccountType.business &&
+        isBusinessUser &&
         switch (ref.watch(businessProfileProvider)) {
           AsyncData(:final value) => value != null,
           _ => false,
@@ -88,6 +109,14 @@ class HomeScreen extends ConsumerWidget {
                 label: 'Edit business profile',
                 onPressed:
                     () => context.goNamed(RouteNames.businessProfileEdit),
+              ),
+            ],
+            if (isBusinessUser) ...[
+              const SizedBox(height: 16),
+              // Temporary — Part P-033, see class docstring above.
+              AppButton(
+                label: 'Business Console (debug)',
+                onPressed: () => context.pushNamed(RouteNames.businessConsole),
               ),
             ],
             const SizedBox(height: 16),

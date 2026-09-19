@@ -375,7 +375,23 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(ProductFormScreen), findsOneWidget);
-        expect(find.text('Create product'), findsOneWidget);
+        // 'Create product' appears twice on screen by design in create
+        // mode — once as the AppBar title, once as the submit button's
+        // own label (see ProductFormScreen, STEP 9: the AppBar title is
+        // `widget.isEditing ? 'Edit product' : 'Create product'`, and
+        // the submit AppButton's label is the same ternary). A bare
+        // `find.text('Create product')` is therefore ambiguous between
+        // the two and always finds 2 widgets, not 1 — this is a router
+        // test taking a dependency on the screen's own wording, not a
+        // bug in ProductFormScreen itself. Scoped to the AppBar's own
+        // title specifically so this assertion is unambiguous.
+        expect(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.text('Create product'),
+          ),
+          findsOneWidget,
+        );
       },
     );
 
