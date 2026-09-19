@@ -18,6 +18,7 @@ import 'package:social_commerce_app/features/categories/domain/category_reposito
 import 'package:social_commerce_app/features/products/data/product_repository_impl.dart';
 import 'package:social_commerce_app/features/products/domain/product_entity.dart';
 import 'package:social_commerce_app/features/products/domain/product_repository.dart';
+import 'package:social_commerce_app/features/products/presentation/product_detail_screen.dart';
 import 'package:social_commerce_app/features/products/presentation/product_form_screen.dart';
 import 'package:social_commerce_app/features/products/presentation/product_list_screen.dart';
 import 'package:social_commerce_app/routing/app_router.dart';
@@ -300,22 +301,32 @@ void main() {
       );
     });
 
-    testWidgets(
-      'productDetail route resolves with its :id path parameter (signed in)',
-      (tester) async {
-        final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+    testWidgets('Part P-034: productDetail route resolves to the real '
+        'ProductDetailScreen — non-numeric id shows not-found (signed in)', (
+      tester,
+    ) async {
+      // Part P-034 replaced P-007's placeholder for this route, so the
+      // old 'Route: productDetail' assertion no longer exists anywhere.
+      // Same approach as the businessProfile test above (Part P-029):
+      // ProductDetailScreen parses the `:id` string itself, and a
+      // non-numeric id resolves to not-found without ever calling the
+      // repository — so no repository override is needed here. Numeric
+      // ids, loading/error states and the price-framing copy are covered
+      // by this part's own screen widget tests.
+      final router = await _pumpRouter(tester, sessionValue: _fakeUser);
 
-        router.goNamed(
-          RouteNames.productDetail,
-          pathParameters: {RouteNames.idParam: 'sample-product-1'},
-        );
-        await tester.pumpAndSettle();
+      router.goNamed(
+        RouteNames.productDetail,
+        pathParameters: {RouteNames.idParam: 'sample-product-1'},
+      );
+      await tester.pumpAndSettle();
 
-        expect(find.text('Route: productDetail'), findsOneWidget);
-        expect(find.text('id param: sample-product-1'), findsOneWidget);
-      },
-    );
-
+      expect(find.byType(ProductDetailScreen), findsOneWidget);
+      expect(
+        find.text('Product not found.\nIt may have been removed.'),
+        findsOneWidget,
+      );
+    });
     testWidgets(
       'chatThread route resolves with its :id path parameter (signed in)',
       (tester) async {

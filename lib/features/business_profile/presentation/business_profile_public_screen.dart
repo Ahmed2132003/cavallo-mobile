@@ -1,12 +1,17 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
+import '../../../routing/route_names.dart';
+import '../../products/domain/product_entity.dart';
+import '../../products/presentation/product_price_framing.dart';
+import '../../products/presentation/product_public_providers.dart';
 import '../domain/business_profile_entity.dart';
 import 'business_profile_public_provider.dart';
 
@@ -20,8 +25,8 @@ import 'business_profile_public_provider.dart';
 /// Three later phases add to **this exact screen**, and must extend it
 /// rather than creating a competing "business profile" screen:
 ///
-/// * **Phase 5 (Products)** — a products grid/section, at the marked
-///   section boundary in [_ProfileView] below.
+/// * **Phase 5 (Products)** — DONE in Part P-034: [_ProductsSection],
+///   appended at the marked section boundary in [_ProfileView] below.
 /// * **Phase 7 (Posts/Reels)** — posts and reels sections, at the same
 ///   boundary, below products.
 /// * **Phase 9 (Follow)** — activates the currently-disabled Follow
@@ -32,6 +37,20 @@ import 'business_profile_public_provider.dart';
 /// can be appended without a relayout rewrite — deliberately NOT
 /// over-engineered with empty placeholder widgets for models that don't
 /// exist yet.
+///
+/// ## Part P-034 — the products section
+///
+/// [_ProductsSection] lists the business's active products (first page
+/// only — cursor pagination's "load more" is out of scope, same
+/// decision as Part P-033's own list), read through
+/// `businessProductsProvider`. Its states are independent of the
+/// profile's own: a failure loading products shows an inline error with
+/// Retry inside the section and never replaces the whole profile.
+/// Every product price is rendered through [ProductPriceFraming], so the
+/// architecture Section 20 "approximate / negotiable" copy accompanies
+/// every price shown here. Nothing in the section resembles a purchase
+/// flow (no cart icon, no Buy Now, no quantity selector). Tapping a card
+/// opens the real `ProductDetailScreen` via [RouteNames.productDetail].
 ///
 /// ## `followerCount` is deliberately not displayed
 ///
@@ -158,12 +177,14 @@ class _ProfileView extends StatelessWidget {
 
           // ---------------------------------------------------------
           // SECTION BOUNDARY — later phases append below this line.
-          //   Phase 5: Products section  (models don't exist yet)
-          //   Phase 7: Posts / Reels sections
+          //   Phase 5: Products section  — DONE (Part P-034), below.
+          //   Phase 7: Posts / Reels sections — append after products.
           // Add new sections here, in this Column, in this file. Do NOT
           // create a second business-profile screen. See this file's
           // top-level docstring.
           // ---------------------------------------------------------
+          const SizedBox(height: 32),
+          _ProductsSection(businessId: profile.id),
         ],
       ),
     );
@@ -246,6 +267,173 @@ class _ProfileHeader extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// Part P-034: the business's active products, first page only.
+///
+/// Owns its own loading/empty/error states so a products failure never
+/// replaces the whole profile. Renders a plain [Column] of cards (not a
+/// nested scrolling list) — it lives inside [_ProfileView]'s
+/// [SingleChildScrollView], and the first page is small.
+class _ProductsSection extends ConsumerWidget {
+  const _ProductsSection({required this.businessId});
+
+  final int businessId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final productsAsync = ref.watch(businessProductsProvider(businessId));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Products', style: theme.textTheme.titleLarge),
+        const SizedBox(height: 12),
+        switch (productsAsync) {
+          AsyncData(value: final products) when products.isEmpty =>
+            const EmptyStateWidget(
+              message: 'This business hasn\'t added any products yet.',
+              icon: Icons.inventory_2_outlined,
+            ),
+          AsyncData(value: final products) => Column(
+            children: [
+              for (final product in products) _ProductCard(product: product),
+            ],
+          ),
+          AsyncError(:final error) => _ProductsErrorView(
+            error: error,
+            businessId: businessId,
+          ),
+          _ => const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: LoadingIndicator(),
+          ),
+        },
+      ],
+    );
+  }
+}
+
+/// Inline, retryable failure for the products section only.
+class _ProductsErrorView extends ConsumerWidget {
+  const _ProductsErrorView({required this.error, required this.businessId});
+
+  final Object error;
+  final int businessId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Same dual-shape handling as [_LoadErrorView] — see the comment
+    // there.
+    final message = switch (error) {
+      DioException(error: final ApiFailure failure) => failure.message,
+      ApiFailure(:final message) => message,
+      _ => 'Could not load this business\'s products.',
+    };
+
+    return ErrorStateWidget(
+      message: message,
+      onRetry: () => ref.invalidate(businessProductsProvider(businessId)),
+    );
+  }
+}
+
+/// One tappable product card: thumbnail, name, and the price WITH its
+/// mandatory Section 20 framing ([ProductPriceFraming], compact). No
+/// cart/buy/quantity affordance of any kind.
+class _ProductCard extends StatelessWidget {
+  const _ProductCard({required this.product});
+
+  final Product product;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        // `push` (not `go`) so the back button returns to this profile.
+        onTap:
+            () => context.pushNamed(
+              RouteNames.productDetail,
+              pathParameters: {RouteNames.idParam: '${product.id}'},
+            ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _ProductThumbnail(imageUrl: product.imageUrl),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      style: theme.textTheme.titleMedium,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    ProductPriceFraming(
+                      price: product.price,
+                      currency: product.currency,
+                      compact: true,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Small square product image with a neutral fallback for "no image" and
+/// for a URL that fails to load. Duplicates the private thumbnail in
+/// `product_list_screen.dart` (Part P-033) rather than sharing it —
+/// flagged in this part's PROJECT_PROGRESS entry.
+class _ProductThumbnail extends StatelessWidget {
+  const _ProductThumbnail({required this.imageUrl});
+
+  final String? imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    const size = 72.0;
+    final surface = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final url = imageUrl;
+
+    Widget placeholder(IconData icon) => Container(
+      width: size,
+      height: size,
+      color: surface,
+      alignment: Alignment.center,
+      child: Icon(icon),
+    );
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child:
+          (url == null || url.isEmpty)
+              ? placeholder(Icons.inventory_2_outlined)
+              : Image.network(
+                url,
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                errorBuilder:
+                    (context, error, stackTrace) =>
+                        placeholder(Icons.broken_image_outlined),
+              ),
     );
   }
 }

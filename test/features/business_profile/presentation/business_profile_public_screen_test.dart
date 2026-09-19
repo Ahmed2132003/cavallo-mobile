@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:social_commerce_app/core/network/api_failure.dart';
+import 'package:social_commerce_app/core/network/paginated_response.dart';
 import 'package:social_commerce_app/core/widgets/app_button.dart';
 import 'package:social_commerce_app/features/business_profile/data/business_profile_public_repository.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_public_repository.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_public_screen.dart';
+import 'package:social_commerce_app/features/products/data/product_public_repository.dart';
+import 'package:social_commerce_app/features/products/domain/product_entity.dart';
+import 'package:social_commerce_app/features/products/domain/product_public_repository.dart';
 
 /// Hand-rolled test double for [BusinessProfilePublicRepository] — this
 /// project doesn't use mockito/mocktail anywhere (confirmed against
@@ -61,6 +65,29 @@ class _FakeBusinessProfilePublicRepository
   }
 }
 
+/// Part P-034 addition: [BusinessProfilePublicScreen] now also shows a
+/// products section, which watches `businessProductsProvider(id)` the
+/// moment a profile is rendered — and that provider calls through
+/// `productPublicRepositoryProvider` to the real Dio client by default.
+/// Without an override, every "profile found" test in this file would
+/// silently start firing a real `GET /api/v1/products/public/` (same
+/// reasoning Part P-029 documented in `app_router_redirect_test.dart`).
+///
+/// This file's own assertions are about the profile header only, so the
+/// fake always resolves to an empty first page — the simplest fixed
+/// outcome. The products section itself is covered by
+/// `business_profile_public_products_section_test.dart` (Part P-034).
+class _EmptyProductPublicRepository implements ProductPublicRepository {
+  @override
+  Future<Product?> fetchPublicProduct(int id) async => null;
+
+  @override
+  Future<PaginatedResponse<Product>> fetchBusinessProducts(
+    int businessId,
+  ) async =>
+      const PaginatedResponse<Product>(results: [], next: null, previous: null);
+}
+
 const _profile = BusinessProfile(
   id: 7,
   businessName: 'Al Ananka Store',
@@ -91,6 +118,9 @@ Future<void> _pumpScreen(
     ProviderScope(
       overrides: [
         businessProfilePublicRepositoryProvider.overrideWithValue(repository),
+        productPublicRepositoryProvider.overrideWithValue(
+          _EmptyProductPublicRepository(),
+        ),
       ],
       child: MaterialApp(
         home: BusinessProfilePublicScreen(businessId: businessId),
