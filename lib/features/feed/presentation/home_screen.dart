@@ -72,6 +72,24 @@ import '../../business_profile/presentation/business_profile_provider.dart';
 /// **Remove this button once a real Home/Profile screen (or a real
 /// Business Console shell, Phase 14) makes it reachable through proper
 /// navigation — it should not ship as-is.**
+///
+/// ### Part P-040 addition — "Moderation queue (debug)" button
+///
+/// Nothing else in the app links to the moderator review UI
+/// (`/moderation`, `lib/features/moderation/`) yet, and P-040's own
+/// acceptance criteria need a real moderator account to reach it. This
+/// one temporary button pushes straight to it. Shown only when the
+/// signed-in user has `isModerator` or `isStaff` — the same condition the
+/// router gate checks.
+///
+/// **Showing or hiding this button is a convenience, NOT the access
+/// control.** The route itself is protected by `app_router.dart`'s
+/// redirect guard, which blocks every non-moderator no matter how they
+/// navigate (see that file's "Part P-040" doc section).
+///
+/// **Remove this button once a real navigation home for moderators
+/// exists (e.g. an admin/moderator section of a real profile or settings
+/// screen) — it should not ship as-is.**
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -84,6 +102,7 @@ class HomeScreen extends ConsumerWidget {
     };
     final isBusinessUser =
         user != null && user.accountType == AccountType.business;
+    final canModerate = user != null && (user.isModerator || user.isStaff);
     final isOnboardedBusinessUser =
         isBusinessUser &&
         switch (ref.watch(businessProfileProvider)) {
@@ -117,6 +136,15 @@ class HomeScreen extends ConsumerWidget {
               AppButton(
                 label: 'Business Console (debug)',
                 onPressed: () => context.pushNamed(RouteNames.businessConsole),
+              ),
+            ],
+            if (canModerate) ...[
+              const SizedBox(height: 16),
+              // Temporary — Part P-040, see class docstring above. A
+              // convenience link only; the route is gated by the router.
+              AppButton(
+                label: 'Moderation queue (debug)',
+                onPressed: () => context.pushNamed(RouteNames.moderation),
               ),
             ],
             const SizedBox(height: 16),

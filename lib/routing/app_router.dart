@@ -16,6 +16,9 @@ import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_thread_screen.dart';
 import '../features/discover/presentation/discover_screen.dart';
 import '../features/feed/presentation/home_screen.dart';
+import '../features/moderation/domain/queue_item_entity.dart';
+import '../features/moderation/presentation/moderation_queue_screen.dart';
+import '../features/moderation/presentation/moderation_review_screen.dart';
 import '../features/notifications/presentation/notifications_screen.dart';
 import '../features/products/domain/product_entity.dart';
 import '../features/products/presentation/product_detail_screen.dart';
@@ -140,6 +143,38 @@ import 'route_names.dart';
 /// non-null for an edit tap, matching [RouteNames.productFormPath]'s own
 /// doc on why there's no `:id` path segment here.
 ///
+/// ## Part P-040 — moderator gate, and the two new routes
+///
+/// Adds a **third gate**, layered on top of the base auth gate and the
+/// Business-account gate (never replacing either): the whole
+/// `/moderation` prefix ([RouteNames.moderationPath] and anything under
+/// `/moderation/`) is reachable only when the signed-in user has
+/// `isModerator` **or** `isStaff` set (`User`, from `GET /api/v1/auth/me/`
+/// — Part P-020, extended for this part). Anyone else is redirected to
+/// `/home`.
+///
+/// This is enforced HERE, in `redirect`, which runs for every navigation
+/// regardless of how it started (`context.go`, `context.push`, a deep
+/// link, a restored location) — not by hiding a menu entry. A signed-out
+/// user never reaches this gate: the base gate above has already sent
+/// them to `/login`.
+///
+/// The review route additionally needs its [QueueItem], which the queue
+/// screen passes as `extra:` (same convention as
+/// [RouteNames.productForm]). If `extra` is missing or not a
+/// [QueueItem] (a deep link, an app restore) the redirect sends the user
+/// to the queue instead of building a broken screen. The role check runs
+/// first, so a non-moderator is never told anything about this route.
+///
+/// Both routes are wired in the `routes:` table below; the queue's
+/// `onOpenItem` callback is supplied here, in the route's `builder:`, for
+/// the same reason `ProductListScreen`'s callbacks are (see P-033 above):
+/// the screen stays free of any `GoRouter` dependency.
+///
+/// `_SessionRefreshListenable` needs no change: it already re-runs
+/// `redirect` whenever the session changes, which is exactly what
+/// re-evaluates this gate on login/logout.
+///
 /// ## ⚠️ Corrected after real-device testing — `refreshListenable`, not `ref.watch`
 ///
 /// P-007's original design called `ref.watch(sessionProvider)` directly
@@ -242,6 +277,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         if (noBusinessProfileYet &&
             location != RouteNames.businessOnboardingPath) {
           return RouteNames.businessOnboardingPath;
+        }
+      }
+
+      // --- Part P-040: third gate, moderator-only routes ---
+      // Layered on top of both gates above, evaluated only once `user`
+      // is known non-null. See this provider's doc comment ("Part P-040
+      // — moderator gate") for why this lives here and not in a menu.
+      if (_isModerationLocation(location)) {
+        final canModerate = user.isModerator || user.isStaff;
+        if (!canModerate) {
+          return RouteNames.homePath;
+        }
+        // The review screen needs the QueueItem handed over as `extra`;
+        // without it (deep link, restored location) go back to the queue.
+        if (location == RouteNames.moderationReviewPath &&
+            state.extra is! QueueItem) {
+          return RouteNames.moderationPath;
         }
       }
 
@@ -369,9 +421,40 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) =>
             ProductFormScreen(existingProduct: state.extra as Product?),
       ),
+      GoRoute(
+        // Part P-040. Moderator-only — gated by the redirect callback
+        // above (see this provider's "Part P-040" doc section), not
+        // here. `onOpenItem` hands the tapped item to the review route
+        // as `extra`, like `productForm`'s edit mode above.
+        path: RouteNames.moderationPath,
+        name: RouteNames.moderation,
+        builder: (context, state) => ModerationQueueScreen(
+          onOpenItem: (item) =>
+              context.pushNamed(RouteNames.moderationReview, extra: item),
+        ),
+      ),
+      GoRoute(
+        // Part P-040. The redirect callback guarantees `extra` is a
+        // QueueItem by the time this builder runs (a missing one is
+        // redirected back to the queue), so the cast cannot fail here.
+        path: RouteNames.moderationReviewPath,
+        name: RouteNames.moderationReview,
+        builder: (context, state) =>
+            ModerationReviewScreen(item: state.extra! as QueueItem),
+      ),
     ],
   );
 });
+
+/// True for `/moderation` itself and anything under `/moderation/` —
+/// the prefix the moderator gate in [appRouterProvider]'s `redirect`
+/// protects. Matched on a path-segment boundary so an unrelated route
+/// that merely starts with the same letters (e.g. `/moderation-tools`)
+/// would not be caught by accident.
+bool _isModerationLocation(String location) {
+  return location == RouteNames.moderationPath ||
+      location.startsWith('${RouteNames.moderationPath}/');
+}
 
 /// Routes reachable only while signed out. Everything else in the route
 /// table is "protected" implicitly (see the `redirect` callback above) —

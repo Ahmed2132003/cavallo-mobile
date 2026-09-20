@@ -48,6 +48,15 @@
 /// [productForm] deliberately has NO `:id` path parameter, unlike
 /// [productDetail]/[businessProfile]/[chatThread] — see this class's
 /// own [productFormPath] doc for why.
+///
+/// ### Part P-040 addition — [moderation] / [moderationReview]
+///
+/// The in-app moderator review UI (`lib/features/moderation/`). Both
+/// paths sit under one `/moderation` prefix on purpose: the router's
+/// role gate (`app_router.dart`) protects the whole prefix in one check,
+/// so a future moderation screen added under it is gated automatically.
+/// Neither entry appears in any menu-driven allow-list — gating is done
+/// by the redirect guard itself, not by hiding a link.
 class RouteNames {
   RouteNames._();
 
@@ -93,6 +102,16 @@ class RouteNames {
   /// Part P-033: the shared create/edit product form (`ProductFormScreen`).
   /// See [productFormPath]'s own doc for why this takes no `:id`.
   static const String productForm = 'productForm';
+
+  /// Part P-040: the moderator's pending-content queue
+  /// (`ModerationQueueScreen`). Reachable only by accounts with
+  /// `is_moderator` or `is_staff` — see [moderationPath].
+  static const String moderation = 'moderation';
+
+  /// Part P-040: the single-item review screen
+  /// (`ModerationReviewScreen`). See [moderationReviewPath] for how the
+  /// item is handed to it.
+  static const String moderationReview = 'moderationReview';
 
   // --- Route paths (used inside GoRoute(path: ...)) ---
   static const String splashPath = '/';
@@ -140,6 +159,26 @@ class RouteNames {
   /// its own at all — the caller (this route's own builder) supplies
   /// navigation.
   static const String productFormPath = '/business-console/products/form';
+
+  /// Part P-040 — see [moderation].
+  ///
+  /// Gated in `app_router.dart`'s `redirect` callback: a signed-in user
+  /// whose session has neither `isModerator` nor `isStaff` is sent to
+  /// [homePath] no matter how they got here (`context.go`, a deep link,
+  /// a restored location). The gate covers this path and everything
+  /// under `/moderation/`.
+  static const String moderationPath = '/moderation';
+
+  /// Part P-040 — see [moderationReview].
+  ///
+  /// No `:id` segment, for the same reason as [productFormPath]: the
+  /// queue screen already holds the full queue item, which is handed
+  /// over as `context.pushNamed(..., extra: item)` instead of being
+  /// looked up again. A location reached WITHOUT that `extra` (a deep
+  /// link, an app restore) has nothing to show, so the router's redirect
+  /// sends it back to [moderationPath] rather than building a broken
+  /// screen.
+  static const String moderationReviewPath = '/moderation/review';
 
   /// Path-parameter key shared by [businessProfilePath], [productDetailPath]
   /// and [chatThreadPath].
