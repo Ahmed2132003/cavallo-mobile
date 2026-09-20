@@ -16,19 +16,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// file). Only [login] is exercised by this screen; the other methods
 /// are never called here.
 class _FakeAuthRepository implements AuthRepository {
-  _FakeAuthRepository({this.loginBehavior, this.fetchMeBehavior});
+  _FakeAuthRepository({this.loginBehavior});
 
   /// Invoked by [login]. Return normally for a successful login, or
   /// `throw` an [ApiFailure] to simulate a backend failure. `null` (the
   /// default) completes successfully with no extra behavior.
   final Future<void> Function()? loginBehavior;
-
-  /// Invoked by [fetchMe]. `SessionNotifier.login` (session_provider.dart)
-  /// calls [fetchMe] immediately after a successful [login] to resolve
-  /// the real authenticated user — it is genuinely exercised by every
-  /// test here whose login succeeds, not just a stub to satisfy the
-  /// interface. `null` (the default) returns a fixed successful [User].
-  final Future<User> Function()? fetchMeBehavior;
 
   int loginCallCount = 0;
   int fetchMeCallCount = 0;
@@ -71,10 +64,12 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<User> fetchMe() async {
+    // `SessionNotifier.login` (session_provider.dart) calls [fetchMe]
+    // immediately after a successful [login] to resolve the real
+    // authenticated user — genuinely exercised by every test here whose
+    // login succeeds. No test in this file needs to customize it, so it
+    // always returns a fixed successful [User].
     fetchMeCallCount++;
-    if (fetchMeBehavior != null) {
-      return fetchMeBehavior!();
-    }
     return _defaultUser;
   }
 }

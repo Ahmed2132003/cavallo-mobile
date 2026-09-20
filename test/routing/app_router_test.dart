@@ -42,6 +42,8 @@ const _fakeUser = User(
   id: 1,
   email: 'test@example.com',
   accountType: AccountType.customer,
+  isModerator: false,
+  isStaff: false,
 );
 
 /// Hand-rolled test double for [ProductRepository] — Part P-033's

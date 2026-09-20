@@ -71,6 +71,8 @@ const _fakeUser = User(
   id: 1,
   email: 'test@example.com',
   accountType: AccountType.customer,
+  isModerator: false,
+  isStaff: false,
 );
 
 /// Pumps a real [GoRouter] (from [appRouterProvider]) wrapped in
