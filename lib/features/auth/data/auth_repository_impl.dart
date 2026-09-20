@@ -74,10 +74,20 @@ class AuthRepositoryImpl implements AuthRepository {
     // register endpoint issues no tokens at all — see AuthRepository's
     // module docstring. The caller (Part P-021's UI) must call [login]
     // explicitly afterward if it wants the user signed in immediately.
+    //
+    // isModerator/isStaff are hardcoded false here, not fetched: the
+    // register endpoint doesn't return them (RegisterSerializer only
+    // ever creates Customer/Business accounts — accounts/models.py's
+    // defaults for both flags are False, and nothing in the
+    // registration flow can set them true). A real Moderator/Admin
+    // account is always granted that role afterward via Django Admin,
+    // never at registration.
     return User(
       id: responseDto.id,
       email: responseDto.email,
       accountType: AccountType.fromWire(responseDto.accountType),
+      isModerator: false,
+      isStaff: false,
     );
   }
 
@@ -157,6 +167,8 @@ class AuthRepositoryImpl implements AuthRepository {
       id: dto.id,
       email: dto.email,
       accountType: AccountType.fromWire(dto.accountType),
+      isModerator: dto.isModerator,
+      isStaff: dto.isStaff,
     );
   }
 }

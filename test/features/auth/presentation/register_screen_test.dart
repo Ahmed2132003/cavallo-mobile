@@ -53,6 +53,8 @@ class _FakeAuthRepository implements AuthRepository {
     id: 1,
     email: 'new@example.com',
     accountType: AccountType.customer,
+    isModerator: false,
+    isStaff: false,
   );
 
   @override
@@ -248,6 +250,8 @@ void main() {
             id: 2,
             email: 'new@example.com',
             accountType: AccountType.customer,
+            isModerator: false,
+            isStaff: false,
           ),
         );
         await tester.pumpAndSettle();

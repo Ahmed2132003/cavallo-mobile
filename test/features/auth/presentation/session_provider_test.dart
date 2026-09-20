@@ -39,12 +39,16 @@ class FakeAuthRepository implements AuthRepository {
     id: 7,
     email: 'fetched@example.com',
     accountType: AccountType.business,
+    isModerator: false,
+    isStaff: false,
   );
 
   final User registerResult = const User(
     id: 42,
     email: 'registered@example.com',
     accountType: AccountType.business,
+    isModerator: false,
+    isStaff: false,
   );
 
   @override

@@ -2,13 +2,18 @@
 /// user — no transport concerns (no raw JSON keys, no DTO types) cross
 /// this boundary, per Clean Architecture Section 11.
 ///
-/// Deliberately minimal (id, email, accountType only), mirroring exactly
-/// what `POST /api/v1/auth/register/` returns (accounts/views.py,
-/// RegisterView.create — confirmed against the real backend, not
-/// assumed): `{"id": ..., "email": ..., "account_type": ...}`. No
-/// `BusinessProfile`/`business_type` fields exist on this entity because
-/// none exist on the backend at this point in the flow either (Part
-/// P-017's own scope decision, deferred to Phase 4 / Part P-042).
+/// Originally deliberately minimal (id, email, accountType only),
+/// mirroring exactly what `POST /api/v1/auth/register/` returns
+/// (accounts/views.py, RegisterView.create): `{"id": ..., "email": ...,
+/// "account_type": ...}`. No `BusinessProfile`/`business_type` fields
+/// exist on this entity because none exist on the backend at this point
+/// in the flow either (Part P-017's own scope decision, deferred to
+/// Phase 4 / Part P-042).
+///
+/// `isModerator`/`isStaff` were added ahead of Part P-040 (Flutter
+/// moderator UI), to give the router redirect guard a real source of
+/// truth for gating the `/moderation` route — see `MeResponseDto`'s
+/// docstring for where these two values come from on the wire.
 library;
 
 /// Mirrors `accounts.models.User.ACCOUNT_TYPE_CHOICES` on the backend
@@ -47,19 +52,36 @@ enum AccountType {
 }
 
 /// A registered user, as far as the domain/presentation layers need to
-/// know. Constructed only by [AuthRepository.register]'s mapping step
-/// (auth_repository_impl.dart) — see that file's module docstring for why
-/// [AuthRepository.login]/`refresh` do NOT also return one of these.
+/// know. Constructed only by [AuthRepository.register]'s and
+/// [AuthRepository.fetchMe]'s mapping steps (auth_repository_impl.dart)
+/// — see that file's module docstring for why [AuthRepository.login]/
+/// `refresh` do NOT also return one of these.
 class User {
   const User({
     required this.id,
     required this.email,
     required this.accountType,
+    required this.isModerator,
+    required this.isStaff,
   });
 
   final int id;
   final String email;
   final AccountType accountType;
+
+  /// Mirrors `accounts.models.User.is_moderator` — `true` only for
+  /// accounts an Admin/Super Admin has explicitly granted moderation
+  /// capability to (`can_moderate_content`, P-019). Always `false` for a
+  /// freshly [AuthRepository.register]ed user — registration never
+  /// grants this (see `AuthRepositoryImpl.register`'s own comment).
+  final bool isModerator;
+
+  /// Mirrors `accounts.models.User.is_staff` (Django's own field,
+  /// reused rather than duplicated — see `accounts/models.py`'s
+  /// field-to-role docstring: is_staff → Admin). Always `false` for a
+  /// freshly [AuthRepository.register]ed user, same reasoning as
+  /// [isModerator].
+  final bool isStaff;
 
   @override
   bool operator ==(Object other) =>
@@ -67,12 +89,16 @@ class User {
       (other is User &&
           other.id == id &&
           other.email == email &&
-          other.accountType == accountType);
+          other.accountType == accountType &&
+          other.isModerator == isModerator &&
+          other.isStaff == isStaff);
 
   @override
-  int get hashCode => Object.hash(id, email, accountType);
+  int get hashCode =>
+      Object.hash(id, email, accountType, isModerator, isStaff);
 
   @override
   String toString() =>
-      'User(id: $id, email: $email, accountType: $accountType)';
+      'User(id: $id, email: $email, accountType: $accountType, '
+      'isModerator: $isModerator, isStaff: $isStaff)';
 }

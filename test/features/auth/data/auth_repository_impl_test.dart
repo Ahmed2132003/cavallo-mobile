@@ -66,7 +66,16 @@ void main() {
         accountType: AccountType.business,
       );
 
-      expect(user, const User(id: 3, email: 'trader@example.com', accountType: AccountType.business));
+      expect(
+        user,
+        const User(
+          id: 3,
+          email: 'trader@example.com',
+          accountType: AccountType.business,
+          isModerator: false,
+          isStaff: false,
+        ),
+      );
       // No tokens issued by this endpoint — see AuthRepository's module
       // docstring — so nothing should have been persisted.
       expect(await tokenStorage.getAccessToken(), isNull);
@@ -233,5 +242,73 @@ void main() {
         expect(await tokenStorage.getRefreshToken(), isNull);
       },
     );
+  });
+
+  group('fetchMe', () {
+    test('maps id/email/accountType/isModerator/isStaff for an ordinary user', () async {
+      adapter.onGet(
+        '/api/v1/auth/me/',
+        (server) => server.reply(200, {
+          'id': 9,
+          'email': 'customer@example.com',
+          'account_type': 'customer',
+          'is_moderator': false,
+          'is_staff': false,
+        }),
+      );
+
+      final user = await repository.fetchMe();
+
+      expect(
+        user,
+        const User(
+          id: 9,
+          email: 'customer@example.com',
+          accountType: AccountType.customer,
+          isModerator: false,
+          isStaff: false,
+        ),
+      );
+    });
+
+    test("maps a Moderator/Staff user's true role flags", () async {
+      // The exact case Part P-040's router gate depends on: a real
+      // Moderator/Admin account must come back with these true, not
+      // silently collapsed to false.
+      adapter.onGet(
+        '/api/v1/auth/me/',
+        (server) => server.reply(200, {
+          'id': 11,
+          'email': 'mod@example.com',
+          'account_type': 'customer',
+          'is_moderator': true,
+          'is_staff': true,
+        }),
+      );
+
+      final user = await repository.fetchMe();
+
+      expect(user.isModerator, isTrue);
+      expect(user.isStaff, isTrue);
+    });
+
+    test('a 401 surfaces as AuthFailure', () async {
+      adapter.onGet(
+        '/api/v1/auth/me/',
+        (server) => server.reply(401, {
+          'error': {
+            'code': 'AUTHENTICATION_FAILED',
+            'message': 'Authentication credentials were not provided.',
+          },
+        }),
+      );
+
+      try {
+        await repository.fetchMe();
+        fail('Expected a DioException to be thrown');
+      } on DioException catch (e) {
+        expect(e.error, isA<AuthFailure>());
+      }
+    });
   });
 }

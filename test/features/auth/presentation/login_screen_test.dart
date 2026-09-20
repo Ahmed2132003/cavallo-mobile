@@ -39,6 +39,8 @@ class _FakeAuthRepository implements AuthRepository {
     id: 1,
     email: 'user@example.com',
     accountType: AccountType.customer,
+    isModerator: false,
+    isStaff: false,
   );
 
   @override
