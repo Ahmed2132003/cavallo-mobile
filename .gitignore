@@ -11,3 +11,5 @@ pubspec.lock
 .idea/
 .vscode/
 .DS_Store
+
+android/hs_err_pid*.log
