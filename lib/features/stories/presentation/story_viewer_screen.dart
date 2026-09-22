@@ -210,10 +210,25 @@ class _StoryPlayerState extends ConsumerState<_StoryPlayer>
     // Local-only "seen" bookkeeping for StoryRingWidget's styling --
     // a deliberately separate, narrower concern from this widget's own
     // timer/progress state above. See viewedStoriesProvider's own doc.
-    final notifier = ref.read(
-      viewedStoriesProvider(widget.businessId).notifier,
-    );
-    notifier.state = {...notifier.state, story.id};
+    //
+    // Deferred to a microtask, NOT written synchronously here. This
+    // method's very first call happens from initState() -- which
+    // Riverpod still treats as "the widget tree building": a
+    // synchronous provider write at that point throws "Tried to
+    // modify a provider while the widget tree was building" (a real
+    // failure this part's own widget tests caught, not a hypothetical
+    // one). Future.microtask runs immediately after the current build
+    // finishes -- Riverpod's own documented fix for exactly this
+    // error -- so the write still lands before the next frame, just
+    // not *during* this one. The `mounted` guard covers the rare case
+    // where the viewer is closed before that microtask runs.
+    Future.microtask(() {
+      if (!mounted) return;
+      final notifier = ref.read(
+        viewedStoriesProvider(widget.businessId).notifier,
+      );
+      notifier.state = {...notifier.state, story.id};
+    });
   }
 
   void _advance() {
