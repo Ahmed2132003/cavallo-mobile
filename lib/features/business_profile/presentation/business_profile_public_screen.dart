@@ -9,6 +9,11 @@ import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
 import '../../../routing/route_names.dart';
+import '../../content/domain/public_post_entity.dart';
+import '../../content/domain/public_reel_entity.dart';
+import '../../content/presentation/content_public_providers.dart';
+import '../../content/presentation/post_card.dart';
+import '../../content/presentation/reel_card.dart';
 import '../../products/domain/product_entity.dart';
 import '../../products/presentation/product_price_framing.dart';
 import '../../products/presentation/product_public_providers.dart';
@@ -27,8 +32,8 @@ import 'business_profile_public_provider.dart';
 ///
 /// * **Phase 5 (Products)** — DONE in Part P-034: [_ProductsSection],
 ///   appended at the marked section boundary in [_ProfileView] below.
-/// * **Phase 7 (Posts/Reels)** — posts and reels sections, at the same
-///   boundary, below products.
+/// * **Phase 7 (Posts/Reels)** — DONE in Part P-045 (STEP 6):
+///   [_PostsSection]/[_ReelsSection], appended right after products.
 /// * **Phase 9 (Follow)** — activates the currently-disabled Follow
 ///   button in [_ProfileHeader], and is also where `followerCount`
 ///   (see note below) becomes real and displayable.
@@ -51,6 +56,32 @@ import 'business_profile_public_provider.dart';
 /// every price shown here. Nothing in the section resembles a purchase
 /// flow (no cart icon, no Buy Now, no quantity selector). Tapping a card
 /// opens the real `ProductDetailScreen` via [RouteNames.productDetail].
+///
+/// ## Part P-045 (STEP 6) — the Posts/Reels sections
+///
+/// [_PostsSection]/[_ReelsSection] follow [_ProductsSection]'s exact
+/// shape: own independent loading/empty/error states, first page only,
+/// read through `businessPostsProvider`/`businessReelsProvider`
+/// (`content_public_providers.dart`, this part's own STEP 6 addition).
+///
+/// Neither section applies any client-side filtering of its own. Both
+/// `PostPublicRepositoryImpl.fetchBusinessPosts` and
+/// `ReelPublicRepositoryImpl.fetchBusinessReels` (Part P-045, STEP 1)
+/// call the backend's `/public/` list endpoints
+/// (`PostPublicListView`/`ReelPublicListView`, Part P-043), whose own
+/// managers (`Post.published_objects`/`Reel.published_objects`) are the
+/// actual enforcement point for "published only" — this screen trusts
+/// and displays whatever those repositories return, exactly the same
+/// trust relationship [_ProductsSection] already has with
+/// `businessProductsProvider`. A second, redundant filter here would
+/// only hide a real backend bug instead of surfacing it.
+///
+/// Each item renders through [PostCard]/[ReelCard] (Part P-045, STEP
+/// 2/3) — the same reusable widgets Phase 10's Feed (Part P-061) will
+/// import unmodified — wrapped with a tap handler that pushes the real
+/// `PostDetailScreen`/`ReelDetailScreen` via [RouteNames.postDetail]/
+/// [RouteNames.reelDetail], same `context.pushNamed` convention as
+/// [_ProductCard]'s own tap handler below.
 ///
 /// ## `followerCount` is deliberately not displayed
 ///
@@ -177,14 +208,24 @@ class _ProfileView extends StatelessWidget {
 
           // ---------------------------------------------------------
           // SECTION BOUNDARY — later phases append below this line.
-          //   Phase 5: Products section  — DONE (Part P-034), below.
-          //   Phase 7: Posts / Reels sections — append after products.
+          //   Phase 5: Products section       — DONE (Part P-034).
+          //   Phase 7: Posts / Reels sections  — DONE (Part P-045).
           // Add new sections here, in this Column, in this file. Do NOT
           // create a second business-profile screen. See this file's
           // top-level docstring.
           // ---------------------------------------------------------
           const SizedBox(height: 32),
           _ProductsSection(businessId: profile.id),
+          const SizedBox(height: 32),
+          _PostsSection(
+            businessId: profile.id,
+            businessName: profile.businessName,
+          ),
+          const SizedBox(height: 32),
+          _ReelsSection(
+            businessId: profile.id,
+            businessName: profile.businessName,
+          ),
         ],
       ),
     );
@@ -434,6 +475,201 @@ class _ProductThumbnail extends StatelessWidget {
                     (context, error, stackTrace) =>
                         placeholder(Icons.broken_image_outlined),
               ),
+    );
+  }
+}
+
+/// Part P-045 (STEP 6): the business's published Posts, first page only.
+///
+/// Same shape as [_ProductsSection] — owns its own loading/empty/error
+/// states so a Posts failure never replaces the whole profile, and never
+/// re-filters what `businessPostsProvider` returns (see this file's
+/// class-level docstring, "Part P-045 (STEP 6)" section, for why a
+/// second filter here would be redundant and would only hide a real
+/// backend bug).
+class _PostsSection extends ConsumerWidget {
+  const _PostsSection({required this.businessId, required this.businessName});
+
+  final int businessId;
+  final String businessName;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final postsAsync = ref.watch(businessPostsProvider(businessId));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Posts', style: theme.textTheme.titleLarge),
+        const SizedBox(height: 12),
+        switch (postsAsync) {
+          AsyncData(value: final posts) when posts.isEmpty =>
+            const EmptyStateWidget(
+              message: 'This business hasn\'t shared any posts yet.',
+              icon: Icons.article_outlined,
+            ),
+          AsyncData(value: final posts) => Column(
+            children: [
+              for (final post in posts)
+                _PostListItem(post: post, businessName: businessName),
+            ],
+          ),
+          AsyncError(:final error) => _PostsErrorView(
+            error: error,
+            businessId: businessId,
+          ),
+          _ => const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: LoadingIndicator(),
+          ),
+        },
+      ],
+    );
+  }
+}
+
+/// Inline, retryable failure for the Posts section only.
+class _PostsErrorView extends ConsumerWidget {
+  const _PostsErrorView({required this.error, required this.businessId});
+
+  final Object error;
+  final int businessId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Same dual-shape handling as [_LoadErrorView]/[_ProductsErrorView].
+    final message = switch (error) {
+      DioException(error: final ApiFailure failure) => failure.message,
+      ApiFailure(:final message) => message,
+      _ => 'Could not load this business\'s posts.',
+    };
+
+    return ErrorStateWidget(
+      message: message,
+      onRetry: () => ref.invalidate(businessPostsProvider(businessId)),
+    );
+  }
+}
+
+/// Wraps [PostCard] (Part P-045, STEP 2) with this screen's own tap
+/// behavior — pushing the real `PostDetailScreen` via
+/// [RouteNames.postDetail] — and the vertical spacing this section's
+/// plain [Column] layout needs. [PostCard] itself stays free of any
+/// navigation dependency, same as [_ProductCard] does for
+/// `ProductDetailScreen`.
+class _PostListItem extends StatelessWidget {
+  const _PostListItem({required this.post, required this.businessName});
+
+  final PublicPost post;
+  final String businessName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: PostCard(
+        post: post,
+        businessName: businessName,
+        onTap:
+            () => context.pushNamed(
+              RouteNames.postDetail,
+              pathParameters: {RouteNames.idParam: '${post.id}'},
+            ),
+      ),
+    );
+  }
+}
+
+/// Part P-045 (STEP 6): the business's published, fully-processed Reels,
+/// first page only. Same shape, same "no redundant re-filtering"
+/// reasoning as [_PostsSection] — see that class's docstring.
+class _ReelsSection extends ConsumerWidget {
+  const _ReelsSection({required this.businessId, required this.businessName});
+
+  final int businessId;
+  final String businessName;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final reelsAsync = ref.watch(businessReelsProvider(businessId));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Reels', style: theme.textTheme.titleLarge),
+        const SizedBox(height: 12),
+        switch (reelsAsync) {
+          AsyncData(value: final reels) when reels.isEmpty =>
+            const EmptyStateWidget(
+              message: 'This business hasn\'t shared any reels yet.',
+              icon: Icons.movie_outlined,
+            ),
+          AsyncData(value: final reels) => Column(
+            children: [
+              for (final reel in reels)
+                _ReelListItem(reel: reel, businessName: businessName),
+            ],
+          ),
+          AsyncError(:final error) => _ReelsErrorView(
+            error: error,
+            businessId: businessId,
+          ),
+          _ => const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: LoadingIndicator(),
+          ),
+        },
+      ],
+    );
+  }
+}
+
+/// Inline, retryable failure for the Reels section only.
+class _ReelsErrorView extends ConsumerWidget {
+  const _ReelsErrorView({required this.error, required this.businessId});
+
+  final Object error;
+  final int businessId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final message = switch (error) {
+      DioException(error: final ApiFailure failure) => failure.message,
+      ApiFailure(:final message) => message,
+      _ => 'Could not load this business\'s reels.',
+    };
+
+    return ErrorStateWidget(
+      message: message,
+      onRetry: () => ref.invalidate(businessReelsProvider(businessId)),
+    );
+  }
+}
+
+/// Wraps [ReelCard] (Part P-045, STEP 3) with this screen's own tap
+/// behavior — pushing the real `ReelDetailScreen` via
+/// [RouteNames.reelDetail]. Same shape as [_PostListItem].
+class _ReelListItem extends StatelessWidget {
+  const _ReelListItem({required this.reel, required this.businessName});
+
+  final PublicReel reel;
+  final String businessName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: ReelCard(
+        reel: reel,
+        businessName: businessName,
+        onTap:
+            () => context.pushNamed(
+              RouteNames.reelDetail,
+              pathParameters: {RouteNames.idParam: '${reel.id}'},
+            ),
+      ),
     );
   }
 }

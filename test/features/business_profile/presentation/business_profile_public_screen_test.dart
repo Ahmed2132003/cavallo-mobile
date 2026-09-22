@@ -10,6 +10,12 @@ import 'package:social_commerce_app/features/business_profile/data/business_prof
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_public_repository.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_public_screen.dart';
+import 'package:social_commerce_app/features/content/data/post_public_repository.dart';
+import 'package:social_commerce_app/features/content/data/reel_public_repository.dart';
+import 'package:social_commerce_app/features/content/domain/post_public_repository.dart';
+import 'package:social_commerce_app/features/content/domain/public_post_entity.dart';
+import 'package:social_commerce_app/features/content/domain/public_reel_entity.dart';
+import 'package:social_commerce_app/features/content/domain/reel_public_repository.dart';
 import 'package:social_commerce_app/features/products/data/product_public_repository.dart';
 import 'package:social_commerce_app/features/products/domain/product_entity.dart';
 import 'package:social_commerce_app/features/products/domain/product_public_repository.dart';
@@ -25,20 +31,11 @@ import 'package:social_commerce_app/features/products/domain/product_public_repo
 /// [fetchError], when set, is thrown as-is (not wrapped in a
 /// [DioException]) — deliberately matching how
 /// `FakeBusinessProfileRepository` throws directly in this project's
-/// existing provider tests. This is the "hand-rolled fake" shape flagged
-/// in this feature's `PROJECT_PROGRESS.md` entry (`_LoadErrorView`
-/// handles both this shape and the real, `DioException`-wrapped shape
-/// `ErrorInterceptor` actually produces in production) — this test
-/// exercises the bare-[ApiFailure] branch specifically, since that is
-/// what every fake repository in this project throws.
+/// existing provider tests.
 ///
 /// [pending], when set, makes [fetchPublicProfile] await it instead of
 /// resolving/throwing immediately — needed to assert the loading state
-/// deterministically. Without this, an immediately-resolving fake's
-/// `Future` can complete during the same microtask a single
-/// `tester.pump()` processes, making the "still loading" window
-/// unobservable and the assertion flaky depending on event-loop timing
-/// rather than actual provider state.
+/// deterministically.
 class _FakeBusinessProfilePublicRepository
     implements BusinessProfilePublicRepository {
   _FakeBusinessProfilePublicRepository({
@@ -65,18 +62,17 @@ class _FakeBusinessProfilePublicRepository
   }
 }
 
-/// Part P-034 addition: [BusinessProfilePublicScreen] now also shows a
-/// products section, which watches `businessProductsProvider(id)` the
-/// moment a profile is rendered — and that provider calls through
+/// Part P-034 addition: [BusinessProfilePublicScreen] shows a products
+/// section, which watches `businessProductsProvider(id)` the moment a
+/// profile is rendered — and that provider calls through
 /// `productPublicRepositoryProvider` to the real Dio client by default.
 /// Without an override, every "profile found" test in this file would
-/// silently start firing a real `GET /api/v1/products/public/` (same
-/// reasoning Part P-029 documented in `app_router_redirect_test.dart`).
+/// silently start firing a real `GET /api/v1/products/public/`.
 ///
-/// This file's own assertions are about the profile header only, so the
-/// fake always resolves to an empty first page — the simplest fixed
-/// outcome. The products section itself is covered by
-/// `business_profile_public_products_section_test.dart` (Part P-034).
+/// This file's own assertions are about the profile header (and, since
+/// Part P-045, the Posts/Reels sections' OWN dedicated test file) — the
+/// fake here always resolves to an empty first page, the simplest fixed
+/// outcome.
 class _EmptyProductPublicRepository implements ProductPublicRepository {
   @override
   Future<Product?> fetchPublicProduct(int id) async => null;
@@ -86,6 +82,45 @@ class _EmptyProductPublicRepository implements ProductPublicRepository {
     int businessId,
   ) async =>
       const PaginatedResponse<Product>(results: [], next: null, previous: null);
+}
+
+/// Part P-045 (STEP 7) addition: same reasoning as
+/// [_EmptyProductPublicRepository], now for `businessPostsProvider`
+/// (`content_public_providers.dart`, this part's STEP 6 addition) —
+/// [_PostsSection] watches it the moment a profile renders. Without this
+/// override every test in this file would fire a real
+/// `GET /api/v1/posts/public/`. Detailed Posts-section behavior (real
+/// items, empty state, error/retry) is covered by
+/// `business_profile_public_content_section_test.dart` (this part, STEP
+/// 7) — this fake always resolves to an empty first page.
+class _EmptyPostPublicRepository implements PostPublicRepository {
+  @override
+  Future<PublicPost?> fetchPublicPost(int id) async => null;
+
+  @override
+  Future<PaginatedResponse<PublicPost>> fetchBusinessPosts(
+    int businessId,
+  ) async => const PaginatedResponse<PublicPost>(
+    results: [],
+    next: null,
+    previous: null,
+  );
+}
+
+/// See [_EmptyPostPublicRepository]'s doc — identical reasoning, for
+/// `businessReelsProvider`/[_ReelsSection].
+class _EmptyReelPublicRepository implements ReelPublicRepository {
+  @override
+  Future<PublicReel?> fetchPublicReel(int id) async => null;
+
+  @override
+  Future<PaginatedResponse<PublicReel>> fetchBusinessReels(
+    int businessId,
+  ) async => const PaginatedResponse<PublicReel>(
+    results: [],
+    next: null,
+    previous: null,
+  );
 }
 
 const _profile = BusinessProfile(
@@ -108,7 +143,9 @@ const _unverifiedProfile = BusinessProfile(
 );
 
 /// Pumps [BusinessProfilePublicScreen] for [businessId], with
-/// [businessProfilePublicRepositoryProvider] overridden to [repository].
+/// [businessProfilePublicRepositoryProvider] overridden to [repository],
+/// and Products/Posts/Reels all overridden to empty (Part P-045, STEP 7)
+/// so this file's assertions stay about the profile header only.
 Future<void> _pumpScreen(
   WidgetTester tester, {
   required String businessId,
@@ -120,6 +157,12 @@ Future<void> _pumpScreen(
         businessProfilePublicRepositoryProvider.overrideWithValue(repository),
         productPublicRepositoryProvider.overrideWithValue(
           _EmptyProductPublicRepository(),
+        ),
+        postPublicRepositoryProvider.overrideWithValue(
+          _EmptyPostPublicRepository(),
+        ),
+        reelPublicRepositoryProvider.overrideWithValue(
+          _EmptyReelPublicRepository(),
         ),
       ],
       child: MaterialApp(
@@ -167,14 +210,8 @@ void main() {
       await _pumpScreen(tester, businessId: '7', repository: repository);
       await tester.pump();
 
-      // Still pending — the fake's Future has not been completed yet, so
-      // the provider is genuinely stuck in AsyncLoading, not merely
-      // "not yet checked."
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      // Resolve it now and confirm the screen actually moves on — this
-      // guards against a false pass where the loading state renders
-      // simply because nothing else ever would.
       completer.complete(_profile);
       await tester.pumpAndSettle();
 
@@ -209,6 +246,18 @@ void main() {
         );
         expect(followButton.onPressed, isNull);
         expect(find.text('(coming soon)'), findsOneWidget);
+
+        // Part P-045 (STEP 6): the Posts/Reels sections render their own
+        // empty states here, since the fake repositories always resolve
+        // to an empty first page in this file.
+        expect(
+          find.text('This business hasn\'t shared any posts yet.'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('This business hasn\'t shared any reels yet.'),
+          findsOneWidget,
+        );
       },
     );
 
@@ -286,9 +335,6 @@ void main() {
 
         expect(find.text('Something broke.'), findsOneWidget);
         expect(find.widgetWithText(AppButton, 'Retry'), findsOneWidget);
-        // Not the not-found copy — a genuine error is distinct from
-        // "this business doesn't exist," per this part's own acceptance
-        // criteria.
         expect(
           find.text('Business not found.\nIt may have been removed.'),
           findsNothing,
@@ -306,8 +352,6 @@ void main() {
 
       expect(repository.callCount, 1);
 
-      // Fix the "backend" before retrying, mirroring a real transient
-      // failure that clears up.
       repository.fetchError = null;
       repository.fetchResult = _profile;
 

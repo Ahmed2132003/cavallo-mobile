@@ -26,14 +26,6 @@ import '../domain/public_reel_entity.dart';
 /// are `<int:pk>/`, so a non-numeric id can never identify anything.
 /// `PostDetailScreen`/`ReelDetailScreen` (this part, STEP 4/5) parse it
 /// before ever reading these providers.
-///
-/// Business-list providers (`businessPostsProvider`/
-/// `businessReelsProvider`, mirroring `businessProductsProvider` — the
-/// second provider in `product_public_providers.dart`, right below
-/// `productPublicDetailProvider`) are deliberately NOT added here yet:
-/// STEP 4/5 only need these two by-id providers for the detail screens.
-/// They belong in this same file once the business-profile-screen
-/// Posts/Reels section (this part's remaining scope) is built.
 final postPublicDetailProvider = FutureProvider.autoDispose
     .family<PublicPost?, int>((ref, id) {
       return ref.watch(postPublicRepositoryProvider).fetchPublicPost(id);
@@ -43,4 +35,33 @@ final postPublicDetailProvider = FutureProvider.autoDispose
 final reelPublicDetailProvider = FutureProvider.autoDispose
     .family<PublicReel?, int>((ref, id) {
       return ref.watch(reelPublicRepositoryProvider).fetchPublicReel(id);
+    }, retry: (retryCount, error) => null);
+
+/// Part P-045 STEP 6 addition: the FIRST page of one business's public,
+/// published Posts (`GET /api/v1/posts/public/?business_id=...`), shown
+/// as the Posts section of the public business profile screen
+/// (`business_profile_public_screen.dart`, Part P-029's screen, extended
+/// by this part). Same "first page only, no load-more UI" scope decision
+/// as `businessProductsProvider` (`product_public_providers.dart`, Part
+/// P-034) — the cursor metadata (`next`/`previous`) is intentionally
+/// dropped. An empty list is a valid, renderable state (the business
+/// hasn't shared any posts yet), not an error.
+///
+/// `autoDispose` + disabled retry, for the same reasons as
+/// [postPublicDetailProvider].
+final businessPostsProvider = FutureProvider.autoDispose
+    .family<List<PublicPost>, int>((ref, businessId) async {
+      final page = await ref
+          .watch(postPublicRepositoryProvider)
+          .fetchBusinessPosts(businessId);
+      return page.results;
+    }, retry: (retryCount, error) => null);
+
+/// See [businessPostsProvider]'s doc — identical contract, for Reel.
+final businessReelsProvider = FutureProvider.autoDispose
+    .family<List<PublicReel>, int>((ref, businessId) async {
+      final page = await ref
+          .watch(reelPublicRepositoryProvider)
+          .fetchBusinessReels(businessId);
+      return page.results;
     }, retry: (retryCount, error) => null);
