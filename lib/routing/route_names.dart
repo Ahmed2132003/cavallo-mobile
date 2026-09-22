@@ -141,6 +141,19 @@ class RouteNames {
   /// Same reasoning as [postDetail].
   static const String reelDetail = 'reelDetail';
 
+  /// Part P-050: the customer-facing Story viewer (`StoryViewerScreen`)
+  /// for one business's currently-visible Story sequence, reached from
+  /// `StoryRingWidget` (this part). Uses [idParam], same convention as
+  /// [businessProfilePath]/[productDetailPath]/[postDetailPath]/
+  /// [reelDetailPath] — this router always names its path segment `id`
+  /// regardless of what it semantically identifies (here: a business
+  /// id, exactly like [businessProfilePath]). Its natural entry point
+  /// (Phase 10's Discover screen stories bar, P-062) doesn't exist yet
+  /// — reachable for now via direct navigation from wherever
+  /// `StoryRingWidget` is placed, same precedent as [postDetail]/
+  /// [reelDetail] being reachable before Phase 10's Feed existed.
+  static const String storyViewer = 'storyViewer';
+
   // --- Route paths (used inside GoRoute(path: ...)) ---
   static const String splashPath = '/';
   static const String loginPath = '/login';
@@ -227,7 +240,11 @@ class RouteNames {
   /// Part P-045 — see [reelDetail]. Same shape as [postDetailPath].
   static const String reelDetailPath = '/reel/:id';
 
+  /// Part P-050 — see [storyViewer].
+  static const String storyViewerPath = '/stories/:id';
+
   /// Path-parameter key shared by [businessProfilePath], [productDetailPath],
-  /// [chatThreadPath], [postDetailPath] and [reelDetailPath].
+  /// [chatThreadPath], [postDetailPath], [reelDetailPath] and
+  /// [storyViewerPath].
   static const String idParam = 'id';
 }
