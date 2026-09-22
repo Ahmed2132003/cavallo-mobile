@@ -208,6 +208,25 @@ void main() {
     });
   });
 
+  group('StoryViewerScreen — load error', () {
+    testWidgets(
+      'a genuine fetch failure shows the error message, not the empty '
+      'or not-found state',
+      (tester) async {
+        final repository = _FakeStoryPublicRepository(
+          fetchError: Exception('network down'),
+        );
+
+        await _pumpScreen(tester, businessId: '1', repository: repository);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Could not load stories.'), findsOneWidget);
+        expect(find.text('No stories to show right now.'), findsNothing);
+        expect(find.text('Story not found.'), findsNothing);
+      },
+    );
+  });
+
   group('StoryViewerScreen — tap-to-advance / tap-to-go-back', () {
     testWidgets(
       'tapping the right half advances to the next story and records a '
@@ -334,7 +353,18 @@ void main() {
         // Advances the test binding's virtual clock -- the same
         // AnimationController driving `_ProgressBars` completes for
         // real, exactly as it would on a device after 5 real seconds.
-        await tester.pump(const Duration(seconds: 5));
+        //
+        // A small buffer (100ms) is added past the exact 5-second
+        // duration: AnimationController's ticker only captures its
+        // real _startTime on the FIRST tick after .forward() is
+        // called, not at the call itself, so pumping exactly 5000ms
+        // can land the animation's value a hair under 1.0 (still
+        // `forward`, not `completed`) and _advance() never fires.
+        // 100ms is nowhere near enough to let the second story's own
+        // fresh 5-second cycle (started by _advance()'s reset/forward)
+        // complete on its own, so this can't mask a missed SECOND
+        // auto-advance.
+        await tester.pump(const Duration(seconds: 5, milliseconds: 100));
         await tester.pump();
 
         expect(repository.recordedViewIds, [41, 42]);

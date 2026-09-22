@@ -90,6 +90,23 @@ import '../../business_profile/presentation/business_profile_provider.dart';
 /// **Remove this button once a real navigation home for moderators
 /// exists (e.g. an admin/moderator section of a real profile or settings
 /// screen) — it should not ship as-is.**
+///
+/// ### Part P-050 addition — "View Story (debug)" button
+///
+/// P-050's own natural entry point (Phase 10's Discover screen stories
+/// bar, `story_ring_widget.dart` import target, P-062) doesn't exist
+/// yet — same "reachable only via a temporary debug button until its
+/// real navigational home is built" situation as every other addition
+/// above. Hardcodes `businessId: 3` — this is a manual-verification-only
+/// button (P-050's own end-to-end acceptance criterion: business
+/// creates → moderator approves → customer views → view recorded), not
+/// a real navigation entry, so it isn't gated on `isBusinessUser`/
+/// `canModerate` like the buttons above — any signed-in Customer needs
+/// to reach it to exercise that criterion.
+///
+/// **Remove this button once Phase 10's Discover screen (P-062) gives
+/// `StoryRingWidget` its real, permanent home — it should not ship
+/// as-is.**
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -147,6 +164,18 @@ class HomeScreen extends ConsumerWidget {
                 onPressed: () => context.pushNamed(RouteNames.moderation),
               ),
             ],
+            const SizedBox(height: 16),
+            // Temporary — Part P-050, see class docstring above.
+            // Manual-verification-only entry point, hardcoded to
+            // businessId 3 — not gated on account type.
+            AppButton(
+              label: 'View Story (debug, business 3)',
+              onPressed: () => context.pushNamed(
+                RouteNames.storyViewer,
+                pathParameters: {RouteNames.idParam: '3'},
+                extra: 'Business 3',
+              ),
+            ),
             const SizedBox(height: 16),
             // Temporary — Part P-021c, see class docstring above.
             AppButton(
