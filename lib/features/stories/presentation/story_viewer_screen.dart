@@ -8,6 +8,7 @@ import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
+import '../data/story_public_repository.dart';
 import '../domain/public_story_entity.dart';
 import 'story_public_provider.dart';
 

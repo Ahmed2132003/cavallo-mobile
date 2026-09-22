@@ -30,6 +30,7 @@ import '../features/products/presentation/product_detail_screen.dart';
 import '../features/products/presentation/product_form_screen.dart';
 import '../features/products/presentation/product_list_screen.dart';
 import '../features/search/presentation/search_screen.dart';
+import '../features/stories/presentation/story_viewer_screen.dart';
 import 'route_names.dart';
 
 /// Part P-007 scope: wires the app's single [GoRouter] instance and its
@@ -442,6 +443,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters[RouteNames.idParam]!;
           return ReelDetailScreen(reelId: id);
+        },
+      ),
+      GoRoute(
+        // Part P-050. Same "public, customer-facing, id-param" shape as
+        // postDetail/reelDetail immediately above — no gate clause of
+        // its own, an ordinary protected route, reachable only while
+        // signed in like everything else outside _publicRoutes.
+        // `businessName` comes from `context.pushNamed(..., extra:
+        // businessName)` (StoryRingWidget, this part) as a plain
+        // String — `null` when this route is reached without it (a
+        // deep link, a restored location); StoryViewerScreen's own
+        // constructor already treats that as optional/cosmetic, same
+        // as its own docstring says.
+        path: RouteNames.storyViewerPath,
+        name: RouteNames.storyViewer,
+        builder: (context, state) {
+          final id = state.pathParameters[RouteNames.idParam]!;
+          return StoryViewerScreen(
+            businessId: id,
+            businessName: state.extra as String?,
+          );
         },
       ),
       GoRoute(
