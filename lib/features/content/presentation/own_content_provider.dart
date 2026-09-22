@@ -13,17 +13,41 @@
 /// ### Why both fetches run concurrently, and why either failing fails
 /// the whole build
 ///
-/// Both repository calls are STARTED before either is awaited (see
-/// [_fetchMerged]) — they hit two independent endpoints
-/// (`/api/v1/posts/`, `/api/v1/reels/`), so there is no reason to wait
-/// for one before starting the other. `Future.wait` was deliberately
-/// NOT used: it requires a single `Future<T>` type, and
-/// `PaginatedResponse<Post>`/`PaginatedResponse<Reel>` are different
-/// `T`s. If EITHER call fails, [build] rethrows and the whole screen
-/// shows `AsyncError` (no partial "Posts loaded, Reels silently
-/// missing" state) — the same "don't silently swallow a failure"
-/// principle `ProductListScreen`'s own docstring (Part P-033) already
-/// established for this project.
+/// Both repository calls are started concurrently (see [_fetchMerged])
+/// — they hit two independent endpoints (`/api/v1/posts/`,
+/// `/api/v1/reels/`), so there is no reason to wait for one before
+/// starting the other. If EITHER call fails, [build] rethrows and the
+/// whole screen shows `AsyncError` (no partial "Posts loaded, Reels
+/// silently missing" state) — the same "don't silently swallow a
+/// failure" principle `ProductListScreen`'s own docstring (Part P-033)
+/// already established for this project.
+///
+/// ### `Future.wait`, not two separately-awaited locals (fixed after
+/// a real `flutter test` failure — not a hypothetical)
+///
+/// An earlier version of [_fetchMerged] started both futures, assigned
+/// them to two local variables, and awaited them ONE AT A TIME
+/// (`final postsPage = await postsFuture;` then
+/// `final reelsPage = await reelsFuture;`). That pattern is
+/// functionally correct — the second future's rejection IS eventually
+/// caught by its own `await` — but it produces a genuine Dart Zone
+/// "Unhandled exception in Future" report whenever the SECOND-awaited
+/// future is also the one that rejects: between the moment it settles
+/// (rejects) and the moment the code actually reaches its `await`,
+/// Dart's zone error handler sees a rejected future with no listener
+/// yet attached, and reports it as unhandled — even though the code
+/// goes on to handle it two lines later. This showed up as a real,
+/// reproducible `flutter test` failure on the "when the Reel fetch
+/// fails, the whole merge fails" test (the Post fetch — awaited FIRST
+/// — never triggered it; only whichever future was awaited SECOND
+/// could).
+///
+/// `Future.wait` fixes this at the root: it attaches a listener to
+/// every future in its list synchronously, at the moment it's called,
+/// so neither future is ever left unobserved regardless of which one
+/// settles first or which one fails. Concurrency and the
+/// eager-fail-on-any-error contract are both unchanged — only the
+/// waiting mechanism changed.
 ///
 /// ### Why mutations refresh the whole list, not just their own half
 ///
@@ -52,8 +76,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/post_repository_impl.dart';
 import '../data/reel_repository_impl.dart';
 import '../domain/content_item_entity.dart';
+import '../domain/post_entity.dart';
 import '../domain/post_repository.dart';
+import '../domain/reel_entity.dart';
 import '../domain/reel_repository.dart';
+import '../../../core/network/paginated_response.dart';
 
 /// Sorts a mixed Post/Reel list newest-first by `createdAt`. An item
 /// with a `null` createdAt (should not normally happen — every real
@@ -81,21 +108,25 @@ class OwnContentNotifier extends AsyncNotifier<List<ContentItem>> {
     return _fetchMerged(postRepo, reelRepo);
   }
 
+  /// Runs both fetches concurrently via [Future.wait] — see this
+  /// file's module docstring ("`Future.wait`, not two
+  /// separately-awaited locals") for why this specific mechanism is
+  /// required, not just a style preference.
   Future<List<ContentItem>> _fetchMerged(
     PostRepository postRepo,
     ReelRepository reelRepo,
   ) async {
-    // Both started before either is awaited — concurrent, not
-    // sequential. See this file's module docstring.
-    final postsFuture = postRepo.fetchOwnPosts();
-    final reelsFuture = reelRepo.fetchOwnReels();
+    PaginatedResponse<Post>? postsPage;
+    PaginatedResponse<Reel>? reelsPage;
 
-    final postsPage = await postsFuture;
-    final reelsPage = await reelsFuture;
+    await Future.wait<void>([
+      postRepo.fetchOwnPosts().then((value) => postsPage = value),
+      reelRepo.fetchOwnReels().then((value) => reelsPage = value),
+    ]);
 
     final merged = <ContentItem>[
-      ...postsPage.results.map(PostContentItem.new),
-      ...reelsPage.results.map(ReelContentItem.new),
+      ...postsPage!.results.map(PostContentItem.new),
+      ...reelsPage!.results.map(ReelContentItem.new),
     ];
     return sortContentItems(merged);
   }
