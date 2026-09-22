@@ -14,6 +14,9 @@ import '../features/business_profile/presentation/business_profile_provider.dart
 import '../features/business_profile/presentation/business_profile_public_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_thread_screen.dart';
+import '../features/content/presentation/content_list_screen.dart';
+import '../features/content/presentation/post_form_screen.dart';
+import '../features/content/presentation/reel_form_screen.dart';
 import '../features/discover/presentation/discover_screen.dart';
 import '../features/feed/presentation/home_screen.dart';
 import '../features/moderation/domain/queue_item_entity.dart';
@@ -174,6 +177,27 @@ import 'route_names.dart';
 /// `_SessionRefreshListenable` needs no change: it already re-runs
 /// `redirect` whenever the session changes, which is exactly what
 /// re-evaluates this gate on login/logout.
+///
+/// ## Part P-044 — three new routes, no new gate
+///
+/// Adds [RouteNames.contentListPath] → `ContentListScreen`,
+/// [RouteNames.postFormPath] → `PostFormScreen`, and
+/// [RouteNames.reelFormPath] → `ReelFormScreen`, nested right after
+/// [RouteNames.productFormPath] — same `/business-console/...` prefix
+/// convention as the Part P-033 block immediately above. None of the
+/// three needs a gate clause of its own, for the exact same reason
+/// [RouteNames.productListPath]/[RouteNames.productFormPath] don't: all
+/// three are ordinary protected routes, already covered by the base
+/// auth gate.
+///
+/// `ContentListScreen`'s `onCreatePost`/`onCreateReel` callbacks (see
+/// that screen's own docstring for why it takes them instead of calling
+/// `context.pushNamed` itself) are supplied here, in this route's own
+/// `builder:` — identical wiring shape to `ProductListScreen`'s
+/// `onCreateNew`/`onEditProduct` above. Unlike `productForm`,
+/// `postForm`/`reelForm` read no `extra:` — both forms are strictly
+/// create-only (see each screen's own docstring for why), so there is
+/// no edit-mode payload to hand over.
 ///
 /// ## ⚠️ Corrected after real-device testing — `refreshListenable`, not `ref.watch`
 ///
@@ -420,6 +444,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.productForm,
         builder: (context, state) =>
             ProductFormScreen(existingProduct: state.extra as Product?),
+      ),
+      GoRoute(
+        // Part P-044. See this provider's "Part P-044" doc section
+        // above for why the navigation callbacks are wired here rather
+        // than inside `content_list_screen.dart` itself (same reasoning
+        // as `productList` above).
+        path: RouteNames.contentListPath,
+        name: RouteNames.contentList,
+        builder: (context, state) => ContentListScreen(
+          onCreatePost: () => context.pushNamed(RouteNames.postForm),
+          onCreateReel: () => context.pushNamed(RouteNames.reelForm),
+        ),
+      ),
+      GoRoute(
+        // Part P-044. Create-only — no `extra:` to read, unlike
+        // `productForm` — see `PostFormScreen`'s own docstring.
+        path: RouteNames.postFormPath,
+        name: RouteNames.postForm,
+        builder: (context, state) => const PostFormScreen(),
+      ),
+      GoRoute(
+        // Part P-044. Same create-only shape as `postForm` above.
+        path: RouteNames.reelFormPath,
+        name: RouteNames.reelForm,
+        builder: (context, state) => const ReelFormScreen(),
       ),
       GoRoute(
         // Part P-040. Moderator-only — gated by the redirect callback

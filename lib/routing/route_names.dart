@@ -113,6 +113,22 @@ class RouteNames {
   /// item is handed to it.
   static const String moderationReview = 'moderationReview';
 
+  /// Part P-044: the signed-in Business user's own Post/Reel list
+  /// (`ContentListScreen`), backed by `ownContentProvider`. Same "no id
+  /// — resolved from `request.user`" reasoning as [productList].
+  static const String contentList = 'contentList';
+
+  /// Part P-044: the Post creation form (`PostFormScreen`). Create-only
+  /// (no edit mode, unlike [productForm]) — see that screen's own
+  /// docstring for why. Reached from [contentList]'s own "New Post"
+  /// action.
+  static const String postForm = 'postForm';
+
+  /// Part P-044: the Reel creation form (`ReelFormScreen`). Same
+  /// create-only reasoning as [postForm]. Reached from [contentList]'s
+  /// own "New Reel" action.
+  static const String reelForm = 'reelForm';
+
   // --- Route paths (used inside GoRoute(path: ...)) ---
   static const String splashPath = '/';
   static const String loginPath = '/login';
@@ -179,6 +195,18 @@ class RouteNames {
   /// sends it back to [moderationPath] rather than building a broken
   /// screen.
   static const String moderationReviewPath = '/moderation/review';
+
+  /// Part P-044 — see [contentList]. Nested under [businessConsolePath],
+  /// same convention as [productListPath].
+  static const String contentListPath = '/business-console/content';
+
+  /// Part P-044 — see [postForm]. No `:id` segment — create-only, same
+  /// reasoning as [productFormPath] minus the edit-mode `extra:`
+  /// (`PostFormScreen` takes none).
+  static const String postFormPath = '/business-console/content/post';
+
+  /// Part P-044 — see [reelForm]. Same shape as [postFormPath].
+  static const String reelFormPath = '/business-console/content/reel';
 
   /// Path-parameter key shared by [businessProfilePath], [productDetailPath]
   /// and [chatThreadPath].
