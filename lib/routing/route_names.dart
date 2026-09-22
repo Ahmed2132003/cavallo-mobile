@@ -129,6 +129,18 @@ class RouteNames {
   /// own "New Reel" action.
   static const String reelForm = 'reelForm';
 
+  /// Part P-045: the public, by-id Post detail screen (`PostDetailScreen`).
+  /// A genuinely new route — P-007's original skeleton never anticipated
+  /// Posts/Reels as top-level routes, so this is an additive routing
+  /// change, not a placeholder replacement like [productDetail]'s route
+  /// was. No gate of its own in `app_router.dart` — an ordinary protected
+  /// route, same as [productDetail].
+  static const String postDetail = 'postDetail';
+
+  /// Part P-045: the public, by-id Reel detail screen (`ReelDetailScreen`).
+  /// Same reasoning as [postDetail].
+  static const String reelDetail = 'reelDetail';
+
   // --- Route paths (used inside GoRoute(path: ...)) ---
   static const String splashPath = '/';
   static const String loginPath = '/login';
@@ -208,7 +220,14 @@ class RouteNames {
   /// Part P-044 — see [reelForm]. Same shape as [postFormPath].
   static const String reelFormPath = '/business-console/content/reel';
 
-  /// Path-parameter key shared by [businessProfilePath], [productDetailPath]
-  /// and [chatThreadPath].
+  /// Part P-045 — see [postDetail]. Uses [idParam], same convention as
+  /// [productDetailPath]/[businessProfilePath]/[chatThreadPath].
+  static const String postDetailPath = '/post/:id';
+
+  /// Part P-045 — see [reelDetail]. Same shape as [postDetailPath].
+  static const String reelDetailPath = '/reel/:id';
+
+  /// Path-parameter key shared by [businessProfilePath], [productDetailPath],
+  /// [chatThreadPath], [postDetailPath] and [reelDetailPath].
   static const String idParam = 'id';
 }

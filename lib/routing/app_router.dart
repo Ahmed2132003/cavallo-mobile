@@ -15,7 +15,9 @@ import '../features/business_profile/presentation/business_profile_public_screen
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_thread_screen.dart';
 import '../features/content/presentation/content_list_screen.dart';
+import '../features/content/presentation/post_detail_screen.dart';
 import '../features/content/presentation/post_form_screen.dart';
+import '../features/content/presentation/reel_detail_screen.dart';
 import '../features/content/presentation/reel_form_screen.dart';
 import '../features/discover/presentation/discover_screen.dart';
 import '../features/feed/presentation/home_screen.dart';
@@ -199,6 +201,25 @@ import 'route_names.dart';
 /// create-only (see each screen's own docstring for why), so there is
 /// no edit-mode payload to hand over.
 ///
+/// ## Part P-045 — two new public detail routes, no new gate
+///
+/// Adds [RouteNames.postDetailPath] (`/post/:id`) → `PostDetailScreen`
+/// and [RouteNames.reelDetailPath] (`/reel/:id`) → `ReelDetailScreen`,
+/// placed right after [RouteNames.productDetailPath] since all three are
+/// the same shape: a public, customer-facing "view this exact item by
+/// id" screen. Both read `state.pathParameters[RouteNames.idParam]`,
+/// identically to `productDetail`'s builder immediately above them.
+///
+/// Neither needs a gate clause of its own, for the same reason
+/// `productDetail` doesn't: both are ordinary protected routes, already
+/// covered by the base auth gate — reachable only while signed in, like
+/// everything else in this table outside `_publicRoutes`.
+///
+/// Genuinely new routes, not placeholder replacements: P-007's original
+/// route table never anticipated Posts/Reels as top-level routes at all
+/// (unlike `productDetail`, which replaced an existing P-007 placeholder
+/// screen when Part P-034 built the real one).
+///
 /// ## ⚠️ Corrected after real-device testing — `refreshListenable`, not `ref.watch`
 ///
 /// P-007's original design called `ref.watch(sessionProvider)` directly
@@ -252,7 +273,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // main.dart (Part P-021b) gates that case before GoRouter ever mounts,
       // so by the time this callback runs at all, `isLoading` here can only
       // mean "a screen just called login()/register()/logout() and is
-      // already showing its own loading UI (e.g. AppButton's isLoading)."
+      // already showing its own loading UI (e.g. AppButton's isLoading).
       // Now that the router is a single persistent instance (see above),
       // returning null here correctly means "stay exactly where you
       // already are" — it no longer risks losing the current screen.
@@ -399,6 +420,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters[RouteNames.idParam]!;
           return ProductDetailScreen(productId: id);
+        },
+      ),
+      GoRoute(
+        // Part P-045. A genuinely new route — P-007's original skeleton
+        // never anticipated Posts/Reels as top-level routes, so this is
+        // an additive routing change, not a placeholder replacement
+        // (unlike productDetail's route above). No gate clause of its
+        // own — an ordinary protected route, same as productDetail.
+        path: RouteNames.postDetailPath,
+        name: RouteNames.postDetail,
+        builder: (context, state) {
+          final id = state.pathParameters[RouteNames.idParam]!;
+          return PostDetailScreen(postId: id);
+        },
+      ),
+      GoRoute(
+        // Part P-045. Same reasoning as postDetail immediately above.
+        path: RouteNames.reelDetailPath,
+        name: RouteNames.reelDetail,
+        builder: (context, state) {
+          final id = state.pathParameters[RouteNames.idParam]!;
+          return ReelDetailScreen(reelId: id);
         },
       ),
       GoRoute(
