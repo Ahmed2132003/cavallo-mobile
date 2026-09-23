@@ -129,6 +129,17 @@ class RouteNames {
   /// own "New Reel" action.
   static const String reelForm = 'reelForm';
 
+  /// Part P-051: the Story creation form (`StoryCreationScreen`).
+  /// Create-only, same reasoning as [postForm]/[reelForm]. Distinct
+  /// from [storyViewer] (P-050's PUBLIC, customer-facing "watch this
+  /// business's Stories" screen) — this one is the Business account's
+  /// own upload flow. Not nested under [contentListPath]: Stories has
+  /// its own queue-backed background-retry upload flow
+  /// (`StoryUploadQueueNotifier`), not `ownContentProvider` like
+  /// Posts/Reels, so it gets its own `/business-console/stories/...`
+  /// segment rather than joining [contentListPath]'s.
+  static const String storyForm = 'storyForm';
+
   /// Part P-045: the public, by-id Post detail screen (`PostDetailScreen`).
   /// A genuinely new route — P-007's original skeleton never anticipated
   /// Posts/Reels as top-level routes, so this is an additive routing
@@ -232,6 +243,11 @@ class RouteNames {
 
   /// Part P-044 — see [reelForm]. Same shape as [postFormPath].
   static const String reelFormPath = '/business-console/content/reel';
+
+  /// Part P-051 — see [storyForm]. Own segment under [businessConsolePath]
+  /// rather than under [contentListPath] — see [storyForm]'s own doc for
+  /// why.
+  static const String storyFormPath = '/business-console/stories/create';
 
   /// Part P-045 — see [postDetail]. Uses [idParam], same convention as
   /// [productDetailPath]/[businessProfilePath]/[chatThreadPath].

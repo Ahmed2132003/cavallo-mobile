@@ -30,6 +30,7 @@ import '../features/products/presentation/product_detail_screen.dart';
 import '../features/products/presentation/product_form_screen.dart';
 import '../features/products/presentation/product_list_screen.dart';
 import '../features/search/presentation/search_screen.dart';
+import '../features/stories/presentation/story_creation_screen.dart';
 import '../features/stories/presentation/story_viewer_screen.dart';
 import 'route_names.dart';
 
@@ -534,6 +535,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.reelFormPath,
         name: RouteNames.reelForm,
         builder: (context, state) => const ReelFormScreen(),
+      ),
+      GoRoute(
+        // Part P-051. Same create-only shape as `postForm`/`reelForm`
+        // above — see `RouteNames.storyFormPath`'s own doc for why this
+        // route lives under `/business-console/stories/...` rather than
+        // nested under `contentListPath` alongside Posts/Reels.
+        path: RouteNames.storyFormPath,
+        name: RouteNames.storyForm,
+        builder: (context, state) => const StoryCreationScreen(),
       ),
       GoRoute(
         // Part P-040. Moderator-only — gated by the redirect callback

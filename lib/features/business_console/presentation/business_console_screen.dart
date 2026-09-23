@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/widgets/app_button.dart';
 import '../../../routing/route_names.dart';
+import '../../stories/presentation/story_upload_status_banner.dart';
 
 /// Placeholder screen for the `businessConsole` route (Part P-007 —
 /// routing skeleton only). Represents the Trader/Factory App surface (see
@@ -44,6 +45,16 @@ import '../../../routing/route_names.dart';
 /// `/home` by that guard, so showing the button unconditionally here is
 /// not a security gap, only a UI convenience for whichever signed-in
 /// account happens to also be staff/moderator.
+///
+/// ### Part P-051 addition — "Create Story" entry point + persistent
+/// upload status banner
+///
+/// Same "temporary-but-permanent entry point" reasoning as "My
+/// Products"/"My Content" above: `StoryCreationScreen` has no home in
+/// the real Business Console shell yet either. `StoryUploadStatusBanner`
+/// is placed here too (not only inside `StoryCreationScreen`) — see
+/// that widget's own FLAGGED SCOPE DECISION 6 for why this screen is
+/// its second, deliberate home rather than a single app-wide overlay.
 class BusinessConsoleScreen extends StatelessWidget {
   const BusinessConsoleScreen({super.key});
 
@@ -51,33 +62,51 @@ class BusinessConsoleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('businessConsole')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Route: businessConsole'),
-            const SizedBox(height: 16),
-            AppButton(
-              label: 'My Products',
-              onPressed: () => context.pushNamed(RouteNames.productList),
+      body: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: StoryUploadStatusBanner(),
+          ),
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Route: businessConsole'),
+                  const SizedBox(height: 16),
+                  AppButton(
+                    label: 'My Products',
+                    onPressed: () =>
+                        context.pushNamed(RouteNames.productList),
+                  ),
+                  const SizedBox(height: 16),
+                  AppButton(
+                    label: 'My Content',
+                    onPressed: () =>
+                        context.pushNamed(RouteNames.contentList),
+                  ),
+                  const SizedBox(height: 16),
+                  AppButton(
+                    label: 'Create Story',
+                    onPressed: () => context.pushNamed(RouteNames.storyForm),
+                  ),
+                  const SizedBox(height: 16),
+                  AppButton(
+                    label: 'Moderation Queue',
+                    onPressed: () =>
+                        context.pushNamed(RouteNames.moderation),
+                  ),
+                  const SizedBox(height: 16),
+                  AppButton(
+                    label: 'Back to splash',
+                    onPressed: () => context.goNamed(RouteNames.splash),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            AppButton(
-              label: 'My Content',
-              onPressed: () => context.pushNamed(RouteNames.contentList),
-            ),
-            const SizedBox(height: 16),
-            AppButton(
-              label: 'Moderation Queue',
-              onPressed: () => context.pushNamed(RouteNames.moderation),
-            ),
-            const SizedBox(height: 16),
-            AppButton(
-              label: 'Back to splash',
-              onPressed: () => context.goNamed(RouteNames.splash),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
