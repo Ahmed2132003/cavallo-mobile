@@ -49,13 +49,26 @@ class _NeverCompletesRepository extends StoryCreationRepository {
   }
 }
 
-Future<File> _tempFile() async {
-  final file = File(
-    '${Directory.systemTemp.path}/p051_banner_test_${DateTime.now().microsecondsSinceEpoch}.png',
-  );
-  await file.writeAsBytes(const [0x89, 0x50, 0x4E, 0x47]);
-  return file;
-}
+/// Returns a [File] pointing at a throwaway path — the file is never
+/// actually created or read.
+///
+/// FIX (was: `await file.writeAsBytes(...)`): every repository double
+/// in this file throws or never-completes without ever touching
+/// `mediaFile`'s bytes (neither `_AlwaysValidationFailureRepository`
+/// nor `_NeverCompletesRepository` calls `.readAsBytes()`, `.path` for
+/// upload, or anything else on it), so a real file on disk was never
+/// actually required here — it was pure overhead. Reproduced directly
+/// (via DEBUG prints) that `File.writeAsBytes` into
+/// `Directory.systemTemp` hung indefinitely for this test on one
+/// Windows machine (almost certainly antivirus/real-time-scan
+/// interference on that machine's Temp folder — a machine-specific
+/// I/O stall, not a bug in this codebase's Riverpod or widget code).
+/// Removing the real write removes the dependency on that behavior
+/// entirely rather than working around it.
+File _fakeMediaFile() => File(
+  '${Directory.systemTemp.path}/p051_banner_test_'
+  '${DateTime.now().microsecondsSinceEpoch}.png',
+);
 
 void main() {
   testWidgets('renders nothing when the queue is empty', (tester) async {
@@ -70,10 +83,7 @@ void main() {
 
   testWidgets(
     'shows Retry/Discard for a failed task; Retry re-fails, Discard removes it',
-    timeout: const Timeout(Duration(seconds: 10)),
     (tester) async {
-      // ignore: avoid_print
-      print('DEBUG 1: creating container');
       final container = ProviderContainer(
         overrides: [
           storyCreationRepositoryProvider.overrideWithValue(
@@ -81,20 +91,9 @@ void main() {
           ),
         ],
       );
-      addTearDown(() {
-        // ignore: avoid_print
-        print('DEBUG teardown: disposing container');
-        container.dispose();
-        // ignore: avoid_print
-        print('DEBUG teardown: container disposed');
-      });
+      addTearDown(container.dispose);
 
-      // ignore: avoid_print
-      print('DEBUG 2: writing temp file');
-      final mediaFile = await _tempFile();
-      addTearDown(() => mediaFile.delete());
-      // ignore: avoid_print
-      print('DEBUG 3: temp file ready, pumping widget');
+      final mediaFile = _fakeMediaFile();
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
@@ -104,80 +103,57 @@ void main() {
           ),
         ),
       );
-      // ignore: avoid_print
-      print('DEBUG 4: widget pumped, calling enqueueUpload');
 
       final taskId = container
           .read(storyUploadQueueProvider.notifier)
           .enqueueUpload(mediaFile);
-      // ignore: avoid_print
-      print('DEBUG 5: enqueueUpload returned taskId=$taskId, pump 1');
+      // A ValidationFailure is never retried (STEP 3's `_isRetryable`) —
+      // the task reaches `failed` after exactly one attempt, no backoff
+      // wait involved, so two bounded pumps are enough (no pending
+      // Timer, so no pumpAndSettle risk either way).
       await tester.pump();
-      // ignore: avoid_print
-      print('DEBUG 6: pump 1 done, pump 2');
       await tester.pump();
-      // ignore: avoid_print
-      print('DEBUG 7: pump 2 done, first expects');
 
       expect(
         find.text('Story upload failed: Unsupported file type.'),
         findsOneWidget,
       );
-      // ignore: avoid_print
-      print('DEBUG 8: failed-text expect passed');
       expect(
         find.byKey(Key('storyUploadStatusBanner_retry_$taskId')),
         findsOneWidget,
       );
-      // ignore: avoid_print
-      print('DEBUG 9: retry-button expect passed');
       expect(
         find.byKey(Key('storyUploadStatusBanner_discard_$taskId')),
         findsOneWidget,
       );
-      // ignore: avoid_print
-      print('DEBUG 10: discard-button expect passed');
+      // A failed task shows no Cancel action — Cancel is only for a
+      // task still in flight or waiting out a backoff.
       expect(
         find.byKey(Key('storyUploadStatusBanner_cancel_$taskId')),
         findsNothing,
       );
-      // ignore: avoid_print
-      print('DEBUG 11: no-cancel expect passed, tapping retry');
 
       await tester.tap(
         find.byKey(Key('storyUploadStatusBanner_retry_$taskId')),
       );
-      // ignore: avoid_print
-      print('DEBUG 12: tapped retry, pump 1');
       await tester.pump();
-      // ignore: avoid_print
-      print('DEBUG 13: pump 1 done, pump 2');
       await tester.pump();
-      // ignore: avoid_print
-      print('DEBUG 14: pump 2 done, re-check retry button');
 
+      // retryFailedTask resets the attempt counter and fires
+      // immediately — with the same always-fails repository, it lands
+      // back in `failed` again, same task id.
       expect(
         find.byKey(Key('storyUploadStatusBanner_retry_$taskId')),
         findsOneWidget,
       );
-      // ignore: avoid_print
-      print('DEBUG 15: retry-button re-check passed, tapping discard');
 
       await tester.tap(
         find.byKey(Key('storyUploadStatusBanner_discard_$taskId')),
       );
-      // ignore: avoid_print
-      print('DEBUG 16: tapped discard, pump');
       await tester.pump();
-      // ignore: avoid_print
-      print('DEBUG 17: pump done, final expects');
 
       expect(find.byKey(const Key('storyUploadStatusBanner')), findsNothing);
-      // ignore: avoid_print
-      print('DEBUG 18: banner-gone expect passed');
       expect(container.read(storyUploadQueueProvider), isEmpty);
-      // ignore: avoid_print
-      print('DEBUG 19: queue-empty expect passed — test body finished');
     },
   );
 
@@ -193,8 +169,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      final mediaFile = await _tempFile();
-      addTearDown(() => mediaFile.delete());
+      final mediaFile = _fakeMediaFile();
 
       await tester.pumpWidget(
         UncontrolledProviderScope(

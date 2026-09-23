@@ -23,13 +23,17 @@ class _NeverCompletesRepository extends StoryCreationRepository {
   }
 }
 
-Future<File> _tempFile() async {
-  final file = File(
-    '${Directory.systemTemp.path}/p051_screen_test_${DateTime.now().microsecondsSinceEpoch}.png',
-  );
-  await file.writeAsBytes(const [0x89, 0x50, 0x4E, 0x47]);
-  return file;
-}
+/// Returns a [File] pointing at a throwaway path — never actually
+/// created or read. FIX: see `story_upload_status_banner_test.dart`'s
+/// own `_fakeMediaFile()` doc comment for the full root-cause —
+/// `_NeverCompletesRepository` never touches `mediaFile`'s bytes, so a
+/// real file write was pure overhead and, on one Windows machine, hung
+/// indefinitely (antivirus/real-time-scan interference on that
+/// machine's Temp folder, not a bug in this codebase).
+File _fakeMediaFile() => File(
+  '${Directory.systemTemp.path}/p051_screen_test_'
+  '${DateTime.now().microsecondsSinceEpoch}.png',
+);
 
 void main() {
   // NOTE (flagged, not silently skipped): neither test here drives the
@@ -68,8 +72,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      final mediaFile = await _tempFile();
-      addTearDown(() => mediaFile.delete());
+      final mediaFile = _fakeMediaFile();
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
