@@ -1,52 +1,26 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/social_interaction_repository_impl.dart';
 import '../domain/social_interaction_state.dart';
 import 'content_interaction_key.dart';
 
-/// Part P-058 scope: the optimistic-update state layer for Like/Save/
-/// Follow — Share and Report are fire-and-forget (no lasting local
-/// state to reconcile beyond a locally-bumped share count, see
-/// [ContentInteractionNotifier.share]), and Comment has its own
-/// list/input widgets (a later step) that call
-/// `socialInteractionRepositoryProvider` directly and report new
-/// comments back here via [ContentInteractionNotifier.recordNewComment].
+/// Part P-058: optimistic-update state layer for Like / Save / Share /
+/// Follow.
 ///
-/// ## Two separate families — see this part's STEP 3 rationale
+/// Two separate families:
+/// - [contentInteractionProvider] keyed by (contentType, objectId):
+///   Like / Save / share-count / comment-count for ONE Post or Reel.
+/// - [businessFollowProvider] keyed by businessId: Follow state and
+///   followers count for ONE business, shared by every card and the
+///   business profile screen, so they can never disagree.
 ///
-/// [contentInteractionProvider] (keyed by [ContentInteractionKey] —
-/// `contentType` + `objectId`) tracks Like/Save/share-count/comment-
-/// count for ONE Post or Reel. [businessFollowProvider] (keyed by a
-/// plain `int businessId`) tracks Follow/followerCount for ONE
-/// business, shared by every card and the business-profile screen
-/// that reference the same business — deliberately NOT folded into
-/// the content-keyed family, so two PostCards from the same business
-/// can never show two different Follow states.
-///
-/// ## Optimistic-update contract (both notifiers follow this exact
-/// shape)
-///
-/// 1. Flip the local boolean AND adjust the local count immediately,
-///    synchronously, before any `await` — the UI updates on the very
-///    next frame, not after a round trip.
-/// 2. Fire the real repository call.
-/// 3. On success: reconcile the boolean with the server's OWN
-///    returned value (belt-and-suspenders — the two should always
-///    agree, since every P-052/P-053/P-054 toggle is idempotent, but
-///    the server is still the source of truth). The COUNT is never
-///    reconciled from the server here, because none of Like/Save's
-///    responses include one (`{"liked": bool}` / `{"saved": bool}`
-///    only — confirmed against the real `social/views.py`) — the
-///    locally-adjusted count is kept as-is.
-/// 4. On failure: revert `state` to exactly what it was before step 1
-///    (a saved `previous` snapshot, not a hand-unwound diff), then
-///    rethrow so the caller (a card's `onPressed`) can show a
-///    SnackBar. Never leave `state` in the optimistic-but-unconfirmed
-///    shape on failure — see this part's own Architecture Rule
-///    ("never let an optimistic UI update silently diverge from
-///    server truth indefinitely").
-class ContentInteractionNotifier
-    extends Notifier<SocialInteractionState> {
+/// Optimistic-update contract:
+/// 1. Flip the local state immediately, before any await.
+/// 2. Call the repository.
+/// 3. On success, reconcile the boolean with the server's returned value.
+/// 4. On failure, restore the saved `previous` snapshot and rethrow so the
+///    UI can show a SnackBar.
+class ContentInteractionNotifier extends Notifier<SocialInteractionState> {
   ContentInteractionNotifier(this.key);
 
   final ContentInteractionKey key;
@@ -54,6 +28,8 @@ class ContentInteractionNotifier
   @override
   SocialInteractionState build() => const SocialInteractionState();
 
+  /// One-time seed from counts the caller already has. Do not call after a
+  /// toggle has run, because it replaces the whole state.
   void seed({
     required bool isLiked,
     required bool isSaved,
@@ -123,6 +99,8 @@ class ContentInteractionNotifier
     }
   }
 
+  /// Share is deliberately non-idempotent on the backend (P-056): no local
+  /// dedupe or debounce here.
   Future<void> share() async {
     final previous = state;
     state = state.copyWith(sharesCount: state.sharesCount + 1);
@@ -136,12 +114,13 @@ class ContentInteractionNotifier
     }
   }
 
+  /// Called by the comment input widget after a successful createComment.
   void recordNewComment() {
     state = state.copyWith(commentsCount: state.commentsCount + 1);
   }
 }
 
-final contentInteractionProvider = NotifierProvider.family
+final contentInteractionProvider = NotifierProvider.family<
   ContentInteractionNotifier,
   SocialInteractionState,
   ContentInteractionKey
@@ -187,9 +166,8 @@ class BusinessFollowNotifier extends Notifier<SocialInteractionState> {
   }
 }
 
-final businessFollowProvider =
-    NotifierProvider.family
-      BusinessFollowNotifier,
-      SocialInteractionState,
-      int
-    >((businessId) => BusinessFollowNotifier(businessId));
+final businessFollowProvider = NotifierProvider.family<
+  BusinessFollowNotifier,
+  SocialInteractionState,
+  int
+>((businessId) => BusinessFollowNotifier(businessId));
