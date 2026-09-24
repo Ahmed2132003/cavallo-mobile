@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../domain/public_reel_entity.dart';
-import 'content_stub_action_row.dart';
+import '../../social/presentation/content_action_row.dart';
 
 /// Part P-045 scope: same role as [PostCard] for a published
 /// [PublicReel] — reusable, no parent-screen dependency, ready for
 /// Phase 10's Feed to reuse unmodified. Same "no avatar field on the
 /// backend" reasoning as `PostCard` — business identity is text only.
+///
+/// Part P-058 update: see `PostCard`'s own docstring — same
+/// [ContentActionRow] wiring, `contentType: 'reel'`.
 class ReelCard extends StatelessWidget {
   const ReelCard({
     super.key,
@@ -61,7 +64,11 @@ class ReelCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const ContentStubActionRow(),
+            ContentActionRow(
+              contentType: 'reel',
+              objectId: reel.id,
+              onCommentTap: () => onTap?.call(),
+            ),
           ],
         ),
       ),

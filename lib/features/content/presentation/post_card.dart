@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../domain/public_post_entity.dart';
-import 'content_stub_action_row.dart';
+import '../../social/presentation/content_action_row.dart';
 
 /// Part P-045 scope: a reusable, customer-facing presentation of a
 /// single published [PublicPost] — used by the business profile
@@ -19,6 +19,14 @@ import 'content_stub_action_row.dart';
 /// image" — P-029's `_ProfileHeader` is text-only for the same reason).
 /// Business identity is shown as [businessName] text only, same
 /// precedent.
+///
+/// Part P-058 update: the like/comment/share/save row is now
+/// [ContentActionRow] (real Like/Save/Share wiring via
+/// `contentInteractionProvider`), replacing P-045's
+/// `ContentStubActionRow`. The Comment icon reuses [onTap] — same
+/// navigation the whole card already does — since Comment always
+/// means "open the detail screen's comment section," never an inline
+/// action on the card itself.
 class PostCard extends StatelessWidget {
   const PostCard({
     super.key,
@@ -73,7 +81,11 @@ class PostCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const ContentStubActionRow(),
+            ContentActionRow(
+              contentType: 'post',
+              objectId: post.id,
+              onCommentTap: () => onTap?.call(),
+            ),
           ],
         ),
       ),

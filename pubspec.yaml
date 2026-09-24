@@ -65,6 +65,7 @@ dependencies:
   # since Part P-001) — same situation already flagged for go_router's
   # own pinned version above.
   image_picker: ^1.2.1
+  share_plus: 12.0.0
 
 dev_dependencies:
   flutter_test:
