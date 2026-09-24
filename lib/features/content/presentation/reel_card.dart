@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../domain/public_reel_entity.dart';
 import '../../social/presentation/content_action_row.dart';
+import '../../social/presentation/content_overflow_menu.dart';
 
-/// Part P-045 scope: same role as [PostCard] for a published
-/// [PublicReel] — reusable, no parent-screen dependency, ready for
-/// Phase 10's Feed to reuse unmodified. Same "no avatar field on the
-/// backend" reasoning as `PostCard` — business identity is text only.
+/// Part P-045 scope: same role as [PostCard] for a published [PublicReel].
+/// Reusable, no parent-screen dependency, business identity is text only.
 ///
-/// Part P-058 update: see `PostCard`'s own docstring — same
-/// [ContentActionRow] wiring, `contentType: 'reel'`.
+/// Part P-058 update: same [ContentActionRow] + Report "..." menu wiring as
+/// `PostCard`, with `contentType: 'reel'`.
 class ReelCard extends StatelessWidget {
   const ReelCard({
     super.key,
@@ -35,7 +34,7 @@ class ReelCard extends StatelessWidget {
           children: [
             _ReelThumbnail(thumbnailUrl: reel.thumbnailUrl),
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+              padding: const EdgeInsets.fromLTRB(12, 4, 4, 0),
               child: Row(
                 children: [
                   Icon(
@@ -52,6 +51,7 @@ class ReelCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  ContentOverflowMenu(contentType: 'reel', objectId: reel.id),
                 ],
               ),
             ),
@@ -76,10 +76,8 @@ class ReelCard extends StatelessWidget {
   }
 }
 
-/// Thumbnail + play-icon overlay, with the same neutral-fallback
-/// convention as `PostCard`'s `_PostImage`. Deliberately a separate,
-/// duplicated widget, not shared with `_PostImage` — same
-/// `_ProductThumbnail` precedent.
+/// Thumbnail + play-icon overlay, with the same neutral-fallback convention
+/// as `PostCard`'s `_PostImage`. Deliberately duplicated, not shared.
 class _ReelThumbnail extends StatelessWidget {
   const _ReelThumbnail({required this.thumbnailUrl});
 

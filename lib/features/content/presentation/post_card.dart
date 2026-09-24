@@ -2,31 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../domain/public_post_entity.dart';
 import '../../social/presentation/content_action_row.dart';
+import '../../social/presentation/content_overflow_menu.dart';
 
-/// Part P-045 scope: a reusable, customer-facing presentation of a
-/// single published [PublicPost] — used by the business profile
-/// screen's Posts/Reels section (this part, STEP 7), and designed so
-/// Phase 10's Feed (Part P-061) can drop it into a scrollable list with
-/// zero modification: no hardcoded width assumption beyond ordinary
-/// responsive behavior, no dependency on any specific parent screen's
-/// state — every value this widget needs (the post, the business's
-/// display name, the tap callback) is passed in by the caller.
+/// Part P-045 scope: a reusable, customer-facing presentation of a single
+/// published [PublicPost]. Every value it needs (the post, the business
+/// display name, the tap callback) is passed in by the caller, so Phase 10's
+/// Feed can reuse it unmodified.
 ///
-/// `businessAvatarUrl` was in the master plan's UI mockup but is
-/// deliberately NOT a parameter here: `BusinessProfile` has no
-/// logo/avatar field on the backend at all yet (confirmed from
-/// `business_profile_entity.dart`'s own docstring, "No logo/cover
-/// image" — P-029's `_ProfileHeader` is text-only for the same reason).
-/// Business identity is shown as [businessName] text only, same
-/// precedent.
+/// `businessAvatarUrl` is deliberately not a parameter: `BusinessProfile`
+/// has no logo/avatar field on the backend yet, so business identity is
+/// text only.
 ///
-/// Part P-058 update: the like/comment/share/save row is now
-/// [ContentActionRow] (real Like/Save/Share wiring via
-/// `contentInteractionProvider`), replacing P-045's
-/// `ContentStubActionRow`. The Comment icon reuses [onTap] — same
-/// navigation the whole card already does — since Comment always
-/// means "open the detail screen's comment section," never an inline
-/// action on the card itself.
+/// Part P-058 update: the action row is [ContentActionRow] (real Like/Save/
+/// Share), and the business row ends with a "..." menu offering Report.
+/// The Comment icon reuses [onTap] (open the detail screen).
 class PostCard extends StatelessWidget {
   const PostCard({
     super.key,
@@ -52,7 +41,7 @@ class PostCard extends StatelessWidget {
           children: [
             _PostImage(imageUrl: post.imageUrl),
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+              padding: const EdgeInsets.fromLTRB(12, 4, 4, 0),
               child: Row(
                 children: [
                   Icon(
@@ -69,6 +58,7 @@ class PostCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  ContentOverflowMenu(contentType: 'post', objectId: post.id),
                 ],
               ),
             ),
@@ -93,11 +83,9 @@ class PostCard extends StatelessWidget {
   }
 }
 
-/// Media area with a neutral fallback for "no image" and for a URL
-/// that fails to load. Deliberately a local, duplicated widget rather
-/// than a shared one — same precedent as
-/// `business_profile_public_screen.dart`'s own `_ProductThumbnail`
-/// (flagged there as a deliberate duplication, not an oversight).
+/// Media area with a neutral fallback for "no image" and for a URL that
+/// fails to load. Deliberately a local, duplicated widget (same precedent as
+/// `_ProductThumbnail` in the business profile screen).
 class _PostImage extends StatelessWidget {
   const _PostImage({required this.imageUrl});
 
