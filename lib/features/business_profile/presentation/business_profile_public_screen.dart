@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_failure.dart';
-import '../../../core/widgets/app_button.dart';
+import '../../social/presentation/follow_button.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
@@ -34,9 +34,8 @@ import 'business_profile_public_provider.dart';
 ///   appended at the marked section boundary in [_ProfileView] below.
 /// * **Phase 7 (Posts/Reels)** — DONE in Part P-045 (STEP 6):
 ///   [_PostsSection]/[_ReelsSection], appended right after products.
-/// * **Phase 9 (Follow)** — activates the currently-disabled Follow
-///   button in [_ProfileHeader], and is also where `followerCount`
-///   (see note below) becomes real and displayable.
+/// * **Phase 9 (Follow)** — DONE in Part P-058: [_ProfileHeader] now
+///   renders `FollowButton` (real Follow/Following + follower count).
 ///
 /// The layout is a plain scrolling [Column] precisely so those sections
 /// can be appended without a relayout rewrite — deliberately NOT
@@ -83,14 +82,20 @@ import 'business_profile_public_provider.dart';
 /// [RouteNames.reelDetail], same `context.pushNamed` convention as
 /// [_ProductCard]'s own tap handler below.
 ///
-/// ## `followerCount` is deliberately not displayed
+/// ## Part P-058 — Follow and `followerCount`
 ///
-/// The backend's `follower_count` is a hardcoded `0` placeholder
-/// (`# TODO(Phase 9)` in `businesses/serializers.py` — confirmed in the
-/// real source). Rendering "0 followers" would show a customer a
-/// confident falsehood about every business on the platform. The field
-/// is carried through the DTO/entity (Part P-028A) and simply not shown
-/// until Phase 9 makes it real.
+/// [_ProfileHeader] renders `FollowButton`
+/// (`features/social/presentation/follow_button.dart`), seeded with the
+/// real `profile.followerCount` (real and atomically updated since
+/// P-052). The count changes optimistically on each tap and is reverted
+/// on failure. This screen deliberately does NOT refetch the profile
+/// after a toggle, because invalidating `businessProfilePublicProvider`
+/// would swap the whole screen to its loading state.
+///
+/// KNOWN GAP: the backend exposes no `is_following` field, so a fresh
+/// app session always starts as "Follow"; only follows made in the
+/// current session are remembered. Follow is idempotent server-side, so
+/// tapping "Follow" on an already-followed business is harmless.
 ///
 /// ## No logo/cover image
 ///
@@ -233,7 +238,8 @@ class _ProfileView extends StatelessWidget {
 }
 
 /// Name, type badge, verification badge, location, description and the
-/// (disabled) Follow action.
+/// Follow action (real since Part P-058).
+/// Follow action (real, Part P-058).
 class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({required this.profile});
 
@@ -293,19 +299,12 @@ class _ProfileHeader extends StatelessWidget {
           style: theme.textTheme.bodyMedium,
         ),
         const SizedBox(height: 24),
-        // Present but non-functional on purpose — Follow is Phase 9.
-        // Neither faked (no local-only toggle that silently loses the
-        // action) nor omitted (its absence would change this header's
-        // layout again in Phase 9).
-        Row(
-          children: [
-            Tooltip(
-              message: 'Following businesses arrives in a later phase.',
-              child: const AppButton(label: 'Follow', onPressed: null),
-            ),
-            const SizedBox(width: 12),
-            Text('(coming soon)', style: theme.textTheme.bodySmall),
-          ],
+        // Part P-058: the real Follow / Following button + follower count.
+        // State lives in `businessFollowProvider(profile.id)`, seeded with
+        // the real `followerCount` the backend returned (real since P-052).
+        FollowButton(
+          businessId: profile.id,
+          followerCount: profile.followerCount,
         ),
       ],
     );

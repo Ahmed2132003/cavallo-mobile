@@ -19,6 +19,10 @@ import 'package:social_commerce_app/features/content/domain/reel_public_reposito
 import 'package:social_commerce_app/features/products/data/product_public_repository.dart';
 import 'package:social_commerce_app/features/products/domain/product_entity.dart';
 import 'package:social_commerce_app/features/products/domain/product_public_repository.dart';
+import 'package:social_commerce_app/features/social/data/social_interaction_repository_impl.dart';
+
+
+import '../../social/fake_social_interaction_repository.dart';
 
 /// Hand-rolled test double for [BusinessProfilePublicRepository] — this
 /// project doesn't use mockito/mocktail anywhere (confirmed against
@@ -131,6 +135,7 @@ const _profile = BusinessProfile(
   city: 'Cairo',
   description: 'Fashion and accessories, wholesale and retail.',
   isVerified: true,
+  followerCount: 12,
 );
 
 const _unverifiedProfile = BusinessProfile(
@@ -150,11 +155,15 @@ Future<void> _pumpScreen(
   WidgetTester tester, {
   required String businessId,
   required _FakeBusinessProfilePublicRepository repository,
+  FakeSocialInteractionRepository? social,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         businessProfilePublicRepositoryProvider.overrideWithValue(repository),
+        socialInteractionRepositoryProvider.overrideWithValue(
+          social ?? FakeSocialInteractionRepository(),
+        ),
         productPublicRepositoryProvider.overrideWithValue(
           _EmptyProductPublicRepository(),
         ),
@@ -223,7 +232,7 @@ void main() {
   group('BusinessProfilePublicScreen — found', () {
     testWidgets(
       'a verified business shows its name, badge, location, description, '
-      'and a disabled Follow button',
+      'a live Follow button and its follower count',
       (tester) async {
         final repository = _FakeBusinessProfilePublicRepository(
           fetchResult: _profile,
@@ -241,11 +250,9 @@ void main() {
         );
         expect(find.byIcon(Icons.verified), findsOneWidget);
 
-        final followButton = tester.widget<AppButton>(
-          find.widgetWithText(AppButton, 'Follow'),
-        );
-        expect(followButton.onPressed, isNull);
-        expect(find.text('(coming soon)'), findsOneWidget);
+        expect(find.widgetWithText(AppButton, 'Follow'), findsOneWidget);
+        expect(find.text('12 followers'), findsOneWidget);
+        expect(find.text('(coming soon)'), findsNothing);
 
         // Part P-045 (STEP 6): the Posts/Reels sections render their own
         // empty states here, since the fake repositories always resolve
@@ -274,6 +281,32 @@ void main() {
       expect(find.text('Unverified Shop'), findsOneWidget);
       expect(find.text('Factory'), findsOneWidget);
       expect(find.byIcon(Icons.verified), findsNothing);
+    });
+
+    testWidgets('tapping Follow shows Following and the higher count', (
+      tester,
+    ) async {
+      final repository = _FakeBusinessProfilePublicRepository(
+        fetchResult: _profile,
+      );
+      final social = FakeSocialInteractionRepository();
+
+      await _pumpScreen(
+        tester,
+        businessId: '7',
+        repository: repository,
+        social: social,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(AppButton, 'Follow'));
+      await tester.pumpAndSettle();
+
+      expect(find.widgetWithText(AppButton, 'Following'), findsOneWidget);
+      expect(find.text('13 followers'), findsOneWidget);
+      expect(social.calls, ['follow:7']);
+      // The profile stays on screen (no reload flash after a toggle).
+      expect(find.text('Al Ananka Store'), findsOneWidget);
     });
 
     testWidgets(
