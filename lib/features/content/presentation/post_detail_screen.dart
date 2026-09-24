@@ -6,16 +6,23 @@ import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
+import '../../social/presentation/comments_section.dart';
+import '../../social/presentation/content_action_row.dart';
+import '../../social/presentation/content_overflow_menu.dart';
 import '../domain/public_post_entity.dart';
 import 'content_public_providers.dart';
-import 'content_stub_action_row.dart';
 
-/// Part P-045 scope: the customer-facing, READ-ONLY Post detail screen
-/// behind `/post/:id`. A genuinely new route — P-007's original skeleton
-/// never anticipated Posts/Reels as top-level routes, so this is an
-/// additive routing change (`route_names.dart` / `app_router.dart`,
-/// this part's routing edit), not a placeholder replacement the way
+/// Part P-045 scope: the customer-facing Post detail screen behind
+/// `/post/:id`. A genuinely new route — P-007's original skeleton never
+/// anticipated Posts/Reels as top-level routes, so this is an additive
+/// routing change (`route_names.dart` / `app_router.dart`, this part's
+/// routing edit), not a placeholder replacement the way
 /// `ProductDetailScreen`'s `/product/:id` route was.
+///
+/// Part P-058 update: the stub action row is now the real
+/// [ContentActionRow] (Like/Save/Share), the Comment icon scrolls to the
+/// new [ContentCommentsSection] below it, and the AppBar has a "..." menu
+/// with Report (shown only once the Post has loaded).
 ///
 /// ## States — mirrors `ProductDetailScreen` (Part P-034) exactly
 ///
@@ -26,15 +33,11 @@ import 'content_stub_action_row.dart';
 ///
 /// ## Deliberately NO business name/avatar on this screen
 ///
-/// Same precedent as `ProductDetailScreen`, which shows no business
-/// info either. [PublicPost] only carries `businessId`, not a name —
-/// showing one here would mean a second network call (fetching the
-/// business profile) that neither this part's own spec nor
-/// `ProductDetailScreen`'s precedent asks for. `PostCard` (this part,
-/// STEP 2) shows a business name only because ITS caller already holds
-/// one in memory (the business-profile screen this part will extend,
-/// and Phase 10's Feed) — this screen, reached directly by id with
-/// nothing else known, does not.
+/// Same precedent as `ProductDetailScreen`, which shows no business info
+/// either. [PublicPost] only carries `businessId`, not a name — showing one
+/// here would mean a second network call (fetching the business profile)
+/// that neither this part's own spec nor `ProductDetailScreen`'s precedent
+/// asks for.
 class PostDetailScreen extends ConsumerWidget {
   const PostDetailScreen({super.key, required this.postId});
 
@@ -44,10 +47,9 @@ class PostDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // The backend route is `<int:pk>/`, so a non-numeric id can never
+    // The backend route is an integer pk, so a non-numeric id can never
     // identify a Post — nothing to fetch. Resolve it to not-found here
-    // instead of firing a request guaranteed to fail. Same early-exit
-    // as ProductDetailScreen.
+    // instead of firing a request guaranteed to fail.
     final id = int.tryParse(postId);
     if (id == null) {
       return Scaffold(
@@ -57,9 +59,15 @@ class PostDetailScreen extends ConsumerWidget {
     }
 
     final postAsync = ref.watch(postPublicDetailProvider(id));
+    final loadedPost = postAsync.value;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Post')),
+      appBar: AppBar(
+        title: const Text('Post'),
+        actions: loadedPost == null
+            ? null
+            : [ContentOverflowMenu(contentType: 'post', objectId: loadedPost.id)],
+      ),
       body: switch (postAsync) {
         AsyncData(value: final PublicPost post) => _PostDetailView(
           post: post,
@@ -114,14 +122,32 @@ class _LoadErrorView extends ConsumerWidget {
   }
 }
 
-class _PostDetailView extends StatelessWidget {
+class _PostDetailView extends StatefulWidget {
   const _PostDetailView({required this.post});
 
   final PublicPost post;
 
   @override
+  State<_PostDetailView> createState() => _PostDetailViewState();
+}
+
+class _PostDetailViewState extends State<_PostDetailView> {
+  final GlobalKey _commentsKey = GlobalKey();
+
+  void _scrollToComments() {
+    final target = _commentsKey.currentContext;
+    if (target == null) return;
+    Scrollable.ensureVisible(
+      target,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final post = widget.post;
 
     return SingleChildScrollView(
       child: Column(
@@ -138,7 +164,19 @@ class _PostDetailView extends StatelessWidget {
                   style: theme.textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 12),
-                const ContentStubActionRow(),
+                ContentActionRow(
+                  contentType: 'post',
+                  objectId: post.id,
+                  onCommentTap: _scrollToComments,
+                ),
+                const Divider(height: 32),
+                KeyedSubtree(
+                  key: _commentsKey,
+                  child: ContentCommentsSection(
+                    contentType: 'post',
+                    objectId: post.id,
+                  ),
+                ),
               ],
             ),
           ),
@@ -149,12 +187,11 @@ class _PostDetailView extends StatelessWidget {
 }
 
 /// Larger, full-width version of `PostCard`'s `_PostImage` (STEP 2) —
-/// same neutral-fallback convention, deliberately duplicated rather
-/// than shared (this project's `_ProductThumbnail`/`business_profile_
-/// public_screen.dart` precedent for local, per-screen duplication).
-/// Uses a 1:1 aspect ratio (vs. the card's 4:3) since this is the
-/// primary, full-screen view of the image rather than a compact list
-/// thumbnail.
+/// same neutral-fallback convention, deliberately duplicated rather than
+/// shared (this project's `_ProductThumbnail` precedent for local,
+/// per-screen duplication). Uses a 1:1 aspect ratio (vs. the card's 4:3)
+/// since this is the primary, full-screen view of the image rather than a
+/// compact list thumbnail.
 class _PostDetailImage extends StatelessWidget {
   const _PostDetailImage({required this.imageUrl});
 
