@@ -10,12 +10,17 @@ import 'package:social_commerce_app/features/content/data/reel_public_repository
 import 'package:social_commerce_app/features/content/domain/public_reel_entity.dart';
 import 'package:social_commerce_app/features/content/domain/reel_public_repository.dart';
 import 'package:social_commerce_app/features/content/presentation/reel_detail_screen.dart';
+import 'package:social_commerce_app/features/social/data/social_interaction_repository_impl.dart';
+
+import '../../social/fake_social_interaction_repository.dart';
 
 /// Part P-045 (STEP 8) scope: widget tests for `ReelDetailScreen`
 /// (`/reel/:id`). Same fake-repository shape as
-/// `post_detail_screen_test.dart`'s `_FakePostPublicRepository` — see
-/// that file's docstring for the "no mockito/mocktail" convention this
-/// mirrors.
+/// `post_detail_screen_test.dart`'s `_FakePostPublicRepository`.
+///
+/// Part P-058 update: every test also overrides the social repository with
+/// a controllable fake, since the screen now contains the real action row,
+/// the comments section and a Report menu.
 class _FakeReelPublicRepository implements ReelPublicRepository {
   _FakeReelPublicRepository({this.result, this.error, this.pending});
 
@@ -36,8 +41,7 @@ class _FakeReelPublicRepository implements ReelPublicRepository {
     return result;
   }
 
-  // Unused by this screen — same "implemented to satisfy the interface"
-  // convention as _FakePostPublicRepository.fetchBusinessPosts.
+  // Unused by this screen — implemented to satisfy the interface.
   @override
   Future<PaginatedResponse<PublicReel>> fetchBusinessReels(
     int businessId,
@@ -61,10 +65,16 @@ Future<void> _pumpScreen(
   WidgetTester tester, {
   required String reelId,
   required _FakeReelPublicRepository repository,
+  FakeSocialInteractionRepository? social,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [reelPublicRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        reelPublicRepositoryProvider.overrideWithValue(repository),
+        socialInteractionRepositoryProvider.overrideWithValue(
+          social ?? FakeSocialInteractionRepository(),
+        ),
+      ],
       child: MaterialApp(home: ReelDetailScreen(reelId: reelId)),
     ),
   );
@@ -104,6 +114,7 @@ void main() {
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byTooltip('More options'), findsNothing);
 
       completer.complete(_reel);
       await tester.pumpAndSettle();
@@ -114,7 +125,8 @@ void main() {
 
   group('ReelDetailScreen — found', () {
     testWidgets(
-      'shows the caption, the formatted duration, and the stub action row',
+      'shows the caption, the formatted duration, the real action row and '
+      'the comments section',
       (tester) async {
         final repository = _FakeReelPublicRepository(result: _reel);
 
@@ -125,10 +137,11 @@ void main() {
           find.text('A published reel, seen at /reel/601.'),
           findsOneWidget,
         );
-        // 125 seconds -> 2:05, per ReelDetailScreen's own
-        // `_formatDuration` (mm:ss, no leading hour segment).
+        // 125 seconds -> 2:05, per ReelDetailScreen's own `_formatDuration`
+        // (mm:ss, no leading hour segment).
         expect(find.text('2:05'), findsOneWidget);
         expect(find.byIcon(Icons.favorite_border), findsOneWidget);
+        expect(find.text('Comments'), findsOneWidget);
       },
     );
 
@@ -147,8 +160,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // No mm:ss label anywhere on screen when durationSeconds is null —
-      // the caption itself deliberately contains no colon, so this also
-      // confirms _ReelDetailView's `if (duration != null)` guard.
+      // nothing else on this screen (caption, comments section copy)
+      // contains a colon either.
       expect(find.textContaining(':'), findsNothing);
     });
 
@@ -186,22 +199,91 @@ void main() {
     );
 
     testWidgets(
-      'tapping a like/comment/share stub icon shows the honest '
-      '"coming soon" SnackBar',
+      'tapping Like shows the liked state immediately, before any response',
       (tester) async {
         final repository = _FakeReelPublicRepository(result: _reel);
+        final social = FakeSocialInteractionRepository();
 
-        await _pumpScreen(tester, reelId: '601', repository: repository);
+        await _pumpScreen(
+          tester,
+          reelId: '601',
+          repository: repository,
+          social: social,
+        );
         await tester.pumpAndSettle();
 
-        final shareIcon = find.byIcon(Icons.share_outlined);
-        await tester.ensureVisible(shareIcon);
+        // Close the gate only now, after the initial comment load finished.
+        social.gate = Completer<void>();
+
+        final likeButton = find.byTooltip('Like');
+        await tester.ensureVisible(likeButton);
         await tester.pumpAndSettle();
 
-        await tester.tap(shareIcon);
+        await tester.tap(likeButton);
         await tester.pump();
 
-        expect(find.text('Share — Coming soon'), findsOneWidget);
+        expect(find.byIcon(Icons.favorite), findsOneWidget);
+        expect(find.byIcon(Icons.favorite_border), findsNothing);
+
+        social.gate!.complete();
+        await tester.pumpAndSettle();
+
+        expect(social.calls, contains('like:reel:601'));
+      },
+    );
+
+    testWidgets(
+      'posting a comment adds it to the list and bumps the comment count',
+      (tester) async {
+        final repository = _FakeReelPublicRepository(result: _reel);
+        final social = FakeSocialInteractionRepository();
+
+        await _pumpScreen(
+          tester,
+          reelId: '601',
+          repository: repository,
+          social: social,
+        );
+        await tester.pumpAndSettle();
+
+        final field = find.byType(TextField);
+        await tester.ensureVisible(field);
+        await tester.pumpAndSettle();
+
+        await tester.enterText(field, 'nice reel');
+        await tester.tap(find.byIcon(Icons.send));
+        await tester.pumpAndSettle();
+
+        expect(social.calls, contains('createComment:reel:601'));
+        expect(find.text('nice reel'), findsOneWidget);
+        expect(find.text('1'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'the AppBar "..." menu appears once loaded and reports the Reel',
+      (tester) async {
+        final repository = _FakeReelPublicRepository(result: _reel);
+        final social = FakeSocialInteractionRepository();
+
+        await _pumpScreen(
+          tester,
+          reelId: '601',
+          repository: repository,
+          social: social,
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byTooltip('More options'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Report'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Other'));
+        await tester.pump();
+        await tester.tap(find.widgetWithText(FilledButton, 'Submit'));
+        await tester.pumpAndSettle();
+
+        expect(social.calls, contains('report:reel:601:other'));
       },
     );
   });

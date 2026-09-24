@@ -10,15 +10,21 @@ import 'package:social_commerce_app/features/content/data/post_public_repository
 import 'package:social_commerce_app/features/content/domain/post_public_repository.dart';
 import 'package:social_commerce_app/features/content/domain/public_post_entity.dart';
 import 'package:social_commerce_app/features/content/presentation/post_detail_screen.dart';
+import 'package:social_commerce_app/features/social/data/social_interaction_repository_impl.dart';
+import 'package:social_commerce_app/features/social/domain/comment_entity.dart';
+
+import '../../social/fake_social_interaction_repository.dart';
 
 /// Part P-045 (STEP 8) scope: widget tests for `PostDetailScreen`
-/// (`/post/:id`) — the Testing section's own explicit requirement
-/// ("Widget tests for ... both detail screens"). Hand-rolled fake, same
-/// shape as every other fake repository in this project (no
-/// mockito/mocktail — confirmed against PROJECT_PROGRESS.md's own
-/// P-021a note): a mutable result/error, an optional pending
-/// [Completer] for a deterministic loading state, and a call counter so
-/// the non-numeric-id test can assert zero network calls.
+/// (`/post/:id`). Hand-rolled fake, same shape as every other fake
+/// repository in this project (no mockito/mocktail): a mutable
+/// result/error, an optional pending [Completer] for a deterministic
+/// loading state, and a call counter so the non-numeric-id test can assert
+/// zero network calls.
+///
+/// Part P-058 update: the screen now also contains the real action row, the
+/// comments section and a Report menu, so every test also overrides the
+/// social repository with a controllable fake (never the real Dio one).
 class _FakePostPublicRepository implements PostPublicRepository {
   _FakePostPublicRepository({this.result, this.error, this.pending});
 
@@ -39,10 +45,7 @@ class _FakePostPublicRepository implements PostPublicRepository {
     return result;
   }
 
-  // Unused by this screen (PostDetailScreen only reads
-  // postPublicDetailProvider, which calls fetchPublicPost) — implemented
-  // to satisfy the interface, same convention as this project's other
-  // single-purpose fakes.
+  // Unused by this screen — implemented to satisfy the interface.
   @override
   Future<PaginatedResponse<PublicPost>> fetchBusinessPosts(
     int businessId,
@@ -64,10 +67,16 @@ Future<void> _pumpScreen(
   WidgetTester tester, {
   required String postId,
   required _FakePostPublicRepository repository,
+  FakeSocialInteractionRepository? social,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [postPublicRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        postPublicRepositoryProvider.overrideWithValue(repository),
+        socialInteractionRepositoryProvider.overrideWithValue(
+          social ?? FakeSocialInteractionRepository(),
+        ),
+      ],
       child: MaterialApp(home: PostDetailScreen(postId: postId)),
     ),
   );
@@ -107,6 +116,8 @@ void main() {
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      // No Report menu until the Post itself has loaded.
+      expect(find.byTooltip('More options'), findsNothing);
 
       completer.complete(_post);
       await tester.pumpAndSettle();
@@ -117,7 +128,7 @@ void main() {
 
   group('PostDetailScreen — found', () {
     testWidgets(
-      'shows the caption and the stub action row for a published post',
+      'shows the caption, the real action row and the comments section',
       (tester) async {
         final repository = _FakePostPublicRepository(result: _post);
 
@@ -131,6 +142,11 @@ void main() {
         expect(find.byIcon(Icons.favorite_border), findsOneWidget);
         expect(find.byIcon(Icons.mode_comment_outlined), findsOneWidget);
         expect(find.byIcon(Icons.share_outlined), findsOneWidget);
+        expect(find.text('Comments'), findsOneWidget);
+        expect(
+          find.text('No comments yet. Be the first to comment.'),
+          findsOneWidget,
+        );
       },
     );
 
@@ -148,27 +164,125 @@ void main() {
     });
 
     testWidgets(
-      'tapping a stub icon shows the honest "coming soon" SnackBar '
-      'instead of doing nothing silently',
+      'tapping Like shows the liked state immediately, before any response',
       (tester) async {
         final repository = _FakePostPublicRepository(result: _post);
+        final social = FakeSocialInteractionRepository();
 
-        await _pumpScreen(tester, postId: '501', repository: repository);
+        await _pumpScreen(
+          tester,
+          postId: '501',
+          repository: repository,
+          social: social,
+        );
         await tester.pumpAndSettle();
+
+        // Close the gate only now, after the initial comment load finished.
+        social.gate = Completer<void>();
 
         // Full-screen image at the default 800×600 test surface can push
-        // the action row below the fold (same reasoning as
-        // post_card_test.dart's own overflow note) — ensureVisible
-        // scrolls it into view before the tap, same fix already proven
-        // in business_profile_public_content_section_test.dart.
-        final likeIcon = find.byIcon(Icons.favorite_border);
-        await tester.ensureVisible(likeIcon);
+        // the action row below the fold — ensureVisible scrolls it into
+        // view before the tap.
+        final likeButton = find.byTooltip('Like');
+        await tester.ensureVisible(likeButton);
         await tester.pumpAndSettle();
 
-        await tester.tap(likeIcon);
+        await tester.tap(likeButton);
         await tester.pump();
 
-        expect(find.text('Like — Coming soon'), findsOneWidget);
+        expect(find.byIcon(Icons.favorite), findsOneWidget);
+        expect(find.byIcon(Icons.favorite_border), findsNothing);
+
+        social.gate!.complete();
+        await tester.pumpAndSettle();
+
+        expect(social.calls, contains('like:post:501'));
+      },
+    );
+
+    testWidgets('shows the comments the API returned, as-is', (tester) async {
+      final repository = _FakePostPublicRepository(result: _post);
+      final social = FakeSocialInteractionRepository()
+        ..commentsToReturn = [
+          CommentEntity(
+            id: 1,
+            userId: 42,
+            contentType: 'post',
+            objectId: 501,
+            text: 'Lovely colours!',
+            isHidden: false,
+            createdAt: DateTime.utc(2026, 9, 24, 10),
+          ),
+        ];
+
+      await _pumpScreen(
+        tester,
+        postId: '501',
+        repository: repository,
+        social: social,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Lovely colours!'), findsOneWidget);
+      expect(find.text('User #42'), findsOneWidget);
+      expect(social.calls, contains('listComments:post:501'));
+    });
+
+    testWidgets(
+      'posting a comment adds it to the list and bumps the comment count',
+      (tester) async {
+        final repository = _FakePostPublicRepository(result: _post);
+        final social = FakeSocialInteractionRepository();
+
+        await _pumpScreen(
+          tester,
+          postId: '501',
+          repository: repository,
+          social: social,
+        );
+        await tester.pumpAndSettle();
+
+        final field = find.byType(TextField);
+        await tester.ensureVisible(field);
+        await tester.pumpAndSettle();
+
+        await tester.enterText(field, 'great post');
+        await tester.tap(find.byIcon(Icons.send));
+        await tester.pumpAndSettle();
+
+        expect(social.calls, contains('createComment:post:501'));
+        // Shown once, in the list (the input field was cleared).
+        expect(find.text('great post'), findsOneWidget);
+        // The comment counter next to the Comment icon.
+        expect(find.text('1'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'the AppBar "..." menu appears once loaded and reports the Post',
+      (tester) async {
+        final repository = _FakePostPublicRepository(result: _post);
+        final social = FakeSocialInteractionRepository();
+
+        await _pumpScreen(
+          tester,
+          postId: '501',
+          repository: repository,
+          social: social,
+        );
+        await tester.pumpAndSettle();
+
+        // No comments loaded, so this is the only "..." menu on screen.
+        await tester.tap(find.byTooltip('More options'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Report'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Spam'));
+        await tester.pump();
+        await tester.tap(find.widgetWithText(FilledButton, 'Submit'));
+        await tester.pumpAndSettle();
+
+        expect(social.calls, contains('report:post:501:spam'));
       },
     );
   });
