@@ -6,7 +6,7 @@ import 'package:social_commerce_app/core/network/paginated_response.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/login_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
-import 'package:social_commerce_app/features/feed/presentation/home_screen.dart';
+import 'package:social_commerce_app/features/feed/presentation/home_feed_screen.dart';
 import 'package:social_commerce_app/features/moderation/data/moderation_repository_impl.dart';
 import 'package:social_commerce_app/features/moderation/domain/moderation_repository.dart';
 import 'package:social_commerce_app/features/moderation/domain/queue_item_entity.dart';
@@ -168,7 +168,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(_currentPath(router), RouteNames.homePath);
-        expect(find.byType(HomeScreen), findsOneWidget);
+        expect(find.byType(HomeFeedScreen), findsOneWidget);
         expect(find.byType(ModerationQueueScreen), findsNothing);
       },
     );

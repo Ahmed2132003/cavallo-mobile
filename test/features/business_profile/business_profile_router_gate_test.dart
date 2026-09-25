@@ -7,7 +7,7 @@ import 'package:social_commerce_app/features/business_profile/domain/business_pr
 import 'package:social_commerce_app/features/business_profile/presentation/business_onboarding_screen.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_edit_screen.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_provider.dart';
-import 'package:social_commerce_app/features/feed/presentation/home_screen.dart';
+import 'package:social_commerce_app/features/feed/presentation/home_feed_screen.dart';
 import 'package:social_commerce_app/main.dart';
 import 'package:social_commerce_app/routing/app_router.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
@@ -87,7 +87,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.byType(HomeFeedScreen), findsOneWidget);
       expect(
         buildCalls.count,
         0,

@@ -3,7 +3,7 @@
 /// ### Filename deviation, documented not silent
 ///
 /// Every other feature in this project splits its interface/impl as
-/// `<name>_repository.dart` (domain, abstract) / `<name>_repository_impl
+/// `\<name\>_repository.dart` (domain, abstract) / `\<name\>_repository_impl
 /// .dart` (data, concrete) — e.g. `ProductRepository` /
 /// `ProductRepositoryImpl`. This file is named `feed_repository.dart`
 /// (no `_impl` suffix) inside `data/` because P-061's own Files

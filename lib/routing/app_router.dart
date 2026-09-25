@@ -20,7 +20,7 @@ import '../features/content/presentation/post_form_screen.dart';
 import '../features/content/presentation/reel_detail_screen.dart';
 import '../features/content/presentation/reel_form_screen.dart';
 import '../features/discover/presentation/discover_screen.dart';
-import '../features/feed/presentation/home_screen.dart';
+import '../features/feed/presentation/home_feed_screen.dart';
 import '../features/moderation/domain/queue_item_entity.dart';
 import '../features/moderation/presentation/moderation_queue_screen.dart';
 import '../features/moderation/presentation/moderation_review_screen.dart';
@@ -392,8 +392,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.homePath,
         name: RouteNames.home,
-        builder: (context, state) => const HomeScreen(),
-      ),
+        builder: (context, state) => const HomeFeedScreen(),
+      ),      
       GoRoute(
         path: RouteNames.discoverPath,
         name: RouteNames.discover,
