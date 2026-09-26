@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_failure.dart';
 import '../../../core/storage/secure_token_storage.dart';
+import '../../social/presentation/social_interaction_provider.dart';
 import '../data/auth_repository_impl.dart';
 import '../domain/auth_repository.dart';
 import '../domain/user_entity.dart';
@@ -136,12 +137,26 @@ class SessionNotifier extends AsyncNotifier<User?> {
   /// propagates to the caller after [state] has been updated, so a
   /// future screen can show e.g. "signed out on this device, but the
   /// server logout failed" messaging if it wants to.
+  ///
+  /// Part BUGFIX-058: also force-clears every live
+  /// `contentInteractionProvider`/`businessFollowProvider` instance
+  /// (`social_interaction_provider.dart`) in the same `finally` block, so
+  /// a still-mounted `ContentActionRow`/`FollowButton` never keeps showing
+  /// the just-logged-out account's Like/Save/Follow state to whichever
+  /// account signs in next in this same running app session. This is
+  /// unconditional (success or failure of the backend call above) because
+  /// the local session is unauthenticated either way. Paired with making
+  /// both providers `.autoDispose` (same file) — that reclaims a key once
+  /// nothing is watching it; this guarantees immediate correctness even
+  /// for a key some still-mounted widget is actively watching right now.
   Future<void> logout() async {
     state = const AsyncValue<User?>.loading();
     try {
       await _authRepository.logout();
     } finally {
       state = const AsyncValue.data(null);
+      ref.invalidate(contentInteractionProvider);
+      ref.invalidate(businessFollowProvider);
     }
   }
 

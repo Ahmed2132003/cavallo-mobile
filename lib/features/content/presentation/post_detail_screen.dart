@@ -168,6 +168,12 @@ class _PostDetailViewState extends State<_PostDetailView> {
                   contentType: 'post',
                   objectId: post.id,
                   onCommentTap: _scrollToComments,
+                  isLiked: post.isLiked,
+                  isSaved: post.isSaved,
+                  likesCount: post.likesCount,
+                  commentsCount: post.commentsCount,
+                  sharesCount: post.sharesCount,
+                  updatedAt: post.updatedAt,
                 ),
                 const Divider(height: 32),
                 KeyedSubtree(

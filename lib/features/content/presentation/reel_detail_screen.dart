@@ -180,6 +180,12 @@ class _ReelDetailViewState extends State<_ReelDetailView> {
                   contentType: 'reel',
                   objectId: reel.id,
                   onCommentTap: _scrollToComments,
+                  isLiked: reel.isLiked,
+                  isSaved: reel.isSaved,
+                  likesCount: reel.likesCount,
+                  commentsCount: reel.commentsCount,
+                  sharesCount: reel.sharesCount,
+                  updatedAt: reel.updatedAt,
                 ),
                 const Divider(height: 32),
                 KeyedSubtree(

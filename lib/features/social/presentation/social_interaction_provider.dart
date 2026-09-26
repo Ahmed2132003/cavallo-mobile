@@ -120,7 +120,18 @@ class ContentInteractionNotifier extends Notifier<SocialInteractionState> {
   }
 }
 
-final contentInteractionProvider = NotifierProvider.family<
+/// Part BUGFIX-058: `.autoDispose` — combined with the seed-from-real-data
+/// fix in `ContentActionRow`, this closes the cross-account state-leakage
+/// bug from two directions. `.autoDispose` means a key with no active
+/// watcher (e.g. a card scrolled out of the feed and disposed) drops its
+/// state entirely rather than persisting in memory for the app process's
+/// lifetime; `sessionProvider`'s `logout()` (`session_provider.dart`)
+/// additionally calls `ref.invalidate(contentInteractionProvider)` — with
+/// no key argument, this invalidates every currently-alive instance of
+/// this family at once — so even a still-mounted widget's interaction
+/// state is force-cleared the moment a session ends, not just eventually
+/// reclaimed once nothing is watching it.
+final contentInteractionProvider = NotifierProvider.autoDispose.family<
   ContentInteractionNotifier,
   SocialInteractionState,
   ContentInteractionKey
@@ -166,7 +177,10 @@ class BusinessFollowNotifier extends Notifier<SocialInteractionState> {
   }
 }
 
-final businessFollowProvider = NotifierProvider.family<
+/// Part BUGFIX-058: `.autoDispose`, same reasoning as
+/// [contentInteractionProvider] above — paired with
+/// `ref.invalidate(businessFollowProvider)` in `SessionNotifier.logout()`.
+final businessFollowProvider = NotifierProvider.autoDispose.family<
   BusinessFollowNotifier,
   SocialInteractionState,
   int
