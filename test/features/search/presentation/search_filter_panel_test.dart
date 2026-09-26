@@ -20,31 +20,7 @@ class _FakeCategoryRepository implements CategoryRepository {
 
 const _categories = [CategoryNode(id: 1, name: 'Fashion', slug: 'fashion')];
 
-Widget _host(Widget sheetChild, {List<CategoryNode> categories = _categories}) {
-  return ProviderScope(
-    overrides: [
-      categoryRepositoryProvider.overrideWith(
-        (ref) async => _FakeCategoryRepository(tree: categories),
-      ),
-    ],
-    child: MaterialApp(
-      home: Builder(
-        builder: (context) => Scaffold(
-          body: Center(
-            child: ElevatedButton(
-              onPressed: () => showModalBottomSheet<SearchFilters>(
-                context: context,
-                isScrollControlled: true,
-                builder: (context) => sheetChild,
-              ),
-              child: const Text('open'),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-}
+
 
 void main() {
   testWidgets(

@@ -314,6 +314,14 @@ class _DebugMenu extends ConsumerWidget {
           value: 'viewStory',
           child: Text('View Story (debug, business 3)'),
         ),
+        const PopupMenuItem(
+          value: 'search',
+          child: Text('Search (debug — no nav entry point yet)'),
+        ),
+        const PopupMenuItem(
+          value: 'discover',
+          child: Text('Discover (debug — no nav entry point yet)'),
+        ),
         const PopupMenuItem(value: 'logout', child: Text('Logout (debug)')),
       ],
     );
@@ -333,6 +341,10 @@ class _DebugMenu extends ConsumerWidget {
           pathParameters: {RouteNames.idParam: '3'},
           extra: 'Business 3',
         );
+      case 'search':
+        context.pushNamed(RouteNames.search);
+      case 'discover':
+        context.pushNamed(RouteNames.discover);
       case 'logout':
         ref.read(sessionProvider.notifier).logout();
     }
