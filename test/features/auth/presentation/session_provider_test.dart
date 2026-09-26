@@ -8,6 +8,11 @@ import 'package:social_commerce_app/features/auth/data/auth_repository_impl.dart
 import 'package:social_commerce_app/features/auth/domain/auth_repository.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
+import 'package:social_commerce_app/features/social/data/social_interaction_repository_impl.dart';
+import 'package:social_commerce_app/features/social/presentation/content_interaction_key.dart';
+import 'package:social_commerce_app/features/social/presentation/social_interaction_provider.dart';
+
+import '../../social/fake_social_interaction_repository.dart';
 
 /// Hand-rolled test double for [AuthRepository] — this project doesn't use
 /// mockito/mocktail anywhere (confirmed by searching PROJECT_PROGRESS.md);
@@ -109,6 +114,10 @@ DioException _dioFailure(ApiFailure failure) {
     error: failure,
   );
 }
+
+/// Part BUGFIX-058: the (contentType, objectId) key used by the
+/// cross-account leakage test in the `SessionNotifier.logout` group below.
+const ContentInteractionKey _postKey = (contentType: 'post', objectId: 501);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -377,6 +386,83 @@ void main() {
 
       expect(container.read(sessionProvider).value, isNull);
     });
+
+    test(
+      'Part BUGFIX-058: force-clears a previously-seeded '
+      'contentInteractionProvider key on logout, so the next account '
+      'signed into this same running app instance never sees the '
+      'previous account\'s Like/Save state for the same content',
+      () async {
+        FlutterSecureStorage.setMockInitialValues({});
+        final tokenStorage = SecureTokenStorage();
+        await tokenStorage.saveTokens(access: 'account-a-token', refresh: 'r');
+        final fakeAuth = FakeAuthRepository();
+        final fakeSocial = FakeSocialInteractionRepository();
+        final container = ProviderContainer(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(fakeAuth),
+            secureTokenStorageProvider.overrideWithValue(tokenStorage),
+            socialInteractionRepositoryProvider.overrideWithValue(fakeSocial),
+          ],
+        );
+        addTearDown(container.dispose);
+        await container.read(sessionProvider.future); // Account A signed in
+
+        // Simulate what ContentActionRow's deferred seed does once Account
+        // A's real per-viewer data comes back from the backend: Account A
+        // has liked this post.
+        container
+            .read(contentInteractionProvider(_postKey).notifier)
+            .seed(
+              isLiked: true,
+              isSaved: false,
+              likesCount: 5,
+              commentsCount: 0,
+              sharesCount: 0,
+            );
+        expect(
+          container.read(contentInteractionProvider(_postKey)).isLiked,
+          isTrue,
+        );
+
+        // Account A logs out — still the same running app
+        // instance/container. This is exactly the scenario BUGFIX-058
+        // fixes.
+        await container.read(sessionProvider.notifier).logout();
+
+        // The key must now resolve to a brand-new default state, not
+        // Account A's seeded isLiked: true — proving `ref.invalidate`
+        // actually forced this specific, previously-seeded key to rebuild,
+        // not merely that invalidation is reachable in theory.
+        final afterLogout = container.read(
+          contentInteractionProvider(_postKey),
+        );
+        expect(afterLogout.isLiked, isFalse);
+        expect(afterLogout.likesCount, 0);
+
+        // Account B signs in, in the same running container/app instance.
+        fakeAuth.fetchMeResult = const User(
+          id: 99,
+          email: 'account-b@example.com',
+          accountType: AccountType.customer,
+          isModerator: false,
+          isStaff: false,
+        );
+        await container
+            .read(sessionProvider.notifier)
+            .login(email: 'account-b@example.com', password: 'account-b-pw');
+
+        // Nothing re-seeds this key until ContentActionRow's own deferred
+        // seed runs for Account B's real per-viewer data (that widget's
+        // job, not logout()'s) — what's being verified here is only that
+        // Account A's value is gone, not that Account B's value has
+        // already arrived.
+        expect(
+          container.read(contentInteractionProvider(_postKey)).isLiked,
+          isFalse,
+        );
+      },
+    );
   });
 
   group('SessionNotifier.invalidateSession (Part P-022B)', () {
