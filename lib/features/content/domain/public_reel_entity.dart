@@ -5,6 +5,12 @@
 /// `status == published` AND `processing_status == ready` — see
 /// `ReelPublicRepositoryImpl` (this part, STEP 1) for exactly where
 /// and how both are enforced.
+///
+/// Part BUGFIX-058: added [isLiked], [isSaved], [likesCount],
+/// [commentsCount], [sharesCount] — same per-viewer social state and
+/// real counters added to `PublicPost`, now returned by
+/// `ReelPublicSerializer` too. Same optional-with-defaults reasoning
+/// as `PublicPost` above — see that entity's docstring.
 library;
 
 class PublicReel {
@@ -15,6 +21,11 @@ class PublicReel {
     this.videoUrl,
     this.thumbnailUrl,
     this.durationSeconds,
+    this.likesCount = 0,
+    this.commentsCount = 0,
+    this.sharesCount = 0,
+    this.isLiked = false,
+    this.isSaved = false,
     this.createdAt,
     this.updatedAt,
   });
@@ -36,6 +47,23 @@ class PublicReel {
 
   final int? durationSeconds;
 
+  /// Denormalized counter from the backend (`Reel.likes_count`).
+  final int likesCount;
+
+  /// Denormalized counter from the backend (`Reel.comments_count`).
+  final int commentsCount;
+
+  /// Denormalized counter from the backend (`Reel.shares_count`).
+  final int sharesCount;
+
+  /// Whether the CURRENT viewer has liked this reel. False for an
+  /// unauthenticated fetch — see `ReelPublicSerializer.get_is_liked`.
+  final bool isLiked;
+
+  /// Whether the CURRENT viewer has saved this reel. Same
+  /// per-viewer/unauthenticated-false shape as [isLiked].
+  final bool isSaved;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -46,6 +74,11 @@ class PublicReel {
     String? videoUrl,
     String? thumbnailUrl,
     int? durationSeconds,
+    int? likesCount,
+    int? commentsCount,
+    int? sharesCount,
+    bool? isLiked,
+    bool? isSaved,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -56,6 +89,11 @@ class PublicReel {
       videoUrl: videoUrl ?? this.videoUrl,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       durationSeconds: durationSeconds ?? this.durationSeconds,
+      likesCount: likesCount ?? this.likesCount,
+      commentsCount: commentsCount ?? this.commentsCount,
+      sharesCount: sharesCount ?? this.sharesCount,
+      isLiked: isLiked ?? this.isLiked,
+      isSaved: isSaved ?? this.isSaved,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -71,6 +109,11 @@ class PublicReel {
           other.videoUrl == videoUrl &&
           other.thumbnailUrl == thumbnailUrl &&
           other.durationSeconds == durationSeconds &&
+          other.likesCount == likesCount &&
+          other.commentsCount == commentsCount &&
+          other.sharesCount == sharesCount &&
+          other.isLiked == isLiked &&
+          other.isSaved == isSaved &&
           other.createdAt == createdAt &&
           other.updatedAt == updatedAt);
 
@@ -82,6 +125,11 @@ class PublicReel {
     videoUrl,
     thumbnailUrl,
     durationSeconds,
+    likesCount,
+    commentsCount,
+    sharesCount,
+    isLiked,
+    isSaved,
     createdAt,
     updatedAt,
   );
