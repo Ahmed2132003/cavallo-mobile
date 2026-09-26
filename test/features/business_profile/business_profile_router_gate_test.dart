@@ -143,7 +143,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.byType(HomeScreen),
+        find.byType(HomeFeedScreen),
         findsNothing,
         reason: 'a Business user with no profile must never reach /home',
       );
@@ -190,7 +190,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byType(HomeScreen), findsOneWidget);
+        expect(find.byType(HomeFeedScreen), findsOneWidget);
         expect(find.byType(BusinessOnboardingScreen), findsNothing);
       },
     );

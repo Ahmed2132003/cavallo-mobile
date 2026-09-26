@@ -13,6 +13,7 @@ import 'package:social_commerce_app/features/auth/presentation/register_screen.d
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_public_screen.dart';
 import 'package:social_commerce_app/features/categories/data/category_repository_impl.dart';
+import 'package:social_commerce_app/features/feed/presentation/home_feed_screen.dart';
 import 'package:social_commerce_app/features/categories/domain/category_entity.dart';
 import 'package:social_commerce_app/features/categories/domain/category_repository.dart';
 import 'package:social_commerce_app/features/products/data/product_repository_impl.dart';
@@ -211,8 +212,14 @@ void main() {
       // register tests below and app_router_redirect_test.dart) —
       // asserting their placeholder text under this session state
       // would be asserting an unreachable state.
+      //
+      // home deliberately excluded here too: Part P-061 replaced
+      // P-007's placeholder for this route with the real
+      // `HomeFeedScreen`, so the old 'Route: home' assertion no
+      // longer exists anywhere — see the dedicated P-061 test below,
+      // same pattern as the businessProfile (P-029) and productDetail
+      // (P-034) placeholder replacements further down this file.
       const protectedSimpleRoutes = <String>[
-        RouteNames.home,
         RouteNames.discover,
         RouteNames.search,
         RouteNames.chatList,
@@ -230,6 +237,29 @@ void main() {
         );
       }
     });
+
+    testWidgets(
+      'Part P-061: home route resolves to the real HomeFeedScreen '
+      '(signed in)',
+      (tester) async {
+        // Part P-061 replaced P-007's placeholder for this route, so
+        // the old 'Route: home' assertion (still used for the other
+        // routes in `protectedSimpleRoutes` above) no longer exists
+        // anywhere for `home`. No `feedRepositoryProvider` override is
+        // used here — same approach as `moderation_router_gate_test
+        // .dart`/`business_profile_router_gate_test.dart`'s own
+        // `find.byType(HomeFeedScreen)` assertions: the screen resolves
+        // (loading → real or failed network fetch → error state) either
+        // way, and this test only cares that the correct widget type is
+        // what /home now builds, not that its data call succeeds.
+        final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+        router.goNamed(RouteNames.home);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(HomeFeedScreen), findsOneWidget);
+      },
+    );
 
     testWidgets('login route resolves to the real LoginScreen (signed out)', (
       tester,
