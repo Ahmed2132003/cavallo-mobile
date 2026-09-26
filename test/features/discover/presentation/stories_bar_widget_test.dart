@@ -14,6 +14,7 @@ import 'package:social_commerce_app/features/stories/domain/public_story_entity.
 import 'package:social_commerce_app/features/stories/domain/story_public_repository.dart';
 import 'package:social_commerce_app/core/network/paginated_response.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
+import 'package:social_commerce_app/features/feed/domain/feed_page_entity.dart';
 
 /// Part P-062 scope (STEP 4 tests). Hand-rolled fakes only, mirroring
 /// `home_feed_screen_test.dart`'s (Part P-061) exact convention.
@@ -26,7 +27,7 @@ class _FakeDiscoverRepository implements DiscoverRepository {
   Future<List<ActiveStoryGroup>> fetchActiveStoryGroups() async => groups;
 
   @override
-  Future<dynamic> fetchDiscoverFeed({String? cursor}) =>
+  Future<FeedPage> fetchDiscoverFeed({String? cursor}) =>
       throw UnimplementedError('Not exercised by StoriesBarWidget tests');
 }
 
