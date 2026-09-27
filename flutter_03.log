@@ -1,0 +1,87 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter analyze
+
+## exception
+
+_Exception: Exception: analysis server exited with code -1073740791 and output:
+[stderr] -- End of DumpStackTrace
+[stderr] === Crash occurred when compiling package:analyzer/src/summary2/informative_data.dart_InformativeDataApplier_applyToUnit in optimizing JIT mode in TypePropagation pass
+[stderr] *** BEGIN CFG
+[stderr] TypePropagation
+[stderr] ==== dart:core__Array@0150898_[] (RegularFunction)
+[stderr] B0[graph]:0 {
+[stderr]       v3180 <- Constant(#null)
+[stderr]       v3181 <- Constant(#<optimized out>)
+[stderr] }
+[stderr] B1141[function entry]:2 {
+[stderr]       v3182 <- Parameter(0 @fp[3])
+[stderr]       v3183 <- Parameter(1 @fp[2])
+[stderr]       v3184 <- Parameter(0 @?) T{_Array<X0>}
+[stderr]       v3185 <- Parameter(1 @?) T{_Smi}
+[stderr] }
+[stderr]     v3186 <- LoadField(v3184 . Array.length {final})
+[stderr]     v3187 <- GenericCheckBound:10(v3186, v3185) int64
+[stderr]     v3188 <- LoadIndexed([_List] v3184, v3187)
+[stderr]     DartReturn:12(v3188)
+[stderr] *** END CFG
+
+```
+```
+
+## flutter doctor
+
+```
+[32m[✓][39m Flutter (Channel stable, 3.29.3, on Microsoft Windows [Version 10.0.26200.9457], locale en-US) [462ms]
+    [32m•[39m Flutter version 3.29.3 on channel stable at D:\flutter
+    [32m•[39m Upstream repository https://github.com/flutter/flutter.git
+    [32m•[39m Framework revision ea121f8859 (1 year, 6 months ago), 2025-04-11 19:10:07 +0000
+    [32m•[39m Engine revision cf56914b32
+    [32m•[39m Dart version 3.7.2
+    [32m•[39m DevTools version 2.42.3
+
+[32m[✓][39m Windows Version (Windows 11 or higher, 25H2, 2009) [998ms]
+
+[33m[!][39m Android toolchain - develop for Android devices (Android SDK version 36.0.0) [366ms]
+    [32m•[39m Android SDK at D:\sdk
+    [32m•[39m Platform android-36, build-tools 36.0.0
+    [32m•[39m Java binary at: C:\Program Files (x86)\Common Files\Oracle\Java\java8path\java.exe
+      This JDK was found in the system PATH.
+      To manually set the JDK path, use: `flutter config --jdk-dir="path/to/jdk"`.
+    [31m✗[39m Could not determine java version
+
+[32m[✓][39m Chrome - develop for the web [104ms]
+    [32m•[39m Chrome at C:\Program Files\Google\Chrome\Application\chrome.exe
+
+[32m[✓][39m Visual Studio - develop Windows apps (Visual Studio Community 2022 17.14.0) [102ms]
+    [32m•[39m Visual Studio at C:\Program Files\Microsoft Visual Studio\2022\Community
+    [32m•[39m Visual Studio Community 2022 version 17.14.36109.1
+    [32m•[39m Windows 10 SDK version 10.0.26100.0
+
+[33m[!][39m Android Studio (version 2024.3) [16ms]
+    [32m•[39m Android Studio at C:\Program Files\Android\Android Studio
+    [32m•[39m Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    [32m•[39m Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+    [31m✗[39m Unable to determine bundled Java version.
+    [32m•[39m Try updating or re-installing Android Studio.
+
+[32m[✓][39m VS Code (version unknown) [14ms]
+    [32m•[39m VS Code at C:\Users\HP\AppData\Local\Programs\Microsoft VS Code
+    [32m•[39m Flutter extension version 3.142.0
+    [31m✗[39m Unable to determine VS Code version.
+
+[32m[✓][39m Connected device (3 available) [199ms]
+    [32m•[39m Windows (desktop) • windows • windows-x64    • Microsoft Windows [Version 10.0.26200.9457]
+    [32m•[39m Chrome (web)      • chrome  • web-javascript • Google Chrome 154.0.8037.57
+    [32m•[39m Edge (web)        • edge    • web-javascript • Microsoft Edge 154.0.4258.37
+
+[32m[✓][39m Network resources [643ms]
+    [32m•[39m All expected network resources are available.
+
+[33m![39m Doctor found issues in 2 categories.
+```
