@@ -19,6 +19,11 @@ import '../domain/conversation.dart';
 /// as the next page's request URL — the same opaque-cursor contract
 /// `ConversationRepository.listConversations`'s own doc comment
 /// describes.
+///
+/// ### STEP 4 addition — "New chat (test)" floating action button
+/// See [_ChatListScreenState._startTestConversation]'s own doc comment
+/// for why this exists and why it is explicitly a manual-testing aid,
+/// not a designed product entry point.
 class ChatListScreen extends ConsumerStatefulWidget {
   const ChatListScreen({super.key});
 
@@ -34,6 +39,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   bool _isLoadingFirstPage = true;
   bool _isLoadingMore = false;
   ApiFailure? _error;
+  bool _isStartingTestConversation = false;
 
   @override
   void initState() {
@@ -112,11 +118,125 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     );
   }
 
+  /// STEP 4 — manual-testing aid only, NOT part of P-074's original
+  /// scope as written. P-074's own execution prompt assumes
+  /// conversations already exist or are started from elsewhere (e.g. a
+  /// "Message" button on a business profile screen) — no such entry
+  /// point exists anywhere in this codebase yet (confirmed by
+  /// inspecting `lib/features/business_profile/` directly: no
+  /// reference to `ConversationRepository`/`startConversation` anywhere
+  /// outside `lib/features/chat/` itself). Without SOME way to create a
+  /// conversation between two real test accounts, P-074's own
+  /// acceptance criteria — a manual two-account run against the real
+  /// backend — cannot be performed at all.
+  ///
+  /// This button is a deliberately minimal, clearly-temporary bridge:
+  /// it prompts for the other account's numeric user id, calls
+  /// `ConversationRepository.startConversation` (`POST
+  /// /api/v1/conversations/start/`, built in STEP 2), and hand-builds a
+  /// minimal [Conversation] from the response. That endpoint returns
+  /// only `{id, created_at, updated_at, participant_ids}` — see
+  /// `ConversationRepository.startConversation`'s own doc comment for
+  /// why a full [Conversation] can't be parsed from it directly — so
+  /// [ConversationParticipantSummary.displayName] here is a placeholder
+  /// (`"User #<id>"`), not the real resolved name. This is enough to
+  /// satisfy `app_router.dart`'s `extra is Conversation` redirect guard
+  /// and let [ChatThreadScreen] mount and function correctly (it only
+  /// needs `conversation.id` and `conversation.otherParticipant.id` —
+  /// see that screen's own doc comment). Re-opening the same
+  /// conversation later from this list shows the real resolved name,
+  /// since that came from `GET /api/v1/conversations/` — this
+  /// screen's normal fetch.
+  ///
+  /// A real "Message" entry point from a business profile (or anywhere
+  /// else) is out of P-074's scope and should replace this button in a
+  /// later part.
+  Future<void> _startTestConversation() async {
+    final recipientIdText = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: const Text('Start test conversation'),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            autofocus: true,
+            decoration: const InputDecoration(
+              labelText: "Other account's user id",
+              hintText: 'e.g. 7',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () =>
+                  Navigator.of(dialogContext).pop(controller.text),
+              child: const Text('Start'),
+            ),
+          ],
+        );
+      },
+    );
+
+    final recipientId = int.tryParse(recipientIdText?.trim() ?? '');
+    if (recipientId == null) return;
+
+    setState(() => _isStartingTestConversation = true);
+    try {
+      final conversationId = await ref
+          .read(conversationRepositoryProvider)
+          .startConversation(recipientId: recipientId);
+      if (!mounted) return;
+      setState(() => _isStartingTestConversation = false);
+
+      final placeholderConversation = Conversation(
+        id: conversationId,
+        otherParticipant: ConversationParticipantSummary(
+          id: recipientId,
+          accountType: 'unknown',
+          displayName: 'User #$recipientId',
+        ),
+        lastMessage: null,
+        unreadCount: 0,
+        createdAt: DateTime.now(),
+      );
+      if (!mounted) return;
+      context.pushNamed(
+        RouteNames.chatThread,
+        pathParameters: {RouteNames.idParam: conversationId.toString()},
+        extra: placeholderConversation,
+      );
+    } on ApiFailure catch (e) {
+      if (!mounted) return;
+      setState(() => _isStartingTestConversation = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Messages')),
       body: _buildBody(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _isStartingTestConversation
+            ? null
+            : _startTestConversation,
+        icon: _isStartingTestConversation
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.add_comment_outlined),
+        label: const Text('New chat (test)'),
+      ),
     );
   }
 
