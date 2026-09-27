@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'chat_connection_manager.dart';
-import 'chat_event.dart';
 
 /// شاشة تجربة مؤقتة لـ P-073 — مش جزء من الـ Part نفسه، ومش المفروض
 /// تتعمل عليها commit نهائي. امسحها لما P-074 (chat UI) يتعمل.
