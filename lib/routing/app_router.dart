@@ -32,6 +32,7 @@ import '../features/products/presentation/product_list_screen.dart';
 import '../features/search/presentation/search_screen.dart';
 import '../features/stories/presentation/story_creation_screen.dart';
 import '../features/stories/presentation/story_viewer_screen.dart';
+import '../features/chat/domain/conversation.dart';
 import 'route_names.dart';
 
 /// Part P-007 scope: wires the app's single [GoRouter] instance and its
@@ -344,6 +345,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         }
       }
 
+      // --- Part P-074 STEP 3: chatThread needs its Conversation handed
+      // over as `extra` (same convention as moderationReview's
+      // QueueItem above) — without it (deep link, restored location) go
+      // back to the conversation list instead of building a broken
+      // screen.
+      if (_isChatThreadLocation(location) && state.extra is! Conversation) {
+        return RouteNames.chatListPath;
+      }
+
       // Signed in: /login and /register bounce to /home, per the spec's
       // literal example. splash is ALSO included here — a deliberate
       // addition beyond the literal spec text (which never mentioned
@@ -476,8 +486,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.chatThreadPath,
         name: RouteNames.chatThread,
         builder: (context, state) {
-          final id = state.pathParameters[RouteNames.idParam]!;
-          return ChatThreadScreen(chatId: id);
+          // The redirect guard above (Part P-074 STEP 3) already
+          // guarantees `extra` is a Conversation — same pattern as
+          // moderationReview's QueueItem cast just below.
+          return ChatThreadScreen(conversation: state.extra! as Conversation);
         },
       ),
       GoRoute(
@@ -578,6 +590,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 bool _isModerationLocation(String location) {
   return location == RouteNames.moderationPath ||
       location.startsWith('${RouteNames.moderationPath}/');
+}
+/// True for `/chat/<id>` — the concrete, id-filled location the
+/// `chatThread` route resolves to (`location` is always the matched,
+/// concrete path, never the `:id` pattern itself — see
+/// `_isModerationLocation`'s own note on why this is prefix-based, not
+/// an exact-match against `RouteNames.chatThreadPath`).
+bool _isChatThreadLocation(String location) {
+  return location.startsWith('${RouteNames.chatListPath}/');
 }
 
 /// Routes reachable only while signed out. Everything else in the route
