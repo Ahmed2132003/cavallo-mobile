@@ -28,6 +28,36 @@ import '../domain/message.dart';
 /// All four routes below are stated explicitly, more than once, in
 /// `chat/views.py`'s class docstrings as living under
 /// `/api/v1/conversations/` — that is the basis for `_basePath`.
+///
+/// ### CONFIRMED bug fix — [listConversations] response shape
+///
+/// This method's own STEP 2 doc comment already flagged the risk:
+/// "if [`REST_FRAMEWORK.DEFAULT_PAGINATION_CLASS`] turns out to be
+/// unset ... this method will fail loudly." Live, real-device testing
+/// during P-074's manual-test pass confirmed exactly that: `base.py`'s
+/// `REST_FRAMEWORK` dict has no `DEFAULT_PAGINATION_CLASS` entry at
+/// all, and `ConversationListView` sets none of its own, so
+/// `GET /api/v1/conversations/` returns a **plain JSON array**, not
+/// `{results, next, previous}`. Requesting it as
+/// `_dio.get<Map<String, dynamic>>(...)` made Dio itself throw trying
+/// to cast the decoded `List` to a `Map` — wrapped as a `DioException`
+/// whose `.error` was the raw `TypeError`, not an `ApiFailure`,
+/// crashing the `on DioException catch (e) { throw e.error as
+/// ApiFailure; }` line below with a *second*, more confusing cast
+/// failure (`_TypeError is not a subtype of ApiFailure`) — which is
+/// what actually surfaced in the running app as an uncaught exception,
+/// leaving `ChatListScreen`'s loading spinner stuck forever (its
+/// `on ApiFailure catch` never matched an escaped `_TypeError`).
+///
+/// Fixed below by requesting the response untyped (`dynamic`) and
+/// branching on the real runtime shape: a bare `List` is wrapped into a
+/// single, non-paginated "page" (`next`/`previous` both `null`); the
+/// `{results, next, previous}` envelope is still parsed the original
+/// way if the backend is ever changed to emit it (e.g. by giving
+/// `ConversationListView` an explicit `pagination_class`, matching
+/// whatever convention `ProductListScreen`'s/`ContentListScreen`'s own
+/// already-working paginated endpoints use) — so this method keeps
+/// working either way, no future Flutter change required.
 class ConversationRepository {
   ConversationRepository(this._dio);
 
@@ -38,30 +68,42 @@ class ConversationRepository {
   /// GET /api/v1/conversations/ — the Conversation List screen's primary
   /// fetch (`ConversationListView`).
   ///
-  /// Assumed paginated (`{results, next, previous}`, parsed via the
-  /// shared `PaginatedResponse`) because `ConversationListView` sets no
-  /// `pagination_class` of its own and therefore falls back to whatever
-  /// `REST_FRAMEWORK.DEFAULT_PAGINATION_CLASS` is configured project-wide
-  /// — `config/settings.py` was not available to confirm this directly.
-  /// **Flagging this explicitly**: if that default turns out to be unset
-  /// (a plain, non-paginated array, the same shape
-  /// `MessageFetchSinceView` returns), this method will fail loudly at
-  /// `PaginatedResponse.fromJson`'s `json['results']` cast rather than
-  /// silently — that failure is the signal to change this method's
-  /// return type to `Future<List<Conversation>>` instead.
+  /// See this class's own "CONFIRMED bug fix" doc section above for why
+  /// this branches on the response's actual runtime shape instead of
+  /// assuming a paginated envelope.
   ///
   /// [cursor] is an opaque full URL from a previous
   /// `PaginatedResponse.next` — pass it to fetch the next page. Omit (or
-  /// pass null) for the first page.
+  /// pass null) for the first page. Currently always `null` in practice
+  /// (the backend returns everything in one plain array — see above),
+  /// but kept so this method's signature doesn't need to change again
+  /// if/when the backend adds real pagination.
   Future<PaginatedResponse<Conversation>> listConversations({
     String? cursor,
   }) async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>(
-        cursor ?? _basePath,
-      );
+      final response = await _dio.get<dynamic>(cursor ?? _basePath);
+      final data = response.data;
+
+      if (data is List) {
+        // Confirmed live (P-074 manual test): the backend returns a
+        // plain array, not {results, next, previous}. Wrap it into a
+        // single, non-paginated "page" so ChatListScreen's own
+        // pagination handling (harmlessly) just never finds a `next`
+        // cursor to follow.
+        return PaginatedResponse<Conversation>(
+          results: data
+              .map(
+                (json) => Conversation.fromJson(json as Map<String, dynamic>),
+              )
+              .toList(),
+          next: null,
+          previous: null,
+        );
+      }
+
       return PaginatedResponse.fromJson(
-        response.data!,
+        data as Map<String, dynamic>,
         Conversation.fromJson,
       );
     } on DioException catch (e) {
@@ -103,6 +145,18 @@ class ConversationRepository {
   /// oldest-to-newest is the on-screen order, not the wire order. This
   /// repository does not reverse it — that is a presentation-layer
   /// concern, not a data-layer one.
+  ///
+  /// ⚠️ NOT YET given the same defensive fix as [listConversations]
+  /// above — `MessageHistoryView`'s own doc comment (per this method's
+  /// STEP 2 note) claims a specific, named `StandardCursorPagination`
+  /// class, unlike `ConversationListView`, which named none and fell
+  /// through to a (missing) project-wide default. That's a real
+  /// difference, not just an assumption repeated twice — but it hasn't
+  /// been live-tested yet the way [listConversations] just was. If
+  /// opening a real chat thread during this part's manual test throws
+  /// the same `_TypeError`/`ApiFailure` cast failure at this method's
+  /// own `PaginatedResponse.fromJson` line, apply the identical fix
+  /// here.
   ///
   /// [cursor]: same opaque-next-URL convention as [listConversations].
   Future<PaginatedResponse<Message>> fetchMessageHistory(
