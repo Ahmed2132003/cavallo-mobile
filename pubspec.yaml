@@ -67,6 +67,13 @@ dependencies:
   image_picker: ^1.2.1
   share_plus: 12.0.0
 
+  # Cross-platform WebSocket client for the global chat connection
+  # (Part P-073). Pinned to 3.0.3, current stable on pub.dev at
+  # authoring time — its own pubspec declares `sdk: ^3.3.0`, comfortably
+  # below this project's floor (Dart >=3.7.0), so no version-floor
+  # conflict of the kind flagged for go_router/image_picker above.
+  web_socket_channel: ^3.0.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
