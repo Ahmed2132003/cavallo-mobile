@@ -12,6 +12,7 @@ import '../domain/conversation.dart';
 import '../domain/message.dart';
 import '../domain/message_status.dart';
 import 'message_bubble_widget.dart';
+import 'outbound_message_queue_provider.dart';
 
 /// Part P-074 STEP 3 — the Message Thread screen (`/chat/:id`), replacing
 /// P-007's placeholder IN PLACE (same file; class renamed only in its
@@ -61,6 +62,27 @@ import 'message_bubble_widget.dart';
 /// app bar title below therefore shows THIS DEVICE'S OWN socket
 /// connection state (`ChatConnectionState`), not real per-user presence
 /// — see that label's own inline comment.
+///
+/// ### Sending — Part P-075 STEP 3 (optimistic UI + outbound queue)
+/// Pressing send no longer awaits the REST call here. The text is
+/// handed to [OutboundMessageQueueNotifier.enqueueMessage] and the
+/// field is cleared immediately; the message shows up right away as a
+/// local [OutboundMessageBubbleWidget] at the bottom of the thread
+/// (sending / retrying / failed-tap-to-retry). When the queue reports
+/// success on [OutboundMessageQueueNotifier.sentStream], the
+/// server-confirmed [Message] is upserted into [_messagesById] and the
+/// local bubble is already gone (the queue removes it first).
+///
+/// The queue provider is NOT autoDispose (P-051's same choice), so a
+/// message still retrying when the user leaves this screen keeps
+/// retrying; on re-entry its pending bubble reappears from the queue.
+/// If it succeeds while no thread screen is open, nothing is lost — the
+/// next open's history fetch includes it.
+///
+/// Only pending bubbles for THIS conversation are shown. If history
+/// failed to load but pending messages exist, the message list is shown
+/// (with those pending bubbles) instead of the history-error view, so a
+/// failed send is never hidden behind an error screen.
 class ChatThreadScreen extends ConsumerStatefulWidget {
   const ChatThreadScreen({super.key, required this.conversation});
 
@@ -85,11 +107,11 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
 
   StreamSubscription<ChatEvent>? _eventSubscription;
   StreamSubscription<ChatConnectionState>? _connectionSubscription;
+  StreamSubscription<OutboundMessageSent>? _sentSubscription;
   ChatConnectionState _connectionState = ChatConnectionState.disconnected;
   bool _hasConnectedOnce = false;
 
   bool _isLoadingHistory = true;
-  bool _isSending = false;
   bool _isAppInForeground = true;
   bool _otherIsTyping = false;
   Timer? _typingTimeoutTimer;
@@ -104,6 +126,10 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _sentSubscription = ref
+        .read(outboundMessageQueueProvider.notifier)
+        .sentStream
+        .listen(_handleOutboundSent);
     _connect();
     _loadHistory();
   }
@@ -115,6 +141,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     _stopTypingTimer?.cancel();
     _eventSubscription?.cancel();
     _connectionSubscription?.cancel();
+    _sentSubscription?.cancel();
     final manager = ref.read(chatConnectionManagerProvider);
     manager.sendTyping(false);
     // A deliberate close, per this part's execution prompt ("On leaving
@@ -266,6 +293,19 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     }
   }
 
+  /// Part P-075 STEP 3 — a queued message reached the server. The queue
+  /// has already removed its local pending bubble; this puts the real,
+  /// server-confirmed [Message] into the thread. Ignores messages that
+  /// belong to a different conversation (the queue is app-wide).
+  void _handleOutboundSent(OutboundMessageSent event) {
+    if (!mounted) return;
+    if (event.message.conversationId != _conversationId) return;
+    setState(() {
+      _messagesById[event.message.id] = event.message;
+    });
+    _scrollToBottomSoon();
+  }
+
   void _onTextChanged(String text) {
     final manager = ref.read(chatConnectionManagerProvider);
     _stopTypingTimer?.cancel();
@@ -280,32 +320,21 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     );
   }
 
-  Future<void> _sendMessage() async {
+  /// Part P-075 STEP 3 — optimistic send: hands the text to the
+  /// outbound queue and clears the field immediately. The queue owns
+  /// the real REST call, retries and the failed state.
+  void _sendMessage() {
     final text = _textController.text.trim();
-    if (text.isEmpty || _isSending) return;
+    if (text.isEmpty) return;
 
     _stopTypingTimer?.cancel();
     ref.read(chatConnectionManagerProvider).sendTyping(false);
 
-    setState(() => _isSending = true);
-    try {
-      final message = await ref
-          .read(messageRepositoryProvider)
-          .sendMessage(conversationId: _conversationId, text: text);
-      if (!mounted) return;
-      setState(() {
-        _messagesById[message.id] = message;
-        _isSending = false;
-        _textController.clear();
-      });
-      _scrollToBottomSoon();
-    } on ApiFailure catch (e) {
-      if (!mounted) return;
-      setState(() => _isSending = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.message)));
-    }
+    ref
+        .read(outboundMessageQueueProvider.notifier)
+        .enqueueMessage(conversationId: _conversationId, text: text);
+    _textController.clear();
+    _scrollToBottomSoon();
   }
 
   void _scrollToBottomSoon() {
@@ -338,6 +367,12 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
         widget.conversation.otherParticipant?.displayName ?? 'Chat';
     final sortedMessages = _messagesById.values.toList()
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final pending =
+        ref
+            .watch(outboundMessageQueueProvider)
+            .where((m) => m.conversationId == _conversationId)
+            .toList()
+          ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     return Scaffold(
       appBar: AppBar(
@@ -358,18 +393,21 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
       ),
       body: Column(
         children: [
-          Expanded(child: _buildMessageList(sortedMessages)),
+          Expanded(child: _buildMessageList(sortedMessages, pending)),
           _buildComposer(),
         ],
       ),
     );
   }
 
-  Widget _buildMessageList(List<Message> messages) {
+  Widget _buildMessageList(
+    List<Message> messages,
+    List<OutboundMessage> pending,
+  ) {
     if (_isLoadingHistory) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (_historyError != null && messages.isEmpty) {
+    if (_historyError != null && messages.isEmpty && pending.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -384,18 +422,29 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
         ),
       );
     }
-    if (messages.isEmpty) {
+    if (messages.isEmpty && pending.isEmpty) {
       return const Center(child: Text('No messages yet — say hi!'));
     }
+
+    final queue = ref.read(outboundMessageQueueProvider.notifier);
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: messages.length,
+      itemCount: messages.length + pending.length,
       itemBuilder: (context, index) {
-        final message = messages[index];
-        return MessageBubbleWidget(
-          message: message,
-          isMine: message.senderId != _otherParticipantId,
+        if (index < messages.length) {
+          final message = messages[index];
+          return MessageBubbleWidget(
+            message: message,
+            isMine: message.senderId != _otherParticipantId,
+          );
+        }
+        final outbound = pending[index - messages.length];
+        return OutboundMessageBubbleWidget(
+          key: ValueKey('outbound_bubble_${outbound.id}'),
+          outbound: outbound,
+          onRetry: () => queue.retryFailedMessage(outbound.id),
+          onDiscard: () => queue.discardFailedMessage(outbound.id),
         );
       },
     );
@@ -422,14 +471,8 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
             ),
             const SizedBox(width: 8),
             IconButton(
-              icon: _isSending
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.send),
-              onPressed: _isSending ? null : _sendMessage,
+              icon: const Icon(Icons.send),
+              onPressed: _sendMessage,
             ),
           ],
         ),
