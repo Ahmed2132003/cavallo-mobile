@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../domain/message.dart';
@@ -23,6 +25,13 @@ import 'outbound_message_queue_provider.dart';
 /// Both widgets share one private layout ([_BubbleShell]) so a pending
 /// bubble looks like a real one. [MessageBubbleWidget]'s own API is
 /// unchanged.
+///
+/// Part P-076: both bubbles can now show media above the text. An image
+/// renders as a thumbnail; a video renders as a neutral placeholder with
+/// a play icon (same visual language as `ReelCard`'s play overlay — the
+/// backend produces no thumbnail for chat video and this project has no
+/// video-playback package, so there is no inline playback). A
+/// media-only message simply shows no text.
 class MessageBubbleWidget extends StatelessWidget {
   const MessageBubbleWidget({
     super.key,
@@ -35,9 +44,13 @@ class MessageBubbleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaType = message.mediaType;
     return _BubbleShell(
       text: message.text,
       isMine: isMine,
+      media: mediaType == null
+          ? null
+          : _MediaPreview(type: mediaType, networkUrl: message.mediaUrl),
       footerBuilder: (textColor) => Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -66,6 +79,9 @@ class MessageBubbleWidget extends StatelessWidget {
 /// - [OutboundMessageStatus.failed]: error-colored bubble with
 ///   "Failed to send · Tap to retry"; tapping ANYWHERE on the bubble
 ///   calls [onRetry], and the small × calls [onDiscard].
+///
+/// Part P-076: a queued media message shows its local file as the
+/// thumbnail (video: placeholder + play icon) with the same three states.
 class OutboundMessageBubbleWidget extends StatelessWidget {
   const OutboundMessageBubbleWidget({
     super.key,
@@ -81,6 +97,7 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isFailed = outbound.status == OutboundMessageStatus.failed;
+    final mediaType = outbound.mediaType;
 
     return _BubbleShell(
       text: outbound.text,
@@ -88,6 +105,9 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
       isFailed: isFailed,
       onTap: isFailed ? onRetry : null,
       tapKey: isFailed ? ValueKey('outbound_retry_${outbound.id}') : null,
+      media: mediaType == null
+          ? null
+          : _MediaPreview(type: mediaType, localPath: outbound.mediaPath),
       footerBuilder: (textColor) {
         if (isFailed) {
           return Column(
@@ -179,16 +199,20 @@ String _formatTime(DateTime dt) {
   return '$hour:$minute';
 }
 
-/// The shared bubble layout (alignment, colors, shape, text, footer).
-/// [footerBuilder] receives the resolved text color so each caller's
-/// footer matches the bubble. When [isFailed] the bubble uses the
-/// theme's error container colors; when [onTap] is non-null the whole
-/// bubble is tappable ([tapKey] lets tests find that tap target).
+/// The shared bubble layout (alignment, colors, shape, media, text,
+/// footer). [footerBuilder] receives the resolved text color so each
+/// caller's footer matches the bubble. When [isFailed] the bubble uses
+/// the theme's error container colors; when [onTap] is non-null the
+/// whole bubble is tappable ([tapKey] lets tests find that tap target).
+///
+/// Part P-076: [media], when non-null, is drawn above the text; the text
+/// line is skipped entirely when [text] is empty (a media-only message).
 class _BubbleShell extends StatelessWidget {
   const _BubbleShell({
     required this.text,
     required this.isMine,
     required this.footerBuilder,
+    this.media,
     this.isFailed = false,
     this.onTap,
     this.tapKey,
@@ -197,6 +221,7 @@ class _BubbleShell extends StatelessWidget {
   final String text;
   final bool isMine;
   final Widget Function(Color textColor) footerBuilder;
+  final Widget? media;
   final bool isFailed;
   final VoidCallback? onTap;
   final Key? tapKey;
@@ -234,7 +259,10 @@ class _BubbleShell extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(text, style: TextStyle(color: textColor, fontSize: 15)),
+          if (media != null) media!,
+          if (media != null && text.isNotEmpty) const SizedBox(height: 6),
+          if (text.isNotEmpty)
+            Text(text, style: TextStyle(color: textColor, fontSize: 15)),
           const SizedBox(height: 4),
           footerBuilder(textColor),
         ],
@@ -251,6 +279,96 @@ class _BubbleShell extends StatelessWidget {
               onTap: onTap,
               child: bubble,
             ),
+    );
+  }
+}
+
+/// Part P-076 — the image thumbnail / video placeholder shown inside a
+/// bubble. Exactly one of [networkUrl] (a delivered message) or
+/// [localPath] (a still-queued message) is normally set.
+///
+/// - image: `Image.file` for a local path, `Image.network` for a URL,
+///   with the same neutral broken-image fallback convention as
+///   `PostCard`/`ReelCard` (never throws on a bad/expired URL).
+/// - video: a neutral placeholder plus a play icon (the `ReelCard`
+///   overlay look). No thumbnail exists for chat video and there is no
+///   video-playback package in this project, so it is not playable
+///   inline — flagged limitation, not silently omitted.
+///
+/// The root carries `ValueKey('chatMedia_image')` / `'chatMedia_video'`
+/// so widget tests can find it.
+class _MediaPreview extends StatelessWidget {
+  const _MediaPreview({required this.type, this.networkUrl, this.localPath});
+
+  final ChatMediaType type;
+  final String? networkUrl;
+  final String? localPath;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = Theme.of(context).colorScheme.surfaceContainerHighest;
+
+    Widget placeholder(IconData icon) => Container(
+      color: surface,
+      alignment: Alignment.center,
+      child: Icon(icon, size: 40),
+    );
+
+    final Widget content;
+    final path = localPath;
+    final url = networkUrl;
+    if (type == ChatMediaType.video) {
+      content = Stack(
+        fit: StackFit.expand,
+        children: [placeholder(Icons.movie_outlined), const _PlayIconOverlay()],
+      );
+    } else if (path != null) {
+      content = Image.file(
+        File(path),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) =>
+            placeholder(Icons.broken_image_outlined),
+      );
+    } else if (url != null && url.isNotEmpty) {
+      content = Image.network(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) =>
+            placeholder(Icons.broken_image_outlined),
+      );
+    } else {
+      content = placeholder(Icons.image_outlined);
+    }
+
+    return ConstrainedBox(
+      key: ValueKey('chatMedia_${type.name}'),
+      constraints: const BoxConstraints(maxWidth: 200),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: AspectRatio(aspectRatio: 4 / 3, child: content),
+      ),
+    );
+  }
+}
+
+/// Same look as `ReelCard`'s private `_PlayIconOverlay` — deliberately
+/// duplicated (that widget is private to `reel_card.dart`, and this
+/// project's own convention for such small visuals is duplication over
+/// cross-feature coupling; see that file's own comment).
+class _PlayIconOverlay extends StatelessWidget {
+  const _PlayIconOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.45),
+          shape: BoxShape.circle,
+        ),
+        padding: const EdgeInsets.all(10),
+        child: const Icon(Icons.play_arrow, color: Colors.white, size: 32),
+      ),
     );
   }
 }

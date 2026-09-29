@@ -301,7 +301,7 @@ class _ConversationTile extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        lastMessage?.text ?? 'No messages yet',
+        lastMessage?.previewText ?? 'No messages yet',
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(

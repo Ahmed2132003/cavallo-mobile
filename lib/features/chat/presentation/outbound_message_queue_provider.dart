@@ -39,6 +39,15 @@ import '../domain/message.dart';
 /// (kept so raising the cap needs no change here), same reading P-051
 /// chose.
 ///
+/// ### Part P-076 — media messages reuse this SAME state machine
+/// A media message is just an [OutboundMessage] that also carries a
+/// [OutboundMessage.mediaPath] / [OutboundMessage.mediaType]. It goes
+/// through the identical lifecycle (attempt counter, backoff,
+/// retryable-vs-not, manual retry, discard, `sentStream`). The ONLY
+/// difference is inside [_attempt]: which repository method performs
+/// the single send call. There is deliberately no second retry
+/// implementation for media.
+///
 /// ### Scope
 /// In-memory only. Surviving a full app kill/restart is explicitly out
 /// of scope (same MVP boundary as P-051). No cancel of an in-flight
@@ -50,6 +59,9 @@ import '../domain/message.dart';
 /// - Each queued message retries independently, so under repeated
 ///   failures the server-side order of two queued messages is not
 ///   strictly guaranteed to match the order they were typed in.
+/// - A queued media message only holds the local file PATH. If the
+///   picker's temp file is cleaned up by the OS before a retry, that
+///   retry fails (non-retryable) instead of sending.
 
 /// Lifecycle of one queued outbound message.
 enum OutboundMessageStatus {
@@ -79,10 +91,15 @@ class OutboundMessage {
     required this.attempt,
     required this.status,
     this.errorMessage,
+    this.mediaPath,
+    this.mediaType,
   });
 
   final String id;
   final int conversationId;
+
+  /// The text, or the caption of a media message. May be empty for a
+  /// media-only message.
   final String text;
 
   /// When the user pressed send — used to order the pending bubble in
@@ -96,10 +113,18 @@ class OutboundMessage {
   /// Only meaningful when [status] is [OutboundMessageStatus.failed].
   final String? errorMessage;
 
+  /// Part P-076. Local file path of the picked image/video, or `null`
+  /// for a plain text message.
+  final String? mediaPath;
+
+  /// Part P-076. Set together with [mediaPath]; drives the pending
+  /// bubble's thumbnail. `null` for a plain text message.
+  final ChatMediaType? mediaType;
+
   /// Returns a copy with the given fields replaced. Like P-051's
   /// `UploadTask.copyWith`, [errorMessage] is NOT carried over when
   /// omitted — a copy without it clears the error, which is exactly what
-  /// a retry wants.
+  /// a retry wants. [mediaPath]/[mediaType] are always carried over.
   OutboundMessage copyWith({
     int? attempt,
     OutboundMessageStatus? status,
@@ -113,6 +138,8 @@ class OutboundMessage {
       attempt: attempt ?? this.attempt,
       status: status ?? this.status,
       errorMessage: errorMessage,
+      mediaPath: mediaPath,
+      mediaType: mediaType,
     );
   }
 }
@@ -178,10 +205,37 @@ class OutboundMessageQueueNotifier extends Notifier<List<OutboundMessage>> {
     return const [];
   }
 
-  /// Adds a message to the queue and fires the first attempt
+  /// Adds a text message to the queue and fires the first attempt
   /// immediately. Returns the new message's local id so the caller can
   /// reference it (retry/discard).
   String enqueueMessage({required int conversationId, required String text}) {
+    return _enqueue(conversationId: conversationId, text: text);
+  }
+
+  /// Part P-076 — adds a media message (with an optional caption in
+  /// [text]) to the SAME queue and fires the first attempt immediately.
+  /// From here on it follows exactly the same retry/backoff/failed
+  /// lifecycle as [enqueueMessage]. Returns the local id.
+  String enqueueMediaMessage({
+    required int conversationId,
+    required String text,
+    required String mediaPath,
+    required ChatMediaType mediaType,
+  }) {
+    return _enqueue(
+      conversationId: conversationId,
+      text: text,
+      mediaPath: mediaPath,
+      mediaType: mediaType,
+    );
+  }
+
+  String _enqueue({
+    required int conversationId,
+    required String text,
+    String? mediaPath,
+    ChatMediaType? mediaType,
+  }) {
     final id = 'outbound_${_nextTaskId++}';
     final message = OutboundMessage(
       id: id,
@@ -190,6 +244,8 @@ class OutboundMessageQueueNotifier extends Notifier<List<OutboundMessage>> {
       createdAt: DateTime.now(),
       attempt: 1,
       status: OutboundMessageStatus.sending,
+      mediaPath: mediaPath,
+      mediaType: mediaType,
     );
     state = [...state, message];
     unawaited(_attempt(id));
@@ -227,12 +283,21 @@ class OutboundMessageQueueNotifier extends Notifier<List<OutboundMessage>> {
     if (message == null) return;
 
     try {
-      final sent = await ref
-          .read(messageRepositoryProvider)
-          .sendMessage(
-            conversationId: message.conversationId,
-            text: message.text,
-          );
+      final repository = ref.read(messageRepositoryProvider);
+      // The ONLY media-specific line in the whole queue (Part P-076):
+      // which repository method performs the single send call. Every
+      // outcome below is handled identically for text and media.
+      final mediaPath = message.mediaPath;
+      final sent = mediaPath == null
+          ? await repository.sendMessage(
+              conversationId: message.conversationId,
+              text: message.text,
+            )
+          : await repository.sendMediaMessage(
+              conversationId: message.conversationId,
+              text: message.text,
+              mediaPath: mediaPath,
+            );
       if (_disposed) return;
       state = state.where((m) => m.id != messageId).toList();
       _sentController.add(OutboundMessageSent(localId: messageId, message: sent));

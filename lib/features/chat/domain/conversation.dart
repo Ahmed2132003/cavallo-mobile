@@ -1,5 +1,5 @@
 import 'message_status.dart';
-
+import 'message.dart';
 /// Part P-074 STEP 2 — the other participant in a 1:1 conversation, as
 /// shown on the Conversation List screen.
 ///
@@ -47,10 +47,14 @@ class LastMessagePreview {
     required this.senderId,
     required this.status,
     required this.createdAt,
+    this.mediaType,
   });
 
   final int id;
   final String text;
+
+  /// Part P-076. `null` for a text-only last message.
+  final ChatMediaType? mediaType;
   final int senderId;
   final MessageStatus status;
   final DateTime createdAt;
@@ -62,7 +66,24 @@ class LastMessagePreview {
       senderId: json['sender_id'] as int,
       status: MessageStatus.fromRaw(json['status'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
+      mediaType: ChatMediaType.fromRaw(json['media_type'] as String?),
     );
+  }
+
+  /// Part P-076 — what the conversation-list row shows. A media-only
+  /// message has blank [text], so it falls back to a short label instead
+  /// of an empty subtitle. Text always wins when present (a captioned
+  /// photo shows its caption).
+  String get previewText {
+    if (text.isNotEmpty) return text;
+    switch (mediaType) {
+      case ChatMediaType.image:
+        return 'Photo';
+      case ChatMediaType.video:
+        return 'Video';
+      case null:
+        return text;
+    }
   }
 }
 

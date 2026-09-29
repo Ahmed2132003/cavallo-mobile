@@ -136,6 +136,13 @@ sealed class ChatEvent {
         );
       }
 
+      // Part P-076: `media` / `media_type` are additive and optional on
+      // the wire (a text-only message has media null and media_type "").
+      // Lenient on purpose — a media field of an unexpected type is
+      // treated as "no media" rather than dropping the whole frame.
+      final mediaRaw = json['media'];
+      final mediaTypeRaw = json['media_type'];
+
       return MessageReceived(
         id: id,
         conversationId: conversation,
@@ -143,6 +150,10 @@ sealed class ChatEvent {
         text: text,
         status: status,
         createdAt: createdAt,
+        mediaUrl: mediaRaw is String && mediaRaw.isNotEmpty ? mediaRaw : null,
+        mediaType: mediaTypeRaw is String && mediaTypeRaw.isNotEmpty
+            ? mediaTypeRaw
+            : null,
       );
     }
 
@@ -171,6 +182,8 @@ final class MessageReceived extends ChatEvent {
     required this.text,
     required this.status,
     required this.createdAt,
+    this.mediaUrl,
+    this.mediaType,
   });
 
   final int id;
@@ -179,6 +192,14 @@ final class MessageReceived extends ChatEvent {
   final String text;
   final String status;
   final DateTime createdAt;
+
+  /// Part P-076. Absolute URL of the attached file, `null` if none.
+  final String? mediaUrl;
+
+  /// Part P-076. Raw backend value (`"image"` / `"video"`), `null` if
+  /// none — a raw string for the same reason [status] is (this core-layer
+  /// file does not import feature-layer enums).
+  final String? mediaType;
 
   @override
   bool operator ==(Object other) =>
@@ -189,11 +210,21 @@ final class MessageReceived extends ChatEvent {
           other.senderId == senderId &&
           other.text == text &&
           other.status == status &&
-          other.createdAt == createdAt);
+          other.createdAt == createdAt &&
+          other.mediaUrl == mediaUrl &&
+          other.mediaType == mediaType);
 
   @override
-  int get hashCode =>
-      Object.hash(id, conversationId, senderId, text, status, createdAt);
+  int get hashCode => Object.hash(
+    id,
+    conversationId,
+    senderId,
+    text,
+    status,
+    createdAt,
+    mediaUrl,
+    mediaType,
+  );
 
   @override
   String toString() =>

@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/chat/chat_connection_manager.dart';
 import '../../../core/chat/chat_event.dart';
@@ -282,6 +284,8 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
             text: event.text,
             status: MessageStatus.fromRaw(event.status),
             createdAt: event.createdAt,
+            mediaUrl: event.mediaUrl,
+            mediaType: ChatMediaType.fromRaw(event.mediaType),
           );
         });
         _markDeliveredForLoadedMessages();
@@ -349,6 +353,87 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     ref
         .read(outboundMessageQueueProvider.notifier)
         .enqueueMessage(conversationId: _conversationId, text: text);
+    _textController.clear();
+    _scrollToBottomSoon();
+  }
+
+  /// Part P-076 — client-side size caps. MUST stay in sync with the
+  /// backend's `CHAT_IMAGE_MAX_BYTES` / `CHAT_VIDEO_MAX_BYTES`
+  /// (`chat/serializers.py`): 5 MB image / 25 MB video. The backend is
+  /// still the final authority (`validate_upload()`); this pre-check only
+  /// avoids uploading a file that is already known to be rejected.
+  static const _maxImageBytes = 5 * 1024 * 1024;
+  static const _maxVideoBytes = 25 * 1024 * 1024;
+
+  /// Part P-076 — the attach button: a small sheet to choose Photo or
+  /// Video, then [_pickAndEnqueueMedia].
+  Future<void> _showAttachSheet() async {
+    final choice = await showModalBottomSheet<ChatMediaType>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              key: const Key('chatAttach_photo'),
+              leading: const Icon(Icons.photo_outlined),
+              title: const Text('Photo'),
+              onTap: () => Navigator.of(sheetContext).pop(ChatMediaType.image),
+            ),
+            ListTile(
+              key: const Key('chatAttach_video'),
+              leading: const Icon(Icons.videocam_outlined),
+              title: const Text('Video'),
+              onTap: () => Navigator.of(sheetContext).pop(ChatMediaType.video),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (choice == null || !mounted) return;
+    await _pickAndEnqueueMedia(choice);
+  }
+
+  /// Part P-076 — picks a file (same `image_picker` calls as
+  /// `story_creation_screen.dart`), rejects an over-cap file with a
+  /// SnackBar, and otherwise hands it to the SAME outbound queue as text
+  /// messages. Whatever is typed in the composer is sent as the caption.
+  Future<void> _pickAndEnqueueMedia(ChatMediaType type) async {
+    final picker = ImagePicker();
+    final XFile? picked = type == ChatMediaType.image
+        ? await picker.pickImage(
+            source: ImageSource.gallery,
+            imageQuality: 85,
+            maxWidth: 1920,
+          )
+        : await picker.pickVideo(source: ImageSource.gallery);
+    if (picked == null || !mounted) return;
+
+    final size = await File(picked.path).length();
+    if (!mounted) return;
+    final limit = type == ChatMediaType.image ? _maxImageBytes : _maxVideoBytes;
+    if (size > limit) {
+      final label = type == ChatMediaType.image ? 'Photo' : 'Video';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$label is too large (max ${limit ~/ (1024 * 1024)} MB).'),
+        ),
+      );
+      return;
+    }
+
+    _stopTypingTimer?.cancel();
+    _chatManager.sendTyping(false);
+
+    final caption = _textController.text.trim();
+    ref
+        .read(outboundMessageQueueProvider.notifier)
+        .enqueueMediaMessage(
+          conversationId: _conversationId,
+          text: caption,
+          mediaPath: picked.path,
+          mediaType: type,
+        );
     _textController.clear();
     _scrollToBottomSoon();
   }
@@ -472,6 +557,11 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
         padding: const EdgeInsets.all(8),
         child: Row(
           children: [
+            IconButton(
+              key: const Key('chatComposer_attachButton'),
+              icon: const Icon(Icons.attach_file),
+              onPressed: _showAttachSheet,
+            ),
             Expanded(
               child: TextField(
                 controller: _textController,

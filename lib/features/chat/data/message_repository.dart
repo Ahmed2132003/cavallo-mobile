@@ -51,6 +51,52 @@ class MessageRepository {
     }
   }
 
+  /// Part P-076 — POST the SAME endpoint as [sendMessage], but as
+  /// multipart with a `media` file (and an optional `text` caption).
+  ///
+  /// Kept as a separate method (not extra optional parameters on
+  /// [sendMessage]) so [sendMessage]'s signature — which P-075's test
+  /// doubles override — stays byte-for-byte unchanged.
+  ///
+  /// The `FormData` is built INSIDE this method on purpose: Dio can
+  /// only send a given `FormData` once ("has already been finalized"),
+  /// so `OutboundMessageQueueNotifier` retrying by calling this method
+  /// again gets a brand-new `FormData` every attempt.
+  ///
+  /// `text` is omitted from the body when empty (a media-only message).
+  /// The client never sends a media type — the backend sniffs the real
+  /// content type via `validate_upload()` and reports it back as
+  /// `media_type`.
+  ///
+  /// Like [sendMessage], throws the typed [ApiFailure] for any Dio
+  /// failure. A missing/unreadable local file throws the underlying
+  /// `FileSystemException` instead, which the queue treats as a
+  /// non-retryable failure.
+  Future<Message> sendMediaMessage({
+    required int conversationId,
+    required String text,
+    required String mediaPath,
+  }) async {
+    try {
+      final data = FormData.fromMap({
+        if (text.isNotEmpty) 'text': text,
+        'media': await MultipartFile.fromFile(
+          mediaPath,
+          filename: _fileNameOf(mediaPath),
+        ),
+      });
+      final response = await _dio.post<Map<String, dynamic>>(
+        '$_basePath$conversationId/messages/',
+        data: data,
+      );
+      return Message.fromJson(response.data!);
+    } on DioException catch (e) {
+      throw e.error as ApiFailure;
+    }
+  }
+
+  static String _fileNameOf(String path) => path.split(RegExp(r'[\\/]')).last;
+
   /// GET
   /// `/api/v1/conversations/<conversationId>/messages/?since=<sinceMessageId>`
   /// — `MessageFetchSinceView` (P-072). Returns every message with
