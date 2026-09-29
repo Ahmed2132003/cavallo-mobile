@@ -83,6 +83,16 @@ import 'outbound_message_queue_provider.dart';
 /// failed to load but pending messages exist, the message list is shown
 /// (with those pending bubbles) instead of the history-error view, so a
 /// failed send is never hidden behind an error screen.
+///
+/// ### BUGFIX (found by P-075 STEP 4's widget tests)
+/// `dispose()` used to call `ref.read(chatConnectionManagerProvider)`.
+/// Riverpod 3 forbids using `ref` once the element is being unmounted
+/// (`Bad state: Using "ref" when a widget is about to or has been
+/// unmounted is unsafe`), so that line threw and the REST of `dispose()`
+/// never ran: the WebSocket was never disconnected and the text/scroll
+/// controllers were never disposed. The manager is now cached in
+/// [_chatManager] during `initState` (when `ref` is still valid) and
+/// `dispose()` uses that field instead.
 class ChatThreadScreen extends ConsumerStatefulWidget {
   const ChatThreadScreen({super.key, required this.conversation});
 
@@ -96,6 +106,10 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     with WidgetsBindingObserver {
   final _textController = TextEditingController();
   final _scrollController = ScrollController();
+
+  /// Cached in `initState` so `dispose()` never has to touch `ref`
+  /// (see this class's BUGFIX note above).
+  late final ChatConnectionManager _chatManager;
 
   /// Keyed by message id — makes upsert/dedupe O(1) and cheaply absorbs
   /// a `MessageReceived` echo of a message this device itself just sent
@@ -126,6 +140,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _chatManager = ref.read(chatConnectionManagerProvider);
     _sentSubscription = ref
         .read(outboundMessageQueueProvider.notifier)
         .sentStream
@@ -142,12 +157,13 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     _eventSubscription?.cancel();
     _connectionSubscription?.cancel();
     _sentSubscription?.cancel();
-    final manager = ref.read(chatConnectionManagerProvider);
-    manager.sendTyping(false);
+    // Uses the cached [_chatManager], NOT `ref.read` — `ref` is unsafe
+    // to use during dispose (see this class's BUGFIX note).
+    _chatManager.sendTyping(false);
     // A deliberate close, per this part's execution prompt ("On leaving
     // the screen, call disconnect()"). Fire-and-forget is correct here —
     // this widget is already unmounting.
-    unawaited(manager.disconnect());
+    unawaited(_chatManager.disconnect());
     _textController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -162,7 +178,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
   }
 
   void _connect() {
-    final manager = ref.read(chatConnectionManagerProvider);
+    final manager = _chatManager;
     _connectionSubscription = manager.connectionState.listen((state) {
       if (!mounted) return;
       final wasConnected = _connectionState == ChatConnectionState.connected;
@@ -234,7 +250,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
   }
 
   void _markDeliveredForLoadedMessages() {
-    final manager = ref.read(chatConnectionManagerProvider);
+    final manager = _chatManager;
     for (final message in _messagesById.values) {
       if (message.senderId == _otherParticipantId &&
           message.status == MessageStatus.sent) {
@@ -245,7 +261,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
 
   void _markVisibleMessagesAsRead() {
     if (!_isAppInForeground) return;
-    final manager = ref.read(chatConnectionManagerProvider);
+    final manager = _chatManager;
     for (final message in _messagesById.values) {
       if (message.senderId == _otherParticipantId &&
           message.status != MessageStatus.read) {
@@ -307,7 +323,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
   }
 
   void _onTextChanged(String text) {
-    final manager = ref.read(chatConnectionManagerProvider);
+    final manager = _chatManager;
     _stopTypingTimer?.cancel();
     if (text.isEmpty) {
       manager.sendTyping(false);
@@ -328,7 +344,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     if (text.isEmpty) return;
 
     _stopTypingTimer?.cancel();
-    ref.read(chatConnectionManagerProvider).sendTyping(false);
+    _chatManager.sendTyping(false);
 
     ref
         .read(outboundMessageQueueProvider.notifier)
