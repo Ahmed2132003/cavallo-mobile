@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/dio_client.dart';
 import '../domain/message.dart';
+import '../domain/shared_content.dart';
 
 /// Part P-074 STEP 2 — REST data layer for sending a message and for
 /// resuming a conversation after being away (fetch-since).
@@ -88,6 +89,43 @@ class MessageRepository {
       final response = await _dio.post<Map<String, dynamic>>(
         '$_basePath$conversationId/messages/',
         data: data,
+      );
+      return Message.fromJson(response.data!);
+    } on DioException catch (e) {
+      throw e.error as ApiFailure;
+    }
+  }
+
+  /// Part P-077 — POST the SAME endpoint as [sendMessage], but as JSON
+  /// carrying a `shared_content_type` / `shared_object_id` pair that
+  /// references an existing Post / Reel / Product (resolved and
+  /// authorized server-side by `resolve_shareable_target()`), with an
+  /// optional `text` alongside (e.g. "check this out!").
+  ///
+  /// Kept as a separate method for the same reason as
+  /// [sendMediaMessage]: [sendMessage]'s signature stays byte-for-byte
+  /// unchanged. `text` is omitted from the body when empty. The client
+  /// never sends preview data — the backend derives the card's preview
+  /// itself and returns it as `shared_content` on the persisted message.
+  ///
+  /// Error mapping is the typed [ApiFailure] like the other methods:
+  /// the backend answers 404 for a missing / unpublished / inactive
+  /// target, 400 for a type outside the whitelist, and 403 when the
+  /// caller is not a participant of the conversation.
+  Future<Message> sendSharedContentMessage({
+    required int conversationId,
+    required SharedContentType contentType,
+    required int objectId,
+    String text = '',
+  }) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '$_basePath$conversationId/messages/',
+        data: {
+          if (text.isNotEmpty) 'text': text,
+          'shared_content_type': contentType.raw,
+          'shared_object_id': objectId,
+        },
       );
       return Message.fromJson(response.data!);
     } on DioException catch (e) {

@@ -1,4 +1,5 @@
 import 'message_status.dart';
+import 'shared_content.dart';
 
 /// Part P-076 — the kind of media a chat message carries.
 ///
@@ -26,8 +27,8 @@ enum ChatMediaType {
 /// Part P-074 STEP 2 — a single chat message.
 ///
 /// Mirrors `MessageSerializer`'s exact JSON shape (`chat/serializers.py`):
-/// `{id, conversation, sender, text, media, media_type, status,
-/// created_at}`. This is the identical wire shape `chat_event.dart`'s
+/// `{id, conversation, sender, text, media, media_type, shared_content,
+/// status, created_at}`. This is the identical wire shape `chat_event.dart`'s
 /// `MessageReceived` already documents for the WebSocket path — the same
 /// shape arrives over REST too (initial history fetch, fetch-since, and
 /// the send response), so this entity is the one this feature's data
@@ -36,6 +37,11 @@ enum ChatMediaType {
 /// Part P-076: [mediaUrl] / [mediaType] are additive and optional. A
 /// text-only message has both `null`; a media-only message has an empty
 /// [text].
+///
+/// Part P-077: [sharedContent] is additive and optional. `null` for any
+/// message that shares nothing. A shared-content message may also carry
+/// [text] (e.g. "check this out!"), but never media (the backend rejects
+/// that combination).
 class Message {
   const Message({
     required this.id,
@@ -46,6 +52,7 @@ class Message {
     required this.createdAt,
     this.mediaUrl,
     this.mediaType,
+    this.sharedContent,
   });
 
   final int id;
@@ -61,6 +68,9 @@ class Message {
   /// `null` when the message has no media.
   final ChatMediaType? mediaType;
 
+  /// Part P-077. `null` when the message shares no platform content.
+  final SharedContent? sharedContent;
+
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
       id: json['id'] as int,
@@ -71,6 +81,7 @@ class Message {
       createdAt: DateTime.parse(json['created_at'] as String),
       mediaUrl: json['media'] as String?,
       mediaType: ChatMediaType.fromRaw(json['media_type'] as String?),
+      sharedContent: SharedContent.tryParse(json['shared_content']),
     );
   }
 
@@ -89,6 +100,7 @@ class Message {
       createdAt: createdAt,
       mediaUrl: mediaUrl,
       mediaType: mediaType,
+      sharedContent: sharedContent,
     );
   }
 
@@ -103,7 +115,8 @@ class Message {
           other.status == status &&
           other.createdAt == createdAt &&
           other.mediaUrl == mediaUrl &&
-          other.mediaType == mediaType);
+          other.mediaType == mediaType &&
+          other.sharedContent == sharedContent);
 
   @override
   int get hashCode => Object.hash(
@@ -115,5 +128,6 @@ class Message {
     createdAt,
     mediaUrl,
     mediaType,
+    sharedContent,
   );
 }

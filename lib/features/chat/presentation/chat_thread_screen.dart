@@ -13,6 +13,7 @@ import '../data/message_repository.dart';
 import '../domain/conversation.dart';
 import '../domain/message.dart';
 import '../domain/message_status.dart';
+import '../domain/shared_content.dart';
 import 'message_bubble_widget.dart';
 import 'outbound_message_queue_provider.dart';
 
@@ -286,6 +287,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
             createdAt: event.createdAt,
             mediaUrl: event.mediaUrl,
             mediaType: ChatMediaType.fromRaw(event.mediaType),
+            sharedContent: SharedContent.tryParse(event.sharedContent),
           );
         });
         _markDeliveredForLoadedMessages();

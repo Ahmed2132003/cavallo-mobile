@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../domain/message.dart';
 import '../domain/message_status.dart';
+import '../domain/shared_content.dart';
 import 'outbound_message_queue_provider.dart';
+import 'shared_content_card.dart';
 
 /// Part P-074 STEP 3 — renders a single message bubble inside the
 /// message thread screen (kept as `chat_thread_screen.dart`'s
@@ -32,6 +35,14 @@ import 'outbound_message_queue_provider.dart';
 /// backend produces no thumbnail for chat video and this project has no
 /// video-playback package, so there is no inline playback). A
 /// media-only message simply shows no text.
+///
+/// Part P-077 STEP 3: a delivered message that shares platform content
+/// ([Message.sharedContent]) renders a [SharedContentCard] (PostCard /
+/// ReelCard reused unmodified, or a compact product card) ABOVE a
+/// regular text bubble. That text bubble carries the optional text
+/// ("check this out!") plus the time / delivery-status footer, so the
+/// footer looks exactly like every other bubble's. The backend never
+/// combines shared content with media, so the two layouts never mix.
 class MessageBubbleWidget extends StatelessWidget {
   const MessageBubbleWidget({
     super.key,
@@ -44,6 +55,15 @@ class MessageBubbleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shared = message.sharedContent;
+    if (shared != null) {
+      return _SharedContentBubble(
+        message: message,
+        shared: shared,
+        isMine: isMine,
+      );
+    }
+
     final mediaType = message.mediaType;
     return _BubbleShell(
       text: message.text,
@@ -51,22 +71,70 @@ class MessageBubbleWidget extends StatelessWidget {
       media: mediaType == null
           ? null
           : _MediaPreview(type: mediaType, networkUrl: message.mediaUrl),
-      footerBuilder: (textColor) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            _formatTime(message.createdAt),
-            style: TextStyle(
-              color: textColor.withValues(alpha: 0.7),
-              fontSize: 11,
-            ),
-          ),
-          if (isMine) ...[
-            const SizedBox(width: 4),
-            _StatusIcon(status: message.status, color: textColor),
-          ],
-        ],
+      footerBuilder: (textColor) =>
+          _deliveredFooter(message, isMine, textColor),
+    );
+  }
+}
+
+/// Time + (for my own messages) the delivery-status icon. Shared by the
+/// regular bubble and the shared-content bubble.
+Widget _deliveredFooter(Message message, bool isMine, Color textColor) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(
+        _formatTime(message.createdAt),
+        style: TextStyle(color: textColor.withValues(alpha: 0.7), fontSize: 11),
       ),
+      if (isMine) ...[
+        const SizedBox(width: 4),
+        _StatusIcon(status: message.status, color: textColor),
+      ],
+    ],
+  );
+}
+
+/// Part P-077 STEP 3 — a delivered message that shares Post / Reel /
+/// Product content: the card on top, then a normal text bubble (text,
+/// if any, plus the footer) aligned to the same side.
+class _SharedContentBubble extends StatelessWidget {
+  const _SharedContentBubble({
+    required this.message,
+    required this.shared,
+    required this.isMine,
+  });
+
+  final Message message;
+  final SharedContent shared;
+  final bool isMine;
+
+  @override
+  Widget build(BuildContext context) {
+    // Same 75%-of-screen rule as the text bubble, capped so a card is
+    // never absurdly wide on a tablet.
+    final cardWidth = math.min(MediaQuery.of(context).size.width * 0.75, 300.0);
+
+    return Column(
+      crossAxisAlignment: isMine
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+          child: SizedBox(
+            width: cardWidth,
+            child: SharedContentCard(sharedContent: shared),
+          ),
+        ),
+        _BubbleShell(
+          text: message.text,
+          isMine: isMine,
+          footerBuilder: (textColor) =>
+              _deliveredFooter(message, isMine, textColor),
+        ),
+      ],
     );
   }
 }

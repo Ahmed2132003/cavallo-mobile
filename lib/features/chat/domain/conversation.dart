@@ -1,5 +1,7 @@
 import 'message_status.dart';
 import 'message.dart';
+import 'shared_content.dart';
+
 /// Part P-074 STEP 2 — the other participant in a 1:1 conversation, as
 /// shown on the Conversation List screen.
 ///
@@ -48,6 +50,7 @@ class LastMessagePreview {
     required this.status,
     required this.createdAt,
     this.mediaType,
+    this.sharedContentType,
   });
 
   final int id;
@@ -55,6 +58,11 @@ class LastMessagePreview {
 
   /// Part P-076. `null` for a text-only last message.
   final ChatMediaType? mediaType;
+
+  /// Part P-077. `null` when the last message shares nothing. Parsed
+  /// from the backend's `shared_content_type` string (`"post"` /
+  /// `"reel"` / `"product"` / `""`).
+  final SharedContentType? sharedContentType;
   final int senderId;
   final MessageStatus status;
   final DateTime createdAt;
@@ -67,13 +75,17 @@ class LastMessagePreview {
       status: MessageStatus.fromRaw(json['status'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
       mediaType: ChatMediaType.fromRaw(json['media_type'] as String?),
+      sharedContentType: SharedContentType.fromRaw(
+        json['shared_content_type'] as String?,
+      ),
     );
   }
 
-  /// Part P-076 — what the conversation-list row shows. A media-only
-  /// message has blank [text], so it falls back to a short label instead
-  /// of an empty subtitle. Text always wins when present (a captioned
-  /// photo shows its caption).
+  /// Part P-076 / P-077 — what the conversation-list row shows. A
+  /// media-only or shared-content-only message has blank [text], so it
+  /// falls back to a short label instead of an empty subtitle. Text
+  /// always wins when present (a captioned photo, or "check this out!"
+  /// sent together with a shared product, shows its text).
   String get previewText {
     if (text.isNotEmpty) return text;
     switch (mediaType) {
@@ -81,6 +93,16 @@ class LastMessagePreview {
         return 'Photo';
       case ChatMediaType.video:
         return 'Video';
+      case null:
+        break;
+    }
+    switch (sharedContentType) {
+      case SharedContentType.post:
+        return 'Shared a post';
+      case SharedContentType.reel:
+        return 'Shared a reel';
+      case SharedContentType.product:
+        return 'Shared a product';
       case null:
         return text;
     }

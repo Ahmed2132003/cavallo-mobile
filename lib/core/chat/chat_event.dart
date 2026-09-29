@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// Part P-073 STEP 1 — incoming WebSocket event model for the chat feature.
 ///
 /// A sealed type covering the three kinds of JSON payload the backend's
@@ -143,6 +145,14 @@ sealed class ChatEvent {
       final mediaRaw = json['media'];
       final mediaTypeRaw = json['media_type'];
 
+      // Part P-077: `shared_content` is additive and optional too — a
+      // map when the message shares Post/Reel/Product content, `null`
+      // otherwise. Kept as the raw decoded map here (this core-layer
+      // file does not import feature-layer types); the feature layer
+      // turns it into a `SharedContent`. Lenient like the media fields:
+      // anything that is not a map is treated as "nothing shared".
+      final sharedContentRaw = json['shared_content'];
+
       return MessageReceived(
         id: id,
         conversationId: conversation,
@@ -153,6 +163,9 @@ sealed class ChatEvent {
         mediaUrl: mediaRaw is String && mediaRaw.isNotEmpty ? mediaRaw : null,
         mediaType: mediaTypeRaw is String && mediaTypeRaw.isNotEmpty
             ? mediaTypeRaw
+            : null,
+        sharedContent: sharedContentRaw is Map<String, dynamic>
+            ? sharedContentRaw
             : null,
       );
     }
@@ -184,6 +197,7 @@ final class MessageReceived extends ChatEvent {
     required this.createdAt,
     this.mediaUrl,
     this.mediaType,
+    this.sharedContent,
   });
 
   final int id;
@@ -201,6 +215,18 @@ final class MessageReceived extends ChatEvent {
   /// file does not import feature-layer enums).
   final String? mediaType;
 
+  /// Part P-077. The raw decoded `shared_content` map exactly as the
+  /// backend sent it (see `build_shared_content_payload()` in
+  /// `chat/serializers.py`), or `null` if the message shares nothing.
+  /// Raw for the same reason as [mediaType]; the feature layer parses it
+  /// with `SharedContent.tryParse`.
+  final Map<String, dynamic>? sharedContent;
+
+  // Deterministic JSON encoding used only for value equality of the raw
+  // (possibly nested) shared-content map — Dart's Map `==` is identity.
+  String? get _sharedContentKey =>
+      sharedContent == null ? null : jsonEncode(sharedContent);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -212,7 +238,8 @@ final class MessageReceived extends ChatEvent {
           other.status == status &&
           other.createdAt == createdAt &&
           other.mediaUrl == mediaUrl &&
-          other.mediaType == mediaType);
+          other.mediaType == mediaType &&
+          other._sharedContentKey == _sharedContentKey);
 
   @override
   int get hashCode => Object.hash(
@@ -224,6 +251,7 @@ final class MessageReceived extends ChatEvent {
     createdAt,
     mediaUrl,
     mediaType,
+    _sharedContentKey,
   );
 
   @override
