@@ -135,6 +135,45 @@ class ConversationRepository {
     }
   }
 
+  /// Part P-077 STEP 5 — start (or resume) the conversation with a
+  /// business's owner, naming the business by its `BusinessProfile` id
+  /// (`POST /api/v1/conversations/start/` with `{"business_id": ...}`).
+  /// The backend resolves the owning user itself: no public endpoint
+  /// exposes a business owner's user id, so the app could not use
+  /// [startConversation]'s `recipient_id` for this.
+  ///
+  /// That endpoint answers only `{id, created_at, updated_at,
+  /// participant_ids}`, and this app deliberately never knows its own
+  /// user id, so it cannot tell which participant is "the other one".
+  /// So after the POST, the real [Conversation] (with the resolved
+  /// display name) is looked up in the conversation list — brand-new,
+  /// still-empty conversations are listed too. Returns `null` only if
+  /// the conversation was started but is not in the list (should not
+  /// happen); the caller must not open a thread in that case.
+  ///
+  /// Throws the typed [ApiFailure] like every other method here (e.g. a
+  /// [ValidationFailure] when a business owner messages their own
+  /// business, or when the business no longer exists).
+  Future<Conversation?> startConversationWithBusiness({
+    required int businessId,
+  }) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '${_basePath}start/',
+        data: {'business_id': businessId},
+      );
+      final conversationId = response.data!['id'] as int;
+
+      final page = await listConversations();
+      for (final conversation in page.results) {
+        if (conversation.id == conversationId) return conversation;
+      }
+      return null;
+    } on DioException catch (e) {
+      throw e.error as ApiFailure;
+    }
+  }
+
   /// GET `/api/v1/conversations/<conversationId>/messages/` — the initial,
   /// paginated message-history fetch for opening a thread
   /// (`MessageHistoryView`, no `since` query param). Newest-first on the

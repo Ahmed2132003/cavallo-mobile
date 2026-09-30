@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../chat/domain/shared_content.dart';
+import '../../chat/presentation/share_to_conversation_sheet.dart';
 import 'content_interaction_key.dart';
 import 'social_error_message.dart';
 import 'social_interaction_provider.dart';
@@ -227,16 +229,40 @@ class _ContentActionRowState extends ConsumerState<ContentActionRow> {
         IconButton(
           icon: Icon(Icons.share_outlined, color: iconColor),
           tooltip: 'Share',
-          onPressed: () => guarded(() async {
-            await notifier.share();
-            if (context.mounted) {
-              await SharePlus.instance.share(
-                ShareParams(
-                  text: 'Check out this ${widget.contentType} on Cavallo',
-                ),
-              );
+          onPressed: () {
+            // The pre-existing P-058 flow, byte-for-byte the same
+            // behavior: track the share, then open the native sheet.
+            Future<void> nativeShare() => guarded(() async {
+              await notifier.share();
+              if (context.mounted) {
+                await SharePlus.instance.share(
+                  ShareParams(
+                    text: 'Check out this ${widget.contentType} on Cavallo',
+                  ),
+                );
+              }
+            });
+
+            // Part P-077: offer "Share to conversation" next to it.
+            final sharedType = SharedContentType.fromRaw(widget.contentType);
+            if (sharedType == null) {
+              nativeShare();
+              return;
             }
-          }),
+            showShareOptionsSheet(
+              context,
+              contentType: sharedType,
+              objectId: widget.objectId,
+              onNativeShare: nativeShare,
+              onSharedToConversation: () async {
+                // Best-effort: the message is already delivered, so a
+                // failed share-count bump must not surface as an error.
+                try {
+                  await notifier.share();
+                } catch (_) {}
+              },
+            );
+          },
         ),
         const Spacer(),
         IconButton(

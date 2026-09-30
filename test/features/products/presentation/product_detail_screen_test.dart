@@ -206,8 +206,8 @@ void main() {
       );
     });
 
-    testWidgets('"Message Business" is visibly present but DISABLED, with a '
-        '"(coming soon)" note', (tester) async {
+    testWidgets('"Message Business" is ENABLED (P-077 activated the P-034 '
+        'stub) and the "(coming soon)" note is gone', (tester) async {
       final repository = _FakeProductPublicRepository(result: _product);
 
       await _pumpScreen(tester, productId: '10', repository: repository);
@@ -215,8 +215,8 @@ void main() {
 
       final button = find.widgetWithText(AppButton, 'Message Business');
       expect(button, findsOneWidget);
-      expect(tester.widget<AppButton>(button).onPressed, isNull);
-      expect(find.text('(coming soon)'), findsOneWidget);
+      expect(tester.widget<AppButton>(button).onPressed, isNotNull);
+      expect(find.text('(coming soon)'), findsNothing);
     });
 
     testWidgets('NO transactional UI: no cart/buy/quantity pattern anywhere '
@@ -249,7 +249,15 @@ void main() {
       expect(find.byType(TextField), findsNothing);
       expect(find.byType(TextFormField), findsNothing);
       expect(find.byType(DropdownButton<int>), findsNothing);
-      expect(find.byType(IconButton), findsNothing);
+      // Part P-077 STEP 4: the ONLY IconButton allowed is the Share
+      // action in the AppBar (the part spec's "Share Product" action —
+      // sharing is not a purchase). Any other IconButton, e.g. a +/-
+      // quantity stepper, would still fail here.
+      expect(
+        find.widgetWithIcon(IconButton, Icons.share_outlined),
+        findsOneWidget,
+      );
+      expect(find.byType(IconButton), findsOneWidget);
 
       // The ONLY button on the screen is the disabled "Message
       // Business" stub.
@@ -259,14 +267,30 @@ void main() {
       // (inside `AppButton`) — `byType(ButtonStyleButton)` matches
       // nothing even when a button is present, which would make the
       // "no buttons" style assertions vacuous.
-      expect(find.bySubtype<ButtonStyleButton>(), findsOneWidget);
-      expect(find.byType(AppButton), findsOneWidget);
+      // Part P-077 STEP 4: exactly TWO ButtonStyleButtons exist now —
+      // the Share icon in the AppBar (in Material 3 an IconButton
+      // builds a ButtonStyleButton internally) and the body's disabled
+      // "Message Business" stub. Split by location so the body check
+      // stays as strict as before: the body still has exactly ONE
+      // button, and it is still the disabled stub.
+      expect(find.bySubtype<ButtonStyleButton>(), findsNWidgets(2));
       expect(
-        tester
-            .widget<ButtonStyleButton>(find.bySubtype<ButtonStyleButton>())
-            .onPressed,
-        isNull,
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.bySubtype<ButtonStyleButton>(),
+        ),
+        findsOneWidget,
       );
+
+      final bodyButtons = find.descendant(
+        of: find.byType(SingleChildScrollView),
+        matching: find.bySubtype<ButtonStyleButton>(),
+      );
+      expect(bodyButtons, findsOneWidget);
+      expect(find.byType(AppButton), findsOneWidget);
+      // Part P-077: the body's single button is now the ACTIVE
+      // "Message Business" action (it was a disabled stub before).
+      expect(tester.widget<ButtonStyleButton>(bodyButtons).onPressed, isNotNull);
     });
   });
 

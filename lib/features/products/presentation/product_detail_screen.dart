@@ -1,12 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
+import '../../../routing/route_names.dart';
+import '../../chat/data/conversation_repository.dart';
+import '../../chat/domain/shared_content.dart';
+import '../../chat/presentation/share_to_conversation_sheet.dart';
 import '../domain/product_entity.dart';
 import 'product_price_framing.dart';
 import 'product_public_providers.dart';
@@ -27,11 +33,13 @@ import 'product_public_providers.dart';
 /// ## ⚠️ No transactional UI, by rule
 ///
 /// Nothing on this screen may resemble a purchase flow: no cart icon, no
-/// "Buy Now" button, no quantity selector. The only action is
-/// "Message Business", visibly present but DISABLED — chat is Phase 12.
-/// Same stub-don't-fake pattern as the Follow button in
-/// `business_profile_public_screen.dart` (Part P-029): neither faked nor
-/// omitted, so Phase 12 only has to give it an `onPressed`.
+/// "Buy Now" button, no quantity selector. The only body action is
+/// "Message Business". It was a deliberately DISABLED stub from Part
+/// P-034 until Part P-077 activated it: it now starts (or resumes) a
+/// real conversation with the business's owner
+/// (`ConversationRepository.startConversationWithBusiness`) and opens
+/// that conversation's thread. Part P-077 also added the AppBar Share
+/// action ("Share to conversation" / native share sheet).
 ///
 /// ## States
 ///
@@ -49,6 +57,24 @@ class ProductDetailScreen extends ConsumerWidget {
   /// [String], parsed here rather than by the router.
   final String productId;
 
+  /// Part P-077: the Share icon's two options — native share sheet
+  /// (unchanged style, no share tracking: P-056's endpoint covers only
+  /// Post/Reel) or "Share to conversation".
+  void _share(BuildContext context, Product product) {
+    showShareOptionsSheet(
+      context,
+      contentType: SharedContentType.product,
+      objectId: product.id,
+      onNativeShare: () async {
+        try {
+          await SharePlus.instance.share(
+            ShareParams(text: 'Check out ${product.name} on Cavallo'),
+          );
+        } catch (_) {}
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // The backend route is `<int:pk>/`, so a non-numeric id can never
@@ -65,7 +91,17 @@ class ProductDetailScreen extends ConsumerWidget {
     final productAsync = ref.watch(productPublicDetailProvider(id));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Product')),
+      appBar: AppBar(
+        title: const Text('Product'),
+        actions: [
+          if (productAsync case AsyncData(value: final Product product))
+            IconButton(
+              icon: const Icon(Icons.share_outlined),
+              tooltip: 'Share',
+              onPressed: () => _share(context, product),
+            ),
+        ],
+      ),
       body: switch (productAsync) {
         AsyncData(value: final Product product) => _ProductView(
           product: product,
@@ -122,14 +158,71 @@ class _LoadErrorView extends ConsumerWidget {
   }
 }
 
-class _ProductView extends StatelessWidget {
+class _ProductView extends ConsumerStatefulWidget {
   const _ProductView({required this.product});
 
   final Product product;
 
   @override
+  ConsumerState<_ProductView> createState() => _ProductViewState();
+}
+
+class _ProductViewState extends ConsumerState<_ProductView> {
+  bool _isStartingConversation = false;
+
+  /// Part P-077: "Message Business". Starts (or resumes) the
+  /// conversation with this product's business, then opens its thread.
+  ///
+  /// The router and messenger are captured BEFORE the await so they are
+  /// still valid afterwards. A second tap while a request is in flight
+  /// is ignored, so it can't start two.
+  Future<void> _messageBusiness() async {
+    if (_isStartingConversation) return;
+
+    final router = GoRouter.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _isStartingConversation = true);
+
+    try {
+      final conversation = await ref
+          .read(conversationRepositoryProvider)
+          .startConversationWithBusiness(businessId: widget.product.businessId);
+      if (!mounted) return;
+      setState(() => _isStartingConversation = false);
+
+      if (conversation == null) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Conversation started. Open it from Messages.'),
+          ),
+        );
+        return;
+      }
+
+      router.pushNamed(
+        RouteNames.chatThread,
+        pathParameters: {RouteNames.idParam: conversation.id.toString()},
+        extra: conversation,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isStartingConversation = false);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            e is ApiFailure
+                ? e.message
+                : 'Could not start the conversation. Please try again.',
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final product = widget.product;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -166,28 +259,17 @@ class _ProductView extends StatelessWidget {
               ),
           ],
           const SizedBox(height: 24),
-          // Present but non-functional on purpose — chat is Phase 12.
-          // Neither faked nor omitted; Phase 12 replaces `onPressed: null`
-          // with the real action.
-          Row(
-            children: [
-              Tooltip(
-                message: 'Messaging businesses arrives in a later phase.',
-                child: const AppButton(
-                  label: 'Message Business',
-                  onPressed: null,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text('(coming soon)', style: theme.textTheme.bodySmall),
-            ],
+          // Part P-077: the stub from P-034, now real.
+          AppButton(
+            label: 'Message Business',
+            isLoading: _isStartingConversation,
+            onPressed: _messageBusiness,
           ),
         ],
       ),
     );
   }
 }
-
 /// The product's single primary image (the backend has one `image`
 /// field, not a gallery — Part P-032). Falls back to a neutral
 /// placeholder when there is no image or the URL fails to load.
