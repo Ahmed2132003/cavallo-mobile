@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +7,7 @@ import 'core/error_reporting.dart';
 import 'core/network/dio_client.dart';
 import 'core/storage/secure_token_storage.dart';
 import 'features/auth/presentation/session_provider.dart';
+import 'features/notifications/presentation/push_session_bridge.dart';
 import 'routing/app_router.dart';
 
 /// Composition root for the app.
@@ -74,7 +75,11 @@ void main() {
           };
         }),
       ],
-      child: const SocialCommerceApp(),
+      // Part P-081: registers/unregisters the FCM device token as the
+      // session changes (initialize after login, stop on logout). Wrapped
+      // here in main(), not inside SocialCommerceApp, so widget tests that
+      // pump SocialCommerceApp directly never touch Firebase.
+      child: const PushSessionBridge(child: SocialCommerceApp()),
     ),
   );
 }
