@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
+import '../../../routing/route_names.dart';
 import '../domain/app_notification.dart';
 import 'notification_list_provider.dart';
 import 'notification_navigator.dart';
@@ -88,7 +90,20 @@ class _NotificationCenterScreenState
     final listAsync = ref.watch(notificationListProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Notifications')),
+      appBar: AppBar(
+        title: const Text('Notifications'),
+        actions: [
+          IconButton(
+            key: const ValueKey('notification-preferences-button'),
+            tooltip: 'Notification settings',
+            icon: const Icon(Icons.settings_outlined),
+            onPressed:
+                () => unawaited(
+                  context.pushNamed<void>(RouteNames.notificationPreferences),
+                ),
+          ),
+        ],
+      ),
       body: switch (listAsync) {
         AsyncData(value: final state) => _NotificationListBody(
           state: state,

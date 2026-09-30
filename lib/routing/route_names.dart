@@ -72,6 +72,10 @@ class RouteNames {
   static const String chatList = 'chatList';
   static const String chatThread = 'chatThread';
   static const String notifications = 'notifications';
+
+  /// Part P-082: the notification preferences screen, opened from the
+  /// notification center's app bar.
+  static const String notificationPreferences = 'notificationPreferences';
   static const String businessConsole = 'businessConsole';
 
   /// Part P-028C1: the "complete your business profile" onboarding
@@ -177,6 +181,8 @@ class RouteNames {
   static const String chatListPath = '/chat';
   static const String chatThreadPath = '/chat/:id';
   static const String notificationsPath = '/notifications';
+  static const String notificationPreferencesPath =
+      '/notifications/preferences';
   static const String businessConsolePath = '/business-console';
 
   /// Part P-028C1 — see [businessOnboarding]/this class's docstring.

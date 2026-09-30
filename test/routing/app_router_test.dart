@@ -16,6 +16,9 @@ import 'package:social_commerce_app/features/chat/presentation/chat_list_screen.
 import 'package:social_commerce_app/features/categories/data/category_repository_impl.dart';
 import 'package:social_commerce_app/features/discover/presentation/discover_screen.dart';
 import 'package:social_commerce_app/features/feed/presentation/home_feed_screen.dart';
+import 'package:social_commerce_app/features/notifications/data/notification_repository_impl.dart';
+import 'package:social_commerce_app/features/notifications/presentation/notification_center_screen.dart';
+import 'package:social_commerce_app/features/notifications/presentation/notification_preferences_screen.dart';
 import 'package:social_commerce_app/features/categories/domain/category_entity.dart';
 import 'package:social_commerce_app/features/categories/domain/category_repository.dart';
 import 'package:social_commerce_app/features/products/data/product_repository_impl.dart';
@@ -27,6 +30,7 @@ import 'package:social_commerce_app/features/products/presentation/product_list_
 import 'package:social_commerce_app/features/search/presentation/search_screen.dart';
 import 'package:social_commerce_app/routing/app_router.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
+import '../features/notifications/fake_notification_repository.dart';
 
 /// A [SessionNotifier] whose [build] resolves immediately to a fixed
 /// value. Duplicated here (rather than imported) from
@@ -235,10 +239,12 @@ void main() {
       // 'Route: chatList' assertions no longer exist anywhere — see the
       // dedicated tests below, same pattern as home (P-061) and
       // discover (P-062).
-      const protectedSimpleRoutes = <String>[
-        RouteNames.notifications,
-        RouteNames.businessConsole,
-      ];
+      // notifications deliberately excluded here too: Part P-082
+      // replaced P-007's placeholder for this route with the real
+      // `NotificationCenterScreen`, so the old 'Route: notifications'
+      // assertion no longer exists anywhere — see the dedicated P-082
+      // test below, same pattern as home (P-061) and discover (P-062).
+      const protectedSimpleRoutes = <String>[RouteNames.businessConsole];
 
       for (final name in protectedSimpleRoutes) {
         router.goNamed(name);
@@ -251,28 +257,64 @@ void main() {
       }
     });
 
-    testWidgets(
-      'Part P-061: home route resolves to the real HomeFeedScreen '
-      '(signed in)',
-      (tester) async {
-        // Part P-061 replaced P-007's placeholder for this route, so
-        // the old 'Route: home' assertion (still used for the other
-        // routes in `protectedSimpleRoutes` above) no longer exists
-        // anywhere for `home`. No `feedRepositoryProvider` override is
-        // used here — same approach as `moderation_router_gate_test
-        // .dart`/`business_profile_router_gate_test.dart`'s own
-        // `find.byType(HomeFeedScreen)` assertions: the screen resolves
-        // (loading → real or failed network fetch → error state) either
-        // way, and this test only cares that the correct widget type is
-        // what /home now builds, not that its data call succeeds.
-        final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+    testWidgets('Part P-082: notifications route resolves to the real '
+        'NotificationCenterScreen (signed in)', (tester) async {
+      final router = await _pumpRouter(
+        tester,
+        sessionValue: _fakeUser,
+        extraOverrides: [
+          notificationRepositoryProvider.overrideWithValue(
+            FakeNotificationRepository(pages: {null: fakePage([])}),
+          ),
+        ],
+      );
 
-        router.goNamed(RouteNames.home);
+      router.goNamed(RouteNames.notifications);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(NotificationCenterScreen), findsOneWidget);
+    });
+
+    testWidgets(
+      'Part P-082: notificationPreferences route resolves to the real '
+      'NotificationPreferencesScreen (signed in)',
+      (tester) async {
+        final router = await _pumpRouter(
+          tester,
+          sessionValue: _fakeUser,
+          extraOverrides: [
+            notificationRepositoryProvider.overrideWithValue(
+              FakeNotificationRepository(),
+            ),
+          ],
+        );
+
+        router.goNamed(RouteNames.notificationPreferences);
         await tester.pumpAndSettle();
 
-        expect(find.byType(HomeFeedScreen), findsOneWidget);
+        expect(find.byType(NotificationPreferencesScreen), findsOneWidget);
       },
     );
+
+    testWidgets('Part P-061: home route resolves to the real HomeFeedScreen '
+        '(signed in)', (tester) async {
+      // Part P-061 replaced P-007's placeholder for this route, so
+      // the old 'Route: home' assertion (still used for the other
+      // routes in `protectedSimpleRoutes` above) no longer exists
+      // anywhere for `home`. No `feedRepositoryProvider` override is
+      // used here — same approach as `moderation_router_gate_test
+      // .dart`/`business_profile_router_gate_test.dart`'s own
+      // `find.byType(HomeFeedScreen)` assertions: the screen resolves
+      // (loading → real or failed network fetch → error state) either
+      // way, and this test only cares that the correct widget type is
+      // what /home now builds, not that its data call succeeds.
+      final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+      router.goNamed(RouteNames.home);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HomeFeedScreen), findsOneWidget);
+    });
 
     testWidgets(
       'Part P-062: discover route resolves to the real DiscoverScreen '

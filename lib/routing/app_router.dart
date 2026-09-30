@@ -25,6 +25,7 @@ import '../features/moderation/domain/queue_item_entity.dart';
 import '../features/moderation/presentation/moderation_queue_screen.dart';
 import '../features/moderation/presentation/moderation_review_screen.dart';
 import '../features/notifications/presentation/notification_center_screen.dart';
+import '../features/notifications/presentation/notification_preferences_screen.dart';
 import '../features/products/domain/product_entity.dart';
 import '../features/products/presentation/product_detail_screen.dart';
 import '../features/products/presentation/product_form_screen.dart';
@@ -496,6 +497,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.notificationsPath,
         name: RouteNames.notifications,
         builder: (context, state) => const NotificationCenterScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.notificationPreferencesPath,
+        name: RouteNames.notificationPreferences,
+        builder: (context, state) => const NotificationPreferencesScreen(),
       ),
       GoRoute(
         path: RouteNames.businessConsolePath,
