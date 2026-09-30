@@ -24,7 +24,7 @@ import '../features/feed/presentation/home_feed_screen.dart';
 import '../features/moderation/domain/queue_item_entity.dart';
 import '../features/moderation/presentation/moderation_queue_screen.dart';
 import '../features/moderation/presentation/moderation_review_screen.dart';
-import '../features/notifications/presentation/notifications_screen.dart';
+import '../features/notifications/presentation/notification_center_screen.dart';
 import '../features/products/domain/product_entity.dart';
 import '../features/products/presentation/product_detail_screen.dart';
 import '../features/products/presentation/product_form_screen.dart';
@@ -403,7 +403,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.homePath,
         name: RouteNames.home,
         builder: (context, state) => const HomeFeedScreen(),
-      ),      
+      ),
       GoRoute(
         path: RouteNames.discoverPath,
         name: RouteNames.discover,
@@ -495,7 +495,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.notificationsPath,
         name: RouteNames.notifications,
-        builder: (context, state) => const NotificationsScreen(),
+        builder: (context, state) => const NotificationCenterScreen(),
       ),
       GoRoute(
         path: RouteNames.businessConsolePath,
@@ -508,11 +508,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         // than inside `product_list_screen.dart` itself.
         path: RouteNames.productListPath,
         name: RouteNames.productList,
-        builder: (context, state) => ProductListScreen(
-          onCreateNew: () => context.pushNamed(RouteNames.productForm),
-          onEditProduct: (product) =>
-              context.pushNamed(RouteNames.productForm, extra: product),
-        ),
+        builder:
+            (context, state) => ProductListScreen(
+              onCreateNew: () => context.pushNamed(RouteNames.productForm),
+              onEditProduct:
+                  (product) =>
+                      context.pushNamed(RouteNames.productForm, extra: product),
+            ),
       ),
       GoRoute(
         // Part P-033. `extra` is the full `Product` for edit mode, or
@@ -520,8 +522,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         // own doc for why there's no `:id` path segment here instead.
         path: RouteNames.productFormPath,
         name: RouteNames.productForm,
-        builder: (context, state) =>
-            ProductFormScreen(existingProduct: state.extra as Product?),
+        builder:
+            (context, state) =>
+                ProductFormScreen(existingProduct: state.extra as Product?),
       ),
       GoRoute(
         // Part P-044. See this provider's "Part P-044" doc section
@@ -530,10 +533,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         // as `productList` above).
         path: RouteNames.contentListPath,
         name: RouteNames.contentList,
-        builder: (context, state) => ContentListScreen(
-          onCreatePost: () => context.pushNamed(RouteNames.postForm),
-          onCreateReel: () => context.pushNamed(RouteNames.reelForm),
-        ),
+        builder:
+            (context, state) => ContentListScreen(
+              onCreatePost: () => context.pushNamed(RouteNames.postForm),
+              onCreateReel: () => context.pushNamed(RouteNames.reelForm),
+            ),
       ),
       GoRoute(
         // Part P-044. Create-only — no `extra:` to read, unlike
@@ -564,10 +568,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         // as `extra`, like `productForm`'s edit mode above.
         path: RouteNames.moderationPath,
         name: RouteNames.moderation,
-        builder: (context, state) => ModerationQueueScreen(
-          onOpenItem: (item) =>
-              context.pushNamed(RouteNames.moderationReview, extra: item),
-        ),
+        builder:
+            (context, state) => ModerationQueueScreen(
+              onOpenItem:
+                  (item) => context.pushNamed(
+                    RouteNames.moderationReview,
+                    extra: item,
+                  ),
+            ),
       ),
       GoRoute(
         // Part P-040. The redirect callback guarantees `extra` is a
@@ -575,8 +583,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         // redirected back to the queue), so the cast cannot fail here.
         path: RouteNames.moderationReviewPath,
         name: RouteNames.moderationReview,
-        builder: (context, state) =>
-            ModerationReviewScreen(item: state.extra! as QueueItem),
+        builder:
+            (context, state) =>
+                ModerationReviewScreen(item: state.extra! as QueueItem),
       ),
     ],
   );
@@ -591,6 +600,7 @@ bool _isModerationLocation(String location) {
   return location == RouteNames.moderationPath ||
       location.startsWith('${RouteNames.moderationPath}/');
 }
+
 /// True for `/chat/<id>` — the concrete, id-filled location the
 /// `chatThread` route resolves to (`location` is always the matched,
 /// concrete path, never the `:id` pattern itself — see
