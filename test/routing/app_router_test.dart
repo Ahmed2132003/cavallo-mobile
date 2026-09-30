@@ -12,6 +12,7 @@ import 'package:social_commerce_app/features/auth/presentation/login_screen.dart
 import 'package:social_commerce_app/features/auth/presentation/register_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_public_screen.dart';
+import 'package:social_commerce_app/features/chat/presentation/chat_list_screen.dart';
 import 'package:social_commerce_app/features/categories/data/category_repository_impl.dart';
 import 'package:social_commerce_app/features/discover/presentation/discover_screen.dart';
 import 'package:social_commerce_app/features/feed/presentation/home_feed_screen.dart';
@@ -23,6 +24,7 @@ import 'package:social_commerce_app/features/products/domain/product_repository.
 import 'package:social_commerce_app/features/products/presentation/product_detail_screen.dart';
 import 'package:social_commerce_app/features/products/presentation/product_form_screen.dart';
 import 'package:social_commerce_app/features/products/presentation/product_list_screen.dart';
+import 'package:social_commerce_app/features/search/presentation/search_screen.dart';
 import 'package:social_commerce_app/routing/app_router.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
 
@@ -226,9 +228,14 @@ void main() {
       // `DiscoverScreen`, so the old 'Route: discover' assertion no
       // longer exists anywhere — see the dedicated P-062 test below,
       // same pattern as home (P-061) above.
+      //
+      // search and chatList deliberately excluded too: the real
+      // `SearchScreen` (Phase 11) and `ChatListScreen` (P-074) replaced
+      // their P-007 placeholders, so the old 'Route: search' /
+      // 'Route: chatList' assertions no longer exist anywhere — see the
+      // dedicated tests below, same pattern as home (P-061) and
+      // discover (P-062).
       const protectedSimpleRoutes = <String>[
-        RouteNames.search,
-        RouteNames.chatList,
         RouteNames.notifications,
         RouteNames.businessConsole,
       ];
@@ -286,6 +293,167 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(DiscoverScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets('search route resolves to the real SearchScreen (signed in)', (
+      tester,
+    ) async {
+      final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+      router.goNamed(RouteNames.search);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SearchScreen), findsOneWidget);
+    });
+
+    testWidgets(
+      'chatList route resolves to the real ChatListScreen (signed in)',
+      (tester) async {
+        final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+        router.goNamed(RouteNames.chatList);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ChatListScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets('search route resolves to the real SearchScreen (signed in)', (
+      tester,
+    ) async {
+      final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+      router.goNamed(RouteNames.search);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SearchScreen), findsOneWidget);
+    });
+
+    testWidgets(
+      'chatList route resolves to the real ChatListScreen (signed in)',
+      (tester) async {
+        final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+        router.goNamed(RouteNames.chatList);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ChatListScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets('search route resolves to the real SearchScreen (signed in)', (
+      tester,
+    ) async {
+      final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+      router.goNamed(RouteNames.search);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SearchScreen), findsOneWidget);
+    });
+
+    testWidgets(
+      'chatList route resolves to the real ChatListScreen (signed in)',
+      (tester) async {
+        final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+        router.goNamed(RouteNames.chatList);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ChatListScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets('search route resolves to the real SearchScreen (signed in)', (
+      tester,
+    ) async {
+      final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+      router.goNamed(RouteNames.search);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SearchScreen), findsOneWidget);
+    });
+
+    testWidgets(
+      'chatList route resolves to the real ChatListScreen (signed in)',
+      (tester) async {
+        final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+        router.goNamed(RouteNames.chatList);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ChatListScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets('search route resolves to the real SearchScreen (signed in)', (
+      tester,
+    ) async {
+      final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+      router.goNamed(RouteNames.search);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SearchScreen), findsOneWidget);
+    });
+
+    testWidgets(
+      'chatList route resolves to the real ChatListScreen (signed in)',
+      (tester) async {
+        final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+        router.goNamed(RouteNames.chatList);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ChatListScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets('search route resolves to the real SearchScreen (signed in)', (
+      tester,
+    ) async {
+      final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+      router.goNamed(RouteNames.search);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SearchScreen), findsOneWidget);
+    });
+
+    testWidgets(
+      'chatList route resolves to the real ChatListScreen (signed in)',
+      (tester) async {
+        final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+        router.goNamed(RouteNames.chatList);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ChatListScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets('search route resolves to the real SearchScreen (signed in)', (
+      tester,
+    ) async {
+      final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+      router.goNamed(RouteNames.search);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SearchScreen), findsOneWidget);
+    });
+
+    testWidgets(
+      'chatList route resolves to the real ChatListScreen (signed in)',
+      (tester) async {
+        final router = await _pumpRouter(tester, sessionValue: _fakeUser);
+
+        router.goNamed(RouteNames.chatList);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ChatListScreen), findsOneWidget);
       },
     );
 
@@ -388,7 +556,8 @@ void main() {
       );
     });
     testWidgets(
-      'chatThread route resolves with its :id path parameter (signed in)',
+      'chatThread without its Conversation extra is redirected to the chat '
+      'list (Part P-074 guard; the P-007 placeholder no longer exists)',
       (tester) async {
         final router = await _pumpRouter(tester, sessionValue: _fakeUser);
 
@@ -398,8 +567,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Route: chatThread'), findsOneWidget);
-        expect(find.text('id param: sample-thread-1'), findsOneWidget);
+        expect(find.byType(ChatListScreen), findsOneWidget);
+        expect(find.text('Route: chatThread'), findsNothing);
       },
     );
 
