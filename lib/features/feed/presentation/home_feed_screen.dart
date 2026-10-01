@@ -143,7 +143,20 @@ class _HomeFeedScreenState extends ConsumerState<HomeFeedScreen> {
     final feedAsync = ref.watch(homeFeedProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Home'), actions: const [_DebugMenu()]),
+      appBar: AppBar(
+        title: const Text('Home'),
+        actions: [
+          // Part P-082: the app's first real entry point to the
+          // notification center (/notifications).
+          IconButton(
+            key: const ValueKey('home-notifications-button'),
+            tooltip: 'Notifications',
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () => context.pushNamed(RouteNames.notifications),
+          ),
+          const _DebugMenu(),
+        ],
+      ),
       body: switch (feedAsync) {
         AsyncData(value: final state) => _FeedBody(
           state: state,
@@ -234,7 +247,8 @@ class _FeedListItem extends ConsumerWidget {
       businessProfilePublicProvider(item.businessId),
     );
     final businessName = switch (profileAsync) {
-      AsyncData(value: final profile) => profile?.businessName ?? 'Unknown business',
+      AsyncData(value: final profile) =>
+        profile?.businessName ?? 'Unknown business',
       _ => '',
     };
 
@@ -244,18 +258,20 @@ class _FeedListItem extends ConsumerWidget {
         PostFeedItem(:final post) => PostCard(
           post: post,
           businessName: businessName,
-          onTap: () => context.pushNamed(
-            RouteNames.postDetail,
-            pathParameters: {RouteNames.idParam: '${post.id}'},
-          ),
+          onTap:
+              () => context.pushNamed(
+                RouteNames.postDetail,
+                pathParameters: {RouteNames.idParam: '${post.id}'},
+              ),
         ),
         ReelFeedItem(:final reel) => ReelCard(
           reel: reel,
           businessName: businessName,
-          onTap: () => context.pushNamed(
-            RouteNames.reelDetail,
-            pathParameters: {RouteNames.idParam: '${reel.id}'},
-          ),
+          onTap:
+              () => context.pushNamed(
+                RouteNames.reelDetail,
+                pathParameters: {RouteNames.idParam: '${reel.id}'},
+              ),
         ),
       },
     );
@@ -318,43 +334,44 @@ class _DebugMenu extends ConsumerWidget {
     return PopupMenuButton<String>(
       tooltip: 'Debug menu',
       onSelected: (value) => _handleSelection(context, ref, value),
-      itemBuilder: (context) => [
-        if (isOnboardedBusinessUser)
-          const PopupMenuItem(
-            value: 'editProfile',
-            child: Text('Edit business profile'),
-          ),
-        if (isBusinessUser)
-          const PopupMenuItem(
-            value: 'businessConsole',
-            child: Text('Business Console (debug)'),
-          ),
-        if (canModerate)
-          const PopupMenuItem(
-            value: 'moderation',
-            child: Text('Moderation queue (debug)'),
-          ),
-        const PopupMenuItem(
-          value: 'viewStory',
-          child: Text('View Story (debug, business 3)'),
-        ),
-        const PopupMenuItem(
-          value: 'search',
-          child: Text('Search (debug — no nav entry point yet)'),
-        ),
-        const PopupMenuItem(
-          value: 'discover',
-          child: Text('Discover (debug — no nav entry point yet)'),
-        ),
-        // Part P-074: no real nav entry point to ChatListScreen exists
-        // anywhere yet — see this file's top-level "Part P-074 addition"
-        // doc section.
-        const PopupMenuItem(
-          value: 'openChat',
-          child: Text('Open Chat (debug — no nav entry point yet)'),
-        ),
-        const PopupMenuItem(value: 'logout', child: Text('Logout (debug)')),
-      ],
+      itemBuilder:
+          (context) => [
+            if (isOnboardedBusinessUser)
+              const PopupMenuItem(
+                value: 'editProfile',
+                child: Text('Edit business profile'),
+              ),
+            if (isBusinessUser)
+              const PopupMenuItem(
+                value: 'businessConsole',
+                child: Text('Business Console (debug)'),
+              ),
+            if (canModerate)
+              const PopupMenuItem(
+                value: 'moderation',
+                child: Text('Moderation queue (debug)'),
+              ),
+            const PopupMenuItem(
+              value: 'viewStory',
+              child: Text('View Story (debug, business 3)'),
+            ),
+            const PopupMenuItem(
+              value: 'search',
+              child: Text('Search (debug — no nav entry point yet)'),
+            ),
+            const PopupMenuItem(
+              value: 'discover',
+              child: Text('Discover (debug — no nav entry point yet)'),
+            ),
+            // Part P-074: no real nav entry point to ChatListScreen exists
+            // anywhere yet — see this file's top-level "Part P-074 addition"
+            // doc section.
+            const PopupMenuItem(
+              value: 'openChat',
+              child: Text('Open Chat (debug — no nav entry point yet)'),
+            ),
+            const PopupMenuItem(value: 'logout', child: Text('Logout (debug)')),
+          ],
     );
   }
 

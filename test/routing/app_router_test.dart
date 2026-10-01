@@ -276,6 +276,32 @@ void main() {
     });
 
     testWidgets(
+      'Part P-082: the Home app bar bell opens the notification center '
+      '(signed in)',
+      (tester) async {
+        final router = await _pumpRouter(
+          tester,
+          sessionValue: _fakeUser,
+          extraOverrides: [
+            notificationRepositoryProvider.overrideWithValue(
+              FakeNotificationRepository(pages: {null: fakePage([])}),
+            ),
+          ],
+        );
+
+        router.goNamed(RouteNames.home);
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const ValueKey('home-notifications-button')),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(NotificationCenterScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets(
       'Part P-082: notificationPreferences route resolves to the real '
       'NotificationPreferencesScreen (signed in)',
       (tester) async {
