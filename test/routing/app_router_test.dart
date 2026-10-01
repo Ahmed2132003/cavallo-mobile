@@ -11,7 +11,11 @@ import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/login_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/register_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
+import 'package:social_commerce_app/features/business_console/presentation/analytics_placeholder_screen.dart';
+import 'package:social_commerce_app/features/business_console/presentation/business_console_shell.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_public_screen.dart';
+import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
+import 'package:social_commerce_app/features/business_profile/presentation/business_profile_provider.dart';
 import 'package:social_commerce_app/features/chat/presentation/chat_list_screen.dart';
 import 'package:social_commerce_app/features/categories/data/category_repository_impl.dart';
 import 'package:social_commerce_app/features/discover/presentation/discover_screen.dart';
@@ -53,6 +57,41 @@ const _fakeUser = User(
   isModerator: false,
   isStaff: false,
 );
+
+/// Part P-083: a Business-type session. The Business Console routes are
+/// reachable only for [AccountType.business] (the Business-only gate in
+/// `app_router.dart`), so the `productList` / `productForm` tests below
+/// sign in as this user instead of [_fakeUser] (a Customer).
+const _businessUser = User(
+  id: 2,
+  email: 'business@example.com',
+  accountType: AccountType.business,
+  isModerator: false,
+  isStaff: false,
+);
+
+/// Part P-083: an already-onboarded profile, so the P-028C1 gate does not
+/// send [_businessUser] to onboarding.
+const _businessProfile = BusinessProfile(
+  id: 1,
+  businessName: 'Ahmed Trading Co.',
+  businessType: BusinessType.trader,
+  country: 'Egypt',
+  city: 'Cairo',
+  isVerified: false,
+);
+
+/// Part P-083: resolves immediately to a fixed profile, so no test here
+/// ever builds the real [BusinessProfileNotifier] (which would call the
+/// network). Same approach as `business_profile_router_gate_test.dart`.
+class _FakeBusinessProfileNotifier extends BusinessProfileNotifier {
+  _FakeBusinessProfileNotifier(this._initial);
+
+  final BusinessProfile? _initial;
+
+  @override
+  Future<BusinessProfile?> build() async => _initial;
+}
 
 /// Hand-rolled test double for [ProductRepository] — Part P-033's
 /// `productList`/`productForm` routes both watch `ownProductsProvider`
@@ -209,52 +248,53 @@ void main() {
   // never pass under the new, correct guard behavior.
 
   group('static route table (Part P-007, extended P-021b)', () {
-    testWidgets('every protected placeholder route resolves (signed in)', (
-      tester,
-    ) async {
+    // Part P-083: this slot used to hold 'every protected placeholder
+    // route resolves (signed in)', which looped over
+    // `protectedSimpleRoutes = [RouteNames.businessConsole]` and expected
+    // P-007's 'Route: businessConsole' placeholder text, as a Customer.
+    // Both premises are gone on purpose: /business-console is now a
+    // Business-only redirect into the Business Console shell, and no
+    // P-007 placeholder route is left in the table (every other one was
+    // replaced by a real screen and has its own dedicated test in this
+    // file). Rather than keeping an empty loop, the test is rewritten to
+    // assert the real new behaviour, for both account types.
+    testWidgets('Part P-083: businessConsole lands a Business account on the '
+        'shell\'s Products branch (signed in as Business)', (tester) async {
+      final router = await _pumpRouter(
+        tester,
+        sessionValue: _businessUser,
+        extraOverrides: [
+          businessProfileProvider.overrideWith(
+            () => _FakeBusinessProfileNotifier(_businessProfile),
+          ),
+          productRepositoryProvider.overrideWithValue(_FakeProductRepository()),
+        ],
+      );
+
+      router.goNamed(RouteNames.businessConsole);
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.toString(),
+        RouteNames.productListPath,
+      );
+      expect(find.byType(BusinessConsoleShell), findsOneWidget);
+      expect(find.byType(ProductListScreen), findsOneWidget);
+    });
+
+    testWidgets('Part P-083: businessConsole is blocked for a Customer and '
+        'sent to /home (signed in as Customer)', (tester) async {
       final router = await _pumpRouter(tester, sessionValue: _fakeUser);
 
-      // login/register deliberately excluded here: while signed in,
-      // the guard bounces both to /home (see the dedicated login/
-      // register tests below and app_router_redirect_test.dart) —
-      // asserting their placeholder text under this session state
-      // would be asserting an unreachable state.
-      //
-      // home deliberately excluded here too: Part P-061 replaced
-      // P-007's placeholder for this route with the real
-      // `HomeFeedScreen`, so the old 'Route: home' assertion no
-      // longer exists anywhere — see the dedicated P-061 test below,
-      // same pattern as the businessProfile (P-029) and productDetail
-      // (P-034) placeholder replacements further down this file.
-      //
-      // discover deliberately excluded here too: Part P-062 replaced
-      // P-007's placeholder for this route with the real
-      // `DiscoverScreen`, so the old 'Route: discover' assertion no
-      // longer exists anywhere — see the dedicated P-062 test below,
-      // same pattern as home (P-061) above.
-      //
-      // search and chatList deliberately excluded too: the real
-      // `SearchScreen` (Phase 11) and `ChatListScreen` (P-074) replaced
-      // their P-007 placeholders, so the old 'Route: search' /
-      // 'Route: chatList' assertions no longer exist anywhere — see the
-      // dedicated tests below, same pattern as home (P-061) and
-      // discover (P-062).
-      // notifications deliberately excluded here too: Part P-082
-      // replaced P-007's placeholder for this route with the real
-      // `NotificationCenterScreen`, so the old 'Route: notifications'
-      // assertion no longer exists anywhere — see the dedicated P-082
-      // test below, same pattern as home (P-061) and discover (P-062).
-      const protectedSimpleRoutes = <String>[RouteNames.businessConsole];
+      router.goNamed(RouteNames.businessConsole);
+      await tester.pumpAndSettle();
 
-      for (final name in protectedSimpleRoutes) {
-        router.goNamed(name);
-        await tester.pumpAndSettle();
-        expect(
-          find.text('Route: $name'),
-          findsOneWidget,
-          reason: 'route "$name" did not resolve',
-        );
-      }
+      expect(
+        router.routerDelegate.currentConfiguration.uri.toString(),
+        RouteNames.homePath,
+      );
+      expect(find.byType(BusinessConsoleShell), findsNothing);
+      expect(find.byType(HomeFeedScreen), findsOneWidget);
     });
 
     testWidgets('Part P-082: notifications route resolves to the real '
@@ -325,8 +365,7 @@ void main() {
     testWidgets('Part P-061: home route resolves to the real HomeFeedScreen '
         '(signed in)', (tester) async {
       // Part P-061 replaced P-007's placeholder for this route, so
-      // the old 'Route: home' assertion (still used for the other
-      // routes in `protectedSimpleRoutes` above) no longer exists
+      // the old 'Route: home' assertion no longer exists
       // anywhere for `home`. No `feedRepositoryProvider` override is
       // used here — same approach as `moderation_router_gate_test
       // .dart`/`business_profile_router_gate_test.dart`'s own
@@ -347,8 +386,7 @@ void main() {
       '(signed in)',
       (tester) async {
         // Part P-062 replaced P-007's placeholder for this route, so
-        // the old 'Route: discover' assertion (still used for the
-        // other routes in `protectedSimpleRoutes` above) no longer
+        // the old 'Route: discover' assertion no longer
         // exists anywhere for `discover`. No repository override is
         // used here — same approach as the P-061 `HomeFeedScreen`
         // test immediately above: the screen resolves (loading →
@@ -642,12 +680,15 @@ void main() {
 
     testWidgets(
       'Part P-033: productList route resolves to the real ProductListScreen '
-      '(signed in)',
+      '(signed in as Business)',
       (tester) async {
         final router = await _pumpRouter(
           tester,
-          sessionValue: _fakeUser,
+          sessionValue: _businessUser,
           extraOverrides: [
+            businessProfileProvider.overrideWith(
+              () => _FakeBusinessProfileNotifier(_businessProfile),
+            ),
             productRepositoryProvider.overrideWithValue(
               _FakeProductRepository(),
             ),
@@ -664,12 +705,15 @@ void main() {
 
     testWidgets(
       'Part P-033: productForm route resolves to ProductFormScreen in '
-      'create mode when no extra is passed (signed in)',
+      'create mode when no extra is passed (signed in as Business)',
       (tester) async {
         final router = await _pumpRouter(
           tester,
-          sessionValue: _fakeUser,
+          sessionValue: _businessUser,
           extraOverrides: [
+            businessProfileProvider.overrideWith(
+              () => _FakeBusinessProfileNotifier(_businessProfile),
+            ),
             productRepositoryProvider.overrideWithValue(
               _FakeProductRepository(),
             ),
@@ -703,14 +747,26 @@ void main() {
       },
     );
 
+    // Part P-083: this test used to tap the 'My Products' AppButton on
+    // P-007's placeholder `BusinessConsoleScreen`, as a Customer. That
+    // screen is no longer routed to (the router now builds
+    // `BusinessConsoleShell`), and Customers can no longer reach the
+    // console at all. The intent, that the console reaches the product
+    // list, is preserved and now exercised through the shell: Products
+    // is the landing tab, and it is still reachable again after
+    // switching to another tab.
     testWidgets(
-      'Part P-033: the business console "My Products" button pushes the '
-      'productList route (signed in)',
+      'Part P-083: the business console shell shows productList on its '
+      'Products tab, and the tab is reachable again after switching away '
+      '(signed in as Business)',
       (tester) async {
         final router = await _pumpRouter(
           tester,
-          sessionValue: _fakeUser,
+          sessionValue: _businessUser,
           extraOverrides: [
+            businessProfileProvider.overrideWith(
+              () => _FakeBusinessProfileNotifier(_businessProfile),
+            ),
             productRepositoryProvider.overrideWithValue(
               _FakeProductRepository(),
             ),
@@ -719,10 +775,29 @@ void main() {
         router.goNamed(RouteNames.businessConsole);
         await tester.pumpAndSettle();
 
-        await tester.tap(find.widgetWithText(AppButton, 'My Products'));
+        expect(find.byType(ProductListScreen), findsOneWidget);
+
+        await tester.tap(
+          find.byKey(const Key('business-console-nav-analytics')),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AnalyticsPlaceholderScreen), findsOneWidget);
+        expect(
+          router.routerDelegate.currentConfiguration.uri.toString(),
+          RouteNames.businessAnalyticsPath,
+        );
+
+        await tester.tap(
+          find.byKey(const Key('business-console-nav-products')),
+        );
         await tester.pumpAndSettle();
 
         expect(find.byType(ProductListScreen), findsOneWidget);
+        expect(
+          router.routerDelegate.currentConfiguration.uri.toString(),
+          RouteNames.productListPath,
+        );
       },
     );
   });

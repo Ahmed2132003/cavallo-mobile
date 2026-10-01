@@ -201,12 +201,19 @@ void main() {
     testWidgets(
       'signed in: a protected route is directly reachable, no redirect',
       (tester) async {
+        // Part P-083: this test originally used `businessConsole` as its
+        // example protected route. That route is now Business-only and
+        // `_fakeUser` is a Customer, so it would (correctly) be sent to
+        // /home. The intent here — a signed-in user reaches an ordinary
+        // protected route with no redirect — is unchanged; `search` is
+        // used instead. The Business-only behaviour of /business-console
+        // is covered by business_console_router_gate_test.dart.
         final router = await _pumpRouter(tester, sessionValue: _fakeUser);
 
-        router.goNamed(RouteNames.businessConsole);
+        router.goNamed(RouteNames.search);
         await tester.pumpAndSettle();
 
-        expect(_currentPath(router), RouteNames.businessConsolePath);
+        expect(_currentPath(router), RouteNames.searchPath);
       },
     );
 

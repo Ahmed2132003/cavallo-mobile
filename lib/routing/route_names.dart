@@ -57,6 +57,16 @@
 /// so a future moderation screen added under it is gated automatically.
 /// Neither entry appears in any menu-driven allow-list — gating is done
 /// by the redirect guard itself, not by hiding a link.
+///
+/// ### Part P-083 addition — [storyList] / [businessAnalytics]
+///
+/// The two Business Console destinations that had no route yet. Both
+/// sit under the existing `/business-console` prefix, so the router's
+/// Business-only gate (`app_router.dart`) covers them automatically,
+/// exactly like [productListPath] / [contentListPath]. They are the
+/// roots of branches 2 (Stories) and 3 (Analytics) of the console's
+/// `StatefulShellRoute`. Nothing pre-existing changed: every earlier
+/// constant keeps its name and path.
 class RouteNames {
   RouteNames._();
 
@@ -169,6 +179,17 @@ class RouteNames {
   /// [reelDetail] being reachable before Phase 10's Feed existed.
   static const String storyViewer = 'storyViewer';
 
+  /// Part P-083: the Business Console's own Stories list tab
+  /// (`StoryListScreen`) — the signed-in Business user's own stories.
+  /// Distinct from [storyForm] (the creation form) and [storyViewer]
+  /// (the public, customer-facing viewer).
+  static const String storyList = 'storyList';
+
+  /// Part P-083: the Business Console's Analytics tab. Currently an
+  /// `AnalyticsPlaceholderScreen`; Part P-085 replaces only the builder
+  /// in `app_router.dart`, this route stays as it is.
+  static const String businessAnalytics = 'businessAnalytics';
+
   // --- Route paths (used inside GoRoute(path: ...)) ---
   static const String splashPath = '/';
   static const String loginPath = '/login';
@@ -264,6 +285,14 @@ class RouteNames {
 
   /// Part P-050 — see [storyViewer].
   static const String storyViewerPath = '/stories/:id';
+
+  /// Part P-083 — see [storyList]. Sibling of [storyFormPath]
+  /// (`/business-console/stories/create`); the two don't collide because
+  /// [storyFormPath] is its own top-level route, not a child of this one.
+  static const String storyListPath = '/business-console/stories';
+
+  /// Part P-083 — see [businessAnalytics].
+  static const String businessAnalyticsPath = '/business-console/analytics';
 
   /// Path-parameter key shared by [businessProfilePath], [productDetailPath],
   /// [chatThreadPath], [postDetailPath], [reelDetailPath] and
