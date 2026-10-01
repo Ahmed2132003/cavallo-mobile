@@ -48,6 +48,13 @@ class StoryListScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Stories')),
       floatingActionButton: FloatingActionButton.extended(
         key: const Key('story-list-create-button'),
+        // Explicit hero tag: this screen lives in the Business Console's
+        // IndexedStack next to `ProductListScreen`, whose FAB keeps the
+        // default hero tag. Two default-tag FABs alive in the same
+        // subtree make Flutter assert ("multiple heroes share the same
+        // tag") the moment a route is pushed above the shell (e.g.
+        // Create Story). Caught by business_console_integration_test.
+        heroTag: 'story-list-create',
         onPressed: () {
           context.pushNamed(RouteNames.storyForm);
         },
