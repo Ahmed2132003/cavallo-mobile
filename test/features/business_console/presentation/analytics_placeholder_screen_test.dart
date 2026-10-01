@@ -31,7 +31,10 @@ void main() {
     await _pump(tester);
 
     expect(
-      find.descendant(of: find.byType(AppBar), matching: find.text('Analytics')),
+      find.descendant(
+        of: find.byType(AppBar),
+        matching: find.text('Analytics'),
+      ),
       findsOneWidget,
     );
   });
