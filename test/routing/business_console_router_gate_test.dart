@@ -8,7 +8,8 @@ import 'package:social_commerce_app/core/network/paginated_response.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/login_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
-import 'package:social_commerce_app/features/business_console/presentation/analytics_placeholder_screen.dart';
+import 'package:social_commerce_app/features/business_console/data/analytics_repository.dart';
+import 'package:social_commerce_app/features/business_console/presentation/analytics_screen.dart';
 import 'package:social_commerce_app/features/business_console/presentation/business_console_shell.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_onboarding_screen.dart';
@@ -22,6 +23,7 @@ import 'package:social_commerce_app/features/products/presentation/product_list_
 import 'package:social_commerce_app/main.dart';
 import 'package:social_commerce_app/routing/app_router.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
+import '../features/business_console/fake_analytics_repository.dart';
 
 /// Part P-083 scope: router tests for the Business-only gate on
 /// `/business-console` (and everything under it), plus the console's
@@ -177,6 +179,7 @@ Future<_Pumped> _pumpApp(
         () => _FakeBusinessProfileNotifier(profile, profileBuilds),
       ),
       productRepositoryProvider.overrideWithValue(_FakeProductRepository()),
+      analyticsRepositoryProvider.overrideWithValue(FakeAnalyticsRepository()),
     ],
   );
   addTearDown(container.dispose);
@@ -257,7 +260,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(app.path, RouteNames.businessAnalyticsPath);
-        expect(find.byType(AnalyticsPlaceholderScreen), findsOneWidget);
+        expect(find.byType(AnalyticsScreen), findsOneWidget);
       },
     );
 
@@ -335,7 +338,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(app.path, RouteNames.businessAnalyticsPath);
-        expect(find.byType(AnalyticsPlaceholderScreen), findsOneWidget);
+        expect(find.byType(AnalyticsScreen), findsOneWidget);
 
         await tester.tap(
           find.byKey(const Key('business-console-nav-products')),

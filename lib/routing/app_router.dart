@@ -7,7 +7,7 @@ import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/auth/presentation/session_provider.dart';
 import '../features/auth/presentation/splash_screen.dart';
-import '../features/business_console/presentation/analytics_placeholder_screen.dart';
+import '../features/business_console/presentation/analytics_screen.dart';
 import '../features/business_console/presentation/business_console_shell.dart';
 import '../features/business_profile/presentation/business_onboarding_screen.dart';
 import '../features/business_profile/presentation/business_profile_edit_screen.dart';
@@ -614,7 +614,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: RouteNames.businessAnalyticsPath,
                 name: RouteNames.businessAnalytics,
-                builder: (context, state) => const AnalyticsPlaceholderScreen(),
+                builder: (context, state) => const AnalyticsScreen(),
               ),
             ],
           ),

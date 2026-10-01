@@ -77,14 +77,12 @@ class BusinessConsoleScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   AppButton(
                     label: 'My Products',
-                    onPressed: () =>
-                        context.pushNamed(RouteNames.productList),
+                    onPressed: () => context.pushNamed(RouteNames.productList),
                   ),
                   const SizedBox(height: 16),
                   AppButton(
                     label: 'My Content',
-                    onPressed: () =>
-                        context.pushNamed(RouteNames.contentList),
+                    onPressed: () => context.pushNamed(RouteNames.contentList),
                   ),
                   const SizedBox(height: 16),
                   AppButton(
@@ -94,8 +92,7 @@ class BusinessConsoleScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   AppButton(
                     label: 'Moderation Queue',
-                    onPressed: () =>
-                        context.pushNamed(RouteNames.moderation),
+                    onPressed: () => context.pushNamed(RouteNames.moderation),
                   ),
                   const SizedBox(height: 16),
                   AppButton(

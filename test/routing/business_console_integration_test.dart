@@ -9,7 +9,8 @@ import 'package:go_router/go_router.dart';
 import 'package:social_commerce_app/core/network/paginated_response.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
-import 'package:social_commerce_app/features/business_console/presentation/analytics_placeholder_screen.dart';
+import 'package:social_commerce_app/features/business_console/data/analytics_repository.dart';
+import 'package:social_commerce_app/features/business_console/presentation/analytics_screen.dart';
 import 'package:social_commerce_app/features/business_console/presentation/business_console_shell.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_provider.dart';
@@ -41,6 +42,8 @@ import 'package:social_commerce_app/features/stories/presentation/story_upload_q
 import 'package:social_commerce_app/main.dart';
 import 'package:social_commerce_app/routing/app_router.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
+
+import '../features/business_console/fake_analytics_repository.dart';
 
 /// Part P-083 (Chat 4, phase B): end-to-end router integration test for
 /// the Business Console.
@@ -243,6 +246,9 @@ Future<_App> _pumpApp(
       ownStoriesRepositoryProvider.overrideWithValue(
         _FakeOwnStoriesRepository(),
       ),
+      analyticsRepositoryProvider.overrideWithValue(
+        FakeAnalyticsRepository(stats: knownTrendStats()),
+      ),
       storyCreationRepositoryProvider.overrideWithValue(
         _NeverCompletesCreationRepository(),
       ),
@@ -327,7 +333,7 @@ const _destinations = <_Destination>[
     navKey: _navAnalytics,
     index: 3,
     path: RouteNames.businessAnalyticsPath,
-    screen: AnalyticsPlaceholderScreen,
+    screen: AnalyticsScreen,
     appBarTitle: 'Analytics',
   ),
 ];
@@ -397,7 +403,8 @@ void main() {
 
     testWidgets(
       'the Stories tab shows the real StoryListScreen (empty state + the '
-      'Create Story button) and Analytics shows the placeholder',
+      'Create Story button) and Analytics shows the real AnalyticsScreen '
+      '(P-085: the P-083 placeholder is gone)',
       (tester) async {
         final app = await _pumpApp(tester, user: _business, profile: _profile);
         await _enterConsole(tester, app);
@@ -410,11 +417,22 @@ void main() {
         );
 
         await _openTab(tester, _navAnalytics);
+        expect(find.byType(AnalyticsScreen), findsOneWidget);
         expect(
           find.byKey(const ValueKey('business-analytics-placeholder')),
+          findsNothing,
+        );
+        expect(find.text('Analytics coming soon'), findsNothing);
+        // Real data from the fake: the totals are the sum of the three
+        // known rows (followers 1+2+3).
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('analytics-total-new-followers')),
+            matching: find.text('6'),
+            matchRoot: true,
+          ),
           findsOneWidget,
         );
-        expect(find.text('Analytics coming soon'), findsOneWidget);
       },
     );
 

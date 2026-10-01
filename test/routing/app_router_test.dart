@@ -11,7 +11,8 @@ import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/login_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/register_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
-import 'package:social_commerce_app/features/business_console/presentation/analytics_placeholder_screen.dart';
+import 'package:social_commerce_app/features/business_console/data/analytics_repository.dart';
+import 'package:social_commerce_app/features/business_console/presentation/analytics_screen.dart';
 import 'package:social_commerce_app/features/business_console/presentation/business_console_shell.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_public_screen.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
@@ -35,6 +36,7 @@ import 'package:social_commerce_app/features/search/presentation/search_screen.d
 import 'package:social_commerce_app/routing/app_router.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
 import '../features/notifications/fake_notification_repository.dart';
+import '../features/business_console/fake_analytics_repository.dart';
 
 /// A [SessionNotifier] whose [build] resolves immediately to a fixed
 /// value. Duplicated here (rather than imported) from
@@ -770,6 +772,9 @@ void main() {
             productRepositoryProvider.overrideWithValue(
               _FakeProductRepository(),
             ),
+            analyticsRepositoryProvider.overrideWithValue(
+              FakeAnalyticsRepository(),
+            ),
           ],
         );
         router.goNamed(RouteNames.businessConsole);
@@ -782,7 +787,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byType(AnalyticsPlaceholderScreen), findsOneWidget);
+        expect(find.byType(AnalyticsScreen), findsOneWidget);
         expect(
           router.routerDelegate.currentConfiguration.uri.toString(),
           RouteNames.businessAnalyticsPath,
