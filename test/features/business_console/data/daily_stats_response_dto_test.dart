@@ -4,7 +4,9 @@ import 'package:social_commerce_app/features/business_console/domain/daily_stats
 
 /// Part P-085 scope. The JSON below is the literal row shape produced by
 /// P-084's `BusinessDailyStatsSerializer` (fields: date, new_followers,
-/// total_likes_received, total_comments_received, total_story_views).
+/// total_likes_received, total_comments_received, total_story_views,
+/// new_ratings_count, average_rating_snapshot, active_products_count,
+/// published_posts_count, published_reels_count).
 void main() {
   Map<String, dynamic> row({
     Object? date = '2026-10-01',
@@ -12,12 +14,22 @@ void main() {
     Object? likes = 12,
     Object? comments = 4,
     Object? storyViews = 27,
+    Object? newRatings = 2,
+    Object? averageRating = '4.50',
+    Object? activeProducts = 8,
+    Object? publishedPosts = 5,
+    Object? publishedReels = 3,
   }) => {
     'date': date,
     'new_followers': newFollowers,
     'total_likes_received': likes,
     'total_comments_received': comments,
     'total_story_views': storyViews,
+    'new_ratings_count': newRatings,
+    'average_rating_snapshot': averageRating,
+    'active_products_count': activeProducts,
+    'published_posts_count': publishedPosts,
+    'published_reels_count': publishedReels,
   };
 
   group('DailyStatsResponseDto.fromJson / toEntity', () {
@@ -32,6 +44,11 @@ void main() {
           totalLikesReceived: 12,
           totalCommentsReceived: 4,
           totalStoryViews: 27,
+          newRatingsCount: 2,
+          averageRatingSnapshot: 4.5,
+          activeProductsCount: 8,
+          publishedPostsCount: 5,
+          publishedReelsCount: 3,
         ),
       );
     });
@@ -64,7 +81,7 @@ void main() {
       final entity = DailyStatsResponseDto.fromJson(json).toEntity();
 
       expect(entity.toString(), isNot(contains('999')));
-      expect(entity.toString().toLowerCase(), isNot(contains('product')));
+      expect(entity.toString().toLowerCase(), isNot(contains('productview')));
     });
 
     for (final key in const [
@@ -73,6 +90,11 @@ void main() {
       'total_likes_received',
       'total_comments_received',
       'total_story_views',
+      'new_ratings_count',
+      'average_rating_snapshot',
+      'active_products_count',
+      'published_posts_count',
+      'published_reels_count',
     ]) {
       test('missing "$key" throws FormatException (never defaults to 0)', () {
         final json = row()..remove(key);
@@ -92,6 +114,56 @@ void main() {
         );
       });
     }
+
+    test('the rating snapshot is parsed from the DRF decimal string', () {
+      final entity =
+          DailyStatsResponseDto.fromJson(
+            row(averageRating: '4.25'),
+          ).toEntity();
+      final unrated =
+          DailyStatsResponseDto.fromJson(
+            row(averageRating: '0.00'),
+          ).toEntity();
+
+      expect(entity.averageRatingSnapshot, 4.25);
+      expect(unrated.averageRatingSnapshot, 0.0);
+    });
+
+    test('the rating snapshot also accepts a plain JSON number', () {
+      expect(
+        DailyStatsResponseDto.fromJson(
+          row(averageRating: 4.5),
+        ).toEntity().averageRatingSnapshot,
+        4.5,
+      );
+      expect(
+        DailyStatsResponseDto.fromJson(
+          row(averageRating: 4),
+        ).toEntity().averageRatingSnapshot,
+        4.0,
+      );
+    });
+
+    test('an invalid rating snapshot throws FormatException', () {
+      for (final bad in const <Object>['abc', 'NaN', '5.01', '-1.00', '', true]) {
+        expect(
+          () => DailyStatsResponseDto.fromJson(row(averageRating: bad)),
+          throwsFormatException,
+          reason: 'rating "$bad" must be rejected',
+        );
+      }
+    });
+
+    test('a P-093 count sent as a string throws FormatException', () {
+      expect(
+        () => DailyStatsResponseDto.fromJson(row(publishedPosts: '5')),
+        throwsFormatException,
+      );
+      expect(
+        () => DailyStatsResponseDto.fromJson(row(newRatings: '2')),
+        throwsFormatException,
+      );
+    });
 
     test('a metric sent as a string throws FormatException', () {
       expect(

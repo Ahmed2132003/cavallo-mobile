@@ -14,6 +14,11 @@ DailyStats _row(int day, int followers, int likes, int comments, int views) {
     totalLikesReceived: likes,
     totalCommentsReceived: comments,
     totalStoryViews: views,
+    newRatingsCount: 0,
+    averageRatingSnapshot: 0.0,
+    activeProductsCount: 0,
+    publishedPostsCount: 0,
+    publishedReelsCount: 0,
   );
 }
 

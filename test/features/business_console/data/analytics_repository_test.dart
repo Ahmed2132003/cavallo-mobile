@@ -23,12 +23,22 @@ void main() {
     int likes = 0,
     int comments = 0,
     int storyViews = 0,
+    int newRatings = 0,
+    String averageRating = '0.00',
+    int activeProducts = 0,
+    int publishedPosts = 0,
+    int publishedReels = 0,
   }) => {
     'date': date,
     'new_followers': followers,
     'total_likes_received': likes,
     'total_comments_received': comments,
     'total_story_views': storyViews,
+    'new_ratings_count': newRatings,
+    'average_rating_snapshot': averageRating,
+    'active_products_count': activeProducts,
+    'published_posts_count': publishedPosts,
+    'published_reels_count': publishedReels,
   };
 
   setUp(() {
@@ -63,6 +73,11 @@ void main() {
               likes: 9,
               comments: 2,
               storyViews: 30,
+              newRatings: 2,
+              averageRating: '4.25',
+              activeProducts: 8,
+              publishedPosts: 5,
+              publishedReels: 3,
             ),
             row('2026-10-02', followers: 1, likes: 4),
             row('2026-10-01', followers: 0),
@@ -90,6 +105,11 @@ void main() {
           totalLikesReceived: 9,
           totalCommentsReceived: 2,
           totalStoryViews: 30,
+          newRatingsCount: 2,
+          averageRatingSnapshot: 4.25,
+          activeProductsCount: 8,
+          publishedPostsCount: 5,
+          publishedReelsCount: 3,
         ),
       );
     });

@@ -8,6 +8,11 @@ DailyStats _row(
   int likes = 0,
   int comments = 0,
   int views = 0,
+  int newRatings = 0,
+  double rating = 0.0,
+  int products = 0,
+  int posts = 0,
+  int reels = 0,
 }) {
   return DailyStats(
     date: DateTime(2026, 9, day),
@@ -15,6 +20,11 @@ DailyStats _row(
     totalLikesReceived: likes,
     totalCommentsReceived: comments,
     totalStoryViews: views,
+    newRatingsCount: newRatings,
+    averageRatingSnapshot: rating,
+    activeProductsCount: products,
+    publishedPostsCount: posts,
+    publishedReelsCount: reels,
   );
 }
 

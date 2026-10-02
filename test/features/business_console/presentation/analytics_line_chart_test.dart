@@ -11,6 +11,11 @@ DailyStats _row(DateTime date, int followers) {
     totalLikesReceived: 0,
     totalCommentsReceived: 0,
     totalStoryViews: 0,
+    newRatingsCount: 0,
+    averageRatingSnapshot: 0.0,
+    activeProductsCount: 0,
+    publishedPostsCount: 0,
+    publishedReelsCount: 0,
   );
 }
 

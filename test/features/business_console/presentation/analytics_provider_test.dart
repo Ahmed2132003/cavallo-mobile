@@ -53,6 +53,11 @@ DailyStats _day(int day, {int followers = 0, int likes = 0}) => DailyStats(
   totalLikesReceived: likes,
   totalCommentsReceived: 0,
   totalStoryViews: 0,
+  newRatingsCount: 0,
+  averageRatingSnapshot: 0.0,
+  activeProductsCount: 0,
+  publishedPostsCount: 0,
+  publishedReelsCount: 0,
 );
 
 ProviderContainer _container({
