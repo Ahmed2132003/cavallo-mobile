@@ -30,6 +30,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/featured_badge.dart';
 import '../../business_profile/domain/business_profile_entity.dart';
 import '../../products/domain/product_entity.dart';
 import '../../products/presentation/product_price_framing.dart';
@@ -111,6 +112,11 @@ class _BusinessResultRow extends StatelessWidget {
                             color: theme.colorScheme.primary,
                           ),
                         ],
+                        // Part P-110: display-only Featured badge.
+                        if (business.isFeatured) ...[
+                          const SizedBox(width: 6),
+                          const FeaturedBadge(),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -165,11 +171,23 @@ class _ProductResultRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      product.name,
-                      style: theme.textTheme.titleMedium,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            product.name,
+                            style: theme.textTheme.titleMedium,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        // Part P-110: display-only; reflects whether the
+                        // OWNING BUSINESS is Featured.
+                        if (product.isFeatured) ...[
+                          const SizedBox(width: 6),
+                          const FeaturedBadge(),
+                        ],
+                      ],
                     ),
                     const SizedBox(height: 6),
                     // The ONLY place this row renders a price — always

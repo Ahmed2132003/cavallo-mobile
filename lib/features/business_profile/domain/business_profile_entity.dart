@@ -103,6 +103,7 @@ class BusinessProfile {
     this.categoryId,
     required this.isVerified,
     this.followerCount = 0,
+    this.isFeatured = false,
   });
 
   final int id;
@@ -137,6 +138,11 @@ class BusinessProfile {
   /// docstring), not because any UI depends on a real value yet.
   final int followerCount;
 
+  /// Part P-110: whether this business currently has Featured status
+  /// (real state from P-087). Read-only and display-only: nothing in
+  /// this app can set it or start a purchase (ADR-006).
+  final bool isFeatured;
+
   BusinessProfile copyWith({
     int? id,
     String? businessName,
@@ -148,6 +154,7 @@ class BusinessProfile {
     int? categoryId,
     bool? isVerified,
     int? followerCount,
+    bool? isFeatured,
   }) {
     return BusinessProfile(
       id: id ?? this.id,
@@ -160,6 +167,7 @@ class BusinessProfile {
       categoryId: categoryId ?? this.categoryId,
       isVerified: isVerified ?? this.isVerified,
       followerCount: followerCount ?? this.followerCount,
+      isFeatured: isFeatured ?? this.isFeatured,
     );
   }
 
@@ -176,7 +184,8 @@ class BusinessProfile {
           other.phoneNumber == phoneNumber &&
           other.categoryId == categoryId &&
           other.isVerified == isVerified &&
-          other.followerCount == followerCount);
+          other.followerCount == followerCount &&
+          other.isFeatured == isFeatured);
 
   @override
   int get hashCode => Object.hash(
@@ -190,11 +199,13 @@ class BusinessProfile {
     categoryId,
     isVerified,
     followerCount,
+    isFeatured,
   );
 
   @override
   String toString() =>
       'BusinessProfile(id: $id, businessName: $businessName, '
       'businessType: $businessType, country: $country, city: $city, '
-      'categoryId: $categoryId, isVerified: $isVerified)';
+      'categoryId: $categoryId, isVerified: $isVerified, '
+      'isFeatured: $isFeatured)';
 }

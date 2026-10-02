@@ -35,6 +35,7 @@ class PublicPost {
     this.isSaved = false,
     this.createdAt,
     this.updatedAt,
+    this.isFeatured = false,
   });
 
   final int id;
@@ -68,6 +69,11 @@ class PublicPost {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
+  /// Part P-110: whether the OWNING BUSINESS is Featured (real P-087
+  /// state via the backend's business join). Display-only; defaults to
+  /// false so existing fixtures that build this entity keep compiling.
+  final bool isFeatured;
+
   PublicPost copyWith({
     int? id,
     int? businessId,
@@ -80,6 +86,7 @@ class PublicPost {
     bool? isSaved,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? isFeatured,
   }) {
     return PublicPost(
       id: id ?? this.id,
@@ -93,6 +100,7 @@ class PublicPost {
       isSaved: isSaved ?? this.isSaved,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isFeatured: isFeatured ?? this.isFeatured,
     );
   }
 
@@ -110,7 +118,8 @@ class PublicPost {
           other.isLiked == isLiked &&
           other.isSaved == isSaved &&
           other.createdAt == createdAt &&
-          other.updatedAt == updatedAt);
+          other.updatedAt == updatedAt &&
+          other.isFeatured == isFeatured);
 
   @override
   int get hashCode => Object.hash(
@@ -125,6 +134,7 @@ class PublicPost {
     isSaved,
     createdAt,
     updatedAt,
+    isFeatured,
   );
 
   @override

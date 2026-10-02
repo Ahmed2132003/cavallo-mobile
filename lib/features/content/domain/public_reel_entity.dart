@@ -28,6 +28,7 @@ class PublicReel {
     this.isSaved = false,
     this.createdAt,
     this.updatedAt,
+    this.isFeatured = false,
   });
 
   final int id;
@@ -67,6 +68,11 @@ class PublicReel {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
+  /// Part P-110: whether the OWNING BUSINESS is Featured (real P-087
+  /// state via the backend's business join). Display-only; defaults to
+  /// false so existing fixtures that build this entity keep compiling.
+  final bool isFeatured;
+
   PublicReel copyWith({
     int? id,
     int? businessId,
@@ -81,6 +87,7 @@ class PublicReel {
     bool? isSaved,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? isFeatured,
   }) {
     return PublicReel(
       id: id ?? this.id,
@@ -96,6 +103,7 @@ class PublicReel {
       isSaved: isSaved ?? this.isSaved,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isFeatured: isFeatured ?? this.isFeatured,
     );
   }
 
@@ -115,7 +123,8 @@ class PublicReel {
           other.isLiked == isLiked &&
           other.isSaved == isSaved &&
           other.createdAt == createdAt &&
-          other.updatedAt == updatedAt);
+          other.updatedAt == updatedAt &&
+          other.isFeatured == isFeatured);
 
   @override
   int get hashCode => Object.hash(
@@ -132,6 +141,7 @@ class PublicReel {
     isSaved,
     createdAt,
     updatedAt,
+    isFeatured,
   );
 
   @override

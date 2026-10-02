@@ -72,6 +72,7 @@ class BusinessProfilePublicRepositoryImpl
       categoryId: dto.categoryId,
       isVerified: dto.isVerified,
       followerCount: dto.followerCount,
+      isFeatured: dto.isFeatured,
     );
   }
 }

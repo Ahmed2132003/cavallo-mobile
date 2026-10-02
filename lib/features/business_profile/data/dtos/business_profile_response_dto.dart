@@ -28,6 +28,7 @@ class BusinessProfileResponseDto {
     required this.categoryId,
     required this.isVerified,
     required this.followerCount,
+    this.isFeatured = false,
   });
 
   factory BusinessProfileResponseDto.fromJson(Map<String, dynamic> json) {
@@ -61,6 +62,9 @@ class BusinessProfileResponseDto {
       categoryId: json['category'] as int?,
       isVerified: json['is_verified'] as bool,
       followerCount: (json['follower_count'] as num?)?.toInt() ?? 0,
+      // Part P-110: defensive default. The public profile read is cached
+      // server-side for 5 min, so an older cached payload may lack the key.
+      isFeatured: (json['is_featured'] as bool?) ?? false,
     );
   }
 
@@ -75,6 +79,9 @@ class BusinessProfileResponseDto {
   final bool isVerified;
   final int followerCount;
 
+  /// Part P-110: read-only Featured flag (P-087), display-only.
+  final bool isFeatured;
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'business_name': businessName,
@@ -86,5 +93,6 @@ class BusinessProfileResponseDto {
     'category': categoryId,
     'is_verified': isVerified,
     'follower_count': followerCount,
+    'is_featured': isFeatured,
   };
 }

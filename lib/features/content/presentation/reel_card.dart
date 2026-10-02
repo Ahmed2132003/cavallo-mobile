@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/featured_badge.dart';
 import '../domain/public_reel_entity.dart';
 import '../../social/presentation/content_action_row.dart';
 import '../../social/presentation/content_overflow_menu.dart';
@@ -51,6 +52,13 @@ class ReelCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  // Part P-110: display-only; shown when the OWNING
+                  // business is Featured. Every caller (Home feed, Discover,
+                  // chat shares, business profile) inherits it from here.
+                  if (reel.isFeatured) ...[
+                    const SizedBox(width: 6),
+                    const FeaturedBadge(),
+                  ],
                   ContentOverflowMenu(contentType: 'reel', objectId: reel.id),
                 ],
               ),
