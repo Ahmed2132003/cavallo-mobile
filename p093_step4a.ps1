@@ -1,3 +1,395 @@
+# p093_step4a.ps1  --  run from D:\Cavallo\social_commerce_app  (branch part-083)
+$ErrorActionPreference = 'Stop'
+
+if (-not (Test-Path .\pubspec.yaml) -or -not (Test-Path .\lib\features\business_console\domain\daily_stats_entity.dart)) {
+    throw 'Run this script from D:\Cavallo\social_commerce_app (pubspec.yaml / business_console not found).'
+}
+$branch = (git rev-parse --abbrev-ref HEAD).Trim()
+if ($branch -ne 'part-083') {
+    throw "Current branch is '$branch' but the P-085 analytics code lives on 'part-083'. Run: git checkout part-083"
+}
+$entText = [IO.File]::ReadAllText((Join-Path (Get-Location).Path 'lib\features\business_console\domain\daily_stats_entity.dart'))
+if (-not $entText.Contains('required this.newRatingsCount')) {
+    throw 'STEP 3 is not applied (the entity has no P-093 fields). Apply p093_step3a.ps1 first.'
+}
+
+$utf8 = New-Object System.Text.UTF8Encoding($false)
+
+function ConvertTo-Eol([string]$s, [string]$eol) {
+    $lf = $s -replace "`r?`n", "`n"
+    if ($eol -eq 'CRLF') { return $lf -replace "`n", "`r`n" }
+    return $lf
+}
+
+# Replaces a WHOLE file with the content below. Refuses to run if the file
+# has local uncommitted changes (so nothing of yours is overwritten).
+function Write-WholeFile {
+    param([string]$Path, [string]$Content)
+    git diff --quiet -- $Path
+    if ($LASTEXITCODE -ne 0) {
+        throw "$Path has uncommitted local changes. Commit or stash them first."
+    }
+    $full = Join-Path (Get-Location).Path $Path
+    [IO.File]::WriteAllText($full, (ConvertTo-Eol $Content 'CRLF'), $utf8)
+    Write-Host "WROTE: $Path"
+}
+
+Write-WholeFile -Path 'lib\features\business_console\presentation\analytics_line_chart.dart' -Content @'
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+
+import '../domain/daily_stats_entity.dart';
+
+/// Part P-085 scope: one single-metric line chart over the rows the
+/// backend returned. P-093 generalises it so the same widget also draws the
+/// average-rating trend.
+///
+/// * **No zero-fill (E3).** One point per returned row. The X position is
+///   the real calendar offset from the first row, so a missing day shows
+///   up as a visible gap in the line, not as a fabricated 0.
+/// * **Y starts at 0.** By default the top follows the data and ticks are
+///   whole numbers (counts). A caller can pin the top with [fixedMaxY] and
+///   the tick spacing with [yInterval] (the rating trend uses 5 and 1).
+/// * **Readable X axis.** At most ~5 date labels (`d/M`), whatever the
+///   period, so 30 days never crowd.
+/// * **A single row** is drawn as one visible dot.
+///
+/// [rows] must be sorted ascending by date (the data layer guarantees it).
+class AnalyticsLineChart extends StatelessWidget {
+  const AnalyticsLineChart({
+    super.key,
+    required this.title,
+    required this.semanticsLabel,
+    required this.rows,
+    required this.valueOf,
+    this.color,
+    this.fixedMaxY,
+    this.yInterval,
+  });
+
+  /// Heading shown above the chart.
+  final String title;
+
+  /// Text summary read by screen readers instead of the drawing, e.g.
+  /// "New followers: 14 total over 7 days".
+  final String semanticsLabel;
+
+  final List<DailyStats> rows;
+
+  /// Picks the single metric this chart plots from a row (a count or a
+  /// decimal such as a rating).
+  final num Function(DailyStats row) valueOf;
+
+  final Color? color;
+
+  /// Pins the top of the Y axis (e.g. 5 for a 1-5 star rating). When null
+  /// the top is derived from the data.
+  final double? fixedMaxY;
+
+  /// Pins the Y tick spacing. Only used together with [fixedMaxY]; when
+  /// null it defaults to 1.
+  final double? yInterval;
+
+  /// Whole days between the calendar dates of [a] and [b], DST-safe.
+  static int dayOffset(DateTime a, DateTime b) {
+    final first = DateTime.utc(a.year, a.month, a.day);
+    final second = DateTime.utc(b.year, b.month, b.day);
+    return second.difference(first).inDays;
+  }
+
+  /// The plotted points: X = day offset from the first row, Y = metric.
+  static List<FlSpot> spotsFor(
+    List<DailyStats> rows,
+    num Function(DailyStats row) valueOf,
+  ) {
+    if (rows.isEmpty) return const [];
+    final first = rows.first.date;
+    return [
+      for (final row in rows)
+        FlSpot(dayOffset(first, row.date).toDouble(), valueOf(row).toDouble()),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final lineColor = color ?? theme.colorScheme.primary;
+    final spots = spotsFor(rows, valueOf);
+
+    final span = spots.isEmpty ? 0.0 : spots.last.x;
+    final maxX = span == 0 ? 1.0 : span;
+    final xInterval = (span / 4).ceil().clamp(1, 1 << 20).toDouble();
+
+    final pinnedMax = fixedMaxY;
+    final maxValue = spots.fold<double>(0, (m, s) => s.y > m ? s.y : m);
+    final double yStep;
+    final double maxY;
+    if (pinnedMax != null) {
+      yStep = yInterval ?? 1.0;
+      maxY = pinnedMax;
+    } else {
+      yStep = maxValue <= 4 ? 1.0 : (maxValue / 4).ceilToDouble();
+      maxY = yStep * 4;
+    }
+
+    final labelStyle = theme.textTheme.labelSmall;
+
+    return Semantics(
+      container: true,
+      label: semanticsLabel,
+      child: ExcludeSemantics(
+        child: Card(
+          margin: EdgeInsets.zero,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 4, bottom: 12),
+                  child: Text(title, style: theme.textTheme.titleSmall),
+                ),
+                SizedBox(
+                  height: 180,
+                  child: LineChart(
+                    LineChartData(
+                      minX: 0,
+                      maxX: maxX,
+                      minY: 0,
+                      maxY: maxY,
+                      gridData: FlGridData(
+                        drawVerticalLine: false,
+                        horizontalInterval: yStep,
+                      ),
+                      borderData: FlBorderData(show: false),
+                      titlesData: FlTitlesData(
+                        topTitles: const AxisTitles(),
+                        rightTitles: const AxisTitles(),
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 32,
+                            interval: yStep,
+                            getTitlesWidget:
+                                (value, meta) => Text(
+                                  value.round().toString(),
+                                  style: labelStyle,
+                                ),
+                          ),
+                        ),
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 28,
+                            interval: xInterval,
+                            getTitlesWidget: (value, meta) {
+                              if (rows.isEmpty || value > span + 0.001) {
+                                return const SizedBox.shrink();
+                              }
+                              final date = DateTime.utc(
+                                rows.first.date.year,
+                                rows.first.date.month,
+                                rows.first.date.day,
+                              ).add(Duration(days: value.round()));
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  '${date.day}/${date.month}',
+                                  style: labelStyle,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      lineBarsData: [
+                        LineChartBarData(
+                          spots: spots,
+                          isCurved: false,
+                          barWidth: 3,
+                          color: lineColor,
+                          dotData: FlDotData(show: spots.length <= 14),
+                          belowBarData: BarAreaData(
+                            show: true,
+                            color: lineColor.withValues(alpha: 0.12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+'@
+
+Write-WholeFile -Path 'lib\features\business_console\presentation\analytics_summary.dart' -Content @'
+import '../domain/daily_stats_entity.dart';
+
+/// Part P-085 scope: pure (Flutter-free) helpers that turn the rows the
+/// backend returned into the numbers the Analytics screen shows.
+///
+/// Decision E3: these helpers only ever look at the rows they are given.
+/// A day the backend returned no row for is NOT counted as a zero here -
+/// the rollup may simply not have run for it, so a zero would be an
+/// unconfirmed claim.
+class AnalyticsTotals {
+  const AnalyticsTotals({
+    required this.newFollowers,
+    required this.likesReceived,
+    required this.commentsReceived,
+    required this.storyViews,
+  });
+
+  /// Sum of `new_followers` over the returned rows.
+  final int newFollowers;
+
+  /// Sum of `total_likes_received` over the returned rows.
+  final int likesReceived;
+
+  /// Sum of `total_comments_received` over the returned rows.
+  final int commentsReceived;
+
+  /// Sum of `total_story_views` over the returned rows.
+  final int storyViews;
+
+  @override
+  bool operator ==(Object other) =>
+      other is AnalyticsTotals &&
+      other.newFollowers == newFollowers &&
+      other.likesReceived == likesReceived &&
+      other.commentsReceived == commentsReceived &&
+      other.storyViews == storyViews;
+
+  @override
+  int get hashCode =>
+      Object.hash(newFollowers, likesReceived, commentsReceived, storyViews);
+
+  @override
+  String toString() =>
+      'AnalyticsTotals(newFollowers: $newFollowers, likesReceived: '
+      '$likesReceived, commentsReceived: $commentsReceived, '
+      'storyViews: $storyViews)';
+}
+
+/// Sums the four tracked metrics across [rows]. An empty list sums to
+/// all zeros (the screen shows its empty state instead of these).
+AnalyticsTotals sumDailyStats(List<DailyStats> rows) {
+  var newFollowers = 0;
+  var likes = 0;
+  var comments = 0;
+  var storyViews = 0;
+  for (final row in rows) {
+    newFollowers += row.newFollowers;
+    likes += row.totalLikesReceived;
+    comments += row.totalCommentsReceived;
+    storyViews += row.totalStoryViews;
+  }
+  return AnalyticsTotals(
+    newFollowers: newFollowers,
+    likesReceived: likes,
+    commentsReceived: comments,
+    storyViews: storyViews,
+  );
+}
+
+/// How many distinct calendar days [rows] covers - the "X" in
+/// "Days with data: X of N". Duplicated dates count once.
+int daysWithData(List<DailyStats> rows) {
+  final days = <(int, int, int)>{
+    for (final row in rows) (row.date.year, row.date.month, row.date.day),
+  };
+  return days.length;
+}
+
+/// Part P-093: the rating numbers the Analytics screen shows.
+///
+/// * [newRatings] is the sum of `new_ratings_count` over the returned rows
+///   (rows only, like every other total here).
+/// * [latestAverage] is the most recent row's rating snapshot that is above
+///   zero, or null when no returned row has one. The backend stores 0 for
+///   "not rated yet" (a real average is never below 1), so 0 is never shown
+///   as a rating.
+class RatingSummary {
+  const RatingSummary({
+    required this.newRatings,
+    required this.latestAverage,
+    required this.latestAverageDate,
+  });
+
+  final int newRatings;
+  final double? latestAverage;
+  final DateTime? latestAverageDate;
+}
+
+/// Sums new ratings and finds the latest real rating snapshot in [rows].
+/// Does not rely on [rows] being sorted.
+RatingSummary summarizeRatings(List<DailyStats> rows) {
+  var newRatings = 0;
+  DailyStats? latestRated;
+  for (final row in rows) {
+    newRatings += row.newRatingsCount;
+    if (row.averageRatingSnapshot > 0 &&
+        (latestRated == null || row.date.isAfter(latestRated.date))) {
+      latestRated = row;
+    }
+  }
+  return RatingSummary(
+    newRatings: newRatings,
+    latestAverage: latestRated?.averageRatingSnapshot,
+    latestAverageDate: latestRated?.date,
+  );
+}
+
+/// The rows that carry a real rating snapshot (above zero), in their
+/// original order. These are the only rows the rating trend plots: a 0
+/// snapshot means "not rated yet", never a rating of zero.
+List<DailyStats> ratedRows(List<DailyStats> rows) => [
+  for (final row in rows)
+    if (row.averageRatingSnapshot > 0) row,
+];
+
+/// Part P-093: the three catalog-size snapshots of one row, with the date
+/// they were recorded for.
+class CatalogSnapshot {
+  const CatalogSnapshot({
+    required this.asOf,
+    required this.activeProducts,
+    required this.publishedPosts,
+    required this.publishedReels,
+  });
+
+  final DateTime asOf;
+  final int activeProducts;
+  final int publishedPosts;
+  final int publishedReels;
+}
+
+/// The catalog snapshot of the most recent row in [rows], or null for an
+/// empty list. These are totals as of the rollup run, so they are read from
+/// ONE row (the latest) and never summed across days. Does not rely on
+/// [rows] being sorted.
+CatalogSnapshot? latestCatalogSnapshot(List<DailyStats> rows) {
+  if (rows.isEmpty) return null;
+  var latest = rows.first;
+  for (final row in rows) {
+    if (row.date.isAfter(latest.date)) latest = row;
+  }
+  return CatalogSnapshot(
+    asOf: latest.date,
+    activeProducts: latest.activeProductsCount,
+    publishedPosts: latest.publishedPostsCount,
+    publishedReels: latest.publishedReelsCount,
+  );
+}
+'@
+
+Write-WholeFile -Path 'lib\features\business_console\presentation\analytics_screen.dart' -Content @'
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -449,3 +841,7 @@ class _ErrorView extends StatelessWidget {
     );
   }
 }
+'@
+
+Write-Host ''
+Write-Host 'P-093 STEP4A script finished.'

@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:social_commerce_app/features/business_console/domain/daily_stats_entity.dart';
 import 'package:social_commerce_app/features/business_console/presentation/analytics_line_chart.dart';
 
-DailyStats _row(DateTime date, int followers) {
+DailyStats _row(DateTime date, int followers, {double rating = 0.0}) {
   return DailyStats(
     date: date,
     newFollowers: followers,
@@ -12,7 +12,7 @@ DailyStats _row(DateTime date, int followers) {
     totalCommentsReceived: 0,
     totalStoryViews: 0,
     newRatingsCount: 0,
-    averageRatingSnapshot: 0.0,
+    averageRatingSnapshot: rating,
     activeProductsCount: 0,
     publishedPostsCount: 0,
     publishedReelsCount: 0,
@@ -103,6 +103,44 @@ void main() {
       findsOneWidget,
     );
     handle.dispose();
+  });
+
+  testWidgets('P-093: a decimal metric with a pinned 0-5 axis', (tester) async {
+    final rated = [
+      _row(DateTime(2026, 9, 1), 0, rating: 4.0),
+      _row(DateTime(2026, 9, 2), 0, rating: 4.5),
+    ];
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: AnalyticsLineChart(
+              title: 'Average rating by day',
+              semanticsLabel: 'Average rating: latest 4.50 over 7 days',
+              rows: rated,
+              valueOf: (row) => row.averageRatingSnapshot,
+              fixedMaxY: 5,
+              yInterval: 1,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final chart = tester.widget<LineChart>(find.byType(LineChart));
+    expect(chart.data.lineBarsData.single.spots.map((s) => s.y), [4.0, 4.5]);
+    expect(chart.data.minY, 0);
+    expect(chart.data.maxY, 5);
+    expect(chart.data.gridData.horizontalInterval, 1);
+    expect(tester.takeException(), isNull);
+  });
+
+  test('spotsFor keeps decimal values', () {
+    final spots = AnalyticsLineChart.spotsFor([
+      _row(DateTime(2026, 9, 1), 0, rating: 3.25),
+    ], (row) => row.averageRatingSnapshot);
+    expect(spots.single.y, 3.25);
   });
 
   test('dayOffset ignores time of day', () {

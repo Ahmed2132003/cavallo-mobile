@@ -65,7 +65,7 @@ void main() {
   });
 
   group('daysWithData', () {
-    test('counts returned rows only — gaps are not filled', () {
+    test('counts returned rows only - gaps are not filled', () {
       // Days 1, 2 and 6 returned; days 3-5 have no row.
       expect(daysWithData([_row(1), _row(2), _row(6)]), 3);
     });
@@ -77,6 +77,90 @@ void main() {
 
     test('a duplicated date counts once', () {
       expect(daysWithData([_row(1), _row(1)]), 1);
+    });
+  });
+
+  group('summarizeRatings (P-093)', () {
+    test('sums new ratings and takes the latest real snapshot', () {
+      final summary = summarizeRatings([
+        _row(1, newRatings: 1, rating: 4.0),
+        _row(2, newRatings: 0, rating: 4.0),
+        _row(3, newRatings: 2, rating: 4.5),
+      ]);
+      expect(summary.newRatings, 3);
+      expect(summary.latestAverage, 4.5);
+      expect(summary.latestAverageDate, DateTime(2026, 9, 3));
+    });
+
+    test('a snapshot of 0 (not rated yet) is never the latest average', () {
+      final summary = summarizeRatings([
+        _row(1, newRatings: 1, rating: 4.0),
+        _row(2),
+      ]);
+      expect(summary.latestAverage, 4.0);
+      expect(summary.latestAverageDate, DateTime(2026, 9, 1));
+    });
+
+    test('no rated row means no average, and empty means zero', () {
+      final unrated = summarizeRatings([_row(1), _row(2)]);
+      expect(unrated.latestAverage, isNull);
+      expect(unrated.latestAverageDate, isNull);
+      expect(unrated.newRatings, 0);
+      expect(summarizeRatings(const []).latestAverage, isNull);
+    });
+
+    test('does not rely on the rows being sorted', () {
+      final summary = summarizeRatings([
+        _row(3, rating: 4.5),
+        _row(1, rating: 4.0),
+      ]);
+      expect(summary.latestAverage, 4.5);
+    });
+  });
+
+  group('ratedRows (P-093)', () {
+    test('keeps only rows with a real snapshot, in order', () {
+      final rows = [_row(1), _row(2, rating: 4.0), _row(3, rating: 4.5)];
+      final rated = ratedRows(rows);
+      expect(rated.map((r) => r.date.day), [2, 3]);
+    });
+
+    test('nothing rated gives an empty list', () {
+      expect(ratedRows([_row(1), _row(2)]), isEmpty);
+    });
+  });
+
+  group('latestCatalogSnapshot (P-093)', () {
+    test('reads the latest row and never sums across days', () {
+      final snapshot = latestCatalogSnapshot([
+        _row(1, products: 3, posts: 2, reels: 1),
+        _row(2, products: 4, posts: 5, reels: 2),
+      ]);
+      expect(snapshot, isNotNull);
+      expect(snapshot!.asOf, DateTime(2026, 9, 2));
+      expect(snapshot.activeProducts, 4);
+      expect(snapshot.publishedPosts, 5);
+      expect(snapshot.publishedReels, 2);
+    });
+
+    test('picks the latest date even when rows are unsorted', () {
+      final snapshot = latestCatalogSnapshot([
+        _row(5, products: 9),
+        _row(1, products: 1),
+      ]);
+      expect(snapshot!.activeProducts, 9);
+    });
+
+    test('a genuine zero in the latest row is returned as 0', () {
+      final snapshot = latestCatalogSnapshot([
+        _row(1, products: 3),
+        _row(2),
+      ]);
+      expect(snapshot!.activeProducts, 0);
+    });
+
+    test('no rows means no snapshot', () {
+      expect(latestCatalogSnapshot(const []), isNull);
     });
   });
 }

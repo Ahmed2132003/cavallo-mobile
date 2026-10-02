@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import '../domain/daily_stats_entity.dart';
 
 /// Part P-085 scope: one single-metric line chart over the rows the
-/// backend returned.
+/// backend returned. P-093 generalises it so the same widget also draws the
+/// average-rating trend.
 ///
 /// * **No zero-fill (E3).** One point per returned row. The X position is
 ///   the real calendar offset from the first row, so a missing day shows
 ///   up as a visible gap in the line, not as a fabricated 0.
-/// * **Y starts at 0** and always uses whole-number ticks (these are
-///   counts).
+/// * **Y starts at 0.** By default the top follows the data and ticks are
+///   whole numbers (counts). A caller can pin the top with [fixedMaxY] and
+///   the tick spacing with [yInterval] (the rating trend uses 5 and 1).
 /// * **Readable X axis.** At most ~5 date labels (`d/M`), whatever the
 ///   period, so 30 days never crowd.
 /// * **A single row** is drawn as one visible dot.
@@ -24,6 +26,8 @@ class AnalyticsLineChart extends StatelessWidget {
     required this.rows,
     required this.valueOf,
     this.color,
+    this.fixedMaxY,
+    this.yInterval,
   });
 
   /// Heading shown above the chart.
@@ -35,10 +39,19 @@ class AnalyticsLineChart extends StatelessWidget {
 
   final List<DailyStats> rows;
 
-  /// Picks the single metric this chart plots from a row.
-  final int Function(DailyStats row) valueOf;
+  /// Picks the single metric this chart plots from a row (a count or a
+  /// decimal such as a rating).
+  final num Function(DailyStats row) valueOf;
 
   final Color? color;
+
+  /// Pins the top of the Y axis (e.g. 5 for a 1-5 star rating). When null
+  /// the top is derived from the data.
+  final double? fixedMaxY;
+
+  /// Pins the Y tick spacing. Only used together with [fixedMaxY]; when
+  /// null it defaults to 1.
+  final double? yInterval;
 
   /// Whole days between the calendar dates of [a] and [b], DST-safe.
   static int dayOffset(DateTime a, DateTime b) {
@@ -50,7 +63,7 @@ class AnalyticsLineChart extends StatelessWidget {
   /// The plotted points: X = day offset from the first row, Y = metric.
   static List<FlSpot> spotsFor(
     List<DailyStats> rows,
-    int Function(DailyStats row) valueOf,
+    num Function(DailyStats row) valueOf,
   ) {
     if (rows.isEmpty) return const [];
     final first = rows.first.date;
@@ -70,9 +83,17 @@ class AnalyticsLineChart extends StatelessWidget {
     final maxX = span == 0 ? 1.0 : span;
     final xInterval = (span / 4).ceil().clamp(1, 1 << 20).toDouble();
 
+    final pinnedMax = fixedMaxY;
     final maxValue = spots.fold<double>(0, (m, s) => s.y > m ? s.y : m);
-    final yInterval = maxValue <= 4 ? 1.0 : (maxValue / 4).ceilToDouble();
-    final maxY = yInterval * 4;
+    final double yStep;
+    final double maxY;
+    if (pinnedMax != null) {
+      yStep = yInterval ?? 1.0;
+      maxY = pinnedMax;
+    } else {
+      yStep = maxValue <= 4 ? 1.0 : (maxValue / 4).ceilToDouble();
+      maxY = yStep * 4;
+    }
 
     final labelStyle = theme.textTheme.labelSmall;
 
@@ -101,7 +122,7 @@ class AnalyticsLineChart extends StatelessWidget {
                       maxY: maxY,
                       gridData: FlGridData(
                         drawVerticalLine: false,
-                        horizontalInterval: yInterval,
+                        horizontalInterval: yStep,
                       ),
                       borderData: FlBorderData(show: false),
                       titlesData: FlTitlesData(
@@ -111,7 +132,7 @@ class AnalyticsLineChart extends StatelessWidget {
                           sideTitles: SideTitles(
                             showTitles: true,
                             reservedSize: 32,
-                            interval: yInterval,
+                            interval: yStep,
                             getTitlesWidget:
                                 (value, meta) => Text(
                                   value.round().toString(),

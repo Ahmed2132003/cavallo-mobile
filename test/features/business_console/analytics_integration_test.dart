@@ -76,6 +76,11 @@ const _trackedLabels = <String>[
   'Likes received',
   'Comments received',
   'Story views',
+  'New ratings',
+  'Average rating',
+  'Active products',
+  'Published posts',
+  'Published reels',
 ];
 
 /// Metrics that exist in the product deck but are NOT tracked by P-084.
@@ -279,14 +284,40 @@ void main() {
           find.byKey(const Key('analytics-days-with-data')),
           findsOneWidget,
         );
+
+        // P-093 (knownTrendStats): new ratings 1+0+2 = 3, latest rating
+        // snapshot 4.5, and the LATEST row's catalog snapshot (4 active
+        // products, 3 posts, 2 reels).
+        expect(
+          find.byKey(const Key('analytics-chart-rating-trend')),
+          findsOneWidget,
+        );
+        const expectedP093 = <String, String>{
+          'analytics-total-new-ratings': '3',
+          'analytics-rating-latest': '4.50',
+          'analytics-catalog-active-products': '4',
+          'analytics-catalog-published-posts': '3',
+          'analytics-catalog-published-reels': '2',
+        };
+        for (final entry in expectedP093.entries) {
+          expect(
+            find.descendant(
+              of: find.byKey(Key(entry.key)),
+              matching: find.text(entry.value),
+              matchRoot: true,
+            ),
+            findsOneWidget,
+            reason: '${entry.key} should show ${entry.value}',
+          );
+        }
         expect(find.byKey(const Key('analytics-loading')), findsNothing);
         expect(find.byKey(const Key('analytics-error')), findsNothing);
         expect(find.byKey(const Key('analytics-empty')), findsNothing);
       },
     );
 
-    testWidgets('only the four tracked metrics are labelled, and nothing about '
-        'products or placeholders exists inside the screen', (tester) async {
+    testWidgets('only tracked metrics are labelled, and no product-views or '
+        'placeholder content exists inside the screen', (tester) async {
       final app = await _pumpApp(tester, user: _business);
       await _goToAnalytics(tester, app);
 
@@ -315,7 +346,12 @@ void main() {
               .toList();
       expect(texts, isNotEmpty);
       for (final text in texts) {
-        expect(text.contains('product'), isFalse, reason: 'text: "$text"');
+        expect(
+          text.contains('product view'),
+          isFalse,
+          reason: 'text: "$text"',
+        );
+        expect(text.contains('productview'), isFalse, reason: 'text: "$text"');
         expect(text.contains('placeholder'), isFalse, reason: 'text: "$text"');
         expect(text.contains('coming soon'), isFalse, reason: 'text: "$text"');
       }
@@ -328,7 +364,8 @@ void main() {
                     final key = w.key;
                     if (key == null) return false;
                     final text = key.toString().toLowerCase();
-                    return text.contains('product') ||
+                    return text.contains('productview') ||
+                        text.contains('product-view') ||
                         text.contains('placeholder');
                   }),
                 ),
