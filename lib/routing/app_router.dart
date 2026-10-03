@@ -7,7 +7,8 @@ import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/auth/presentation/session_provider.dart';
 import '../features/auth/presentation/splash_screen.dart';
-import '../features/business_console/presentation/business_console_screen.dart';
+import '../features/business_console/presentation/analytics_screen.dart';
+import '../features/business_console/presentation/business_console_shell.dart';
 import '../features/business_profile/presentation/business_onboarding_screen.dart';
 import '../features/business_profile/presentation/business_profile_edit_screen.dart';
 import '../features/business_profile/presentation/business_profile_provider.dart';
@@ -32,6 +33,7 @@ import '../features/products/presentation/product_form_screen.dart';
 import '../features/products/presentation/product_list_screen.dart';
 import '../features/search/presentation/search_screen.dart';
 import '../features/stories/presentation/story_creation_screen.dart';
+import '../features/stories/presentation/story_list_screen.dart';
 import '../features/stories/presentation/story_viewer_screen.dart';
 import '../features/chat/domain/conversation.dart';
 import 'route_names.dart';
@@ -255,6 +257,31 @@ import 'route_names.dart';
 /// watching inside `redirect` would have reintroduced the same bug by
 /// making a `redirect` re-run also count as "this provider's dependency
 /// changed."
+///
+/// ## Part P-083 — Business-only gate for `/business-console`
+///
+/// A fourth gate in `redirect`, layered after the P-028C1 Business-account
+/// gate and before the P-040 moderator gate (neither changed): any
+/// location equal to or under `/business-console` is reachable only when
+/// the signed-in user's `accountType` is [AccountType.business]; anyone
+/// else is sent to `/home`. Signed-out users never reach it — the base
+/// gate already sent them to `/login`.
+///
+/// ### Part P-083 — the Business Console shell
+///
+/// The console is a `StatefulShellRoute.indexedStack` (the app's first
+/// shell) with four branches, in this order: 0 Products
+/// ([RouteNames.productListPath]), 1 Posts/Reels
+/// ([RouteNames.contentListPath]), 2 Stories
+/// ([RouteNames.storyListPath]), 3 Analytics
+/// ([RouteNames.businessAnalyticsPath]). Its builder wraps the active
+/// branch in `BusinessConsoleShell`. `/business-console` itself only
+/// redirects to branch 0's root. The four create/edit forms
+/// (`productForm`, `postForm`, `reelForm`, `storyForm`) stay top-level
+/// routes, so they open full-screen above the shell exactly as before.
+/// Every pre-existing route name, path and screen builder is unchanged;
+/// `productList` and `contentList` were only moved into their branches.
+/// Part P-085 replaces the Analytics branch's builder and nothing else.
 final appRouterProvider = Provider<GoRouter>((ref) {
   final refreshListenable = _SessionRefreshListenable(ref);
   ref.onDispose(refreshListenable.dispose);
@@ -327,6 +354,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             location != RouteNames.businessOnboardingPath) {
           return RouteNames.businessOnboardingPath;
         }
+      }
+
+      // --- Part P-083: fourth gate, Business Console is Business-only ---
+      // Layered after the base auth gate and the P-028C1 Business-account
+      // gate (both untouched), before the P-040 moderator gate. Evaluated
+      // only once `user` is known non-null, so a signed-out user was
+      // already sent to /login above. Enforced here, in `redirect`, for
+      // every navigation (go, push, deep link, restored location), not by
+      // hiding a menu entry. A Business user with no profile never gets
+      // this far: the P-028C1 gate above already sent them to onboarding.
+      if (_isBusinessConsoleLocation(location) &&
+          user.accountType != AccountType.business) {
+        return RouteNames.homePath;
       }
 
       // --- Part P-040: third gate, moderator-only routes ---
@@ -504,23 +544,81 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const NotificationPreferencesScreen(),
       ),
       GoRoute(
+        // Part P-083. No screen of its own any more: `/business-console`
+        // just lands on branch 0 (Products) of the shell below. The route
+        // keeps its name and path, so `goNamed/pushNamed(businessConsole)`
+        // (the Home debug menu) still works. The old placeholder
+        // `BusinessConsoleScreen` file is no longer referenced here.
         path: RouteNames.businessConsolePath,
         name: RouteNames.businessConsole,
-        builder: (context, state) => const BusinessConsoleScreen(),
+        redirect: (context, state) => RouteNames.productListPath,
       ),
-      GoRoute(
-        // Part P-033. See this provider's own "Part P-033" doc section
-        // above for why the navigation callbacks are wired here rather
-        // than inside `product_list_screen.dart` itself.
-        path: RouteNames.productListPath,
-        name: RouteNames.productList,
+      StatefulShellRoute.indexedStack(
+        // Part P-083. See this provider's "Business Console shell" doc
+        // section. Branch order is part of the P-083 contract.
         builder:
-            (context, state) => ProductListScreen(
-              onCreateNew: () => context.pushNamed(RouteNames.productForm),
-              onEditProduct:
-                  (product) =>
-                      context.pushNamed(RouteNames.productForm, extra: product),
-            ),
+            (context, state, navigationShell) =>
+                BusinessConsoleShell(navigationShell: navigationShell),
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                // Part P-033. See this provider's own "Part P-033" doc section
+                // above for why the navigation callbacks are wired here rather
+                // than inside `product_list_screen.dart` itself.
+                path: RouteNames.productListPath,
+                name: RouteNames.productList,
+                builder:
+                    (context, state) => ProductListScreen(
+                      onCreateNew:
+                          () => context.pushNamed(RouteNames.productForm),
+                      onEditProduct:
+                          (product) => context.pushNamed(
+                            RouteNames.productForm,
+                            extra: product,
+                          ),
+                    ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                // Part P-044. See this provider's "Part P-044" doc section
+                // above for why the navigation callbacks are wired here rather
+                // than inside `content_list_screen.dart` itself (same reasoning
+                // as `productList` above).
+                path: RouteNames.contentListPath,
+                name: RouteNames.contentList,
+                builder:
+                    (context, state) => ContentListScreen(
+                      onCreatePost:
+                          () => context.pushNamed(RouteNames.postForm),
+                      onCreateReel:
+                          () => context.pushNamed(RouteNames.reelForm),
+                    ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.storyListPath,
+                name: RouteNames.storyList,
+                builder: (context, state) => const StoryListScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.businessAnalyticsPath,
+                name: RouteNames.businessAnalytics,
+                builder: (context, state) => const AnalyticsScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         // Part P-033. `extra` is the full `Product` for edit mode, or
@@ -531,19 +629,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder:
             (context, state) =>
                 ProductFormScreen(existingProduct: state.extra as Product?),
-      ),
-      GoRoute(
-        // Part P-044. See this provider's "Part P-044" doc section
-        // above for why the navigation callbacks are wired here rather
-        // than inside `content_list_screen.dart` itself (same reasoning
-        // as `productList` above).
-        path: RouteNames.contentListPath,
-        name: RouteNames.contentList,
-        builder:
-            (context, state) => ContentListScreen(
-              onCreatePost: () => context.pushNamed(RouteNames.postForm),
-              onCreateReel: () => context.pushNamed(RouteNames.reelForm),
-            ),
       ),
       GoRoute(
         // Part P-044. Create-only — no `extra:` to read, unlike
@@ -596,6 +681,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+/// True for `/business-console` itself and anything under
+/// `/business-console/` — the prefix the Business-only gate in
+/// [appRouterProvider]'s `redirect` protects. Matched on a path-segment
+/// boundary, same reasoning as [_isModerationLocation].
+bool _isBusinessConsoleLocation(String location) {
+  return location == RouteNames.businessConsolePath ||
+      location.startsWith('${RouteNames.businessConsolePath}/');
+}
 
 /// True for `/moderation` itself and anything under `/moderation/` —
 /// the prefix the moderator gate in [appRouterProvider]'s `redirect`

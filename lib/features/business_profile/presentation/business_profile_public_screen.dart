@@ -7,6 +7,7 @@ import '../../../core/network/api_failure.dart';
 import '../../social/presentation/follow_button.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
+import '../../../core/widgets/featured_badge.dart';
 import '../../../core/widgets/loading_indicator.dart';
 import '../../../routing/route_names.dart';
 import '../../content/domain/public_post_entity.dart';
@@ -275,6 +276,12 @@ class _ProfileHeader extends StatelessWidget {
                 color: theme.colorScheme.primary,
                 semanticLabel: 'Verified business',
               ),
+            ],
+            // Part P-110: display-only Featured badge, shown ONLY when the
+            // backend says this business is Featured (real P-087 state).
+            if (profile.isFeatured) ...[
+              const SizedBox(width: 8),
+              const FeaturedBadge(),
             ],
           ],
         ),

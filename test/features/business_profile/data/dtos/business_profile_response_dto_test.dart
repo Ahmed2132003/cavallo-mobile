@@ -94,6 +94,8 @@ void main() {
       'category': 3,
       'is_verified': true,
       'follower_count': 12400,
+      // Part P-110: the DTO now carries is_featured (defaults to false).
+      'is_featured': false,
     });
   });
 }

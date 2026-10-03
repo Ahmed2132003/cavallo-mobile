@@ -30,6 +30,7 @@ class ReelPublicResponseDto {
     required this.isSaved,
     required this.createdAt,
     required this.updatedAt,
+    this.isFeatured = false,
   });
 
   factory ReelPublicResponseDto.fromJson(Map<String, dynamic> json) {
@@ -51,6 +52,8 @@ class ReelPublicResponseDto {
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
+      // Part P-110: the owning business's Featured state (backend join).
+      isFeatured: (json['is_featured'] as bool?) ?? false,
     );
   }
 
@@ -68,6 +71,9 @@ class ReelPublicResponseDto {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
+  /// Part P-110: whether the OWNING BUSINESS is Featured.
+  final bool isFeatured;
+
   PublicReel toEntity() {
     return PublicReel(
       id: id,
@@ -83,6 +89,7 @@ class ReelPublicResponseDto {
       isSaved: isSaved,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      isFeatured: isFeatured,
     );
   }
 }

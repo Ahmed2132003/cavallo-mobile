@@ -119,6 +119,7 @@ class SearchRepositoryImpl implements SearchRepository {
       categoryId: dto.categoryId,
       isVerified: dto.isVerified,
       followerCount: dto.followerCount,
+      isFeatured: dto.isFeatured,
     );
   }
 

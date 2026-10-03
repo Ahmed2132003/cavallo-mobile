@@ -144,6 +144,7 @@ class BusinessProfileRepositoryImpl implements BusinessProfileRepository {
       categoryId: dto.categoryId,
       isVerified: dto.isVerified,
       followerCount: dto.followerCount,
+      isFeatured: dto.isFeatured,
     );
   }
 }

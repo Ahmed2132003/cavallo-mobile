@@ -99,6 +99,7 @@ class Product {
     this.variants = const [],
     this.createdAt,
     this.updatedAt,
+    this.isFeatured = false,
   });
 
   final int id;
@@ -130,6 +131,11 @@ class Product {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
+  /// Part P-110: whether the OWNING BUSINESS is Featured (real P-087
+  /// state, resolved by the backend through the business join). Not a
+  /// per-product setting. Display-only.
+  final bool isFeatured;
+
   Product copyWith({
     int? id,
     int? businessId,
@@ -143,6 +149,7 @@ class Product {
     List<ProductVariant>? variants,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? isFeatured,
   }) {
     return Product(
       id: id ?? this.id,
@@ -157,6 +164,7 @@ class Product {
       variants: variants ?? this.variants,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isFeatured: isFeatured ?? this.isFeatured,
     );
   }
 
@@ -175,7 +183,8 @@ class Product {
           other.isActive == isActive &&
           _variantsEqual(other.variants, variants) &&
           other.createdAt == createdAt &&
-          other.updatedAt == updatedAt);
+          other.updatedAt == updatedAt &&
+          other.isFeatured == isFeatured);
 
   static bool _variantsEqual(List<ProductVariant> a, List<ProductVariant> b) {
     if (a.length != b.length) return false;
@@ -199,10 +208,12 @@ class Product {
     Object.hashAll(variants),
     createdAt,
     updatedAt,
+    isFeatured,
   );
 
   @override
   String toString() =>
       'Product(id: $id, name: $name, price: $price, currency: $currency, '
-      'categoryId: $categoryId, businessId: $businessId)';
+      'categoryId: $categoryId, businessId: $businessId, '
+      'isFeatured: $isFeatured)';
 }

@@ -28,6 +28,7 @@ class ProductResponseDto {
     required this.variants,
     required this.createdAt,
     required this.updatedAt,
+    this.isFeatured = false,
   });
 
   factory ProductResponseDto.fromJson(Map<String, dynamic> json) {
@@ -51,6 +52,9 @@ class ProductResponseDto {
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
+      // Part P-110: the owning business's Featured state, resolved by
+      // the backend through the business join.
+      isFeatured: (json['is_featured'] as bool?) ?? false,
     );
   }
 
@@ -71,6 +75,9 @@ class ProductResponseDto {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
+  /// Part P-110: whether the OWNING BUSINESS is Featured.
+  final bool isFeatured;
+
   Product toEntity() {
     return Product(
       id: id,
@@ -85,6 +92,7 @@ class ProductResponseDto {
       variants: variants.map((v) => v.toEntity()).toList(),
       createdAt: createdAt,
       updatedAt: updatedAt,
+      isFeatured: isFeatured,
     );
   }
 }
