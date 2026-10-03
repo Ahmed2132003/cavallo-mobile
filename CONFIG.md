@@ -69,3 +69,17 @@ See the backend repo's own `CONFIG.md` (`cavallo-app`) for the Django-side
 environment variables (database, Redis, JWT, Sentry, object storage, FCM,
 Paymob) — unrelated to this file, which only covers the Flutter build-time
 config above.
+
+## Certificate pinning (deferred - P-100)
+
+Certificate pinning is **deliberately deferred** for the MVP (Architecture Section 15, Could-Have).
+`lib/core/network/dio_client.dart` uses the platform's normal TLS validation, and a bad
+certificate surfaces as `DioExceptionType.badCertificate` through `ErrorInterceptor`.
+No `--dart-define` flag is needed for pinning because none exists.
+
+Do not add a `badCertificateCallback` override or any custom `SecurityContext` to "make
+staging work". Use a staging domain with a valid certificate instead.
+
+The reason for the deferral is that there is no real production domain or certificate yet
+(master plan Section 7 item 9). Full decision, prerequisites for adding it later and when
+to revisit: see `CERTIFICATE_PINNING_DECISION.md` in the backend repo (`cavallo-app`) root.
