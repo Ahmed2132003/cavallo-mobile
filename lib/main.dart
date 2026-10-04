@@ -53,10 +53,32 @@ Future<void> main() async {
       options.environment = AppConfig.environment.name;
       options.tracesSampleRate = 0.0; // errors only, no performance traces
       options.sendDefaultPii = false;
+      options.addIntegration(_DetachSentryIsolateListener());
     }, appRunner: _installErrorHooksAndRunApp);
   } else {
     _installErrorHooksAndRunApp();
   }
+}
+
+/// Sentry registers an `Isolate.addErrorListener` (IsolateErrorIntegration).
+/// While that listener exists the Dart VM hands uncaught async errors to it
+/// instead of [PlatformDispatcher.onError], so they reach Sentry as a
+/// type-less `String` and bypass [reportError]. This integration runs after
+/// it (integrations run in list order), closes and removes it, so the P-008
+/// hook below is the single path for those errors (P-105).
+class _DetachSentryIsolateListener implements Integration<SentryOptions> {
+  @override
+  void call(Hub hub, SentryOptions options) {
+    final listeners =
+        options.integrations.whereType<IsolateErrorIntegration>().toList();
+    for (final integration in listeners) {
+      integration.close();
+      options.removeIntegration(integration);
+    }
+  }
+
+  @override
+  void close() {}
 }
 
 /// Installs the single [FlutterError.onError] / [PlatformDispatcher] hooks
