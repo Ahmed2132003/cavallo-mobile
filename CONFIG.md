@@ -13,6 +13,7 @@ non-secret config like API URLs and environment names only).
 | --- | --- | --- |
 | `API_BASE_URL` | `AppConfig.apiBaseUrl` | Base URL the Dio client (P-010+) will call for all backend requests |
 | `ENVIRONMENT` | `AppConfig.environment` | Which backend environment this build targets: `dev` \| `staging` \| `prod` |
+| `SENTRY_DSN` | `AppConfig.sentryDsn` / `AppConfig.sentryEnabled` | Sentry project DSN (P-105). Empty by default. Sentry only runs in `staging`/`prod` builds that also pass a DSN |
 
 ## Running locally (no flags needed)
 
@@ -56,6 +57,21 @@ flutter build apk --dart-define=ENVIRONMENT=prod --dart-define=API_BASE_URL=http
 `prod` and `API_BASE_URL` wasn't also passed — this is intentional, to fail a
 staging/prod build loudly at first use rather than silently falling back to a
 local dev URL nobody meant to ship.
+
+## Sentry (P-105)
+
+Error reporting goes through `reportError()` in `lib/core/error_reporting.dart`
+into Sentry. It only runs when `AppConfig.sentryEnabled` is true: the build is
+`staging` or `prod` **and** a DSN was passed.
+
+```bash
+flutter build apk --dart-define=ENVIRONMENT=staging --dart-define=API_BASE_URL=https://staging-api.example.com --dart-define=SENTRY_DSN=https://<key>@<org>.ingest.sentry.io/<project>
+```
+
+A Sentry DSN only allows sending events to the project; Sentry documents it as
+safe to embed in client apps. That is why it is the one exception to the
+"no secrets in `--dart-define`" rule above. Use the Flutter project's DSN here,
+not the backend project's DSN.
 
 ## Adding a new config value later
 

@@ -95,6 +95,14 @@ dependencies:
   # pinned by flutter_test on the validated SDK (1.1.1+ need ^2.2.0 and
   # fail to resolve).
   fl_chart: 1.0.0
+
+  # Crash / error reporting (Part P-105, Phase 21). Backs reportError() in
+  # lib/core/error_reporting.dart. Pinned exactly (same discipline as
+  # share_plus/fl_chart above). 9.30.1 declares Dart >=3.5 / Flutter >=3.24,
+  # below this project's validated Flutter 3.29.3 / Dart 3.7.2. Initialization
+  # (SentryFlutter.init in main.dart) is added in P-105 STEP 5; until then
+  # Sentry is not initialized and every capture call is a harmless no-op.
+  sentry_flutter: 9.30.1
   
 dev_dependencies:
   flutter_test:

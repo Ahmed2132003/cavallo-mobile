@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Single funnel point for every uncaught error in the app.
 ///
@@ -8,14 +11,31 @@ import 'package:flutter/foundation.dart';
 /// thrown outside the Flutter framework or inside async gaps not caught
 /// by a zone).
 ///
-/// The body is intentionally trivial for now (just logs). Its signature —
-/// `void reportError(Object error, StackTrace stack)` — is the stable
-/// contract Part P-021 (Sentry / crash-reporting integration, Phase 21)
-/// will fill in with a real `Sentry.captureException(error, stackTrace:
-/// stack)` call. No call site anywhere in the app should need to change
-/// when that happens.
-// TODO(Phase 21): replace the body with Sentry.captureException —
-// signature must not change.
+/// Part P-105: the body now forwards to `Sentry.captureException`. The
+/// signature - `void reportError(Object error, StackTrace stack)` - is the
+/// stable contract P-008 promised and is unchanged, so no call site anywhere
+/// in the app needed to change.
+///
+/// Safe everywhere: when Sentry has not been initialized (dev builds, the
+/// test run) `Sentry.captureException` does nothing. This function is the
+/// last line of defence for errors, so it must never throw or leak an
+/// unhandled async error of its own (that would loop back into
+/// `PlatformDispatcher.instance.onError`, which calls this function).
+///
+/// The console line is kept for debug builds only, so local development
+/// still shows every reported error.
 void reportError(Object error, StackTrace stack) {
-  debugPrint('[reportError] $error\n$stack');
+  if (kDebugMode) {
+    debugPrint('[reportError] $error\n$stack');
+  }
+  try {
+    unawaited(
+      Sentry.captureException(error, stackTrace: stack).then<void>(
+        (_) {},
+        onError: (Object _) {},
+      ),
+    );
+  } catch (_) {
+    // Intentionally swallowed: reporting must never throw.
+  }
 }

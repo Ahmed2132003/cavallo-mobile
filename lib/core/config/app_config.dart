@@ -71,6 +71,22 @@ class AppConfig {
     }
   }
 
+  /// Sentry DSN for this build (Part P-105). Pass with
+  /// `--dart-define=SENTRY_DSN=...`; empty by default. A Sentry DSN is an
+  /// ingest-only address that Sentry documents as safe to ship inside client
+  /// apps, so unlike a real secret it may travel through `--dart-define`.
+  static String get sentryDsn {
+    const dsn = String.fromEnvironment('SENTRY_DSN');
+    return dsn;
+  }
+
+  /// Whether Sentry should be initialized in this build: staging or prod
+  /// only (dev builds and the test run never send events - the same rule the
+  /// backend follows by initializing Sentry only in staging.py and prod.py),
+  /// and only when a DSN was actually provided.
+  static bool get sentryEnabled =>
+      environment != AppEnvironment.dev && sentryDsn.isNotEmpty;
+
   static const int _devBackendPort = 8095;
 
   static String get _devDefaultBaseUrl {
