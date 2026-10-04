@@ -1,8 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Part P-107: INTERNET was only declared in the debug/profile manifests, so a
+         release build had NO network access (REST, WebSocket, FCM, Sentry all need it). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Part P-107: android:label below is PROVISIONAL (was the scaffold leftover
+         a "_tmp" name); replace with the final store/launcher name. -->
     <!-- Part P-081: runtime notification permission on Android 13+ (API 33). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
-        android:label="social_commerce_app_tmp"
+        android:label="Social Commerce App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

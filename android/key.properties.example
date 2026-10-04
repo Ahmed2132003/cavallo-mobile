@@ -1,0 +1,9 @@
+# Part P-107 - TEMPLATE ONLY. Copy this file to android/key.properties (git-ignored)
+# once the Google Play upload keystore exists (master plan Section 7 item 8).
+# NEVER commit key.properties or the keystore file (.jks / .keystore).
+#
+# storeFile: absolute path with FORWARD slashes, or a path relative to android/app/.
+storeFile=C:/path/to/upload-keystore.jks
+storePassword=REPLACE_ME
+keyAlias=upload
+keyPassword=REPLACE_ME
