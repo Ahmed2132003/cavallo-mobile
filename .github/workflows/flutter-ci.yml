@@ -29,3 +29,78 @@ jobs:
 
       - name: flutter test
         run: flutter test
+
+# ---------------------------------------------------------------------------
+# Part P-103: build a release APK and keep it as a CI artifact. Distribution
+# (Play Store / App Store) is NOT automated here: that depends on the
+# store-account work in Phase 22 (P-107). The APK is signed with the debug key
+# (android/app/build.gradle.kts), so it is for internal testing only.
+#
+# Runs only on a push to develop (staging) or main (prod), after the tests
+# pass. AppConfig throws for staging/prod builds without API_BASE_URL, so the
+# URL comes from repository variables (Settings -> Secrets and variables ->
+# Actions -> Variables). These are not secrets: a URL is baked into the APK
+# anyway. Until they exist the build is skipped with a warning annotation.
+#   STAGING_API_BASE_URL     e.g. https://staging-api.<domain>
+#   PRODUCTION_API_BASE_URL  e.g. https://api.<domain>
+# ---------------------------------------------------------------------------
+
+  build-android-artifact:
+    name: Build Android release APK (artifact)
+    needs: analyze-and-test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      BUILD_ENV: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
+      API_BASE_URL: ${{ github.ref == 'refs/heads/main' && vars.PRODUCTION_API_BASE_URL || vars.STAGING_API_BASE_URL }}
+
+    steps:
+      - name: Check API base URL is configured
+        id: config
+        run: |
+          if [ -z "$API_BASE_URL" ]; then
+            echo "::warning::Skipping the $BUILD_ENV APK build: repository variable for the $BUILD_ENV API base URL is not set yet (needs the real domain)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.config.outputs.ready == 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        if: steps.config.outputs.ready == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        if: steps.config.outputs.ready == 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.29.3"
+          channel: "stable"
+
+      - name: flutter pub get
+        if: steps.config.outputs.ready == 'true'
+        run: flutter pub get
+
+      - name: flutter build apk --release
+        if: steps.config.outputs.ready == 'true'
+        run: >-
+          flutter build apk --release
+          --dart-define=ENVIRONMENT="$BUILD_ENV"
+          --dart-define=API_BASE_URL="$API_BASE_URL"
+
+      - name: Upload APK artifact
+        if: steps.config.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cavallo-${{ env.BUILD_ENV }}-apk-${{ github.sha }}
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
