@@ -59,7 +59,10 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 23
-        targetSdk = flutter.targetSdkVersion
+        // P-107: pinned explicitly. Flutter 3.29.3's flutter.targetSdkVersion is 35, but the Play
+        // Console requires target API 36 for new apps and updates from 2026-08-31 (see
+        // STORE_LISTING_CHECKLIST.md, A5). Revisit when Flutter is upgraded.
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

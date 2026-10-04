@@ -13,3 +13,8 @@ pubspec.lock
 .DS_Store
 
 android/hs_err_pid*.log
+
+# P-107 hygiene: generated crash/IDE/Gradle logs must never be committed
+/flutter_*.log
+/hs_err_pid*.log
+android/.kotlin/
