@@ -8,6 +8,7 @@
 	<string>Social Commerce App</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<!-- P-107 PROVISIONAL: the bundle identifier is defined in ios/Runner.xcodeproj/project.pbxproj (com.example.socialCommerceApp) and must be replaced with the final id when the Apple Developer account exists. See RELEASE_SIGNING.md. -->
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -24,6 +25,13 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- P-107: purpose strings. image_picker links the photo library, camera and microphone APIs, and App Store validation rejects a build that lacks these keys. Texts are PROVISIONAL (English only, to be localized). -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Social Commerce App needs access to your photo library so you can choose photos and videos to attach to your posts, reels, stories, products and chat messages.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Social Commerce App uses the camera only when you choose to take a photo or video to share.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Social Commerce App uses the microphone only when you choose to record a video with sound.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
