@@ -1,7 +1,9 @@
 ﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
+import 'core/config/app_config.dart';
 import 'core/config/app_theme.dart';
 import 'core/error_reporting.dart';
 import 'core/network/dio_client.dart';
@@ -19,7 +21,13 @@ import 'routing/app_router.dart';
 /// 2. Uncaught Flutter framework errors (`FlutterError.onError`) and
 ///    everything else (`PlatformDispatcher.instance.onError`) are funneled
 ///    into the single [reportError] function in `core/error_reporting.dart`.
-///    Nothing here calls a real crash-reporting SDK yet — that's Phase 21.
+///    Sentry (Part P-105): in staging/prod builds that were given a DSN
+///    (`AppConfig.sentryEnabled`), the whole bootstrap below runs inside
+///    `SentryFlutter.init(appRunner: ...)`. The two hooks are installed
+///    inside that appRunner, after Sentry has installed its own, so ours
+///    replace Sentry's and every uncaught error still reaches Sentry exactly
+///    once, through [reportError]. Dev builds and tests never initialize
+///    Sentry, so [reportError] is a no-op there.
 /// 3. `runApp(ProviderScope(child: SocialCommerceApp()))` — exactly one
 ///    [ProviderScope] for the whole app; no feature should create its own
 ///    nested one.
@@ -36,11 +44,26 @@ import 'routing/app_router.dart';
 /// [AppTheme] was applied app-wide in P-006. As of P-007, navigation goes
 /// through the single [GoRouter] instance exposed by [appRouterProvider] —
 /// no feature should build a separate `Navigator`.
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  FlutterError.onError = (FlutterErrorDetails details) {
-    reportError(details.exception, details.stack ?? StackTrace.empty);
+  if (AppConfig.sentryEnabled) {
+    await SentryFlutter.init((options) {
+      options.dsn = AppConfig.sentryDsn;
+      options.environment = AppConfig.environment.name;
+      options.tracesSampleRate = 0.0; // errors only, no performance traces
+      options.sendDefaultPii = false;
+    }, appRunner: _installErrorHooksAndRunApp);
+  } else {
+    _installErrorHooksAndRunApp();
+  }
+}
+
+/// Installs the single [FlutterError.onError] / [PlatformDispatcher] hooks
+/// (P-008) and starts the app. Must run AFTER `SentryFlutter.init` when
+/// Sentry is enabled, see the note on [main].
+void _installErrorHooksAndRunApp() {
+  FlutterError.onError = (FlutterErrorDetails details) {    reportError(details.exception, details.stack ?? StackTrace.empty);
   };
 
   PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
