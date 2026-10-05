@@ -1,0 +1,185 @@
+P-111 SHIP evidence - 2026-10-05T03:45:23
+=== 0. PREFLIGHT ===
+git rev-parse --abbrev-ref HEAD  -> exit 0
+part-111
+mobile branch:  part-111
+git rev-parse --abbrev-ref HEAD  -> exit 0
+develop
+backend branch: develop
+git remote get-url origin  -> exit 0
+https://github.com/Ahmed2132003/cavallo-mobile.git
+git remote get-url origin  -> exit 0
+https://github.com/Ahmed2132003/cavallo-app.git
+mobile origin:  https://github.com/Ahmed2132003/cavallo-mobile.git
+backend origin: https://github.com/Ahmed2132003/cavallo-app.git
+git fetch origin  -> exit 0
+git rev-list --count HEAD..origin/develop  -> exit 0
+0
+backend commits behind origin/develop: 0
+git status --porcelain -- PROJECT_PROGRESS.md  -> exit 0
+git diff --cached --name-only  -> exit 0
+preflight OK
+
+=== 1. cavallo-mobile: stage (lib, test, assets, pubspec.yaml only) ===
+git add -A -- lib test assets pubspec.yaml  -> exit 0
+git diff --cached --name-status  -> exit 0
+A	assets/fonts/IBMPlexSansArabic-Bold.ttf
+A	assets/fonts/IBMPlexSansArabic-Medium.ttf
+A	assets/fonts/IBMPlexSansArabic-Regular.ttf
+A	assets/fonts/IBMPlexSansArabic-SemiBold.ttf
+A	assets/fonts/OFL.txt
+D	lib/core/config/app_theme.dart
+A	lib/core/theme/app_colors.dart
+A	lib/core/theme/app_theme.dart
+A	lib/core/theme/app_typography.dart
+A	lib/core/theme/theme_mode_provider.dart
+A	lib/core/widgets/app_avatar.dart
+M	lib/core/widgets/app_button.dart
+A	lib/core/widgets/app_shimmer_box.dart
+M	lib/core/widgets/app_text_field.dart
+M	lib/core/widgets/empty_state_widget.dart
+M	lib/core/widgets/error_state_widget.dart
+M	lib/core/widgets/featured_badge.dart
+M	lib/core/widgets/loading_indicator.dart
+M	lib/features/content/presentation/content_list_screen.dart
+M	lib/features/moderation/presentation/moderation_widgets.dart
+M	lib/features/social/presentation/content_action_row.dart
+M	lib/main.dart
+M	pubspec.yaml
+M	test/core/integration_test.dart
+A	test/core/theme/app_theme_foundation_test.dart
+A	test/core/theme/status_tokens_test.dart
+A	test/core/theme/theme_mode_provider_test.dart
+A	test/core/widgets/app_avatar_test.dart
+A	test/core/widgets/app_shimmer_box_test.dart
+A	test/core/widgets/core_widgets_theming_test.dart
+M	test/core/widgets/widget_gallery_demo_test.dart
+M	test/features/business_console/presentation/business_console_shell_test.dart
+M	test/features/moderation/presentation/moderation_queue_screen_test.dart
+M	test/features/moderation/presentation/moderation_widgets_test.dart
+staged files: 34
+  A	assets/fonts/IBMPlexSansArabic-Bold.ttf
+  A	assets/fonts/IBMPlexSansArabic-Medium.ttf
+  A	assets/fonts/IBMPlexSansArabic-Regular.ttf
+  A	assets/fonts/IBMPlexSansArabic-SemiBold.ttf
+  A	assets/fonts/OFL.txt
+  D	lib/core/config/app_theme.dart
+  A	lib/core/theme/app_colors.dart
+  A	lib/core/theme/app_theme.dart
+  A	lib/core/theme/app_typography.dart
+  A	lib/core/theme/theme_mode_provider.dart
+  A	lib/core/widgets/app_avatar.dart
+  M	lib/core/widgets/app_button.dart
+  A	lib/core/widgets/app_shimmer_box.dart
+  M	lib/core/widgets/app_text_field.dart
+  M	lib/core/widgets/empty_state_widget.dart
+  M	lib/core/widgets/error_state_widget.dart
+  M	lib/core/widgets/featured_badge.dart
+  M	lib/core/widgets/loading_indicator.dart
+  M	lib/features/content/presentation/content_list_screen.dart
+  M	lib/features/moderation/presentation/moderation_widgets.dart
+  M	lib/features/social/presentation/content_action_row.dart
+  M	lib/main.dart
+  M	pubspec.yaml
+  M	test/core/integration_test.dart
+  A	test/core/theme/app_theme_foundation_test.dart
+  A	test/core/theme/status_tokens_test.dart
+  A	test/core/theme/theme_mode_provider_test.dart
+  A	test/core/widgets/app_avatar_test.dart
+  A	test/core/widgets/app_shimmer_box_test.dart
+  A	test/core/widgets/core_widgets_theming_test.dart
+  M	test/core/widgets/widget_gallery_demo_test.dart
+  M	test/features/business_console/presentation/business_console_shell_test.dart
+  M	test/features/moderation/presentation/moderation_queue_screen_test.dart
+  M	test/features/moderation/presentation/moderation_widgets_test.dart
+
+=== 2. cavallo-mobile: commit ===
+git commit -m P-111: design system foundation (Cavallo Blue tokens, light/dark themes, persisted ThemeMode, core widget restyle, status tokens)  -> exit 0
+[part-111 e5b6693] P-111: design system foundation (Cavallo Blue tokens, light/dark themes, persisted ThemeMode, core widget restyle, status tokens)
+ 34 files changed, 2102 insertions(+), 194 deletions(-)
+ create mode 100644 assets/fonts/IBMPlexSansArabic-Bold.ttf
+ create mode 100644 assets/fonts/IBMPlexSansArabic-Medium.ttf
+ create mode 100644 assets/fonts/IBMPlexSansArabic-Regular.ttf
+ create mode 100644 assets/fonts/IBMPlexSansArabic-SemiBold.ttf
+ create mode 100644 assets/fonts/OFL.txt
+ delete mode 100644 lib/core/config/app_theme.dart
+ create mode 100644 lib/core/theme/app_colors.dart
+ create mode 100644 lib/core/theme/app_theme.dart
+ create mode 100644 lib/core/theme/app_typography.dart
+ create mode 100644 lib/core/theme/theme_mode_provider.dart
+ create mode 100644 lib/core/widgets/app_avatar.dart
+ create mode 100644 lib/core/widgets/app_shimmer_box.dart
+ create mode 100644 test/core/theme/app_theme_foundation_test.dart
+ create mode 100644 test/core/theme/status_tokens_test.dart
+ create mode 100644 test/core/theme/theme_mode_provider_test.dart
+ create mode 100644 test/core/widgets/app_avatar_test.dart
+ create mode 100644 test/core/widgets/app_shimmer_box_test.dart
+ create mode 100644 test/core/widgets/core_widgets_theming_test.dart
+  [part-111 e5b6693] P-111: design system foundation (Cavallo Blue tokens, light/dark themes, persisted ThemeMode, core widget restyle, status tokens)
+   34 files changed, 2102 insertions(+), 194 deletions(-)
+   create mode 100644 assets/fonts/IBMPlexSansArabic-Bold.ttf
+git rev-parse HEAD  -> exit 0
+e5b669370520f57d57f6a18ed77e7ee67ec5fbef
+git rev-parse --short=7 HEAD~1  -> exit 0
+98c8ef4
+mobile commit: e5b6693 (parent 98c8ef4)
+
+=== 3. cavallo-mobile: push + verify ===
+git push -u origin part-111  -> exit 0
+remote: 
+remote: Create a pull request for 'part-111' on GitHub by visiting:        
+remote:      https://github.com/Ahmed2132003/cavallo-mobile/pull/new/part-111        
+remote: 
+branch 'part-111' set up to track 'origin/part-111'.
+To https://github.com/Ahmed2132003/cavallo-mobile.git
+ * [new branch]      part-111 -> part-111
+  remote: 
+  branch 'part-111' set up to track 'origin/part-111'.
+  To https://github.com/Ahmed2132003/cavallo-mobile.git
+   * [new branch]      part-111 -> part-111
+git ls-remote origin refs/heads/part-111  -> exit 0
+e5b669370520f57d57f6a18ed77e7ee67ec5fbef	refs/heads/part-111
+local  HEAD:        e5b669370520f57d57f6a18ed77e7ee67ec5fbef
+remote part-111:    e5b669370520f57d57f6a18ed77e7ee67ec5fbef
+MOBILE PUSH VERIFIED
+
+=== 4. cavallo-app: append the P-111 section to PROJECT_PROGRESS.md ===
+git rev-parse --short=7 HEAD  -> exit 0
+36e3ec6
+file size: 1053776 -> 1062960 bytes (appended 9184)
+last 3 lines of the file now:
+  
+  ### Edits to existing sections
+  - In the Part status index/table add: P-111 | Flutter Design System Foundation | Phase 23 | CODE COMPLETE; goldens and manual walk-through OPEN. Set the Phase 23 summary line to "IN PROGRESS (P-111 code complete with open DoD items, P-112 next)".
+
+=== 5. cavallo-app: commit + push + verify ===
+git add -- PROJECT_PROGRESS.md  -> exit 0
+git diff --cached --name-only  -> exit 0
+PROJECT_PROGRESS.md
+git commit -m P-111: Progress section (Phase 23 design system foundation; goldens and manual walk-through still open)  -> exit 0
+[develop 46f3a2c] P-111: Progress section (Phase 23 design system foundation; goldens and manual walk-through still open)
+ 1 file changed, 60 insertions(+), 1 deletion(-)
+  [develop 46f3a2c] P-111: Progress section (Phase 23 design system foundation; goldens and manual walk-through still open)
+   1 file changed, 60 insertions(+), 1 deletion(-)
+git rev-parse HEAD  -> exit 0
+46f3a2ca2c1fb8661c1d99452ec42efaa95fe206
+git push origin develop  -> exit 0
+To https://github.com/Ahmed2132003/cavallo-app.git
+   36e3ec6..46f3a2c  develop -> develop
+  To https://github.com/Ahmed2132003/cavallo-app.git
+     36e3ec6..46f3a2c  develop -> develop
+git ls-remote origin refs/heads/develop  -> exit 0
+46f3a2ca2c1fb8661c1d99452ec42efaa95fe206	refs/heads/develop
+local  HEAD:        46f3a2ca2c1fb8661c1d99452ec42efaa95fe206
+remote develop:     46f3a2ca2c1fb8661c1d99452ec42efaa95fe206
+BACKEND PUSH VERIFIED
+git diff --stat HEAD~1 HEAD -- PROJECT_PROGRESS.md  -> exit 0
+ PROJECT_PROGRESS.md | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 60 insertions(+), 1 deletion(-)
+PROJECT_PROGRESS.md | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 60 insertions(+), 1 deletion(-)
+
+=== SHIP SUMMARY ===
+cavallo-mobile  part-111 : e5b6693  (verified on origin)
+cavallo-app     develop   : 46f3a2c  (verified on origin)
+SHIP RESULT: ALL PUSHED AND VERIFIED

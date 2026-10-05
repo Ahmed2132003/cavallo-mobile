@@ -1,0 +1,58 @@
+lib\core\config\app_theme.dart:21: static const Color _placeholderSeedColor = Colors.indigo;
+lib\core\theme\app_colors.dart:79: static const Color _brand = Color(0xFF2F6BFF);
+lib\core\theme\app_colors.dart:80: static const Color _white = Color(0xFFFFFFFF);
+lib\core\theme\app_colors.dart:81: static const Color _ink = Color(0xFF0B1020);
+lib\core\theme\app_colors.dart:82: static const Color _featured = Color(0xFFF5B301);
+lib\core\theme\app_colors.dart:87: colors: <Color>[Color(0xFF5AC8FF), _brand, Color(0xFF1B4FD8)],
+lib\core\theme\app_colors.dart:94: background: Color(0xFFFFFFFF),
+lib\core\theme\app_colors.dart:95: surface: Color(0xFFFFFFFF),
+lib\core\theme\app_colors.dart:96: surfaceVariant: Color(0xFFF3F5F9),
+lib\core\theme\app_colors.dart:97: outline: Color(0xFFDBDFE8),
+lib\core\theme\app_colors.dart:99: textSecondary: Color(0xFF5B6478),
+lib\core\theme\app_colors.dart:100: danger: Color(0xFFD92D3A),
+lib\core\theme\app_colors.dart:110: brandText: Color(0xFF6F9CFF),
+lib\core\theme\app_colors.dart:111: background: Color(0xFF0A0D14),
+lib\core\theme\app_colors.dart:112: surface: Color(0xFF121724),
+lib\core\theme\app_colors.dart:113: surfaceVariant: Color(0xFF1B2232),
+lib\core\theme\app_colors.dart:114: outline: Color(0xFF2A3347),
+lib\core\theme\app_colors.dart:115: textPrimary: Color(0xFFF5F7FB),
+lib\core\theme\app_colors.dart:116: textSecondary: Color(0xFF9AA4B8),
+lib\core\theme\app_colors.dart:117: danger: Color(0xFFFF6B74),
+lib\core\theme\app_colors.dart:118: onDanger: Color(0xFF0A0D14),
+lib\core\theme\app_colors.dart:185: /// Falls back to [AppColors.light]/[AppColors.dark] (by the ambient
+lib\core\theme\app_colors.dart:192: (theme.brightness == Brightness.dark ? AppColors.dark : AppColors.light);
+lib\core\theme\app_theme.dart:3: import 'app_colors.dart';
+lib\core\theme\app_theme.dart:14: static final ThemeData light = _build(AppColors.light, Brightness.light);
+lib\core\theme\app_theme.dart:15: static final ThemeData dark = _build(AppColors.dark, Brightness.dark);
+lib\core\theme\app_theme.dart:22: static const Color _clear = Colors.transparent;
+lib\core\theme\app_typography.dart:3: import 'app_colors.dart';
+lib\features\chat\presentation\message_bubble_widget.dart:434: color: Colors.black.withValues(alpha: 0.45),
+lib\features\chat\presentation\message_bubble_widget.dart:438: child: const Icon(Icons.play_arrow, color: Colors.white, size: 32),
+lib\features\content\presentation\content_list_screen.dart:381: Colors.amber.shade50,
+lib\features\content\presentation\content_list_screen.dart:382: Colors.amber.shade800,
+lib\features\content\presentation\content_list_screen.dart:387: Colors.green.shade50,
+lib\features\content\presentation\content_list_screen.dart:388: Colors.green.shade700,
+lib\features\content\presentation\content_list_screen.dart:393: Colors.red.shade50,
+lib\features\content\presentation\content_list_screen.dart:394: Colors.red.shade700,
+lib\features\content\presentation\content_list_screen.dart:423: background: Colors.blueGrey.shade50,
+lib\features\content\presentation\content_list_screen.dart:424: foreground: Colors.blueGrey.shade700,
+lib\features\content\presentation\content_list_screen.dart:439: background: Colors.red.shade50,
+lib\features\content\presentation\content_list_screen.dart:440: foreground: Colors.red.shade700,
+lib\features\content\presentation\reel_card.dart:139: color: Colors.black.withValues(alpha: 0.45),
+lib\features\content\presentation\reel_card.dart:143: child: const Icon(Icons.play_arrow, color: Colors.white, size: 32),
+lib\features\content\presentation\reel_detail_screen.dart:277: color: Colors.black.withValues(alpha: 0.45),
+lib\features\content\presentation\reel_detail_screen.dart:281: child: const Icon(Icons.play_arrow, color: Colors.white, size: 40),
+lib\features\moderation\presentation\moderation_widgets.dart:148: foreground: Colors.green.shade700,
+lib\features\moderation\presentation\moderation_widgets.dart:149: background: Colors.green.shade50,
+lib\features\moderation\presentation\moderation_widgets.dart:153: foreground: Colors.amber.shade800,
+lib\features\moderation\presentation\moderation_widgets.dart:154: background: Colors.amber.shade50,
+lib\features\moderation\presentation\moderation_widgets.dart:158: foreground: Colors.red.shade700,
+lib\features\moderation\presentation\moderation_widgets.dart:159: background: Colors.red.shade50,
+lib\features\notifications\presentation\notification_center_screen.dart:207: : Colors.transparent,
+lib\features\social\presentation\content_action_row.dart:217: color: isLiked ? Colors.red : iconColor,
+lib\features\stories\presentation\story_viewer_screen.dart:104: return Scaffold(backgroundColor: Colors.black, body: SafeArea(child: body));
+lib\features\stories\presentation\story_viewer_screen.dart:300: color: Colors.white54,
+lib\features\stories\presentation\story_viewer_screen.dart:334: color: Colors.white,
+lib\features\stories\presentation\story_viewer_screen.dart:342: icon: const Icon(Icons.close, color: Colors.white),
+lib\features\stories\presentation\story_viewer_screen.dart:387: color: Colors.white24,
+lib\features\stories\presentation\story_viewer_screen.dart:395: color: Colors.white,
