@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:social_commerce_app/core/config/app_theme.dart';
+import 'package:social_commerce_app/core/theme/app_theme.dart';
 import 'package:social_commerce_app/core/widgets/app_button.dart';
 import 'package:social_commerce_app/core/widgets/app_text_field.dart';
 import 'package:social_commerce_app/core/widgets/empty_state_widget.dart';

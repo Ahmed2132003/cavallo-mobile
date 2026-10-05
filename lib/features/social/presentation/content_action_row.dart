@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_commerce_app/core/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -110,8 +111,10 @@ class _ContentActionRowState extends ConsumerState<ContentActionRow> {
   late int _seededSharesCount;
   late DateTime? _seededUpdatedAt;
 
-  ContentInteractionKey get _key =>
-      (contentType: widget.contentType, objectId: widget.objectId);
+  ContentInteractionKey get _key => (
+    contentType: widget.contentType,
+    objectId: widget.objectId,
+  );
 
   @override
   void initState() {
@@ -123,9 +126,11 @@ class _ContentActionRowState extends ConsumerState<ContentActionRow> {
   void didUpdateWidget(covariant ContentActionRow oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final keyChanged = oldWidget.contentType != widget.contentType ||
+    final keyChanged =
+        oldWidget.contentType != widget.contentType ||
         oldWidget.objectId != widget.objectId;
-    final dataChanged = widget.isLiked != _seededIsLiked ||
+    final dataChanged =
+        widget.isLiked != _seededIsLiked ||
         widget.isSaved != _seededIsSaved ||
         widget.likesCount != _seededLikesCount ||
         widget.commentsCount != _seededCommentsCount ||
@@ -159,7 +164,9 @@ class _ContentActionRowState extends ConsumerState<ContentActionRow> {
     // (same precedent as FollowButton's one-time seed).
     Future.microtask(() {
       if (!mounted) return;
-      ref.read(contentInteractionProvider(key).notifier).seed(
+      ref
+          .read(contentInteractionProvider(key).notifier)
+          .seed(
             isLiked: isLiked,
             isSaved: isSaved,
             likesCount: likesCount,
@@ -199,22 +206,23 @@ class _ContentActionRowState extends ConsumerState<ContentActionRow> {
       }
     }
 
-    Widget countLabel(int count) => count > 0
-        ? Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: Text(
-              '$count',
-              style: Theme.of(context).textTheme.labelMedium,
-            ),
-          )
-        : const SizedBox.shrink();
+    Widget countLabel(int count) =>
+        count > 0
+            ? Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Text(
+                '$count',
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+            )
+            : const SizedBox.shrink();
 
     return Row(
       children: [
         IconButton(
           icon: Icon(
             isLiked ? Icons.favorite : Icons.favorite_border,
-            color: isLiked ? Colors.red : iconColor,
+            color: isLiked ? context.appColors.danger : iconColor,
           ),
           tooltip: 'Like',
           onPressed: () => guarded(notifier.toggleLike),

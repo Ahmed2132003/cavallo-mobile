@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'core/config/app_config.dart';
-import 'core/config/app_theme.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/theme_mode_provider.dart';
 import 'core/error_reporting.dart';
 import 'core/network/dio_client.dart';
 import 'core/storage/secure_token_storage.dart';
@@ -12,6 +13,10 @@ import 'features/auth/presentation/session_provider.dart';
 import 'features/notifications/presentation/push_notification_handler.dart';
 import 'features/notifications/presentation/push_session_bridge.dart';
 import 'routing/app_router.dart';
+
+/// Part P-111: the ThemeMode read from storage BEFORE the first frame
+/// (set once in main(), consumed by the ProviderScope override below).
+ThemeMode _initialThemeMode = ThemeMode.system;
 
 /// Composition root for the app.
 ///
@@ -46,6 +51,11 @@ import 'routing/app_router.dart';
 /// no feature should build a separate `Navigator`.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Part P-111: read the saved ThemeMode BEFORE the first frame, so a user
+  // who chose Dark never sees a light flash on launch. Never throws
+  // (corrupt or missing value = system).
+  _initialThemeMode = await preloadThemeMode();
 
   if (AppConfig.sentryEnabled) {
     await SentryFlutter.init((options) {
@@ -96,6 +106,7 @@ void _installErrorHooksAndRunApp() {
   runApp(
     ProviderScope(
       overrides: [
+        initialThemeModeProvider.overrideWithValue(_initialThemeMode),
         // Closes a gap flagged during P-022A: [authTokenGetterProvider]'s
         // own default (in dio_client.dart) is intentionally a no-op
         // returning null — that default is asserted directly by
@@ -159,13 +170,16 @@ class _SocialCommerceAppState extends ConsumerState<SocialCommerceApp> {
   @override
   Widget build(BuildContext context) {
     final session = ref.watch(sessionProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
     if (!_bootstrapped) {
       if (session.isLoading) {
         return MaterialApp(
           title: 'Social Commerce Discovery Platform',
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.theme,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: themeMode,
           home: const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           ),
@@ -181,7 +195,9 @@ class _SocialCommerceAppState extends ConsumerState<SocialCommerceApp> {
     return MaterialApp.router(
       title: 'Social Commerce Discovery Platform',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.theme,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: themeMode,
       routerConfig: router,
       scaffoldMessengerKey: ref.watch(rootScaffoldMessengerKeyProvider),
     );

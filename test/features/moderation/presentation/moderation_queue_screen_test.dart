@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:social_commerce_app/core/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:social_commerce_app/core/network/api_failure.dart';
@@ -56,9 +57,8 @@ class _FakeModerationRepository implements ModerationRepository {
   Future<QueueItem> reject({
     required int queueItemId,
     required String reason,
-  }) => throw UnimplementedError(
-    'Not exercised by moderation_queue_screen_test',
-  );
+  }) =>
+      throw UnimplementedError('Not exercised by moderation_queue_screen_test');
 }
 
 QueueItem _item(
@@ -120,10 +120,14 @@ Color _ageIconColorInRow(WidgetTester tester, int id, String urgencyName) {
     of: _rowFinder(id),
     matching: find.byKey(ValueKey('age-chip-$urgencyName')),
   );
-  expect(chip, findsOneWidget, reason: 'row $id should have a $urgencyName chip');
-  return tester.widget<Icon>(
-    find.descendant(of: chip, matching: find.byType(Icon)),
-  ).color!;
+  expect(
+    chip,
+    findsOneWidget,
+    reason: 'row $id should have a $urgencyName chip',
+  );
+  return tester
+      .widget<Icon>(find.descendant(of: chip, matching: find.byType(Icon)))
+      .color!;
 }
 
 void main() {
@@ -156,11 +160,12 @@ void main() {
       'a failure shows the backend message with a Retry that reloads the '
       'queue',
       (tester) async {
-        final fake = _FakeModerationRepository()
-          ..fetchError = _dioFailure(
-            500,
-            const ServerFailure(message: 'Server exploded.'),
-          );
+        final fake =
+            _FakeModerationRepository()
+              ..fetchError = _dioFailure(
+                500,
+                const ServerFailure(message: 'Server exploded.'),
+              );
         await tester.pumpWidget(_wrap(fake));
         await tester.pumpAndSettle();
 
@@ -183,13 +188,14 @@ void main() {
       'a 403 explains the Moderator-group requirement instead of showing '
       'a raw permission string',
       (tester) async {
-        final fake = _FakeModerationRepository()
-          ..fetchError = _dioFailure(
-            403,
-            const AuthFailure(
-              message: 'Missing required capability: can_moderate_content.',
-            ),
-          );
+        final fake =
+            _FakeModerationRepository()
+              ..fetchError = _dioFailure(
+                403,
+                const AuthFailure(
+                  message: 'Missing required capability: can_moderate_content.',
+                ),
+              );
         await tester.pumpWidget(_wrap(fake));
         await tester.pumpAndSettle();
 
@@ -206,8 +212,16 @@ void main() {
       _useTallSurface(tester);
       final fake = _FakeModerationRepository(
         items: [
-          _item(1, previewText: 'Newer normal', age: const Duration(minutes: 5)),
-          _item(2, previewText: 'Older normal', age: const Duration(minutes: 90)),
+          _item(
+            1,
+            previewText: 'Newer normal',
+            age: const Duration(minutes: 5),
+          ),
+          _item(
+            2,
+            previewText: 'Older normal',
+            age: const Duration(minutes: 90),
+          ),
           _item(
             3,
             previewText: 'Fast path item',
@@ -232,17 +246,16 @@ void main() {
     ) async {
       _useTallSurface(tester);
       final fake = _FakeModerationRepository(
-        items: [
-          _item(1),
-          _item(2, priority: QueuePriority.fastPath),
-          _item(3),
-        ],
+        items: [_item(1), _item(2, priority: QueuePriority.fastPath), _item(3)],
       );
       await tester.pumpWidget(_wrap(fake));
       await tester.pumpAndSettle();
 
       expect(find.byKey(const ValueKey('priority-badge-fast')), findsOneWidget);
-      expect(find.byKey(const ValueKey('priority-badge-normal')), findsNWidgets(2));
+      expect(
+        find.byKey(const ValueKey('priority-badge-normal')),
+        findsNWidgets(2),
+      );
       expect(
         find.descendant(
           of: _rowFinder(2),
@@ -338,17 +351,38 @@ void main() {
         _useTallSurface(tester);
         final fake = _FakeModerationRepository(
           items: [
-            _item(1, priority: QueuePriority.fastPath, age: const Duration(minutes: 10)),
-            _item(2, priority: QueuePriority.fastPath, age: const Duration(minutes: 20)),
-            _item(3, priority: QueuePriority.fastPath, age: const Duration(minutes: 31)),
+            _item(
+              1,
+              priority: QueuePriority.fastPath,
+              age: const Duration(minutes: 10),
+            ),
+            _item(
+              2,
+              priority: QueuePriority.fastPath,
+              age: const Duration(minutes: 20),
+            ),
+            _item(
+              3,
+              priority: QueuePriority.fastPath,
+              age: const Duration(minutes: 31),
+            ),
           ],
         );
         await tester.pumpWidget(_wrap(fake));
         await tester.pumpAndSettle();
 
-        expect(_ageIconColorInRow(tester, 1, 'onTrack'), Colors.green.shade700);
-        expect(_ageIconColorInRow(tester, 2, 'approaching'), Colors.amber.shade800);
-        expect(_ageIconColorInRow(tester, 3, 'breached'), Colors.red.shade700);
+        expect(
+          _ageIconColorInRow(tester, 1, 'onTrack'),
+          AppColors.light.successText,
+        );
+        expect(
+          _ageIconColorInRow(tester, 2, 'approaching'),
+          AppColors.light.warningText,
+        );
+        expect(
+          _ageIconColorInRow(tester, 3, 'breached'),
+          AppColors.light.dangerText,
+        );
       },
     );
 
@@ -366,19 +400,33 @@ void main() {
         await tester.pumpWidget(_wrap(fake));
         await tester.pumpAndSettle();
 
-        expect(_ageIconColorInRow(tester, 1, 'onTrack'), Colors.green.shade700);
-        expect(_ageIconColorInRow(tester, 2, 'approaching'), Colors.amber.shade800);
-        expect(_ageIconColorInRow(tester, 3, 'breached'), Colors.red.shade700);
+        expect(
+          _ageIconColorInRow(tester, 1, 'onTrack'),
+          AppColors.light.successText,
+        );
+        expect(
+          _ageIconColorInRow(tester, 2, 'approaching'),
+          AppColors.light.warningText,
+        );
+        expect(
+          _ageIconColorInRow(tester, 3, 'breached'),
+          AppColors.light.dangerText,
+        );
       },
     );
   });
 
   group('interaction', () {
-    testWidgets('tapping a row calls onOpenItem with that item', (tester) async {
+    testWidgets('tapping a row calls onOpenItem with that item', (
+      tester,
+    ) async {
       _useTallSurface(tester);
       final tapped = <QueueItem>[];
       final fake = _FakeModerationRepository(
-        items: [_item(1, previewText: 'First'), _item(2, previewText: 'Second')],
+        items: [
+          _item(1, previewText: 'First'),
+          _item(2, previewText: 'Second'),
+        ],
       );
       await tester.pumpWidget(_wrap(fake, onOpenItem: tapped.add));
       await tester.pumpAndSettle();
@@ -390,7 +438,9 @@ void main() {
       expect(tapped.single.id, 2);
     });
 
-    testWidgets('the app-bar refresh button refetches the queue', (tester) async {
+    testWidgets('the app-bar refresh button refetches the queue', (
+      tester,
+    ) async {
       final fake = _FakeModerationRepository(items: [_item(1)]);
       await tester.pumpWidget(_wrap(fake));
       await tester.pumpAndSettle();

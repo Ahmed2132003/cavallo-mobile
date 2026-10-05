@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_commerce_app/core/theme/app_colors.dart';
 
 import '../domain/queue_item_entity.dart';
 import '../domain/queue_sla.dart';
@@ -109,12 +110,13 @@ class QueueAgeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final urgency = ModerationSla.urgencyFor(priority: priority, age: age);
-    final style = _styleFor(urgency);
+    final style = _styleFor(urgency, context.appColors);
     final textTheme = Theme.of(context).textTheme;
 
-    final label = urgency == QueueUrgency.breached
-        ? '${formatQueueAge(age)} · overdue'
-        : formatQueueAge(age);
+    final label =
+        urgency == QueueUrgency.breached
+            ? '${formatQueueAge(age)} · overdue'
+            : formatQueueAge(age);
 
     return Container(
       key: ValueKey('age-chip-${urgency.name}'),
@@ -142,21 +144,22 @@ class QueueAgeChip extends StatelessWidget {
 
   static ({Color foreground, Color background, IconData icon}) _styleFor(
     QueueUrgency urgency,
+    AppColors colors,
   ) {
     return switch (urgency) {
       QueueUrgency.onTrack => (
-        foreground: Colors.green.shade700,
-        background: Colors.green.shade50,
+        foreground: colors.successText,
+        background: colors.successSubtle,
         icon: Icons.schedule,
       ),
       QueueUrgency.approaching => (
-        foreground: Colors.amber.shade800,
-        background: Colors.amber.shade50,
+        foreground: colors.warningText,
+        background: colors.warningSubtle,
         icon: Icons.hourglass_bottom,
       ),
       QueueUrgency.breached => (
-        foreground: Colors.red.shade700,
-        background: Colors.red.shade50,
+        foreground: colors.dangerText,
+        background: colors.dangerSubtle,
         icon: Icons.warning_amber_rounded,
       ),
     };

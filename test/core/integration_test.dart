@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 
-import 'package:social_commerce_app/core/config/app_theme.dart';
+import 'package:social_commerce_app/core/theme/app_theme.dart';
 import 'package:social_commerce_app/core/error_reporting.dart';
 import 'package:social_commerce_app/core/network/dio_client.dart';
 import 'package:social_commerce_app/core/storage/secure_token_storage.dart';

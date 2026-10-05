@@ -78,6 +78,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:social_commerce_app/core/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_failure.dart';
@@ -328,9 +329,8 @@ class _ContentThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     const size = 56.0;
     final url = thumbnailUrl;
-    final placeholderIcon = isVideo
-        ? Icons.movie_creation_outlined
-        : Icons.image_outlined;
+    final placeholderIcon =
+        isVideo ? Icons.movie_creation_outlined : Icons.image_outlined;
 
     if (url == null || url.isEmpty) {
       return Container(
@@ -350,12 +350,13 @@ class _ContentThumbnail extends StatelessWidget {
         width: size,
         height: size,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => Container(
-          width: size,
-          height: size,
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: const Icon(Icons.broken_image_outlined),
-        ),
+        errorBuilder:
+            (context, error, stackTrace) => Container(
+              width: size,
+              height: size,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              child: const Icon(Icons.broken_image_outlined),
+            ),
       ),
     );
   }
@@ -376,22 +377,23 @@ class _ModerationStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final (background, foreground, icon, label) = switch (status) {
       ModerationStatus.pendingReview => (
-        Colors.amber.shade50,
-        Colors.amber.shade800,
+        colors.warningSubtle,
+        colors.warningText,
         Icons.hourglass_bottom,
         'Under review',
       ),
       ModerationStatus.published => (
-        Colors.green.shade50,
-        Colors.green.shade700,
+        colors.successSubtle,
+        colors.successText,
         Icons.check_circle_outline,
         'Live',
       ),
       ModerationStatus.rejected => (
-        Colors.red.shade50,
-        Colors.red.shade700,
+        colors.dangerSubtle,
+        colors.dangerText,
         Icons.cancel_outlined,
         // Defensive fallback: rejectionReason should always be
         // non-null once status == rejected (STEP 1's backend
@@ -420,8 +422,8 @@ class _ProcessingBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _StatusChip(
-      background: Colors.blueGrey.shade50,
-      foreground: Colors.blueGrey.shade700,
+      background: context.appColors.surfaceVariant,
+      foreground: context.appColors.textSecondary,
       icon: Icons.hourglass_top,
       label: 'Processing video…',
     );
@@ -436,8 +438,8 @@ class _ProcessingFailedBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _StatusChip(
-      background: Colors.red.shade50,
-      foreground: Colors.red.shade700,
+      background: context.appColors.dangerSubtle,
+      foreground: context.appColors.dangerText,
       icon: Icons.error_outline,
       label: 'Video processing failed',
     );

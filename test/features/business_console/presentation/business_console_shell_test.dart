@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:social_commerce_app/core/config/app_theme.dart';
+import 'package:social_commerce_app/core/theme/app_theme.dart';
 import 'package:social_commerce_app/features/business_console/presentation/business_console_shell.dart';
 import 'package:social_commerce_app/features/stories/data/story_creation_repository.dart';
 import 'package:social_commerce_app/features/stories/presentation/story_upload_queue_provider.dart';

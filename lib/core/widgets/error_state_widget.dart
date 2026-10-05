@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
 import 'app_button.dart';
 
 /// Part P-006 scope: the one "something went wrong" state every feature
-/// screen should use — a message plus a retry action — instead of each
+/// screen should use - a message plus a retry action - instead of each
 /// feature hand-rolling its own error UI.
+///
+/// Part P-111: the icon uses the danger token.
 class ErrorStateWidget extends StatelessWidget {
   const ErrorStateWidget({
     super.key,
@@ -14,7 +17,7 @@ class ErrorStateWidget extends StatelessWidget {
 
   /// Human-readable error message shown to the user. Callers are
   /// expected to pass an already-friendly string (e.g. an
-  /// `ApiFailure.message` from `lib/core/network`) — this widget knows
+  /// `ApiFailure.message` from `lib/core/network`) - this widget knows
   /// nothing about failure types, per the architecture rule that
   /// `lib/core/widgets` stays feature- and layer-agnostic.
   final String message;
@@ -29,8 +32,12 @@ class ErrorStateWidget extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 48),
+          children: <Widget>[
+            Icon(
+              Icons.error_outline,
+              size: 48,
+              color: context.appColors.danger,
+            ),
             const SizedBox(height: 12),
             Text(
               message,
