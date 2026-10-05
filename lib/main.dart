@@ -12,6 +12,7 @@ import 'core/storage/secure_token_storage.dart';
 import 'features/auth/presentation/session_provider.dart';
 import 'features/notifications/presentation/push_notification_handler.dart';
 import 'features/notifications/presentation/push_session_bridge.dart';
+import 'l10n/app_localizations.dart';
 import 'routing/app_router.dart';
 
 /// Part P-111: the ThemeMode read from storage BEFORE the first frame
@@ -175,7 +176,10 @@ class _SocialCommerceAppState extends ConsumerState<SocialCommerceApp> {
     if (!_bootstrapped) {
       if (session.isLoading) {
         return MaterialApp(
-          title: 'Social Commerce Discovery Platform',
+          onGenerateTitle: (BuildContext context) =>
+              AppLocalizations.of(context).appTitle,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
@@ -193,7 +197,10 @@ class _SocialCommerceAppState extends ConsumerState<SocialCommerceApp> {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
-      title: 'Social Commerce Discovery Platform',
+      onGenerateTitle: (BuildContext context) =>
+          AppLocalizations.of(context).appTitle,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,

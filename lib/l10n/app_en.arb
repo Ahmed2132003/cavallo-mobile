@@ -1,0 +1,38 @@
+{
+  "@@locale": "en",
+  "appTitle": "Social Commerce Discovery Platform",
+  "@appTitle": {
+    "description": "Application title shown in the OS task switcher."
+  },
+  "relativeJustNow": "just now",
+  "@relativeJustNow": {
+    "description": "Relative time shown for something that happened less than a minute ago."
+  },
+  "relativeMinutesAgo": "{count, plural, one{{count} minute ago} other{{count} minutes ago}}",
+  "@relativeMinutesAgo": {
+    "description": "Relative time in minutes (1 to 59).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relativeHoursAgo": "{count, plural, one{{count} hour ago} other{{count} hours ago}}",
+  "@relativeHoursAgo": {
+    "description": "Relative time in hours (1 to 23).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relativeDaysAgo": "{count, plural, one{{count} day ago} other{{count} days ago}}",
+  "@relativeDaysAgo": {
+    "description": "Relative time in days (1 to 6).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

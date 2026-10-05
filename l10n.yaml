@@ -1,0 +1,12 @@
+# Part P-112: Flutter gen-l10n configuration.
+# Generated files are written NEXT TO the ARB files (no synthetic package),
+# are committed to git, and are imported as
+#   package:social_commerce_app/l10n/app_localizations.dart
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-dir: lib/l10n
+synthetic-package: false
+nullable-getter: false
+# Arabic first: it is the app's fallback language (Phase 23 overview).
+preferred-supported-locales: [ar, en]

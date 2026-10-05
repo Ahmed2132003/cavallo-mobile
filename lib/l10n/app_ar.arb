@@ -1,0 +1,8 @@
+{
+  "@@locale": "ar",
+  "appTitle": "Ù…Ù†ØµØ© Ø§ÙƒØªØ´Ø§Ù Ø§Ù„ØªØ¬Ø§Ø± ÙˆØ§Ù„Ù…ØµØ§Ù†Ø¹",
+  "relativeJustNow": "Ø§Ù„Ø¢Ù†",
+  "relativeMinutesAgo": "{count, plural, zero{Ù…Ù†Ø° {count} Ø¯Ù‚ÙŠÙ‚Ø©} one{Ù…Ù†Ø° Ø¯Ù‚ÙŠÙ‚Ø©} two{Ù…Ù†Ø° Ø¯Ù‚ÙŠÙ‚ØªÙŠÙ†} few{Ù…Ù†Ø° {count} Ø¯Ù‚Ø§Ø¦Ù‚} many{Ù…Ù†Ø° {count} Ø¯Ù‚ÙŠÙ‚Ø©} other{Ù…Ù†Ø° {count} Ø¯Ù‚ÙŠÙ‚Ø©}}",
+  "relativeHoursAgo": "{count, plural, zero{Ù…Ù†Ø° {count} Ø³Ø§Ø¹Ø©} one{Ù…Ù†Ø° Ø³Ø§Ø¹Ø©} two{Ù…Ù†Ø° Ø³Ø§Ø¹ØªÙŠÙ†} few{Ù…Ù†Ø° {count} Ø³Ø§Ø¹Ø§Øª} many{Ù…Ù†Ø° {count} Ø³Ø§Ø¹Ø©} other{Ù…Ù†Ø° {count} Ø³Ø§Ø¹Ø©}}",
+  "relativeDaysAgo": "{count, plural, zero{Ù…Ù†Ø° {count} ÙŠÙˆÙ…} one{Ù…Ù†Ø° ÙŠÙˆÙ…} two{Ù…Ù†Ø° ÙŠÙˆÙ…ÙŠÙ†} few{Ù…Ù†Ø° {count} Ø£ÙŠØ§Ù…} many{Ù…Ù†Ø° {count} ÙŠÙˆÙ…Ù‹Ø§} other{Ù…Ù†Ø° {count} ÙŠÙˆÙ…}}"
+}
