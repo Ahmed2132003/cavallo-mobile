@@ -243,4 +243,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get routeErrorGoHome => 'Back to home';
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navExplore => 'Explore';
+
+  @override
+  String get navSaved => 'Saved';
+
+  @override
+  String get navCreate => 'Create';
+
+  @override
+  String get navModeration => 'Moderation';
+
+  @override
+  String get navChats => 'Chats';
+
+  @override
+  String get navProfile => 'Profile';
 }

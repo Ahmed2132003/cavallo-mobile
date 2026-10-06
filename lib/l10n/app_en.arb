@@ -290,5 +290,33 @@
   "routeErrorGoHome": "Back to home",
   "@routeErrorGoHome": {
     "description": "Button of the unknown-address page that returns to the home screen."
+  },
+  "navHome": "Home",
+  "@navHome": {
+    "description": "Bottom bar tab: the home feed."
+  },
+  "navExplore": "Explore",
+  "@navExplore": {
+    "description": "Bottom bar tab: search and discover."
+  },
+  "navSaved": "Saved",
+  "@navSaved": {
+    "description": "Bottom bar tab (Customer): saved posts, reels and products."
+  },
+  "navCreate": "Create",
+  "@navCreate": {
+    "description": "Bottom bar tab (Business): opens the create sheet (post, reel, story, product)."
+  },
+  "navModeration": "Moderation",
+  "@navModeration": {
+    "description": "Bottom bar tab (Staff): the moderation queue."
+  },
+  "navChats": "Chats",
+  "@navChats": {
+    "description": "Bottom bar tab: conversations."
+  },
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Bottom bar tab: profile and settings."
   }
 }

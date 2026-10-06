@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/shell/app_shell.dart';
 import '../features/auth/domain/user_entity.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
@@ -285,6 +286,17 @@ import 'route_names.dart';
 /// Every pre-existing route name, path and screen builder is unchanged;
 /// `productList` and `contentList` were only moved into their branches.
 /// Part P-085 replaces the Analytics branch's builder and nothing else.
+///
+/// ## Part P-113 (STEP 2B) - the app shell
+///
+/// A second `StatefulShellRoute.indexedStack` (the first one is the Business
+/// console's) wraps the tab destinations in `AppShell`: bottom bar by account
+/// type, one navigator per tab. It has six branches in the order fixed by
+/// `ShellBranch` (home, discover, saved, moderation, chats, profile); the
+/// Business "+" is not a branch. The redirect guards above are unchanged: the
+/// shell sits inside them. Routes that are not tabs stay top-level and open
+/// above the shell. `home`, `discover`, `saved`, `moderation`, `chatList` and
+/// `profile` moved INTO the shell; their names and paths did not change.
 final appRouterProvider = Provider<GoRouter>((ref) {
   final refreshListenable = _SessionRefreshListenable(ref);
   ref.onDispose(refreshListenable.dispose);
@@ -446,16 +458,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const BusinessProfileEditScreen(),
       ),
       GoRoute(
-        path: RouteNames.homePath,
-        name: RouteNames.home,
-        builder: (context, state) => const HomeFeedScreen(),
-      ),
-      GoRoute(
-        path: RouteNames.discoverPath,
-        name: RouteNames.discover,
-        builder: (context, state) => const DiscoverScreen(),
-      ),
-      GoRoute(
         path: RouteNames.searchPath,
         name: RouteNames.search,
         builder: (context, state) => const SearchScreen(),
@@ -524,11 +526,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: RouteNames.chatListPath,
-        name: RouteNames.chatList,
-        builder: (context, state) => const ChatListScreen(),
-      ),
-      GoRoute(
         path: RouteNames.chatThreadPath,
         name: RouteNames.chatThread,
         builder: (context, state) {
@@ -548,17 +545,91 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.notificationPreferences,
         builder: (context, state) => const NotificationPreferencesScreen(),
       ),
-      GoRoute(
-        // Part P-113 (STEP 1 fix): placeholder, moved into the shell in STEP 2.
-        path: RouteNames.savedPath,
-        name: RouteNames.saved,
-        builder: (context, state) => const SavedScreen(),
-      ),
-      GoRoute(
-        // Part P-113 (STEP 1 fix): placeholder, moved into the shell in STEP 2.
-        path: RouteNames.profilePath,
-        name: RouteNames.profile,
-        builder: (context, state) => const ProfileHubScreen(),
+      StatefulShellRoute.indexedStack(
+        // Part P-113 (STEP 2B). The app shell: one branch per tab
+        // destination of ANY account type, in the order fixed by
+        // `ShellBranch` (lib/core/shell/shell_branches.dart):
+        // 0 home, 1 discover, 2 saved, 3 moderation, 4 chats, 5 profile.
+        // Each account type's bottom bar shows only the branches it needs
+        // (navigation_manifest.dart) but the indexes never change, so every
+        // tab keeps its own back stack and scroll position. Access is still
+        // decided by the redirect guards above (the /moderation gate covers
+        // the moderation branch); the shell never grants or hides a route.
+        // Everything that is not a tab (detail screens, forms, search,
+        // notifications, the Business console, moderation review) stays a
+        // top-level route and opens above the shell.
+        builder:
+            (context, state, navigationShell) =>
+                AppShell(navigationShell: navigationShell),
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.homePath,
+                name: RouteNames.home,
+                builder: (context, state) => const HomeFeedScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.discoverPath,
+                name: RouteNames.discover,
+                builder: (context, state) => const DiscoverScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                // Part P-113 STEP 1 placeholder; STEP 6 replaces the screen.
+                path: RouteNames.savedPath,
+                name: RouteNames.saved,
+                builder: (context, state) => const SavedScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                // Part P-040. Moderator-only - gated by the redirect callback
+                // above, not here. `onOpenItem` hands the tapped item to the
+                // review route as `extra`; the review route stays top-level
+                // so it opens above the shell.
+                path: RouteNames.moderationPath,
+                name: RouteNames.moderation,
+                builder:
+                    (context, state) => ModerationQueueScreen(
+                      onOpenItem:
+                          (item) => context.pushNamed(
+                            RouteNames.moderationReview,
+                            extra: item,
+                          ),
+                    ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.chatListPath,
+                name: RouteNames.chatList,
+                builder: (context, state) => const ChatListScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                // Part P-113 STEP 1 placeholder; STEP 5 replaces the screen.
+                path: RouteNames.profilePath,
+                name: RouteNames.profile,
+                builder: (context, state) => const ProfileHubScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         // Part P-083. No screen of its own any more: `/business-console`
@@ -668,22 +739,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.storyFormPath,
         name: RouteNames.storyForm,
         builder: (context, state) => const StoryCreationScreen(),
-      ),
-      GoRoute(
-        // Part P-040. Moderator-only — gated by the redirect callback
-        // above (see this provider's "Part P-040" doc section), not
-        // here. `onOpenItem` hands the tapped item to the review route
-        // as `extra`, like `productForm`'s edit mode above.
-        path: RouteNames.moderationPath,
-        name: RouteNames.moderation,
-        builder:
-            (context, state) => ModerationQueueScreen(
-              onOpenItem:
-                  (item) => context.pushNamed(
-                    RouteNames.moderationReview,
-                    extra: item,
-                  ),
-            ),
       ),
       GoRoute(
         // Part P-040. The redirect callback guarantees `extra` is a

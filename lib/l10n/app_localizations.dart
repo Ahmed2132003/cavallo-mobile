@@ -430,6 +430,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to home'**
   String get routeErrorGoHome;
+
+  /// Bottom bar tab: the home feed.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// Bottom bar tab: search and discover.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get navExplore;
+
+  /// Bottom bar tab (Customer): saved posts, reels and products.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get navSaved;
+
+  /// Bottom bar tab (Business): opens the create sheet (post, reel, story, product).
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get navCreate;
+
+  /// Bottom bar tab (Staff): the moderation queue.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderation'**
+  String get navModeration;
+
+  /// Bottom bar tab: conversations.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats'**
+  String get navChats;
+
+  /// Bottom bar tab: profile and settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get navProfile;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

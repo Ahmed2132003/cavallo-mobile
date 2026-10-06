@@ -255,4 +255,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get routeErrorGoHome => 'العودة إلى الرئيسية';
+
+  @override
+  String get navHome => 'الرئيسية';
+
+  @override
+  String get navExplore => 'استكشاف';
+
+  @override
+  String get navSaved => 'المحفوظات';
+
+  @override
+  String get navCreate => 'إنشاء';
+
+  @override
+  String get navModeration => 'المراجعة';
+
+  @override
+  String get navChats => 'المحادثات';
+
+  @override
+  String get navProfile => 'حسابي';
 }
