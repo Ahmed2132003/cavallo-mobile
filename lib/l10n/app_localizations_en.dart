@@ -88,4 +88,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorUnknown => 'An unexpected error occurred. Please try again.';
+
+  @override
+  String compactThousands(String value) {
+    return '${value}K';
+  }
+
+  @override
+  String compactMillions(String value) {
+    return '${value}M';
+  }
+
+  @override
+  String compactBillions(String value) {
+    return '${value}B';
+  }
+
+  @override
+  String monthName(String month) {
+    String _temp0 = intl.Intl.selectLogic(
+      month,
+      {
+        'january': 'January',
+        'february': 'February',
+        'march': 'March',
+        'april': 'April',
+        'may': 'May',
+        'june': 'June',
+        'july': 'July',
+        'august': 'August',
+        'september': 'September',
+        'october': 'October',
+        'november': 'November',
+        'december': 'December',
+        'other': '$month',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dateFull(String day, String month, String year) {
+    return '$month $day, $year';
+  }
+
+  @override
+  String dateAndTime(String date, String time) {
+    return '$date, $time';
+  }
+
+  @override
+  String currencyLabel(String currency) {
+    String _temp0 = intl.Intl.selectLogic(
+      currency,
+      {
+        'egp': 'EGP',
+        'sar': 'SAR',
+        'aed': 'AED',
+        'jod': 'JOD',
+        'other': '$currency',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String priceDisplay(String amount, String currency) {
+    return '$amount $currency';
+  }
 }

@@ -30,6 +30,10 @@ void main() {
         jsonDecode(File('lib/l10n/app_ar.arb').readAsStringSync())
             as Map<String, dynamic>;
     final List<String> broken = <String>[];
+    // A simple ICU placeholder such as {day}. Values made only of placeholders
+    // and punctuation (dateFull, priceDisplay) have no words to check.
+    final RegExp placeholder = RegExp(r'\{[A-Za-z_]\w*\}');
+    final RegExp anyLetter = RegExp('[A-Za-z\\u0621-\\u064A]');
     for (final MapEntry<String, dynamic> entry in arb.entries) {
       if (entry.key.startsWith('@')) {
         continue;
@@ -38,7 +42,10 @@ void main() {
       if (value is! String) {
         continue;
       }
-      if (!arabicLetter.hasMatch(value) || garbled.hasMatch(value)) {
+      final String words = value.replaceAll(placeholder, '');
+      final bool hasWordsButNoArabic =
+          anyLetter.hasMatch(words) && !arabicLetter.hasMatch(words);
+      if (hasWordsButNoArabic || garbled.hasMatch(value)) {
         broken.add(entry.key);
       }
     }

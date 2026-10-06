@@ -208,6 +208,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An unexpected error occurred. Please try again.'**
   String get errorUnknown;
+
+  /// Compact count in thousands, e.g. 12.4K followers. {value} is already formatted text with Western digits.
+  ///
+  /// In en, this message translates to:
+  /// **'{value}K'**
+  String compactThousands(String value);
+
+  /// Compact count in millions, e.g. 1.2M.
+  ///
+  /// In en, this message translates to:
+  /// **'{value}M'**
+  String compactMillions(String value);
+
+  /// Compact count in billions, e.g. 2.5B.
+  ///
+  /// In en, this message translates to:
+  /// **'{value}B'**
+  String compactBillions(String value);
+
+  /// Full month name. The argument is a lower-case English month key (january ... december).
+  ///
+  /// In en, this message translates to:
+  /// **'{month, select, january{January} february{February} march{March} april{April} may{May} june{June} july{July} august{August} september{September} october{October} november{November} december{December} other{{month}}}'**
+  String monthName(String month);
+
+  /// Absolute date. day and year are plain Western-digit text, month is the localized month name.
+  ///
+  /// In en, this message translates to:
+  /// **'{month} {day}, {year}'**
+  String dateFull(String day, String month, String year);
+
+  /// A date and a clock time written together.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}, {time}'**
+  String dateAndTime(String date, String time);
+
+  /// Short currency label shown next to a price. The argument is a lower-case ISO code of a supported currency.
+  ///
+  /// In en, this message translates to:
+  /// **'{currency, select, egp{EGP} sar{SAR} aed{AED} jod{JOD} other{{currency}}}'**
+  String currencyLabel(String currency);
+
+  /// A price: amount (already grouped, Western digits) and the short currency label. For discovery display only.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} {currency}'**
+  String priceDisplay(String amount, String currency);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

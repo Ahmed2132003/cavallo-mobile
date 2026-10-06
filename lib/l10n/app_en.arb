@@ -90,5 +90,89 @@
   "errorUnknown": "An unexpected error occurred. Please try again.",
   "@errorUnknown": {
     "description": "Fallback when nothing more specific is known."
+  },
+  "compactThousands": "{value}K",
+  "@compactThousands": {
+    "description": "Compact count in thousands, e.g. 12.4K followers. {value} is already formatted text with Western digits.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "compactMillions": "{value}M",
+  "@compactMillions": {
+    "description": "Compact count in millions, e.g. 1.2M.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "compactBillions": "{value}B",
+  "@compactBillions": {
+    "description": "Compact count in billions, e.g. 2.5B.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "monthName": "{month, select, january{January} february{February} march{March} april{April} may{May} june{June} july{July} august{August} september{September} october{October} november{November} december{December} other{{month}}}",
+  "@monthName": {
+    "description": "Full month name. The argument is a lower-case English month key (january ... december).",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "dateFull": "{month} {day}, {year}",
+  "@dateFull": {
+    "description": "Absolute date. day and year are plain Western-digit text, month is the localized month name.",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "dateAndTime": "{date}, {time}",
+  "@dateAndTime": {
+    "description": "A date and a clock time written together.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "currencyLabel": "{currency, select, egp{EGP} sar{SAR} aed{AED} jod{JOD} other{{currency}}}",
+  "@currencyLabel": {
+    "description": "Short currency label shown next to a price. The argument is a lower-case ISO code of a supported currency.",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "priceDisplay": "{amount} {currency}",
+  "@priceDisplay": {
+    "description": "A price: amount (already grouped, Western digits) and the short currency label. For discovery display only.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }
