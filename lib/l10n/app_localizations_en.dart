@@ -396,4 +396,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createSheetProduct => 'Product';
+
+  @override
+  String get homeWordmark => 'Cavallo';
+
+  @override
+  String get homeNotificationsTooltip => 'Notifications';
+
+  @override
+  String get homeChatsTooltip => 'Chats';
+
+  @override
+  String get discoverSearchHint => 'Search businesses, products and posts';
 }

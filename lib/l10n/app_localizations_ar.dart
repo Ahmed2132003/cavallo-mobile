@@ -408,4 +408,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get createSheetProduct => 'منتج';
+
+  @override
+  String get homeWordmark => 'Cavallo';
+
+  @override
+  String get homeNotificationsTooltip => 'الإشعارات';
+
+  @override
+  String get homeChatsTooltip => 'المحادثات';
+
+  @override
+  String get discoverSearchHint => 'ابحث عن أنشطة ومنتجات ومنشورات';
 }

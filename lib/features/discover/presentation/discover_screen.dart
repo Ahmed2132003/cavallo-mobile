@@ -58,6 +58,7 @@ import '../../content/presentation/reel_card.dart';
 import '../../feed/domain/feed_item_entity.dart';
 import '../../feed/presentation/home_feed_provider.dart' show FeedState;
 import 'discover_provider.dart';
+import 'discover_search_bar.dart';
 import 'stories_bar_widget.dart';
 
 class DiscoverScreen extends ConsumerStatefulWidget {
@@ -102,7 +103,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     final feedAsync = ref.watch(discoverFeedProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Discover')),
+      // Part P-113 (STEP 6A): the title is the search entry point.
+      appBar: AppBar(title: const DiscoverSearchBar()),
       body: switch (feedAsync) {
         AsyncData(value: final state) => _DiscoverBody(
           state: state,

@@ -84,6 +84,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/locale_provider.dart';
+import '../../../core/shell/home_top_bar.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
@@ -92,10 +93,14 @@ import '../../auth/domain/user_entity.dart';
 import '../../auth/presentation/session_provider.dart';
 import '../../business_profile/presentation/business_profile_provider.dart';
 import '../../business_profile/presentation/business_profile_public_provider.dart';
+import '../../chat/presentation/chat_unread_provider.dart';
 import '../../content/domain/public_post_entity.dart';
 import '../../content/domain/public_reel_entity.dart';
 import '../../content/presentation/post_card.dart';
 import '../../content/presentation/reel_card.dart';
+import '../../discover/presentation/discover_provider.dart';
+import '../../discover/presentation/stories_bar_widget.dart';
+import '../../notifications/presentation/notification_list_provider.dart';
 import '../domain/feed_item_entity.dart';
 import 'home_feed_provider.dart';
 
@@ -144,20 +149,10 @@ class _HomeFeedScreenState extends ConsumerState<HomeFeedScreen> {
     final feedAsync = ref.watch(homeFeedProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        actions: [
-          // Part P-082: the app's first real entry point to the
-          // notification center (/notifications).
-          IconButton(
-            key: const ValueKey('home-notifications-button'),
-            tooltip: 'Notifications',
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () => context.pushNamed(RouteNames.notifications),
-          ),
-          const _DebugMenu(),
-        ],
-      ),
+      // Part P-113 (STEP 5): the shared Home top bar (wordmark, bell and chats
+      // icons with unread badges). `_DebugMenu` is carried along until STEP 6
+      // deletes it.
+      appBar: const HomeTopBar(extraActions: <Widget>[_DebugMenu()]),
       body: switch (feedAsync) {
         AsyncData(value: final state) => _FeedBody(
           state: state,
@@ -183,8 +178,14 @@ class _FeedBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Future<void> handleRefresh() =>
-        ref.read(homeFeedProvider.notifier).refresh();
+    Future<void> handleRefresh() {
+      // Part P-113 (STEP 5): a user-initiated refresh also re-reads the two
+      // unread counts of the top bar (one request each, no polling).
+      ref.invalidate(notificationListProvider);
+      ref.invalidate(chatUnreadCountProvider);
+      ref.invalidate(activeStoryGroupsProvider);
+      return ref.read(homeFeedProvider.notifier).refresh();
+    }
 
     if (state.items.isEmpty) {
       return RefreshIndicator(
@@ -192,6 +193,7 @@ class _FeedBody extends ConsumerWidget {
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           children: const [
+            _HomeStoriesTray(),
             SizedBox(height: 96),
             EmptyStateWidget(
               message:
@@ -204,7 +206,8 @@ class _FeedBody extends ConsumerWidget {
       );
     }
 
-    final itemCount = state.items.length + (state.isLoadingMore ? 1 : 0);
+    // Index 0 is the stories tray (Part P-113 STEP 6A); feed items follow.
+    final itemCount = 1 + state.items.length + (state.isLoadingMore ? 1 : 0);
 
     return RefreshIndicator(
       onRefresh: handleRefresh,
@@ -214,7 +217,11 @@ class _FeedBody extends ConsumerWidget {
         padding: const EdgeInsets.all(12),
         itemCount: itemCount,
         itemBuilder: (context, index) {
-          if (index >= state.items.length) {
+          if (index == 0) {
+            return const _HomeStoriesTray();
+          }
+          final itemIndex = index - 1;
+          if (itemIndex >= state.items.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
               child: Center(
@@ -226,7 +233,7 @@ class _FeedBody extends ConsumerWidget {
               ),
             );
           }
-          return _FeedListItem(item: state.items[index]);
+          return _FeedListItem(item: state.items[itemIndex]);
         },
       ),
     );
@@ -295,6 +302,32 @@ class _LoadErrorView extends ConsumerWidget {
     return ErrorStateWidget(
       message: 'Could not load your feed.',
       onRetry: () => ref.invalidate(homeFeedProvider),
+    );
+  }
+}
+
+/// Part P-113 (STEP 6A): the stories tray at the top of the Home feed - the
+/// locked reachability matrix names it as the entry point to the Story viewer
+/// ("Tab 1; story rings open Story viewer"). It reuses the existing
+/// [StoriesBarWidget] (the same bar the Explore tab shows), draws nothing
+/// while signed out, and nothing when no business has an active story.
+class _HomeStoriesTray extends ConsumerWidget {
+  const _HomeStoriesTray();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool signedIn = ref.watch(
+      sessionProvider.select(
+        (AsyncValue<User?> session) => switch (session) {
+          AsyncData(:final value) => value != null,
+          _ => false,
+        },
+      ),
+    );
+    if (!signedIn) return const SizedBox.shrink();
+    return const Padding(
+      padding: EdgeInsets.only(bottom: 12),
+      child: StoriesBarWidget(),
     );
   }
 }

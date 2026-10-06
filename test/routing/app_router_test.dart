@@ -18,7 +18,10 @@ import 'package:social_commerce_app/features/business_profile/presentation/busin
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_provider.dart';
 import 'package:social_commerce_app/features/chat/presentation/chat_list_screen.dart';
+import 'package:social_commerce_app/features/chat/presentation/chat_unread_provider.dart';
 import 'package:social_commerce_app/features/categories/data/category_repository_impl.dart';
+import 'package:social_commerce_app/features/discover/domain/active_story_group_entity.dart';
+import 'package:social_commerce_app/features/discover/presentation/discover_provider.dart';
 import 'package:social_commerce_app/features/discover/presentation/discover_screen.dart';
 import 'package:social_commerce_app/features/feed/presentation/home_feed_screen.dart';
 import 'package:social_commerce_app/features/notifications/data/notification_repository_impl.dart';
@@ -193,6 +196,15 @@ Future<GoRouter> _pumpRouter(
   final container = ProviderContainer(
     overrides: [
       sessionProvider.overrideWith(() => _FakeSessionNotifier(sessionValue)),
+      // Part P-113 (STEP 5): Home now shows unread badges. Default fakes keep
+      // router tests off the network for chat and stories. There is
+      // deliberately NO default for notificationRepositoryProvider: Riverpod
+      // refuses two overrides of one provider in a container, and several
+      // tests pass their own through extraOverrides.
+      chatUnreadCountProvider.overrideWith((ref) async => 0),
+      activeStoryGroupsProvider.overrideWith(
+        (ref) async => const <ActiveStoryGroup>[],
+      ),
       ...extraOverrides,
     ],
   );

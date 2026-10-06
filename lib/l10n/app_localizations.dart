@@ -736,6 +736,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Product'**
   String get createSheetProduct;
+
+  /// Brand wordmark at the start of the Home top bar. A brand name, so it is the same in every language.
+  ///
+  /// In en, this message translates to:
+  /// **'Cavallo'**
+  String get homeWordmark;
+
+  /// Tooltip and screen-reader label of the bell icon in the Home top bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get homeNotificationsTooltip;
+
+  /// Tooltip and screen-reader label of the chats icon in the Home top bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats'**
+  String get homeChatsTooltip;
+
+  /// Hint of the search bar at the top of the Explore tab. Tapping it opens the search screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Search businesses, products and posts'**
+  String get discoverSearchHint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

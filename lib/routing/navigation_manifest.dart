@@ -520,7 +520,7 @@ const List<NavEntry> _avatarLinks = [
 const List<NavEntry> _storyRings = [
   NavEntry(
     NavEntryKind.inContextLink,
-    'Story rings in the Home tray and on Business profile avatars',
+    'Story rings in the Home tray and in the Explore tab stories bar',
   ),
 ];
 
