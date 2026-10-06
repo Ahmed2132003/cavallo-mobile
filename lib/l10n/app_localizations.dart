@@ -124,6 +124,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, one{{count} day ago} other{{count} days ago}}'**
   String relativeDaysAgo(int count);
+
+  /// Shown when the request could not reach the server (offline, timeout, DNS).
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check your internet and try again.'**
+  String get errorNetwork;
+
+  /// Shown when the TLS certificate check fails.
+  ///
+  /// In en, this message translates to:
+  /// **'A secure connection to the server could not be established.'**
+  String get errorSecureConnection;
+
+  /// Shown for server-side failures (HTTP 5xx).
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong on our end. Please try again later.'**
+  String get errorServer;
+
+  /// Backend code AUTHENTICATION_FAILED (missing, expired or invalid credentials).
+  ///
+  /// In en, this message translates to:
+  /// **'We could not verify your identity. Please sign in again.'**
+  String get errorAuthentication;
+
+  /// Generic 401/403 without a backend code.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not allowed to do that.'**
+  String get errorNotAuthorized;
+
+  /// Backend code PERMISSION_DENIED.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to do that.'**
+  String get errorPermissionDenied;
+
+  /// Backend code NOT_FOUND.
+  ///
+  /// In en, this message translates to:
+  /// **'We could not find what you were looking for.'**
+  String get errorNotFound;
+
+  /// Backend codes METHOD_NOT_ALLOWED, NOT_ACCEPTABLE, UNSUPPORTED_MEDIA_TYPE, PARSE_ERROR.
+  ///
+  /// In en, this message translates to:
+  /// **'That request could not be completed.'**
+  String get errorBadRequest;
+
+  /// Backend code VALIDATION_ERROR when no field-level text is shown.
+  ///
+  /// In en, this message translates to:
+  /// **'Some of the information you entered could not be accepted. Please check it and try again.'**
+  String get errorValidation;
+
+  /// Backend code THROTTLED (rate limit).
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts in a short time. Please wait a moment and try again.'**
+  String get errorThrottled;
+
+  /// Backend code CONFLICT (state conflict, e.g. already moderated).
+  ///
+  /// In en, this message translates to:
+  /// **'This item has already changed. Refresh and try again.'**
+  String get errorConflict;
+
+  /// Backend code SERVICE_UNAVAILABLE.
+  ///
+  /// In en, this message translates to:
+  /// **'This service is not available right now. Please try again later.'**
+  String get errorServiceUnavailable;
+
+  /// The request was cancelled on the device.
+  ///
+  /// In en, this message translates to:
+  /// **'The request was cancelled.'**
+  String get errorCancelled;
+
+  /// Fallback when nothing more specific is known.
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred. Please try again.'**
+  String get errorUnknown;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

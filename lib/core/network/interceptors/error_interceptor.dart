@@ -12,6 +12,10 @@ import '../api_failure.dart';
 /// so it sees the final outcome of the request, including anything the
 /// auth/logging interceptors did first.
 ///
+/// Part P-112: every failure also carries the envelope's `error.code` (or a
+/// client-side [ApiErrorCodes] value), so the UI can show a localized message
+/// without ever displaying the raw backend text.
+///
 /// Parses the backend's unified error envelope (architecture Section 10):
 /// ```json
 /// {"error": {"code": "VALIDATION_ERROR", "message": "...", "fields": {"email": ["already exists"]}}}
@@ -42,16 +46,21 @@ class ErrorInterceptor extends Interceptor {
         return const NetworkFailure(
           message: 'Network error. Please check your connection and try '
               'again.',
+          code: ApiErrorCodes.networkError,
         );
 
       case DioExceptionType.badCertificate:
         return const NetworkFailure(
           message: 'A secure connection to the server could not be '
               'established.',
+          code: ApiErrorCodes.badCertificate,
         );
 
       case DioExceptionType.cancel:
-        return const UnknownFailure(message: 'Request was cancelled.');
+        return const UnknownFailure(
+          message: 'Request was cancelled.',
+          code: ApiErrorCodes.cancelled,
+        );
 
       case DioExceptionType.badResponse:
         return _mapStatusCode(err);
@@ -65,6 +74,7 @@ class ErrorInterceptor extends Interceptor {
           return const NetworkFailure(
             message: 'Network error. Please check your connection and '
                 'try again.',
+            code: ApiErrorCodes.networkError,
           );
         }
         return UnknownFailure(
@@ -81,12 +91,14 @@ class ErrorInterceptor extends Interceptor {
       return ValidationFailure(
         message: envelope?.message ?? 'The request could not be validated.',
         fields: envelope?.fields ?? const {},
+        code: envelope?.code,
       );
     }
 
     if (statusCode == 401 || statusCode == 403) {
       return AuthFailure(
         message: envelope?.message ?? 'You are not authorized to do that.',
+        code: envelope?.code,
       );
     }
 
@@ -94,17 +106,19 @@ class ErrorInterceptor extends Interceptor {
       return ServerFailure(
         message: envelope?.message ?? 'Something went wrong on our end. '
             'Please try again later.',
+        code: envelope?.code,
       );
     }
 
     return UnknownFailure(
       message: envelope?.message ??
           'An unexpected error occurred (status $statusCode).',
+      code: envelope?.code,
     );
   }
 
   /// Parses the backend's `{"error": {"code","message","fields"}}` shape.
-  /// Returns null for anything that doesn't match — callers fall back to
+  /// Returns null for anything that doesn't match - callers fall back to
   /// a generic message rather than throwing while handling an error.
   _ErrorEnvelope? _parseEnvelope(dynamic data) {
     if (data is! Map) return null;

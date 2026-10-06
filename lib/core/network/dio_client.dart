@@ -2,9 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/app_config.dart';
+import '../l10n/locale_provider.dart';
 import '../storage/secure_token_storage.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
+import 'interceptors/locale_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
 import 'interceptors/refresh_interceptor.dart';
 
@@ -75,6 +77,9 @@ final dioClientProvider = Provider<Dio>((ref) {
   );
 
   final getToken = ref.watch(authTokenGetterProvider);
+  // Part P-112: the active language, as a plain callback (same pattern as the
+  // token getter) so [LocaleInterceptor] never holds a Ref.
+  final getLanguageCode = ref.watch(activeLanguageCodeGetterProvider);
   final tokenStorage = ref.watch(secureTokenStorageProvider);
 
   final invalidateSession = ref.watch(sessionInvalidatorProvider);
@@ -82,6 +87,7 @@ final dioClientProvider = Provider<Dio>((ref) {
   dio.interceptors.addAll([
     LoggingInterceptor(),
     AuthInterceptor(getToken: getToken),
+    LocaleInterceptor(getLanguageCode: getLanguageCode),
     ErrorInterceptor(),
     RefreshInterceptor(
       dio: dio,

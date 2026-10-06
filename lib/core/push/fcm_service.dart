@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../deep_link_resolver.dart';
 import '../error_reporting.dart';
+import '../l10n/locale_provider.dart';
 import '../network/dio_client.dart';
 
 /// Part P-081: the FCM pipeline on the Flutter side.
@@ -228,9 +229,11 @@ class FcmService {
     required PushMessagingClient client,
     required Dio dio,
     String? Function() platformResolver = defaultPushPlatform,
+    String? Function()? localeResolver,
   }) : _client = client,
        _dio = dio,
-       _platformResolver = platformResolver;
+       _platformResolver = platformResolver,
+       _localeResolver = localeResolver;
 
   /// Backend endpoint (Part P-081 backend, `devices/urls.py`).
   static const registerPath = '/api/v1/devices/register/';
@@ -238,6 +241,11 @@ class FcmService {
   final PushMessagingClient _client;
   final Dio _dio;
   final String? Function() _platformResolver;
+
+  /// Part P-112: the active app language ("ar" / "en"), sent with the token so
+  /// the backend can render push text in it. Optional: without it the body is
+  /// exactly `{token, platform}` as before.
+  final String? Function()? _localeResolver;
 
   final StreamController<PushMessage> _foregroundController =
       StreamController<PushMessage>.broadcast();
@@ -385,14 +393,28 @@ class FcmService {
     }
   }
 
+  /// Part P-112: the language to register with, or `null`. Never throws.
+  String? _resolveLocale() {
+    try {
+      return _localeResolver?.call();
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// POSTs the token. Never throws: returns `false` and reports the
   /// error, so neither login nor the refresh listener can be broken by
   /// a backend/network failure.
   Future<bool> _register(String token, String platform) async {
     try {
+      final String? locale = _resolveLocale();
       await _dio.post<dynamic>(
         registerPath,
-        data: {'token': token, 'platform': platform},
+        data: {
+          'token': token,
+          'platform': platform,
+          if (locale != null) 'locale': locale,
+        },
       );
       return true;
     } catch (error, stack) {
@@ -413,6 +435,7 @@ final fcmServiceProvider = Provider<FcmService>((ref) {
   final service = FcmService(
     client: ref.watch(pushMessagingClientProvider),
     dio: ref.watch(dioClientProvider),
+    localeResolver: ref.watch(activeLanguageCodeGetterProvider),
   );
   ref.onDispose(() => unawaited(service.dispose()));
   return service;

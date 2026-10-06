@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'core/config/app_config.dart';
+import 'core/l10n/locale_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_mode_provider.dart';
 import 'core/error_reporting.dart';
@@ -18,6 +19,10 @@ import 'routing/app_router.dart';
 /// Part P-111: the ThemeMode read from storage BEFORE the first frame
 /// (set once in main(), consumed by the ProviderScope override below).
 ThemeMode _initialThemeMode = ThemeMode.system;
+
+/// Part P-112: the saved language read from storage BEFORE the first frame
+/// (`null` = follow the device). Consumed by the ProviderScope override below.
+Locale? _initialLocale;
 
 /// Composition root for the app.
 ///
@@ -57,6 +62,10 @@ Future<void> main() async {
   // who chose Dark never sees a light flash on launch. Never throws
   // (corrupt or missing value = system).
   _initialThemeMode = await preloadThemeMode();
+
+  // Part P-112: same idea for the language, so a user who chose Arabic
+  // never sees English flash on launch. Never throws.
+  _initialLocale = await preloadLocale();
 
   if (AppConfig.sentryEnabled) {
     await SentryFlutter.init((options) {
@@ -108,6 +117,7 @@ void _installErrorHooksAndRunApp() {
     ProviderScope(
       overrides: [
         initialThemeModeProvider.overrideWithValue(_initialThemeMode),
+        initialLocaleProvider.overrideWithValue(_initialLocale),
         // Closes a gap flagged during P-022A: [authTokenGetterProvider]'s
         // own default (in dio_client.dart) is intentionally a no-op
         // returning null — that default is asserted directly by
@@ -172,6 +182,7 @@ class _SocialCommerceAppState extends ConsumerState<SocialCommerceApp> {
   Widget build(BuildContext context) {
     final session = ref.watch(sessionProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final locale = ref.watch(localeProvider);
 
     if (!_bootstrapped) {
       if (session.isLoading) {
@@ -179,6 +190,8 @@ class _SocialCommerceAppState extends ConsumerState<SocialCommerceApp> {
           onGenerateTitle: (BuildContext context) =>
               AppLocalizations.of(context).appTitle,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
+          locale: locale,
+          localeListResolutionCallback: resolveLocaleList,
           supportedLocales: AppLocalizations.supportedLocales,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
@@ -200,6 +213,8 @@ class _SocialCommerceAppState extends ConsumerState<SocialCommerceApp> {
       onGenerateTitle: (BuildContext context) =>
           AppLocalizations.of(context).appTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
+      locale: locale,
+      localeListResolutionCallback: resolveLocaleList,
       supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,

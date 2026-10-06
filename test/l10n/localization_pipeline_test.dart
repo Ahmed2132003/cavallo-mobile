@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:social_commerce_app/l10n/app_localizations.dart';
 
-/// Part P-112: proves the generated l10n pipeline works end to end â€”
+/// Part P-112: proves the generated l10n pipeline works end to end -
 /// Arabic plural forms for 0, 1, 2, 3, 11 and 100, Western digits, and the
 /// real text direction produced by MaterialApp for each language.
 void main() {
@@ -14,30 +14,30 @@ void main() {
     });
 
     test('minutes', () {
-      expect(ar.relativeMinutesAgo(0), 'Ù…Ù†Ø° 0 Ø¯Ù‚ÙŠÙ‚Ø©');
-      expect(ar.relativeMinutesAgo(1), 'Ù…Ù†Ø° Ø¯Ù‚ÙŠÙ‚Ø©');
-      expect(ar.relativeMinutesAgo(2), 'Ù…Ù†Ø° Ø¯Ù‚ÙŠÙ‚ØªÙŠÙ†');
-      expect(ar.relativeMinutesAgo(3), 'Ù…Ù†Ø° 3 Ø¯Ù‚Ø§Ø¦Ù‚');
-      expect(ar.relativeMinutesAgo(11), 'Ù…Ù†Ø° 11 Ø¯Ù‚ÙŠÙ‚Ø©');
-      expect(ar.relativeMinutesAgo(100), 'Ù…Ù†Ø° 100 Ø¯Ù‚ÙŠÙ‚Ø©');
+      expect(ar.relativeMinutesAgo(0), '\u0645\u0646\u0630 0 \u062f\u0642\u064a\u0642\u0629');
+      expect(ar.relativeMinutesAgo(1), '\u0645\u0646\u0630 \u062f\u0642\u064a\u0642\u0629');
+      expect(ar.relativeMinutesAgo(2), '\u0645\u0646\u0630 \u062f\u0642\u064a\u0642\u062a\u064a\u0646');
+      expect(ar.relativeMinutesAgo(3), '\u0645\u0646\u0630 3 \u062f\u0642\u0627\u0626\u0642');
+      expect(ar.relativeMinutesAgo(11), '\u0645\u0646\u0630 11 \u062f\u0642\u064a\u0642\u0629');
+      expect(ar.relativeMinutesAgo(100), '\u0645\u0646\u0630 100 \u062f\u0642\u064a\u0642\u0629');
     });
 
     test('hours', () {
-      expect(ar.relativeHoursAgo(0), 'Ù…Ù†Ø° 0 Ø³Ø§Ø¹Ø©');
-      expect(ar.relativeHoursAgo(1), 'Ù…Ù†Ø° Ø³Ø§Ø¹Ø©');
-      expect(ar.relativeHoursAgo(2), 'Ù…Ù†Ø° Ø³Ø§Ø¹ØªÙŠÙ†');
-      expect(ar.relativeHoursAgo(3), 'Ù…Ù†Ø° 3 Ø³Ø§Ø¹Ø§Øª');
-      expect(ar.relativeHoursAgo(11), 'Ù…Ù†Ø° 11 Ø³Ø§Ø¹Ø©');
-      expect(ar.relativeHoursAgo(100), 'Ù…Ù†Ø° 100 Ø³Ø§Ø¹Ø©');
+      expect(ar.relativeHoursAgo(0), '\u0645\u0646\u0630 0 \u0633\u0627\u0639\u0629');
+      expect(ar.relativeHoursAgo(1), '\u0645\u0646\u0630 \u0633\u0627\u0639\u0629');
+      expect(ar.relativeHoursAgo(2), '\u0645\u0646\u0630 \u0633\u0627\u0639\u062a\u064a\u0646');
+      expect(ar.relativeHoursAgo(3), '\u0645\u0646\u0630 3 \u0633\u0627\u0639\u0627\u062a');
+      expect(ar.relativeHoursAgo(11), '\u0645\u0646\u0630 11 \u0633\u0627\u0639\u0629');
+      expect(ar.relativeHoursAgo(100), '\u0645\u0646\u0630 100 \u0633\u0627\u0639\u0629');
     });
 
     test('days', () {
-      expect(ar.relativeDaysAgo(0), 'Ù…Ù†Ø° 0 ÙŠÙˆÙ…');
-      expect(ar.relativeDaysAgo(1), 'Ù…Ù†Ø° ÙŠÙˆÙ…');
-      expect(ar.relativeDaysAgo(2), 'Ù…Ù†Ø° ÙŠÙˆÙ…ÙŠÙ†');
-      expect(ar.relativeDaysAgo(3), 'Ù…Ù†Ø° 3 Ø£ÙŠØ§Ù…');
-      expect(ar.relativeDaysAgo(11), 'Ù…Ù†Ø° 11 ÙŠÙˆÙ…Ù‹Ø§');
-      expect(ar.relativeDaysAgo(100), 'Ù…Ù†Ø° 100 ÙŠÙˆÙ…');
+      expect(ar.relativeDaysAgo(0), '\u0645\u0646\u0630 0 \u064a\u0648\u0645');
+      expect(ar.relativeDaysAgo(1), '\u0645\u0646\u0630 \u064a\u0648\u0645');
+      expect(ar.relativeDaysAgo(2), '\u0645\u0646\u0630 \u064a\u0648\u0645\u064a\u0646');
+      expect(ar.relativeDaysAgo(3), '\u0645\u0646\u0630 3 \u0623\u064a\u0627\u0645');
+      expect(ar.relativeDaysAgo(11), '\u0645\u0646\u0630 11 \u064a\u0648\u0645\u064b\u0627');
+      expect(ar.relativeDaysAgo(100), '\u0645\u0646\u0630 100 \u064a\u0648\u0645');
     });
 
     test('digits are Western (0-9), never Arabic-Indic', () {
@@ -98,7 +98,7 @@ void main() {
       final TextDirection direction =
           await pumpWith(tester, const Locale('ar'));
       expect(direction, TextDirection.rtl);
-      expect(find.text('Ù…Ù†ØµØ© Ø§ÙƒØªØ´Ø§Ù Ø§Ù„ØªØ¬Ø§Ø± ÙˆØ§Ù„Ù…ØµØ§Ù†Ø¹'), findsOneWidget);
+      expect(find.text('\u0645\u0646\u0635\u0629 \u0627\u0643\u062a\u0634\u0627\u0641 \u0627\u0644\u062a\u062c\u0627\u0631 \u0648\u0627\u0644\u0645\u0635\u0627\u0646\u0639'), findsOneWidget);
     });
 
     testWidgets('English is left-to-right and shows the English title',

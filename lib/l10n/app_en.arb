@@ -34,5 +34,61 @@
         "type": "int"
       }
     }
+  },
+  "errorNetwork": "No connection. Check your internet and try again.",
+  "@errorNetwork": {
+    "description": "Shown when the request could not reach the server (offline, timeout, DNS)."
+  },
+  "errorSecureConnection": "A secure connection to the server could not be established.",
+  "@errorSecureConnection": {
+    "description": "Shown when the TLS certificate check fails."
+  },
+  "errorServer": "Something went wrong on our end. Please try again later.",
+  "@errorServer": {
+    "description": "Shown for server-side failures (HTTP 5xx)."
+  },
+  "errorAuthentication": "We could not verify your identity. Please sign in again.",
+  "@errorAuthentication": {
+    "description": "Backend code AUTHENTICATION_FAILED (missing, expired or invalid credentials)."
+  },
+  "errorNotAuthorized": "You are not allowed to do that.",
+  "@errorNotAuthorized": {
+    "description": "Generic 401/403 without a backend code."
+  },
+  "errorPermissionDenied": "You do not have permission to do that.",
+  "@errorPermissionDenied": {
+    "description": "Backend code PERMISSION_DENIED."
+  },
+  "errorNotFound": "We could not find what you were looking for.",
+  "@errorNotFound": {
+    "description": "Backend code NOT_FOUND."
+  },
+  "errorBadRequest": "That request could not be completed.",
+  "@errorBadRequest": {
+    "description": "Backend codes METHOD_NOT_ALLOWED, NOT_ACCEPTABLE, UNSUPPORTED_MEDIA_TYPE, PARSE_ERROR."
+  },
+  "errorValidation": "Some of the information you entered could not be accepted. Please check it and try again.",
+  "@errorValidation": {
+    "description": "Backend code VALIDATION_ERROR when no field-level text is shown."
+  },
+  "errorThrottled": "Too many attempts in a short time. Please wait a moment and try again.",
+  "@errorThrottled": {
+    "description": "Backend code THROTTLED (rate limit)."
+  },
+  "errorConflict": "This item has already changed. Refresh and try again.",
+  "@errorConflict": {
+    "description": "Backend code CONFLICT (state conflict, e.g. already moderated)."
+  },
+  "errorServiceUnavailable": "This service is not available right now. Please try again later.",
+  "@errorServiceUnavailable": {
+    "description": "Backend code SERVICE_UNAVAILABLE."
+  },
+  "errorCancelled": "The request was cancelled.",
+  "@errorCancelled": {
+    "description": "The request was cancelled on the device."
+  },
+  "errorUnknown": "An unexpected error occurred. Please try again.",
+  "@errorUnknown": {
+    "description": "Fallback when nothing more specific is known."
   }
 }
