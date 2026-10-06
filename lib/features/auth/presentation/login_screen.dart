@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/error_messages.dart';
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
@@ -15,10 +17,18 @@ import 'session_provider.dart';
 /// Deliberately does NOT navigate anywhere on a successful login. Once
 /// [SessionNotifier.login] succeeds, [sessionProvider]'s state becomes a
 /// non-null [User], `appRouterProvider` (which `ref.watch`es
-/// [sessionProvider]) rebuilds, and its redirect guard — also Part
-/// P-021b, `app_router.dart` — bounces away from `/login` toward `/home`
+/// [sessionProvider]) rebuilds, and its redirect guard - also Part
+/// P-021b, `app_router.dart` - bounces away from `/login` toward `/home`
 /// on its own. Navigating manually here as well would risk a double
 /// navigation race against that reactive redirect.
+///
+/// ### Part P-112 - localized texts, no raw backend sentences
+///
+/// Every text comes from the ARB files. The backend's own sentences (its
+/// `message` and its per-field `fields` texts) are English and are NEVER
+/// shown. Instead the screen remembers WHAT went wrong (a flag per field, or
+/// the failure itself) and builds the text at build time in the active
+/// language, so the message also follows a live language change.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -33,23 +43,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   bool _isSubmitting = false;
 
-  /// Backend-driven, field-specific error text — set only from a
-  /// [ValidationFailure]'s `fields` map (Part P-004). `null` unless the
-  /// backend has actually complained about that specific field.
+  /// `true` only when the backend complained about that specific field
+  /// (a [ValidationFailure]'s `fields` map, Part P-004). The text shown is
+  /// a fixed localized message, not the backend's sentence.
   ///
   /// These are read by each field's `validator`, but validators only run
-  /// when `Form.validate()` is called — setting these via `setState`
+  /// when `Form.validate()` is called - setting these via `setState`
   /// alone does not make the error text appear on-screen. [_submit]
   /// re-calls `_formKey.currentState?.validate()` after setting them for
   /// that reason (see the comment there).
-  String? _emailFieldError;
-  String? _passwordFieldError;
+  bool _emailRejected = false;
+  bool _passwordRejected = false;
 
   /// Any failure that doesn't map onto a specific field above (a
   /// [ValidationFailure] with no `email`/`password` entry, an
   /// [AuthFailure] for bad credentials, a [NetworkFailure], a
-  /// [ServerFailure], or an [UnknownFailure]).
-  String? _generalError;
+  /// [ServerFailure], or an [UnknownFailure]). The text is built from it
+  /// at build time.
+  ApiFailure? _generalFailure;
 
   @override
   void dispose() {
@@ -58,14 +69,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  static bool _hasFieldError(Map<String, List<String>> fields, String name) =>
+      (fields[name] ?? const <String>[]).isNotEmpty;
+
   Future<void> _submit() async {
     // Clear any previous backend-driven errors before re-validating, so a
     // field the user has since fixed doesn't keep showing a stale
     // server-side complaint from an earlier attempt.
     setState(() {
-      _emailFieldError = null;
-      _passwordFieldError = null;
-      _generalError = null;
+      _emailRejected = false;
+      _passwordRejected = false;
+      _generalFailure = null;
     });
 
     if (!(_formKey.currentState?.validate() ?? false)) {
@@ -81,31 +95,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
-      // No manual navigation on success — see this class's docstring.
+      // No manual navigation on success - see this class's docstring.
     } on ApiFailure catch (failure) {
       if (!mounted) return;
       setState(() {
         switch (failure) {
           case ValidationFailure(:final fields):
-            _emailFieldError = fields['email']?.join(' ');
-            _passwordFieldError = fields['password']?.join(' ');
+            _emailRejected = _hasFieldError(fields, 'email');
+            _passwordRejected = _hasFieldError(fields, 'password');
             // A ValidationFailure with no field-specific detail for
             // either field this form has (e.g. a generic/non-field
             // 400) still needs to be shown somewhere.
-            if (_emailFieldError == null && _passwordFieldError == null) {
-              _generalError = failure.message;
+            if (!_emailRejected && !_passwordRejected) {
+              _generalFailure = failure;
             }
-          // AuthFailure (bad credentials — LoginView requires valid
+          // AuthFailure (bad credentials - LoginView requires valid
           // credentials, Part P-018), NetworkFailure, ServerFailure,
           // UnknownFailure: none of these map to a specific field.
           case AuthFailure() ||
               NetworkFailure() ||
               ServerFailure() ||
               UnknownFailure():
-            _generalError = failure.message;
+            _generalFailure = failure;
         }
       });
-      // Validators only run when Form.validate() is called — re-run it
+      // Validators only run when Form.validate() is called - re-run it
       // now so the field-error strings just set above actually render.
       _formKey.currentState?.validate();
     } finally {
@@ -115,14 +129,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  /// On the login screen an [AuthFailure] means the credentials were
+  /// refused, so it gets the specific text; everything else goes through the
+  /// shared error-code mapping.
+  String _generalMessage(BuildContext context, ApiFailure failure) {
+    final l10n = context.l10n;
+    if (failure is AuthFailure) {
+      return l10n.authInvalidCredentials;
+    }
+    return localizedApiError(l10n, failure);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final generalFailure = _generalFailure;
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: Text(l10n.authLoginTitle)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsetsDirectional.all(24),
             child: Form(
               key: _formKey,
               child: Column(
@@ -130,38 +157,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   AppTextField(
-                    label: 'Email',
+                    label: l10n.authEmailLabel,
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (_emailFieldError != null) return _emailFieldError;
+                      if (_emailRejected) return l10n.authFieldErrorEmail;
                       final trimmed = value?.trim() ?? '';
-                      if (trimmed.isEmpty) return 'Email is required.';
+                      if (trimmed.isEmpty) return l10n.authEmailRequired;
                       if (!trimmed.contains('@')) {
-                        return 'Enter a valid email address.';
+                        return l10n.authEmailInvalid;
                       }
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
                   AppTextField(
-                    label: 'Password',
+                    label: l10n.authPasswordLabel,
                     controller: _passwordController,
                     obscureText: true,
                     validator: (value) {
-                      if (_passwordFieldError != null) {
-                        return _passwordFieldError;
+                      if (_passwordRejected) {
+                        return l10n.authFieldErrorPassword;
                       }
                       if ((value ?? '').isEmpty) {
-                        return 'Password is required.';
+                        return l10n.authPasswordRequired;
                       }
                       return null;
                     },
                   ),
-                  if (_generalError != null) ...[
+                  if (generalFailure != null) ...[
                     const SizedBox(height: 16),
                     Text(
-                      _generalError!,
+                      _generalMessage(context, generalFailure),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.error,
                       ),
@@ -169,7 +196,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ],
                   const SizedBox(height: 24),
                   AppButton(
-                    label: 'Log in',
+                    label: l10n.authLoginButton,
                     isLoading: _isSubmitting,
                     onPressed: _submit,
                   ),
@@ -179,7 +206,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         _isSubmitting
                             ? null
                             : () => context.goNamed(RouteNames.register),
-                    child: const Text("Don't have an account? Register"),
+                    child: Text(l10n.authGoToRegister),
                   ),
                 ],
               ),

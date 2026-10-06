@@ -36,6 +36,7 @@ import '../features/stories/presentation/story_creation_screen.dart';
 import '../features/stories/presentation/story_list_screen.dart';
 import '../features/stories/presentation/story_viewer_screen.dart';
 import '../features/chat/domain/conversation.dart';
+import 'route_error_screen.dart';
 import 'route_names.dart';
 
 /// Part P-007 scope: wires the app's single [GoRouter] instance and its
@@ -290,6 +291,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: RouteNames.splashPath,
     debugLogDiagnostics: true,
     refreshListenable: refreshListenable,
+    errorBuilder: (BuildContext context, GoRouterState state) =>
+        const RouteErrorScreen(),
     redirect: (BuildContext context, GoRouterState state) {
       // Snapshot read — NOT ref.watch. See the provider-level doc above
       // for why watching here would silently reintroduce the exact bug

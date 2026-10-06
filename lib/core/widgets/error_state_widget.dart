@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n_context.dart';
 import '../theme/app_colors.dart';
 import 'app_button.dart';
 
@@ -8,6 +9,7 @@ import 'app_button.dart';
 /// feature hand-rolling its own error UI.
 ///
 /// Part P-111: the icon uses the danger token.
+/// Part P-112: the retry label comes from the ARB files.
 class ErrorStateWidget extends StatelessWidget {
   const ErrorStateWidget({
     super.key,
@@ -16,10 +18,11 @@ class ErrorStateWidget extends StatelessWidget {
   });
 
   /// Human-readable error message shown to the user. Callers are
-  /// expected to pass an already-friendly string (e.g. an
-  /// `ApiFailure.message` from `lib/core/network`) - this widget knows
-  /// nothing about failure types, per the architecture rule that
-  /// `lib/core/widgets` stays feature- and layer-agnostic.
+  /// expected to pass an already-friendly string - normally the result of
+  /// `localizedApiError` (`lib/core/l10n/error_messages.dart`), never a raw
+  /// backend message. This widget knows nothing about failure types, per the
+  /// architecture rule that `lib/core/widgets` stays feature- and
+  /// layer-agnostic.
   final String message;
 
   /// Called when the user taps the retry button.
@@ -45,7 +48,7 @@ class ErrorStateWidget extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
-            AppButton(label: 'Retry', onPressed: onRetry),
+            AppButton(label: context.l10n.commonRetry, onPressed: onRetry),
           ],
         ),
       ),

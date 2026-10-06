@@ -174,5 +174,121 @@
         "type": "String"
       }
     }
+  },
+  "authLoginTitle": "Login",
+  "@authLoginTitle": {
+    "description": "App bar title of the login screen."
+  },
+  "authRegisterTitle": "Register",
+  "@authRegisterTitle": {
+    "description": "App bar title of the registration screen."
+  },
+  "authEmailLabel": "Email",
+  "@authEmailLabel": {
+    "description": "Label of the email field."
+  },
+  "authPasswordLabel": "Password",
+  "@authPasswordLabel": {
+    "description": "Label of the password field."
+  },
+  "authConfirmPasswordLabel": "Confirm password",
+  "@authConfirmPasswordLabel": {
+    "description": "Label of the confirm-password field."
+  },
+  "authAccountTypeLabel": "Account type",
+  "@authAccountTypeLabel": {
+    "description": "Label above the customer / business selector."
+  },
+  "authAccountTypeCustomer": "Customer",
+  "@authAccountTypeCustomer": {
+    "description": "Account type option: a person who discovers and follows businesses."
+  },
+  "authAccountTypeBusiness": "Business",
+  "@authAccountTypeBusiness": {
+    "description": "Account type option: a trader or factory."
+  },
+  "authLoginButton": "Log in",
+  "@authLoginButton": {
+    "description": "Submit button of the login form."
+  },
+  "authRegisterButton": "Create account",
+  "@authRegisterButton": {
+    "description": "Submit button of the registration form."
+  },
+  "authGoToRegister": "Don't have an account? Register",
+  "@authGoToRegister": {
+    "description": "Link from the login screen to the registration screen."
+  },
+  "authGoToLogin": "Already have an account? Log in",
+  "@authGoToLogin": {
+    "description": "Link from the registration screen to the login screen."
+  },
+  "authEmailRequired": "Email is required.",
+  "@authEmailRequired": {
+    "description": "Validation: email is empty."
+  },
+  "authEmailInvalid": "Enter a valid email address.",
+  "@authEmailInvalid": {
+    "description": "Validation: email has no @."
+  },
+  "authPasswordRequired": "Password is required.",
+  "@authPasswordRequired": {
+    "description": "Validation: password is empty."
+  },
+  "authConfirmPasswordRequired": "Please confirm your password.",
+  "@authConfirmPasswordRequired": {
+    "description": "Validation: confirm-password is empty."
+  },
+  "authPasswordsDoNotMatch": "Passwords do not match.",
+  "@authPasswordsDoNotMatch": {
+    "description": "Validation: the two passwords differ (checked on the device)."
+  },
+  "authInvalidCredentials": "Invalid email or password.",
+  "@authInvalidCredentials": {
+    "description": "Shown on the login screen when the server rejects the credentials."
+  },
+  "authAutoLoginFailed": "Account created, but automatic sign-in failed. Please log in.",
+  "@authAutoLoginFailed": {
+    "description": "Shown when registration worked but the automatic login right after it failed."
+  },
+  "authFieldErrorEmail": "This email address cannot be used. Please check it or try another one.",
+  "@authFieldErrorEmail": {
+    "description": "The server rejected the email field. The server's own sentence is never shown."
+  },
+  "authFieldErrorPassword": "This password cannot be used. Please choose a different one.",
+  "@authFieldErrorPassword": {
+    "description": "The server rejected the password field."
+  },
+  "authFieldErrorPasswordConfirm": "The passwords you entered do not match.",
+  "@authFieldErrorPasswordConfirm": {
+    "description": "The server rejected the confirm-password field."
+  },
+  "authFieldErrorAccountType": "Please choose a valid account type.",
+  "@authFieldErrorAccountType": {
+    "description": "The server rejected the account type."
+  },
+  "commonRetry": "Retry",
+  "@commonRetry": {
+    "description": "Retry button of the shared error state."
+  },
+  "splashLoading": "Loading...",
+  "@splashLoading": {
+    "description": "Text on the splash screen while the session is checked."
+  },
+  "splashGoToLogin": "Go to login",
+  "@splashGoToLogin": {
+    "description": "Button on the splash placeholder that opens the login screen."
+  },
+  "routeErrorTitle": "Page not found",
+  "@routeErrorTitle": {
+    "description": "Title of the page shown for an address the app does not know."
+  },
+  "routeErrorMessage": "The page you are looking for does not exist or has moved.",
+  "@routeErrorMessage": {
+    "description": "Body of the unknown-address page."
+  },
+  "routeErrorGoHome": "Back to home",
+  "@routeErrorGoHome": {
+    "description": "Button of the unknown-address page that returns to the home screen."
   }
 }

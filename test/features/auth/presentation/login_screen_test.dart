@@ -90,6 +90,9 @@ Future<void> _enterCredentials(
   await tester.enterText(find.byType(TextFormField).at(1), password);
 }
 
+const String _emailRejected =
+    'This email address cannot be used. Please check it or try another one.';
+
 void main() {
   setUp(() {
     // SessionNotifier.build() (Part P-021a) reads SecureTokenStorage on
@@ -188,7 +191,7 @@ void main() {
         await tester.tap(find.byType(AppButton));
         await tester.pumpAndSettle();
 
-        expect(find.text('No account found with this email.'), findsOneWidget);
+        expect(find.text(_emailRejected), findsOneWidget);
       },
     );
 
@@ -238,13 +241,13 @@ void main() {
         await _enterCredentials(tester);
         await tester.tap(find.byType(AppButton));
         await tester.pumpAndSettle();
-        expect(find.text('No account found with this email.'), findsOneWidget);
+        expect(find.text(_emailRejected), findsOneWidget);
 
         shouldFail = false;
         await tester.tap(find.byType(AppButton));
         await tester.pumpAndSettle();
 
-        expect(find.text('No account found with this email.'), findsNothing);
+        expect(find.text(_emailRejected), findsNothing);
       },
     );
   });

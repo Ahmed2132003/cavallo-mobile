@@ -256,6 +256,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{amount} {currency}'**
   String priceDisplay(String amount, String currency);
+
+  /// App bar title of the login screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get authLoginTitle;
+
+  /// App bar title of the registration screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get authRegisterTitle;
+
+  /// Label of the email field.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get authEmailLabel;
+
+  /// Label of the password field.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get authPasswordLabel;
+
+  /// Label of the confirm-password field.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get authConfirmPasswordLabel;
+
+  /// Label above the customer / business selector.
+  ///
+  /// In en, this message translates to:
+  /// **'Account type'**
+  String get authAccountTypeLabel;
+
+  /// Account type option: a person who discovers and follows businesses.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer'**
+  String get authAccountTypeCustomer;
+
+  /// Account type option: a trader or factory.
+  ///
+  /// In en, this message translates to:
+  /// **'Business'**
+  String get authAccountTypeBusiness;
+
+  /// Submit button of the login form.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in'**
+  String get authLoginButton;
+
+  /// Submit button of the registration form.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get authRegisterButton;
+
+  /// Link from the login screen to the registration screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? Register'**
+  String get authGoToRegister;
+
+  /// Link from the registration screen to the login screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Log in'**
+  String get authGoToLogin;
+
+  /// Validation: email is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required.'**
+  String get authEmailRequired;
+
+  /// Validation: email has no @.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get authEmailInvalid;
+
+  /// Validation: password is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required.'**
+  String get authPasswordRequired;
+
+  /// Validation: confirm-password is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password.'**
+  String get authConfirmPasswordRequired;
+
+  /// Validation: the two passwords differ (checked on the device).
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get authPasswordsDoNotMatch;
+
+  /// Shown on the login screen when the server rejects the credentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email or password.'**
+  String get authInvalidCredentials;
+
+  /// Shown when registration worked but the automatic login right after it failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Account created, but automatic sign-in failed. Please log in.'**
+  String get authAutoLoginFailed;
+
+  /// The server rejected the email field. The server's own sentence is never shown.
+  ///
+  /// In en, this message translates to:
+  /// **'This email address cannot be used. Please check it or try another one.'**
+  String get authFieldErrorEmail;
+
+  /// The server rejected the password field.
+  ///
+  /// In en, this message translates to:
+  /// **'This password cannot be used. Please choose a different one.'**
+  String get authFieldErrorPassword;
+
+  /// The server rejected the confirm-password field.
+  ///
+  /// In en, this message translates to:
+  /// **'The passwords you entered do not match.'**
+  String get authFieldErrorPasswordConfirm;
+
+  /// The server rejected the account type.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose a valid account type.'**
+  String get authFieldErrorAccountType;
+
+  /// Retry button of the shared error state.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get commonRetry;
+
+  /// Text on the splash screen while the session is checked.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get splashLoading;
+
+  /// Button on the splash placeholder that opens the login screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to login'**
+  String get splashGoToLogin;
+
+  /// Title of the page shown for an address the app does not know.
+  ///
+  /// In en, this message translates to:
+  /// **'Page not found'**
+  String get routeErrorTitle;
+
+  /// Body of the unknown-address page.
+  ///
+  /// In en, this message translates to:
+  /// **'The page you are looking for does not exist or has moved.'**
+  String get routeErrorMessage;
+
+  /// Button of the unknown-address page that returns to the home screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to home'**
+  String get routeErrorGoHome;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

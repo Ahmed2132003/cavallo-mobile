@@ -145,6 +145,17 @@ Future<void> _enterValidForm(
   );
 }
 
+const String _emailRejected =
+    'This email address cannot be used. Please check it or try another one.';
+const String _confirmRejected =
+    'The passwords you entered do not match.';
+const String _accountTypeRejected =
+    'Please choose a valid account type.';
+const String _validationError =
+    'Some of the information you entered could not be accepted. Please check it and try again.';
+const String _serverError =
+    'Something went wrong on our end. Please try again later.';
+
 void main() {
   setUp(() {
     // SessionNotifier.build() (Part P-021a) reads SecureTokenStorage on
@@ -309,7 +320,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(
-          find.text('A user with this email already exists.'),
+          find.text(_emailRejected),
           findsOneWidget,
         );
         expect(fakeRepo.loginCallCount, 0);
@@ -335,7 +346,7 @@ void main() {
         await tester.tap(find.widgetWithText(AppButton, 'Create account'));
         await tester.pumpAndSettle();
 
-        expect(find.text("Passwords didn't match."), findsOneWidget);
+        expect(find.text(_confirmRejected), findsOneWidget);
       },
     );
 
@@ -358,7 +369,7 @@ void main() {
         await tester.tap(find.widgetWithText(AppButton, 'Create account'));
         await tester.pumpAndSettle();
 
-        expect(find.text('Not a valid choice.'), findsOneWidget);
+        expect(find.text(_accountTypeRejected), findsOneWidget);
       },
     );
 
@@ -380,7 +391,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(
-          find.text('Something about the request was invalid.'),
+          find.text(_validationError),
           findsOneWidget,
         );
       },
@@ -400,7 +411,7 @@ void main() {
         await tester.tap(find.widgetWithText(AppButton, 'Create account'));
         await tester.pumpAndSettle();
 
-        expect(find.text('Something went wrong.'), findsOneWidget);
+        expect(find.text(_serverError), findsOneWidget);
       },
     );
   });

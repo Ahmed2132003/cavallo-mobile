@@ -168,4 +168,91 @@ class AppLocalizationsAr extends AppLocalizations {
   String priceDisplay(String amount, String currency) {
     return '$amount $currency';
   }
+
+  @override
+  String get authLoginTitle => 'تسجيل الدخول';
+
+  @override
+  String get authRegisterTitle => 'إنشاء حساب';
+
+  @override
+  String get authEmailLabel => 'البريد الإلكتروني';
+
+  @override
+  String get authPasswordLabel => 'كلمة المرور';
+
+  @override
+  String get authConfirmPasswordLabel => 'تأكيد كلمة المرور';
+
+  @override
+  String get authAccountTypeLabel => 'نوع الحساب';
+
+  @override
+  String get authAccountTypeCustomer => 'عميل';
+
+  @override
+  String get authAccountTypeBusiness => 'نشاط تجاري';
+
+  @override
+  String get authLoginButton => 'تسجيل الدخول';
+
+  @override
+  String get authRegisterButton => 'إنشاء الحساب';
+
+  @override
+  String get authGoToRegister => 'ليس لديك حساب؟ أنشئ حسابًا';
+
+  @override
+  String get authGoToLogin => 'لديك حساب بالفعل؟ سجّل الدخول';
+
+  @override
+  String get authEmailRequired => 'البريد الإلكتروني مطلوب.';
+
+  @override
+  String get authEmailInvalid => 'أدخل بريدًا إلكترونيًا صالحًا.';
+
+  @override
+  String get authPasswordRequired => 'كلمة المرور مطلوبة.';
+
+  @override
+  String get authConfirmPasswordRequired => 'يرجى تأكيد كلمة المرور.';
+
+  @override
+  String get authPasswordsDoNotMatch => 'كلمتا المرور غير متطابقتين.';
+
+  @override
+  String get authInvalidCredentials => 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+
+  @override
+  String get authAutoLoginFailed => 'تم إنشاء الحساب، لكن تعذّر تسجيل الدخول تلقائيًا. يرجى تسجيل الدخول.';
+
+  @override
+  String get authFieldErrorEmail => 'لا يمكن استخدام هذا البريد الإلكتروني. تحقق منه أو جرّب بريدًا آخر.';
+
+  @override
+  String get authFieldErrorPassword => 'لا يمكن استخدام كلمة المرور هذه. يرجى اختيار كلمة أخرى.';
+
+  @override
+  String get authFieldErrorPasswordConfirm => 'كلمتا المرور اللتان أدخلتهما غير متطابقتين.';
+
+  @override
+  String get authFieldErrorAccountType => 'يرجى اختيار نوع حساب صالح.';
+
+  @override
+  String get commonRetry => 'إعادة المحاولة';
+
+  @override
+  String get splashLoading => 'جارٍ التحميل...';
+
+  @override
+  String get splashGoToLogin => 'الانتقال إلى تسجيل الدخول';
+
+  @override
+  String get routeErrorTitle => 'الصفحة غير موجودة';
+
+  @override
+  String get routeErrorMessage => 'الصفحة التي تبحث عنها غير موجودة أو تم نقلها.';
+
+  @override
+  String get routeErrorGoHome => 'العودة إلى الرئيسية';
 }

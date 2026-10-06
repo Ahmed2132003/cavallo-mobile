@@ -156,4 +156,91 @@ class AppLocalizationsEn extends AppLocalizations {
   String priceDisplay(String amount, String currency) {
     return '$amount $currency';
   }
+
+  @override
+  String get authLoginTitle => 'Login';
+
+  @override
+  String get authRegisterTitle => 'Register';
+
+  @override
+  String get authEmailLabel => 'Email';
+
+  @override
+  String get authPasswordLabel => 'Password';
+
+  @override
+  String get authConfirmPasswordLabel => 'Confirm password';
+
+  @override
+  String get authAccountTypeLabel => 'Account type';
+
+  @override
+  String get authAccountTypeCustomer => 'Customer';
+
+  @override
+  String get authAccountTypeBusiness => 'Business';
+
+  @override
+  String get authLoginButton => 'Log in';
+
+  @override
+  String get authRegisterButton => 'Create account';
+
+  @override
+  String get authGoToRegister => 'Don\'t have an account? Register';
+
+  @override
+  String get authGoToLogin => 'Already have an account? Log in';
+
+  @override
+  String get authEmailRequired => 'Email is required.';
+
+  @override
+  String get authEmailInvalid => 'Enter a valid email address.';
+
+  @override
+  String get authPasswordRequired => 'Password is required.';
+
+  @override
+  String get authConfirmPasswordRequired => 'Please confirm your password.';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Passwords do not match.';
+
+  @override
+  String get authInvalidCredentials => 'Invalid email or password.';
+
+  @override
+  String get authAutoLoginFailed => 'Account created, but automatic sign-in failed. Please log in.';
+
+  @override
+  String get authFieldErrorEmail => 'This email address cannot be used. Please check it or try another one.';
+
+  @override
+  String get authFieldErrorPassword => 'This password cannot be used. Please choose a different one.';
+
+  @override
+  String get authFieldErrorPasswordConfirm => 'The passwords you entered do not match.';
+
+  @override
+  String get authFieldErrorAccountType => 'Please choose a valid account type.';
+
+  @override
+  String get commonRetry => 'Retry';
+
+  @override
+  String get splashLoading => 'Loading...';
+
+  @override
+  String get splashGoToLogin => 'Go to login';
+
+  @override
+  String get routeErrorTitle => 'Page not found';
+
+  @override
+  String get routeErrorMessage => 'The page you are looking for does not exist or has moved.';
+
+  @override
+  String get routeErrorGoHome => 'Back to home';
 }
