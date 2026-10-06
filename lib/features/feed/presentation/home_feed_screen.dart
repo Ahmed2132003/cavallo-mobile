@@ -83,6 +83,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/locale_provider.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
@@ -370,6 +371,20 @@ class _DebugMenu extends ConsumerWidget {
               value: 'openChat',
               child: Text('Open Chat (debug — no nav entry point yet)'),
             ),
+            // Part P-112: TEMPORARY language switch (debug only). The real
+            // Language selector arrives in P-113 and replaces these entries.
+            const PopupMenuItem(
+              value: 'langEn',
+              child: Text('Language: English (debug)'),
+            ),
+            const PopupMenuItem(
+              value: 'langAr',
+              child: Text('Language: Arabic (debug)'),
+            ),
+            const PopupMenuItem(
+              value: 'langSystem',
+              child: Text('Language: follow device (debug)'),
+            ),
             const PopupMenuItem(value: 'logout', child: Text('Logout (debug)')),
           ],
     );
@@ -395,6 +410,12 @@ class _DebugMenu extends ConsumerWidget {
         context.pushNamed(RouteNames.discover);
       case 'openChat':
         context.pushNamed(RouteNames.chatList);
+      case 'langEn':
+        ref.read(localeProvider.notifier).setLocale(const Locale('en'));
+      case 'langAr':
+        ref.read(localeProvider.notifier).setLocale(const Locale('ar'));
+      case 'langSystem':
+        ref.read(localeProvider.notifier).setLocale(null);
       case 'logout':
         ref.read(sessionProvider.notifier).logout();
     }

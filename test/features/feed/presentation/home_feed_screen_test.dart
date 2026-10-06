@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:social_commerce_app/core/l10n/locale_provider.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
 import 'package:social_commerce_app/features/business_profile/data/business_profile_public_repository.dart';
@@ -127,6 +128,38 @@ void _useTallSurface(WidgetTester tester) {
 }
 
 void main() {
+  testWidgets('debug menu switches the app language (temporary P-112 control)', (
+    tester,
+  ) async {
+    _useTallSurface(tester);
+    final fake = _FakeFeedRepository({
+      null: FeedPage(items: [_post(1)], nextCursor: null),
+    });
+    await tester.pumpWidget(_wrap(fake));
+    await tester.pump();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(HomeFeedScreen)),
+    );
+    expect(container.read(localeProvider), isNull);
+
+    Future<void> choose(String label) async {
+      await tester.tap(find.byTooltip('Debug menu'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(label));
+      await tester.pumpAndSettle();
+    }
+
+    await choose('Language: Arabic (debug)');
+    expect(container.read(localeProvider), const Locale('ar'));
+
+    await choose('Language: English (debug)');
+    expect(container.read(localeProvider), const Locale('en'));
+
+    await choose('Language: follow device (debug)');
+    expect(container.read(localeProvider), isNull);
+  });
+
   group('loading, empty and error states', () {
     testWidgets('shows a loading indicator while the first page is in flight', (
       tester,
