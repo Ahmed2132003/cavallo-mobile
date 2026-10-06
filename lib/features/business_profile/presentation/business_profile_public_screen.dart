@@ -20,6 +20,7 @@ import '../../products/presentation/product_price_framing.dart';
 import '../../products/presentation/product_public_providers.dart';
 import '../domain/business_profile_entity.dart';
 import 'business_profile_public_provider.dart';
+import 'own_profile_edit_button.dart';
 
 /// Part P-029 scope: the customer-facing, READ-ONLY business profile
 /// screen behind `/business/:id` — the "Business Profile" step of the
@@ -126,7 +127,10 @@ class BusinessProfilePublicScreen extends ConsumerWidget {
     final profileAsync = ref.watch(businessProfilePublicProvider(id));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Business')),
+      appBar: AppBar(
+        title: const Text('Business'),
+        actions: <Widget>[OwnProfileEditButton(businessId: id)],
+      ),
       body: switch (profileAsync) {
         // Order matters: AsyncData is matched before the catch-all, and
         // its null case (a confirmed backend 404 — see

@@ -19,6 +19,7 @@ import '../../business_profile/presentation/business_profile_provider.dart';
 import '../../moderation/domain/queue_item_entity.dart';
 import '../../moderation/presentation/moderation_provider.dart';
 import 'appearance_selector.dart';
+import 'business_shortcuts.dart';
 import 'language_selector.dart';
 import 'settings_rows.dart';
 
@@ -254,6 +255,7 @@ class ProfileHubScreen extends ConsumerWidget {
       body: ListView(
         children: <Widget>[
           _HubHeader(user: user, audience: audience, business: business),
+          if (audience == NavAudience.business) const BusinessShortcuts(),
           if (libraryRows.isNotEmpty) SettingsGroup(children: libraryRows),
           if (settingsRows.isNotEmpty)
             SettingsGroup(title: l10n.hubSettingsGroup, children: settingsRows),
