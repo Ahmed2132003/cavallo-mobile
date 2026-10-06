@@ -276,4 +276,88 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get navProfile => 'حسابي';
+
+  @override
+  String get hubTitle => 'الحساب والإعدادات';
+
+  @override
+  String get hubAccountTypeCustomer => 'عميل';
+
+  @override
+  String get hubAccountTypeBusiness => 'نشاط تجاري';
+
+  @override
+  String get hubAccountTypeStaff => 'فريق العمل';
+
+  @override
+  String get hubSaved => 'المحفوظات';
+
+  @override
+  String get hubNotificationPreferences => 'تفضيلات الإشعارات';
+
+  @override
+  String get hubSettingsGroup => 'الإعدادات';
+
+  @override
+  String get hubAppearance => 'المظهر';
+
+  @override
+  String get hubAppearanceSystem => 'النظام';
+
+  @override
+  String get hubAppearanceLight => 'فاتح';
+
+  @override
+  String get hubAppearanceDark => 'داكن';
+
+  @override
+  String get hubLanguage => 'اللغة';
+
+  @override
+  String get hubBusinessTools => 'أدوات النشاط التجاري';
+
+  @override
+  String get hubBusinessConsole => 'لوحة النشاط التجاري';
+
+  @override
+  String get hubEditBusinessProfile => 'تعديل ملف النشاط';
+
+  @override
+  String get hubProducts => 'المنتجات';
+
+  @override
+  String get hubContent => 'المحتوى';
+
+  @override
+  String get hubStories => 'القصص';
+
+  @override
+  String get hubAnalytics => 'التحليلات';
+
+  @override
+  String get hubFeaturedStatus => 'حالة التمييز';
+
+  @override
+  String get hubFeaturedNo => 'غير مميّز';
+
+  @override
+  String get hubModeration => 'المراجعة';
+
+  @override
+  String get hubModerationQueue => 'قائمة المراجعة';
+
+  @override
+  String get hubAbout => 'عن التطبيق';
+
+  @override
+  String get hubLogOut => 'تسجيل الخروج';
+
+  @override
+  String get hubLogOutConfirmTitle => 'تسجيل الخروج؟';
+
+  @override
+  String get hubLogOutConfirmMessage => 'ستحتاج إلى تسجيل الدخول مرة أخرى لاستخدام حسابك.';
+
+  @override
+  String get hubCancel => 'إلغاء';
 }

@@ -264,4 +264,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navProfile => 'Profile';
+
+  @override
+  String get hubTitle => 'Profile & Settings';
+
+  @override
+  String get hubAccountTypeCustomer => 'Customer';
+
+  @override
+  String get hubAccountTypeBusiness => 'Business';
+
+  @override
+  String get hubAccountTypeStaff => 'Staff';
+
+  @override
+  String get hubSaved => 'Saved';
+
+  @override
+  String get hubNotificationPreferences => 'Notification preferences';
+
+  @override
+  String get hubSettingsGroup => 'Settings';
+
+  @override
+  String get hubAppearance => 'Appearance';
+
+  @override
+  String get hubAppearanceSystem => 'System';
+
+  @override
+  String get hubAppearanceLight => 'Light';
+
+  @override
+  String get hubAppearanceDark => 'Dark';
+
+  @override
+  String get hubLanguage => 'Language';
+
+  @override
+  String get hubBusinessTools => 'Business tools';
+
+  @override
+  String get hubBusinessConsole => 'Business console';
+
+  @override
+  String get hubEditBusinessProfile => 'Edit business profile';
+
+  @override
+  String get hubProducts => 'Products';
+
+  @override
+  String get hubContent => 'Content';
+
+  @override
+  String get hubStories => 'Stories';
+
+  @override
+  String get hubAnalytics => 'Analytics';
+
+  @override
+  String get hubFeaturedStatus => 'Featured status';
+
+  @override
+  String get hubFeaturedNo => 'Not featured';
+
+  @override
+  String get hubModeration => 'Moderation';
+
+  @override
+  String get hubModerationQueue => 'Moderation queue';
+
+  @override
+  String get hubAbout => 'About';
+
+  @override
+  String get hubLogOut => 'Log out';
+
+  @override
+  String get hubLogOutConfirmTitle => 'Log out?';
+
+  @override
+  String get hubLogOutConfirmMessage => 'You will need to sign in again to use your account.';
+
+  @override
+  String get hubCancel => 'Cancel';
 }

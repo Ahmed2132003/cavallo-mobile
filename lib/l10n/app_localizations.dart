@@ -472,6 +472,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile'**
   String get navProfile;
+
+  /// App bar title of the Profile and Settings hub (tab 5).
+  ///
+  /// In en, this message translates to:
+  /// **'Profile & Settings'**
+  String get hubTitle;
+
+  /// Account-type chip in the hub header: a Customer account.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer'**
+  String get hubAccountTypeCustomer;
+
+  /// Account-type chip in the hub header: a Business (Trader or Factory) account.
+  ///
+  /// In en, this message translates to:
+  /// **'Business'**
+  String get hubAccountTypeBusiness;
+
+  /// Account-type chip in the hub header: a Staff or Moderator account.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff'**
+  String get hubAccountTypeStaff;
+
+  /// Hub row: opens the Saved screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get hubSaved;
+
+  /// Hub row: opens the notification preferences screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification preferences'**
+  String get hubNotificationPreferences;
+
+  /// Caption of the hub group that holds Appearance and Language.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get hubSettingsGroup;
+
+  /// Hub row title: the light or dark theme setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get hubAppearance;
+
+  /// Appearance option: follow the device theme.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get hubAppearanceSystem;
+
+  /// Appearance option: always light.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get hubAppearanceLight;
+
+  /// Appearance option: always dark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get hubAppearanceDark;
+
+  /// Hub row title: the app language setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get hubLanguage;
+
+  /// Caption of the hub group shown to Business accounts only.
+  ///
+  /// In en, this message translates to:
+  /// **'Business tools'**
+  String get hubBusinessTools;
+
+  /// Hub row (Business): opens the business console.
+  ///
+  /// In en, this message translates to:
+  /// **'Business console'**
+  String get hubBusinessConsole;
+
+  /// Hub row (Business): opens the business profile editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit business profile'**
+  String get hubEditBusinessProfile;
+
+  /// Hub row (Business): the products list of the business console.
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get hubProducts;
+
+  /// Hub row (Business): the posts and reels list of the business console.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get hubContent;
+
+  /// Hub row (Business): the stories list of the business console.
+  ///
+  /// In en, this message translates to:
+  /// **'Stories'**
+  String get hubStories;
+
+  /// Hub row (Business): the analytics screen of the business console.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get hubAnalytics;
+
+  /// Hub row (Business): shows whether the business is currently Featured. Display only.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured status'**
+  String get hubFeaturedStatus;
+
+  /// Value of the Featured status row when the business is not Featured.
+  ///
+  /// In en, this message translates to:
+  /// **'Not featured'**
+  String get hubFeaturedNo;
+
+  /// Caption of the hub group shown to Staff accounts only.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderation'**
+  String get hubModeration;
+
+  /// Hub row (Staff): opens the moderation queue, with the pending count.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderation queue'**
+  String get hubModerationQueue;
+
+  /// Hub row: opens the About dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get hubAbout;
+
+  /// Hub row and confirm button: sign out of the account.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get hubLogOut;
+
+  /// Title of the dialog that asks for confirmation before signing out.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out?'**
+  String get hubLogOutConfirmTitle;
+
+  /// Body of the sign-out confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'You will need to sign in again to use your account.'**
+  String get hubLogOutConfirmMessage;
+
+  /// Cancel button of the sign-out confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get hubCancel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

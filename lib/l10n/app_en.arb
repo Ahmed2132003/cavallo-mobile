@@ -318,5 +318,117 @@
   "navProfile": "Profile",
   "@navProfile": {
     "description": "Bottom bar tab: profile and settings."
+  },
+  "hubTitle": "Profile & Settings",
+  "@hubTitle": {
+    "description": "App bar title of the Profile and Settings hub (tab 5)."
+  },
+  "hubAccountTypeCustomer": "Customer",
+  "@hubAccountTypeCustomer": {
+    "description": "Account-type chip in the hub header: a Customer account."
+  },
+  "hubAccountTypeBusiness": "Business",
+  "@hubAccountTypeBusiness": {
+    "description": "Account-type chip in the hub header: a Business (Trader or Factory) account."
+  },
+  "hubAccountTypeStaff": "Staff",
+  "@hubAccountTypeStaff": {
+    "description": "Account-type chip in the hub header: a Staff or Moderator account."
+  },
+  "hubSaved": "Saved",
+  "@hubSaved": {
+    "description": "Hub row: opens the Saved screen."
+  },
+  "hubNotificationPreferences": "Notification preferences",
+  "@hubNotificationPreferences": {
+    "description": "Hub row: opens the notification preferences screen."
+  },
+  "hubSettingsGroup": "Settings",
+  "@hubSettingsGroup": {
+    "description": "Caption of the hub group that holds Appearance and Language."
+  },
+  "hubAppearance": "Appearance",
+  "@hubAppearance": {
+    "description": "Hub row title: the light or dark theme setting."
+  },
+  "hubAppearanceSystem": "System",
+  "@hubAppearanceSystem": {
+    "description": "Appearance option: follow the device theme."
+  },
+  "hubAppearanceLight": "Light",
+  "@hubAppearanceLight": {
+    "description": "Appearance option: always light."
+  },
+  "hubAppearanceDark": "Dark",
+  "@hubAppearanceDark": {
+    "description": "Appearance option: always dark."
+  },
+  "hubLanguage": "Language",
+  "@hubLanguage": {
+    "description": "Hub row title: the app language setting."
+  },
+  "hubBusinessTools": "Business tools",
+  "@hubBusinessTools": {
+    "description": "Caption of the hub group shown to Business accounts only."
+  },
+  "hubBusinessConsole": "Business console",
+  "@hubBusinessConsole": {
+    "description": "Hub row (Business): opens the business console."
+  },
+  "hubEditBusinessProfile": "Edit business profile",
+  "@hubEditBusinessProfile": {
+    "description": "Hub row (Business): opens the business profile editor."
+  },
+  "hubProducts": "Products",
+  "@hubProducts": {
+    "description": "Hub row (Business): the products list of the business console."
+  },
+  "hubContent": "Content",
+  "@hubContent": {
+    "description": "Hub row (Business): the posts and reels list of the business console."
+  },
+  "hubStories": "Stories",
+  "@hubStories": {
+    "description": "Hub row (Business): the stories list of the business console."
+  },
+  "hubAnalytics": "Analytics",
+  "@hubAnalytics": {
+    "description": "Hub row (Business): the analytics screen of the business console."
+  },
+  "hubFeaturedStatus": "Featured status",
+  "@hubFeaturedStatus": {
+    "description": "Hub row (Business): shows whether the business is currently Featured. Display only."
+  },
+  "hubFeaturedNo": "Not featured",
+  "@hubFeaturedNo": {
+    "description": "Value of the Featured status row when the business is not Featured."
+  },
+  "hubModeration": "Moderation",
+  "@hubModeration": {
+    "description": "Caption of the hub group shown to Staff accounts only."
+  },
+  "hubModerationQueue": "Moderation queue",
+  "@hubModerationQueue": {
+    "description": "Hub row (Staff): opens the moderation queue, with the pending count."
+  },
+  "hubAbout": "About",
+  "@hubAbout": {
+    "description": "Hub row: opens the About dialog."
+  },
+  "hubLogOut": "Log out",
+  "@hubLogOut": {
+    "description": "Hub row and confirm button: sign out of the account."
+  },
+  "hubLogOutConfirmTitle": "Log out?",
+  "@hubLogOutConfirmTitle": {
+    "description": "Title of the dialog that asks for confirmation before signing out."
+  },
+  "hubLogOutConfirmMessage": "You will need to sign in again to use your account.",
+  "@hubLogOutConfirmMessage": {
+    "description": "Body of the sign-out confirmation dialog."
+  },
+  "hubCancel": "Cancel",
+  "@hubCancel": {
+    "description": "Cancel button of the sign-out confirmation dialog."
   }
 }
