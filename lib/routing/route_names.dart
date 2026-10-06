@@ -294,6 +294,18 @@ class RouteNames {
   /// Part P-083 — see [businessAnalytics].
   static const String businessAnalyticsPath = '/business-console/analytics';
 
+  /// Part P-113: the Saved screen (Posts / Reels / Products tabs), tab 3 of
+  /// the Customer bottom bar and a Profile hub row for every account type.
+  /// The name and path are added in STEP 1 so the navigation manifest
+  /// compiles; the GoRoute itself is added in P-113 STEP 2.
+  static const String saved = 'saved';
+  static const String savedPath = '/saved';
+
+  /// Part P-113: the Profile & Settings hub, tab 5 for every account type.
+  /// Same staging as [saved]: name and path now, GoRoute in STEP 2, real
+  /// screen in STEP 3.
+  static const String profile = 'profile';
+  static const String profilePath = '/profile';
   /// Path-parameter key shared by [businessProfilePath], [productDetailPath],
   /// [chatThreadPath], [postDetailPath], [reelDetailPath] and
   /// [storyViewerPath].

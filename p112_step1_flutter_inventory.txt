@@ -1,0 +1,60 @@
+P-112 STEP 1 - FLUTTER INVENTORY of user-facing literals (2026-10-05 04:32)
+Files scanned: 201 (lib/, excluding *.g.dart, *.freezed.dart, l10n/)
+Note: Text(literal) already includes dialog titles/buttons/app bars written as Text('...'). Text(interpolated) is a subset that needs ICU placeholders/plurals.
+
+[1] Literal counts per group
+group                            Text(literal)Text(interpolated)          hintText         labelText  helper/errorText           tooltip          SnackBar     semanticLabel
+core                                         1                 0                 0                 0                 0                 0                 0                 0
+features/auth                                9                 0                 0                 0                 0                 0                 0                 0
+features/business_console                   12                 3                 0                 0                 0                 0                 0                 3
+features/business_profile                   19                 2                 0                 2                 0                 1                 4                 1
+features/categories                          0                 0                 0                 0                 0                 0                 0                 0
+features/chat                               21                 1                 2                 1                 0                 0                 8                 0
+features/content                            17                 1                 0                 0                 0                 1                 4                 0
+features/discover                            1                 0                 0                 0                 0                 0                 0                 0
+features/feed                                9                 0                 0                 0                 0                 2                 0                 0
+features/moderation                         14                 1                 0                 0                 0                 1                10                 0
+features/notifications                       5                 0                 0                 0                 0                 1                10                 0
+features/products                           21                 4                 0                 2                 0                 4                 6                 0
+features/search                             19                 2                 1                 1                 0                 1                 0                 0
+features/social                             13                 2                 1                 1                 0                 6                 8                 0
+features/stories                            10                 2                 0                 0                 0                 2                 2                 0
+root                                         0                 0                 0                 0                 0                 0                 0                 0
+routing                                      0                 0                 0                 0                 0                 0                 0                 0
+TOTAL                                      171                18                 4                 7                 0                19                52                 4
+
+[2] RTL-hygiene hits per group (left/right API usage that must become Directional)
+group                         EdgeInsets.only(l/r)   EdgeInsets.fromLTRB         Alignment L/R  TextAlign.left/right       Positioned(l/r)     BorderRadius.only     directional icons
+core                                             0                     0                     0                     0                     0                     0                     0
+features/auth                                    0                     0                     0                     0                     0                     0                     0
+features/business_console                        1                     2                     0                     0                     0                     0                     0
+features/business_profile                        0                     0                     0                     0                     0                     0                     0
+features/categories                              0                     0                     0                     0                     0                     0                     0
+features/chat                                    0                     2                     2                     0                     0                     1                     1
+features/content                                 0                     3                     0                     0                     0                     0                     0
+features/discover                                0                     1                     0                     0                     0                     0                     0
+features/feed                                    0                     0                     0                     0                     0                     0                     0
+features/moderation                              0                     3                     0                     0                     0                     0                     1
+features/notifications                           0                     0                     0                     0                     0                     0                     0
+features/products                                0                     0                     0                     0                     0                     0                     0
+features/search                                  1                     0                     0                     0                     0                     0                     1
+features/social                                  1                     0                     0                     0                     0                     0                     1
+features/stories                                 0                     1                     1                     0                     2                     0                     0
+root                                             0                     0                     0                     0                     0                     0                     0
+routing                                          0                     0                     0                     0                     0                     0                     0
+
+[3] Files in the STEP 8 scope (core/, features/auth, routing, root) with counts
+  core\widgets\widget_gallery_demo.dart                                  literals=1    rtl=0
+  features\auth\presentation\login_screen.dart                           literals=2    rtl=0
+  features\auth\presentation\register_screen.dart                        literals=5    rtl=0
+  features\auth\presentation\splash_screen.dart                          literals=2    rtl=0
+
+[4] Existing formatting / locale code (must be centralised in AppFormatters later)
+  core\widgets\app_shimmer_box.dart:88: Directionality.of(context) == TextDirection.rtl ? -1 : 1;
+  core\widgets\app_shimmer_box.dart:129: Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
+  features\business_profile\presentation\business_onboarding_screen.dart:4: import 'package:intl_phone_field/intl_phone_field.dart';
+  features\business_profile\presentation\business_profile_edit_screen.dart:4: import 'package:intl_phone_field/intl_phone_field.dart';
+
+[5] pubspec.yaml: flutter_localizations / intl / generate flag
+  pubspec.yaml:12: sdk: flutter
+  pubspec.yaml:109: sdk: flutter

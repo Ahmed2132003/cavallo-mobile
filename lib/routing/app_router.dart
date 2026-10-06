@@ -27,6 +27,8 @@ import '../features/moderation/presentation/moderation_queue_screen.dart';
 import '../features/moderation/presentation/moderation_review_screen.dart';
 import '../features/notifications/presentation/notification_center_screen.dart';
 import '../features/notifications/presentation/notification_preferences_screen.dart';
+import '../features/profile_hub/presentation/profile_hub_screen.dart';
+import '../features/saved/presentation/saved_screen.dart';
 import '../features/products/domain/product_entity.dart';
 import '../features/products/presentation/product_detail_screen.dart';
 import '../features/products/presentation/product_form_screen.dart';
@@ -545,6 +547,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.notificationPreferencesPath,
         name: RouteNames.notificationPreferences,
         builder: (context, state) => const NotificationPreferencesScreen(),
+      ),
+      GoRoute(
+        // Part P-113 (STEP 1 fix): placeholder, moved into the shell in STEP 2.
+        path: RouteNames.savedPath,
+        name: RouteNames.saved,
+        builder: (context, state) => const SavedScreen(),
+      ),
+      GoRoute(
+        // Part P-113 (STEP 1 fix): placeholder, moved into the shell in STEP 2.
+        path: RouteNames.profilePath,
+        name: RouteNames.profile,
+        builder: (context, state) => const ProfileHubScreen(),
       ),
       GoRoute(
         // Part P-083. No screen of its own any more: `/business-console`
