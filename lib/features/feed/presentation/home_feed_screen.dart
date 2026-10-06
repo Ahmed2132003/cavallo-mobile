@@ -43,47 +43,20 @@
 /// patched: fixing it properly means changing `FeedState`/the
 /// provider's contract, which is out of this screen's own scope.
 ///
-/// ### Router-gate debug menu — ports P-007/P-021c/P-028/P-033/P-040/
-/// P-050's five temporary debug affordances forward, plus P-074's sixth
+/// ### Navigation - no debug menu (Part P-113, STEP 6B)
 ///
-/// The old placeholder `HomeScreen` was, incidentally, the only reachable
-/// entry point for five temporary, non-product debug affordances added
-/// by five different earlier parts (see each one's own comment on
-/// [_DebugMenu] below). Deleting it outright would have made all five
-/// unreachable with no replacement — flagged in this part's own STEP 4
-/// plan rather than silently dropped. They're preserved here, moved into
-/// a single AppBar overflow menu ([_DebugMenu]), with the exact same
-/// visibility conditions the placeholder used. None of this is
-/// permanent product surface; each entry remains labeled "(debug)" and
-/// should be removed once its own real navigational home (named in each
-/// part's original comment) exists.
-///
-/// ### Part P-074 addition — `Open Chat`, a sixth entry
-///
-/// P-074's own four steps built `ChatListScreen`/`ChatThreadScreen` and
-/// wired `RouteNames.chatList`/`chatThread` correctly into
-/// `app_router.dart`, but — same gap `'search'`/`'discover'` below
-/// already flagged for themselves — nothing in the app actually
-/// *navigates* to `RouteNames.chatList` anywhere: this codebase has no
-/// bottom navigation bar, tab bar, or drawer at all yet (confirmed by
-/// grep — no `BottomNavigationBar`/`NavigationBar`/`TabBar`/`Drawer`
-/// exists in `lib/`), so `ChatListScreen` was unreachable from the
-/// running app despite being fully built and tested. This entry is the
-/// same kind of temporary bridge as `'search'`/`'discover'` immediately
-/// below it, not a real product entry point — no `extra:` is passed
-/// (`ChatListScreen` fetches its own data via `ConversationRepository`,
-/// per P-074 STEP 2/3). It should be removed once a real, permanent
-/// messaging entry point (e.g. a bottom-nav tab, or a "Message" button
-/// on `BusinessProfilePublicScreen`) exists — the same removal note
-/// P-074 STEP 4 already left on `ChatListScreen`'s own "New chat
-/// (test)" FAB applies here too.
+/// This screen has no debug or overflow menu. Every destination the old
+/// debug menu opened is now reached from visible UI: the bottom bar (Explore,
+/// Saved, Create, Moderation, Chats, Profile), the Home top bar (notifications
+/// and chats), the stories tray at the top of this feed, and the Profile and
+/// Settings hub (Business tools, language, appearance, log out). The
+/// navigation manifest and its reachability test keep it that way.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/l10n/locale_provider.dart';
 import '../../../core/shell/home_top_bar.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
@@ -91,7 +64,6 @@ import '../../../core/widgets/loading_indicator.dart';
 import '../../../routing/route_names.dart';
 import '../../auth/domain/user_entity.dart';
 import '../../auth/presentation/session_provider.dart';
-import '../../business_profile/presentation/business_profile_provider.dart';
 import '../../business_profile/presentation/business_profile_public_provider.dart';
 import '../../chat/presentation/chat_unread_provider.dart';
 import '../../content/domain/public_post_entity.dart';
@@ -149,10 +121,10 @@ class _HomeFeedScreenState extends ConsumerState<HomeFeedScreen> {
     final feedAsync = ref.watch(homeFeedProvider);
 
     return Scaffold(
-      // Part P-113 (STEP 5): the shared Home top bar (wordmark, bell and chats
-      // icons with unread badges). `_DebugMenu` is carried along until STEP 6
-      // deletes it.
-      appBar: const HomeTopBar(extraActions: <Widget>[_DebugMenu()]),
+      // Part P-113: the shared Home top bar (wordmark, bell and chats icons
+      // with unread badges). No debug or overflow menu: every destination is
+      // reached from the bottom bar, the top bar or the Profile hub.
+      appBar: const HomeTopBar(),
       body: switch (feedAsync) {
         AsyncData(value: final state) => _FeedBody(
           state: state,
@@ -329,128 +301,5 @@ class _HomeStoriesTray extends ConsumerWidget {
       padding: EdgeInsets.only(bottom: 12),
       child: StoriesBarWidget(),
     );
-  }
-}
-
-/// Temporary debug affordances carried forward from the deleted P-007
-/// placeholder `HomeScreen`, unified into one AppBar overflow menu so
-/// nothing they gave access to becomes unreachable. Each entry keeps the
-/// exact visibility condition and destination the placeholder used —
-/// see that class's removed docstring (`git show` on the commit that
-/// deleted `home_screen.dart`) for the full history of why each one
-/// exists. **Access control for every gated destination is enforced by
-/// `app_router.dart`'s redirect guard, not by this menu** — hiding an
-/// entry here is a convenience only.
-///
-/// Part P-074 adds one more entry, `'openChat'` — see this file's own
-/// top-level "Part P-074 addition" doc section for why it's here instead
-/// of a real nav element.
-class _DebugMenu extends ConsumerWidget {
-  const _DebugMenu();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final session = ref.watch(sessionProvider);
-    final user = switch (session) {
-      AsyncData(:final value) => value,
-      _ => null,
-    };
-    final isBusinessUser =
-        user != null && user.accountType == AccountType.business;
-    final canModerate = user != null && (user.isModerator || user.isStaff);
-    final isOnboardedBusinessUser =
-        isBusinessUser &&
-        switch (ref.watch(businessProfileProvider)) {
-          AsyncData(:final value) => value != null,
-          _ => false,
-        };
-
-    return PopupMenuButton<String>(
-      tooltip: 'Debug menu',
-      onSelected: (value) => _handleSelection(context, ref, value),
-      itemBuilder:
-          (context) => [
-            if (isOnboardedBusinessUser)
-              const PopupMenuItem(
-                value: 'editProfile',
-                child: Text('Edit business profile'),
-              ),
-            if (isBusinessUser)
-              const PopupMenuItem(
-                value: 'businessConsole',
-                child: Text('Business Console (debug)'),
-              ),
-            if (canModerate)
-              const PopupMenuItem(
-                value: 'moderation',
-                child: Text('Moderation queue (debug)'),
-              ),
-            const PopupMenuItem(
-              value: 'viewStory',
-              child: Text('View Story (debug, business 3)'),
-            ),
-            const PopupMenuItem(
-              value: 'search',
-              child: Text('Search (debug — no nav entry point yet)'),
-            ),
-            const PopupMenuItem(
-              value: 'discover',
-              child: Text('Discover (debug — no nav entry point yet)'),
-            ),
-            // Part P-074: no real nav entry point to ChatListScreen exists
-            // anywhere yet — see this file's top-level "Part P-074 addition"
-            // doc section.
-            const PopupMenuItem(
-              value: 'openChat',
-              child: Text('Open Chat (debug — no nav entry point yet)'),
-            ),
-            // Part P-112: TEMPORARY language switch (debug only). The real
-            // Language selector arrives in P-113 and replaces these entries.
-            const PopupMenuItem(
-              value: 'langEn',
-              child: Text('Language: English (debug)'),
-            ),
-            const PopupMenuItem(
-              value: 'langAr',
-              child: Text('Language: Arabic (debug)'),
-            ),
-            const PopupMenuItem(
-              value: 'langSystem',
-              child: Text('Language: follow device (debug)'),
-            ),
-            const PopupMenuItem(value: 'logout', child: Text('Logout (debug)')),
-          ],
-    );
-  }
-
-  void _handleSelection(BuildContext context, WidgetRef ref, String value) {
-    switch (value) {
-      case 'editProfile':
-        context.goNamed(RouteNames.businessProfileEdit);
-      case 'businessConsole':
-        context.pushNamed(RouteNames.businessConsole);
-      case 'moderation':
-        context.pushNamed(RouteNames.moderation);
-      case 'viewStory':
-        context.pushNamed(
-          RouteNames.storyViewer,
-          pathParameters: {RouteNames.idParam: '3'},
-          extra: 'Business 3',
-        );
-      case 'search':
-        context.pushNamed(RouteNames.search);
-      case 'discover':
-        context.pushNamed(RouteNames.discover);
-      case 'openChat':
-        context.pushNamed(RouteNames.chatList);
-      case 'langEn':
-        ref.read(localeProvider.notifier).setLocale(const Locale('en'));
-      case 'langAr':
-        ref.read(localeProvider.notifier).setLocale(const Locale('ar'));
-      case 'langSystem':
-        ref.read(localeProvider.notifier).setLocale(null);
-      case 'logout':
-        ref.read(sessionProvider.notifier).logout();
-    }
   }
 }

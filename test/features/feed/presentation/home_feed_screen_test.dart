@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:social_commerce_app/core/l10n/locale_provider.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
 import 'package:social_commerce_app/features/business_profile/data/business_profile_public_repository.dart';
@@ -80,10 +79,9 @@ class _FakeBusinessProfilePublicRepository
 /// Resolves immediately to a fixed session — same shape as
 /// `moderation_router_gate_test.dart`'s own `_FakeSessionNotifier`.
 /// `null` (a guest/unauthenticated session) is used throughout this
-/// file: the feed itself does not require a signed-in user, and it
-/// keeps `_DebugMenu` from ever touching `businessProfileProvider`
-/// (Dart's `&&` short-circuit skips that `ref.watch` when
-/// `isBusinessUser` is false — see `home_feed_screen.dart`).
+/// file: the feed itself does not require a signed-in user, and a null
+/// session keeps the Home top bar and the stories tray from reading any
+/// provider.
 class _FakeSessionNotifier extends SessionNotifier {
   _FakeSessionNotifier(this._fixedValue);
 
@@ -128,7 +126,7 @@ void _useTallSurface(WidgetTester tester) {
 }
 
 void main() {
-  testWidgets('debug menu switches the app language (temporary P-112 control)', (
+  testWidgets('Part P-113: the Home app bar has no debug or overflow menu', (
     tester,
   ) async {
     _useTallSurface(tester);
@@ -138,26 +136,9 @@ void main() {
     await tester.pumpWidget(_wrap(fake));
     await tester.pump();
 
-    final container = ProviderScope.containerOf(
-      tester.element(find.byType(HomeFeedScreen)),
-    );
-    expect(container.read(localeProvider), isNull);
-
-    Future<void> choose(String label) async {
-      await tester.tap(find.byTooltip('Debug menu'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text(label));
-      await tester.pumpAndSettle();
-    }
-
-    await choose('Language: Arabic (debug)');
-    expect(container.read(localeProvider), const Locale('ar'));
-
-    await choose('Language: English (debug)');
-    expect(container.read(localeProvider), const Locale('en'));
-
-    await choose('Language: follow device (debug)');
-    expect(container.read(localeProvider), isNull);
+    expect(find.byTooltip('Debug menu'), findsNothing);
+    expect(find.byType(PopupMenuButton<String>), findsNothing);
+    expect(find.byType(PopupMenuButton<dynamic>), findsNothing);
   });
 
   group('loading, empty and error states', () {

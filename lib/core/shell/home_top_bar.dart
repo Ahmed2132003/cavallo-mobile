@@ -37,8 +37,7 @@ import '../theme/app_colors.dart';
 ///
 /// A count of zero draws no badge. A count above 99 is shown as "99+".
 ///
-/// [extraActions] are appended after the two icons. HomeFeedScreen uses it to
-/// carry the temporary debug menu until STEP 6 deletes that menu.
+/// [extraActions] are appended after the two icons (nothing uses it today).
 class HomeTopBar extends ConsumerWidget implements PreferredSizeWidget {
   const HomeTopBar({this.extraActions = const <Widget>[], super.key});
 
