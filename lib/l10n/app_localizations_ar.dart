@@ -360,4 +360,52 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hubCancel => 'إلغاء';
+
+  @override
+  String get savedTabPosts => 'المنشورات';
+
+  @override
+  String get savedTabReels => 'الريلز';
+
+  @override
+  String get savedTabProducts => 'المنتجات';
+
+  @override
+  String get savedEmptyPosts => 'لا توجد منشورات محفوظة بعد. اضغط على علامة الحفظ في أي منشور ليظهر هنا.';
+
+  @override
+  String get savedEmptyReels => 'لا توجد ريلز محفوظة بعد. اضغط على علامة الحفظ في أي ريل ليظهر هنا.';
+
+  @override
+  String get savedEmptyProducts => 'لا توجد منتجات محفوظة بعد. اضغط على علامة الحفظ في أي منتج ليظهر هنا.';
+
+  @override
+  String get savedUnsave => 'إزالة من المحفوظات';
+
+  @override
+  String get savedUnavailable => 'هذا العنصر لم يعد متاحًا';
+
+  @override
+  String get savedNoPreviewText => 'عنصر محفوظ';
+
+  @override
+  String get savedUnsaveFailed => 'تعذّرت الإزالة من المحفوظات. حاول مرة أخرى.';
+
+  @override
+  String get savedLoadMoreFailed => 'تعذّر تحميل المزيد من المحفوظات.';
+
+  @override
+  String get createSheetTitle => 'إنشاء جديد';
+
+  @override
+  String get createSheetPost => 'منشور';
+
+  @override
+  String get createSheetReel => 'ريل';
+
+  @override
+  String get createSheetStory => 'ستوري';
+
+  @override
+  String get createSheetProduct => 'منتج';
 }

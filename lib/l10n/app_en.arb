@@ -430,5 +430,69 @@
   "hubCancel": "Cancel",
   "@hubCancel": {
     "description": "Cancel button of the sign-out confirmation dialog."
+  },
+  "savedTabPosts": "Posts",
+  "@savedTabPosts": {
+    "description": "Tab of the Saved screen: saved posts."
+  },
+  "savedTabReels": "Reels",
+  "@savedTabReels": {
+    "description": "Tab of the Saved screen: saved reels."
+  },
+  "savedTabProducts": "Products",
+  "@savedTabProducts": {
+    "description": "Tab of the Saved screen: saved products."
+  },
+  "savedEmptyPosts": "No saved posts yet. Tap the bookmark on a post to keep it here.",
+  "@savedEmptyPosts": {
+    "description": "Empty state of the Saved screen, Posts tab."
+  },
+  "savedEmptyReels": "No saved reels yet. Tap the bookmark on a reel to keep it here.",
+  "@savedEmptyReels": {
+    "description": "Empty state of the Saved screen, Reels tab."
+  },
+  "savedEmptyProducts": "No saved products yet. Tap the bookmark on a product to keep it here.",
+  "@savedEmptyProducts": {
+    "description": "Empty state of the Saved screen, Products tab."
+  },
+  "savedUnsave": "Remove from saved",
+  "@savedUnsave": {
+    "description": "Tooltip of the bookmark button that removes an item from Saved."
+  },
+  "savedUnavailable": "This item is no longer available",
+  "@savedUnavailable": {
+    "description": "Shown instead of the preview when a saved item no longer exists."
+  },
+  "savedNoPreviewText": "Saved item",
+  "@savedNoPreviewText": {
+    "description": "Title of a saved item whose preview text is empty (for example an image-only post)."
+  },
+  "savedUnsaveFailed": "Couldn't remove it from saved. Please try again.",
+  "@savedUnsaveFailed": {
+    "description": "SnackBar shown when removing an item from Saved fails."
+  },
+  "savedLoadMoreFailed": "Couldn't load more saved items.",
+  "@savedLoadMoreFailed": {
+    "description": "Shown when loading the next page of the Saved list fails, next to a Retry button."
+  },
+  "createSheetTitle": "Create new",
+  "@createSheetTitle": {
+    "description": "Title of the Business create sheet opened by the + tab."
+  },
+  "createSheetPost": "Post",
+  "@createSheetPost": {
+    "description": "Create sheet option: new post."
+  },
+  "createSheetReel": "Reel",
+  "@createSheetReel": {
+    "description": "Create sheet option: new reel."
+  },
+  "createSheetStory": "Story",
+  "@createSheetStory": {
+    "description": "Create sheet option: new story."
+  },
+  "createSheetProduct": "Product",
+  "@createSheetProduct": {
+    "description": "Create sheet option: new product."
   }
 }

@@ -348,4 +348,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hubCancel => 'Cancel';
+
+  @override
+  String get savedTabPosts => 'Posts';
+
+  @override
+  String get savedTabReels => 'Reels';
+
+  @override
+  String get savedTabProducts => 'Products';
+
+  @override
+  String get savedEmptyPosts => 'No saved posts yet. Tap the bookmark on a post to keep it here.';
+
+  @override
+  String get savedEmptyReels => 'No saved reels yet. Tap the bookmark on a reel to keep it here.';
+
+  @override
+  String get savedEmptyProducts => 'No saved products yet. Tap the bookmark on a product to keep it here.';
+
+  @override
+  String get savedUnsave => 'Remove from saved';
+
+  @override
+  String get savedUnavailable => 'This item is no longer available';
+
+  @override
+  String get savedNoPreviewText => 'Saved item';
+
+  @override
+  String get savedUnsaveFailed => 'Couldn\'t remove it from saved. Please try again.';
+
+  @override
+  String get savedLoadMoreFailed => 'Couldn\'t load more saved items.';
+
+  @override
+  String get createSheetTitle => 'Create new';
+
+  @override
+  String get createSheetPost => 'Post';
+
+  @override
+  String get createSheetReel => 'Reel';
+
+  @override
+  String get createSheetStory => 'Story';
+
+  @override
+  String get createSheetProduct => 'Product';
 }

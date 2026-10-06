@@ -640,6 +640,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get hubCancel;
+
+  /// Tab of the Saved screen: saved posts.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts'**
+  String get savedTabPosts;
+
+  /// Tab of the Saved screen: saved reels.
+  ///
+  /// In en, this message translates to:
+  /// **'Reels'**
+  String get savedTabReels;
+
+  /// Tab of the Saved screen: saved products.
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get savedTabProducts;
+
+  /// Empty state of the Saved screen, Posts tab.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved posts yet. Tap the bookmark on a post to keep it here.'**
+  String get savedEmptyPosts;
+
+  /// Empty state of the Saved screen, Reels tab.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved reels yet. Tap the bookmark on a reel to keep it here.'**
+  String get savedEmptyReels;
+
+  /// Empty state of the Saved screen, Products tab.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved products yet. Tap the bookmark on a product to keep it here.'**
+  String get savedEmptyProducts;
+
+  /// Tooltip of the bookmark button that removes an item from Saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from saved'**
+  String get savedUnsave;
+
+  /// Shown instead of the preview when a saved item no longer exists.
+  ///
+  /// In en, this message translates to:
+  /// **'This item is no longer available'**
+  String get savedUnavailable;
+
+  /// Title of a saved item whose preview text is empty (for example an image-only post).
+  ///
+  /// In en, this message translates to:
+  /// **'Saved item'**
+  String get savedNoPreviewText;
+
+  /// SnackBar shown when removing an item from Saved fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t remove it from saved. Please try again.'**
+  String get savedUnsaveFailed;
+
+  /// Shown when loading the next page of the Saved list fails, next to a Retry button.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load more saved items.'**
+  String get savedLoadMoreFailed;
+
+  /// Title of the Business create sheet opened by the + tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Create new'**
+  String get createSheetTitle;
+
+  /// Create sheet option: new post.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get createSheetPost;
+
+  /// Create sheet option: new reel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reel'**
+  String get createSheetReel;
+
+  /// Create sheet option: new story.
+  ///
+  /// In en, this message translates to:
+  /// **'Story'**
+  String get createSheetStory;
+
+  /// Create sheet option: new product.
+  ///
+  /// In en, this message translates to:
+  /// **'Product'**
+  String get createSheetProduct;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
