@@ -420,4 +420,41 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get discoverSearchHint => 'ابحث عن أنشطة ومنتجات ومنشورات';
+
+  @override
+  String get storyYourStory => 'قصتك';
+
+  @override
+  String get storyAddTooltip => 'أضف إلى قصتك';
+
+  @override
+  String storyRingNewLabel(String name) {
+    return '$name، قصة جديدة';
+  }
+
+  @override
+  String storyRingSeenLabel(String name) {
+    return '$name، تمت مشاهدة القصة';
+  }
+
+  @override
+  String get storyViewerClose => 'إغلاق';
+
+  @override
+  String get storyViewerNotFound => 'لم يتم العثور على القصة.';
+
+  @override
+  String get storyViewerEmpty => 'لا توجد قصص للعرض الآن.';
+
+  @override
+  String get storyViewerLoadFailed => 'تعذّر تحميل القصص.';
+
+  @override
+  String get storyViewerDefaultName => 'نشاط تجاري';
+
+  @override
+  String get businessUnknownName => 'نشاط تجاري غير معروف';
+
+  @override
+  String get captionMore => 'المزيد';
 }

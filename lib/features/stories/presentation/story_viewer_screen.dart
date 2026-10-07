@@ -4,7 +4,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/error_messages.dart';
+import '../../../core/l10n/formatters.dart';
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/widgets/app_avatar.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
@@ -12,40 +16,46 @@ import '../data/story_public_repository.dart';
 import '../domain/public_story_entity.dart';
 import 'story_public_provider.dart';
 
-/// Part P-050 scope: the full-screen, tap-to-advance Story viewer
-/// behind `/stories/:id` -- the primary customer-facing payoff of the
-/// Phase 6-8 moderation+Story pipeline (P-046-P-049).
+/// Translucent shades of the fixed black / white media chrome of this screen
+/// (scrim, progress track, secondary text). They are derived from Colors.black
+/// and Colors.white, the two documented theme-independent colours of this
+/// file, so no other palette colour is used (P-111 hardcoded-colour guard).
+final Color _storyScrim = Colors.black.withValues(alpha: 0.54);
+final Color _storyWhite70 = Colors.white.withValues(alpha: 0.7);
+final Color _storyWhite54 = Colors.white.withValues(alpha: 0.54);
+final Color _storyWhite24 = Colors.white.withValues(alpha: 0.24);
+/// Part P-050 scope: the full-screen, tap-to-advance Story viewer behind
+/// `/stories/:id` -- the customer-facing payoff of the story pipeline.
 ///
 /// ## Architecture Section 13 -- the one rule this whole file exists to satisfy
 ///
 /// ALL timer/progress/current-index state lives as plain fields on
-/// `_StoryPlayerState` (`State<_StoryPlayer>`, below) -- never as a
-/// Riverpod provider of any kind, global or otherwise. This is the
-/// simplest possible way to satisfy "must not leak into any global
-/// provider": there is nothing to leak, because nothing beyond this
-/// one `State` object's own fields (`_currentIndex`, `_controller`)
-/// is ever created to hold it. A fresh `_StoryPlayerState` is built
-/// every time `StoryViewerScreen` is pushed, and `dispose()` tears its
-/// `AnimationController` down completely on close -- exactly the
-/// "created fresh per viewing session, disposed when closed" contract
-/// this part's own spec requires.
+/// `_StoryPlayerState` -- never as a Riverpod provider. A fresh state object is
+/// built every time `StoryViewerScreen` is pushed, and `dispose()` tears its
+/// `AnimationController` down on close.
 ///
-/// `viewedStoriesProvider` (`story_public_provider.dart`) IS a
-/// Riverpod provider this screen writes to -- see that provider's own
-/// doc for why it is a deliberately separate, narrower concern (a
-/// per-business "seen" set for `StoryRingWidget` styling) from the
-/// timer/progress state this rule protects.
+/// `viewedStoriesProvider` IS a provider this screen writes to -- a
+/// deliberately separate, narrower concern (a per-business "seen" set for
+/// `StoryRingWidget` styling).
 ///
-/// ## States
+/// ## Part P-114 STEP 1 (presentation only)
 ///
-/// A non-numeric `:id` resolves to a not-found state with zero network
-/// calls, same convention as `PostDetailScreen`. `AsyncData([])` (a
-/// real, renderable "nothing to show" state -- reachable only via a
-/// deep link/stale link, since `StoryRingWidget` never navigates here
-/// for an empty list) and a genuine `AsyncError` both use
-/// `EmptyStateWidget`/`ErrorStateWidget` wrapped in a forced dark
-/// `Theme` (see `_EdgeStateView`) so they stay legible against this
-/// screen's black background.
+/// * The screen stays full-screen BLACK in Light and Dark. Black and white are
+///   the only fixed (non-token) colours of this file, on purpose: this is
+///   theme-independent media chrome over a photo, not themed UI.
+/// * Segmented progress bars grow from the reading START (right in Arabic).
+/// * Header: shared [AppAvatar], business name, relative time of the current
+///   story, close button with a localized tooltip.
+/// * Tap zones follow the reading direction: see [storyTapAdvances]. In LTR a
+///   tap on the right half goes forward and the left half goes back; in RTL it
+///   is the other way round (the reading-start side always goes back).
+/// * Hold (long press) pauses the timer; releasing resumes it.
+/// * Swipe down closes (unchanged).
+/// * Every text comes from the localization files.
+///
+/// NOT part of this step: a reply field, a Like button and a product/link chip.
+/// The story data model and `StoryPublicRepository` have no like / reply /
+/// product-link capability, and P-114 may not change repositories or DTOs.
 class StoryViewerScreen extends ConsumerWidget {
   const StoryViewerScreen({
     super.key,
@@ -53,30 +63,25 @@ class StoryViewerScreen extends ConsumerWidget {
     this.businessName,
   });
 
-  /// The raw `:id` path parameter -- a business id, per `RouteNames
-  /// .storyViewer`'s own doc -- parsed here rather than by the router,
-  /// same convention as `PostDetailScreen.postId`.
+  /// The raw `:id` path parameter -- a business id -- parsed here rather than
+  /// by the router, same convention as `PostDetailScreen.postId`.
   final String businessId;
 
   /// Passed via `context.pushNamed(..., extra: businessName)` from
-  /// `StoryRingWidget` (a plain `String`, not an object, since that's
-  /// all `StoryRingWidget` itself has). `null` when this route is
-  /// reached without it (a deep link, a restored location) -- falls
-  /// back to a generic label rather than redirecting away, since a
-  /// missing display name is genuinely cosmetic here, unlike
-  /// `moderationReviewPath`'s missing `QueueItem` (which the screen
-  /// cannot function without at all).
+  /// `StoryRingWidget`. `null` when this route is reached without it (a deep
+  /// link, a restored location) -- falls back to a generic label.
   final String? businessName;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final id = int.tryParse(businessId);
+    final l10n = context.l10n;
 
     final Widget body;
     if (id == null) {
-      body = const _EdgeStateView(
+      body = _EdgeStateView(
         child: EmptyStateWidget(
-          message: 'Story not found.',
+          message: l10n.storyViewerNotFound,
           icon: Icons.error_outline,
         ),
       );
@@ -85,12 +90,12 @@ class StoryViewerScreen extends ConsumerWidget {
       body = switch (storiesAsync) {
         AsyncData(:final value) when value.isNotEmpty => _StoryPlayer(
           businessId: id,
-          businessName: businessName ?? 'Business',
+          businessName: businessName ?? l10n.storyViewerDefaultName,
           stories: value,
         ),
-        AsyncData() => const _EdgeStateView(
+        AsyncData() => _EdgeStateView(
           child: EmptyStateWidget(
-            message: 'No stories to show right now.',
+            message: l10n.storyViewerEmpty,
             icon: Icons.auto_stories_outlined,
           ),
         ),
@@ -105,8 +110,26 @@ class StoryViewerScreen extends ConsumerWidget {
   }
 }
 
-/// Forces a dark [Theme] for any non-player state -- see
-/// `StoryViewerScreen`'s own "States" doc section for why.
+/// True when a tap at horizontal position [dx] (0 .. [width]) must go to the
+/// NEXT story, false when it must go to the PREVIOUS one.
+///
+/// LTR: right half forward, left half back (the P-050 behaviour).
+/// RTL: left half forward, right half back -- the reading-START side always
+/// goes back.
+@visibleForTesting
+bool storyTapAdvances({
+  required double dx,
+  required double width,
+  required TextDirection direction,
+}) {
+  if (direction == TextDirection.rtl) {
+    return dx < width / 2;
+  }
+  return dx > width / 2;
+}
+
+/// Forces a dark [Theme] for any non-player state, so the shared empty / error
+/// widgets stay legible against this screen's black background.
 class _EdgeStateView extends StatelessWidget {
   const _EdgeStateView({required this.child});
 
@@ -118,9 +141,7 @@ class _EdgeStateView extends StatelessWidget {
   }
 }
 
-/// A genuine fetch failure -- retryable. Same DioException/ApiFailure
-/// pattern-match as `PostDetailScreen`'s own `_LoadErrorView`
-/// (Part P-045).
+/// A genuine fetch failure -- retryable.
 class _LoadErrorView extends ConsumerWidget {
   const _LoadErrorView({required this.error, required this.businessId});
 
@@ -129,10 +150,14 @@ class _LoadErrorView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final message = switch (error) {
-      DioException(error: final ApiFailure failure) => failure.message,
-      ApiFailure(:final message) => message,
-      _ => 'Could not load stories.',
+      DioException(error: final ApiFailure failure) => localizedApiError(
+        l10n,
+        failure,
+      ),
+      ApiFailure() => localizedApiError(l10n, error),
+      _ => l10n.storyViewerLoadFailed,
     };
 
     return ErrorStateWidget(
@@ -142,9 +167,8 @@ class _LoadErrorView extends ConsumerWidget {
   }
 }
 
-/// The actual tap/auto-advance/swipe-dismiss player -- built only once
-/// [StoryViewerScreen] confirms a non-empty story list, so it never
-/// has to handle an empty-sequence edge case itself.
+/// The actual tap / auto-advance / hold / swipe-dismiss player -- built only
+/// once [StoryViewerScreen] confirms a non-empty story list.
 class _StoryPlayer extends ConsumerStatefulWidget {
   const _StoryPlayer({
     required this.businessId,
@@ -162,16 +186,14 @@ class _StoryPlayer extends ConsumerStatefulWidget {
 
 class _StoryPlayerState extends ConsumerState<_StoryPlayer>
     with SingleTickerProviderStateMixin {
-  /// Fixed duration for every Story (image or video) -- see this
-  /// file's module-level "scope decision" note on why video doesn't
-  /// get its own real-duration timing in this part.
+  /// Fixed duration for every Story (image or video).
   static const _storyDuration = Duration(seconds: 5);
 
-  // --- Everything below is Architecture-Section-13-protected local
-  // state: plain fields on this State object, never a Riverpod
-  // provider of any kind. See this file's module-level doc. ---
+  // --- Everything below is Architecture-Section-13-protected local state:
+  // plain fields on this State object, never a Riverpod provider. ---
   late final AnimationController _controller;
   int _currentIndex = 0;
+  bool _paused = false;
 
   @override
   void initState() {
@@ -184,10 +206,6 @@ class _StoryPlayerState extends ConsumerState<_StoryPlayer>
 
   @override
   void dispose() {
-    // Tears the local timer state down completely on close -- the
-    // concrete proof (this part's own acceptance criteria) that
-    // reopening the viewer later starts with fresh state: nothing
-    // survives past this call for this session to leak from.
     _controller.dispose();
     super.dispose();
   }
@@ -201,27 +219,13 @@ class _StoryPlayerState extends ConsumerState<_StoryPlayer>
   void _recordCurrentView() {
     final story = widget.stories[_currentIndex];
 
-    // Fire-and-forget per this part's own spec ("don't await/block the
-    // UI on this call's completion"). StoryPublicRepositoryImpl
-    // .recordView already swallows its own failures via reportError
-    // (see that method's own doc) -- nothing here needs a try/catch.
+    // Fire-and-forget: `StoryPublicRepositoryImpl.recordView` already swallows
+    // its own failures via reportError.
     unawaited(ref.read(storyPublicRepositoryProvider).recordView(story.id));
 
-    // Local-only "seen" bookkeeping for StoryRingWidget's styling --
-    // a deliberately separate, narrower concern from this widget's own
-    // timer/progress state above. See viewedStoriesProvider's own doc.
-    //
-    // Deferred to a microtask, NOT written synchronously here. This
-    // method's very first call happens from initState() -- which
-    // Riverpod still treats as "the widget tree building": a
-    // synchronous provider write at that point throws "Tried to
-    // modify a provider while the widget tree was building" (a real
-    // failure this part's own widget tests caught, not a hypothetical
-    // one). Future.microtask runs immediately after the current build
-    // finishes -- Riverpod's own documented fix for exactly this
-    // error -- so the write still lands before the next frame, just
-    // not *during* this one. The `mounted` guard covers the rare case
-    // where the viewer is closed before that microtask runs.
+    // Local-only "seen" bookkeeping for StoryRingWidget's styling, deferred to
+    // a microtask because the first call happens from initState() (Riverpod
+    // rejects provider writes while the widget tree is building).
     Future.microtask(() {
       if (!mounted) return;
       final notifier = ref.read(
@@ -231,46 +235,66 @@ class _StoryPlayerState extends ConsumerState<_StoryPlayer>
     });
   }
 
+  void _restartTimer() {
+    _paused = false;
+    _controller
+      ..reset()
+      ..forward();
+  }
+
   void _advance() {
     if (_currentIndex >= widget.stories.length - 1) {
       Navigator.of(context).pop();
       return;
     }
     setState(() => _currentIndex++);
-    _controller
-      ..reset()
-      ..forward();
+    _restartTimer();
     _recordCurrentView();
   }
 
   void _goToPrevious() {
     if (_currentIndex == 0) {
-      // Spec: "tap on the left half ... goes to the previous story" --
-      // silently restarts the first story's timer rather than closing,
-      // since there's nothing before it to go back to.
-      _controller
-        ..reset()
-        ..forward();
+      // Nothing before the first story: silently restart its timer.
+      _restartTimer();
       return;
     }
     setState(() => _currentIndex--);
-    _controller
-      ..reset()
-      ..forward();
+    _restartTimer();
     _recordCurrentView();
   }
 
-  void _handleTapUp(TapUpDetails details, double width) {
-    if (details.localPosition.dx > width / 2) {
+  void _handleTapUp(TapUpDetails details, double width, TextDirection dir) {
+    final bool forward = storyTapAdvances(
+      dx: details.localPosition.dx,
+      width: width,
+      direction: dir,
+    );
+    if (forward) {
       _advance();
     } else {
       _goToPrevious();
     }
   }
 
+  /// Hold: stop the timer where it is.
+  void _pause() {
+    if (_paused) return;
+    _paused = true;
+    _controller.stop();
+  }
+
+  /// Release: continue from where the timer stopped.
+  void _resume() {
+    if (!_paused) return;
+    _paused = false;
+    _controller.forward();
+  }
+
   @override
   Widget build(BuildContext context) {
     final story = widget.stories[_currentIndex];
+    final TextDirection direction = Directionality.of(context);
+    final AppFormatters formatters = AppFormatters(context.l10n);
 
     return GestureDetector(
       onVerticalDragEnd: (details) {
@@ -282,64 +306,100 @@ class _StoryPlayerState extends ConsumerState<_StoryPlayer>
         builder: (context, constraints) {
           return GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTapUp: (details) =>
-                _handleTapUp(details, constraints.maxWidth),
+            onTapUp:
+                (details) =>
+                    _handleTapUp(details, constraints.maxWidth, direction),
+            onLongPressStart: (_) => _pause(),
+            onLongPressEnd: (_) => _resume(),
+            onLongPressCancel: _resume,
             child: Stack(
               fit: StackFit.expand,
               children: [
                 Image.network(
                   story.mediaUrl,
                   fit: BoxFit.contain,
-                  loadingBuilder: (context, child, progress) =>
-                      progress == null
-                      ? child
-                      : const Center(child: LoadingIndicator()),
-                  errorBuilder: (context, error, stackTrace) => const Center(
-                    child: Icon(
-                      Icons.broken_image_outlined,
-                      color: Colors.white54,
-                      size: 56,
+                  loadingBuilder:
+                      (context, child, progress) =>
+                          progress == null
+                              ? child
+                              : const Center(child: LoadingIndicator()),
+                  errorBuilder:
+                      (context, error, stackTrace) => Center(
+                        child: Icon(
+                          Icons.broken_image_outlined,
+                          color: _storyWhite54,
+                          size: 56,
+                        ),
+                      ),
+                ),
+                // Soft dark scrim under the header so white text stays legible
+                // on bright photos. Ignores touches.
+                PositionedDirectional(
+                  top: 0,
+                  start: 0,
+                  end: 0,
+                  child: IgnorePointer(
+                    child: SizedBox(
+                      height: 96,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [_storyScrim, Colors.transparent],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                Positioned(
+                PositionedDirectional(
                   top: 8,
-                  left: 8,
-                  right: 8,
+                  start: 8,
+                  end: 8,
                   child: _ProgressBars(
                     count: widget.stories.length,
                     currentIndex: _currentIndex,
                     controller: _controller,
                   ),
                 ),
-                Positioned(
+                PositionedDirectional(
                   top: 20,
-                  left: 12,
-                  right: 4,
+                  start: 12,
+                  end: 4,
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        radius: 14,
-                        child: Text(
-                          widget.businessName.isNotEmpty
-                              ? widget.businessName[0].toUpperCase()
-                              : '?',
-                        ),
-                      ),
+                      AppAvatar(name: widget.businessName, size: 32),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: Text(
-                          widget.businessName,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                widget.businessName,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              formatters.relativeTime(story.publishedAt),
+                              style: TextStyle(
+                                color: _storyWhite70,
+                                fontSize: 12,
+                              ),
+                              maxLines: 1,
+                            ),
+                          ],
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.close, color: Colors.white),
+                        tooltip: context.l10n.storyViewerClose,
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ],
@@ -354,10 +414,9 @@ class _StoryPlayerState extends ConsumerState<_StoryPlayer>
   }
 }
 
-/// The Instagram/Snapchat-style row of per-story progress segments.
-/// `AnimatedWidget` rebuilds only itself on every animation tick
-/// (not the whole `_StoryPlayer`), listening directly to
-/// `_StoryPlayerState`'s [AnimationController].
+/// The row of per-story progress segments. `AnimatedWidget` rebuilds only
+/// itself on every animation tick, listening directly to the player's
+/// [AnimationController]. Segments fill from the reading START.
 class _ProgressBars extends AnimatedWidget {
   const _ProgressBars({
     required this.count,
@@ -374,21 +433,22 @@ class _ProgressBars extends AnimatedWidget {
   Widget build(BuildContext context) {
     return Row(
       children: List.generate(count, (index) {
-        final fillFraction = index < currentIndex
-            ? 1.0
-            : index == currentIndex
-            ? _animation.value
-            : 0.0;
+        final fillFraction =
+            index < currentIndex
+                ? 1.0
+                : index == currentIndex
+                ? _animation.value
+                : 0.0;
         return Expanded(
           child: Container(
             height: 3,
             margin: const EdgeInsets.symmetric(horizontal: 2),
             decoration: BoxDecoration(
-              color: Colors.white24,
+              color: _storyWhite24,
               borderRadius: BorderRadius.circular(2),
             ),
             child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
+              alignment: AlignmentDirectional.centerStart,
               widthFactor: fillFraction,
               child: DecoratedBox(
                 decoration: BoxDecoration(

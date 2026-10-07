@@ -297,9 +297,19 @@ class _HomeStoriesTray extends ConsumerWidget {
       ),
     );
     if (!signedIn) return const SizedBox.shrink();
-    return const Padding(
-      padding: EdgeInsets.only(bottom: 12),
-      child: StoriesBarWidget(),
+    // Part P-114 STEP 1: Business accounts see their own "+" tile first.
+    final bool isBusiness = ref.watch(
+      sessionProvider.select(
+        (AsyncValue<User?> session) => switch (session) {
+          AsyncData(:final value) =>
+            value?.accountType == AccountType.business,
+          _ => false,
+        },
+      ),
+    );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: StoriesBarWidget(showOwnStoryTile: isBusiness),
     );
   }
 }

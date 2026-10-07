@@ -15,6 +15,10 @@ import 'package:flutter_test/flutter_test.dart';
 /// written as a \uXXXX escape.
 void main() {
   final RegExp arabicLetter = RegExp('[\u0621-\u064A]');
+  // Brand names that stay in Latin letters in the Arabic file on purpose.
+  // They are exempt from the "must contain Arabic letters" check only; the
+  // garbled-text check below still applies to them.
+  const Set<String> latinBrandKeys = <String>{'homeWordmark'};
 
   // A lead character of a broken sequence (U+00C3, U+00D8, U+00D9, U+00DA)
   // followed by a continuation or a Windows-1252 symbol.
@@ -44,7 +48,9 @@ void main() {
       }
       final String words = value.replaceAll(placeholder, '');
       final bool hasWordsButNoArabic =
-          anyLetter.hasMatch(words) && !arabicLetter.hasMatch(words);
+          !latinBrandKeys.contains(entry.key) &&
+          anyLetter.hasMatch(words) &&
+          !arabicLetter.hasMatch(words);
       if (hasWordsButNoArabic || garbled.hasMatch(value)) {
         broken.add(entry.key);
       }

@@ -760,6 +760,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search businesses, products and posts'**
   String get discoverSearchHint;
+
+  /// Label of the Business account's own tile at the start of the stories tray.
+  ///
+  /// In en, this message translates to:
+  /// **'Your story'**
+  String get storyYourStory;
+
+  /// Screen-reader label of the Business account's own '+' tile in the stories tray. Opens the story creation form.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to your story'**
+  String get storyAddTooltip;
+
+  /// Screen-reader label of a story ring with at least one unseen story.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, new story'**
+  String storyRingNewLabel(String name);
+
+  /// Screen-reader label of a story ring whose stories were all seen.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, story seen'**
+  String storyRingSeenLabel(String name);
+
+  /// Tooltip and screen-reader label of the close button of the full-screen story viewer.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get storyViewerClose;
+
+  /// Story viewer: the link does not point to a valid business.
+  ///
+  /// In en, this message translates to:
+  /// **'Story not found.'**
+  String get storyViewerNotFound;
+
+  /// Story viewer: the business has no visible stories.
+  ///
+  /// In en, this message translates to:
+  /// **'No stories to show right now.'**
+  String get storyViewerEmpty;
+
+  /// Story viewer: generic failure message when the stories could not be loaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load stories.'**
+  String get storyViewerLoadFailed;
+
+  /// Story viewer: name shown in the header when the business name is not known.
+  ///
+  /// In en, this message translates to:
+  /// **'Business'**
+  String get storyViewerDefaultName;
+
+  /// Name shown for a business whose public profile could not be resolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown business'**
+  String get businessUnknownName;
+
+  /// Button that expands a cut-off post or reel caption in place.
+  ///
+  /// In en, this message translates to:
+  /// **'more'**
+  String get captionMore;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

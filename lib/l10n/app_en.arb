@@ -510,5 +510,59 @@
   "discoverSearchHint": "Search businesses, products and posts",
   "@discoverSearchHint": {
     "description": "Hint of the search bar at the top of the Explore tab. Tapping it opens the search screen."
+  },
+  "storyYourStory": "Your story",
+  "@storyYourStory": {
+    "description": "Label of the Business account's own tile at the start of the stories tray."
+  },
+  "storyAddTooltip": "Add to your story",
+  "@storyAddTooltip": {
+    "description": "Screen-reader label of the Business account's own '+' tile in the stories tray. Opens the story creation form."
+  },
+  "storyRingNewLabel": "{name}, new story",
+  "@storyRingNewLabel": {
+    "description": "Screen-reader label of a story ring with at least one unseen story.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "storyRingSeenLabel": "{name}, story seen",
+  "@storyRingSeenLabel": {
+    "description": "Screen-reader label of a story ring whose stories were all seen.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "storyViewerClose": "Close",
+  "@storyViewerClose": {
+    "description": "Tooltip and screen-reader label of the close button of the full-screen story viewer."
+  },
+  "storyViewerNotFound": "Story not found.",
+  "@storyViewerNotFound": {
+    "description": "Story viewer: the link does not point to a valid business."
+  },
+  "storyViewerEmpty": "No stories to show right now.",
+  "@storyViewerEmpty": {
+    "description": "Story viewer: the business has no visible stories."
+  },
+  "storyViewerLoadFailed": "Could not load stories.",
+  "@storyViewerLoadFailed": {
+    "description": "Story viewer: generic failure message when the stories could not be loaded."
+  },
+  "storyViewerDefaultName": "Business",
+  "@storyViewerDefaultName": {
+    "description": "Story viewer: name shown in the header when the business name is not known."
+  },
+  "businessUnknownName": "Unknown business",
+  "@businessUnknownName": {
+    "description": "Name shown for a business whose public profile could not be resolved."
+  },
+  "captionMore": "more",
+  "@captionMore": {
+    "description": "Button that expands a cut-off post or reel caption in place."
   }
 }

@@ -408,4 +408,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoverSearchHint => 'Search businesses, products and posts';
+
+  @override
+  String get storyYourStory => 'Your story';
+
+  @override
+  String get storyAddTooltip => 'Add to your story';
+
+  @override
+  String storyRingNewLabel(String name) {
+    return '$name, new story';
+  }
+
+  @override
+  String storyRingSeenLabel(String name) {
+    return '$name, story seen';
+  }
+
+  @override
+  String get storyViewerClose => 'Close';
+
+  @override
+  String get storyViewerNotFound => 'Story not found.';
+
+  @override
+  String get storyViewerEmpty => 'No stories to show right now.';
+
+  @override
+  String get storyViewerLoadFailed => 'Could not load stories.';
+
+  @override
+  String get storyViewerDefaultName => 'Business';
+
+  @override
+  String get businessUnknownName => 'Unknown business';
+
+  @override
+  String get captionMore => 'more';
 }
