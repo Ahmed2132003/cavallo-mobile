@@ -501,4 +501,104 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedLoadingLabel => 'Loading your feed';
+
+  @override
+  String get profileScreenTitle => 'Business';
+
+  @override
+  String get profileStatPosts => 'Posts';
+
+  @override
+  String get profileStatFollowers => 'Followers';
+
+  @override
+  String get profileStatProducts => 'Products';
+
+  @override
+  String get profileTabPosts => 'Posts';
+
+  @override
+  String get profileTabReels => 'Reels';
+
+  @override
+  String get profileTabProducts => 'Products';
+
+  @override
+  String get profileTabInfo => 'Info';
+
+  @override
+  String get followButtonFollow => 'Follow';
+
+  @override
+  String get followButtonFollowing => 'Following';
+
+  @override
+  String followersCountLine(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted followers',
+      one: '$formatted follower',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileMessageButton => 'Message';
+
+  @override
+  String get profileMessageStarted => 'Conversation started. Open it from Messages.';
+
+  @override
+  String get profileMessageFailed => 'Could not start the conversation. Please try again.';
+
+  @override
+  String get profileNotFound => 'Business not found.\nIt may have been removed.';
+
+  @override
+  String get profileLoadFailed => 'Could not load this business profile.';
+
+  @override
+  String get profileNoDescription => 'This business hasn\'t added a description yet.';
+
+  @override
+  String profileLocation(String city, String country) {
+    return '$city, $country';
+  }
+
+  @override
+  String get businessTypeTrader => 'Trader';
+
+  @override
+  String get businessTypeFactory => 'Factory';
+
+  @override
+  String get profilePostsEmpty => 'This business hasn\'t shared any posts yet.';
+
+  @override
+  String get profilePostsLoadFailed => 'Could not load this business\'s posts.';
+
+  @override
+  String get profileReelsEmpty => 'This business hasn\'t shared any reels yet.';
+
+  @override
+  String get profileReelsLoadFailed => 'Could not load this business\'s reels.';
+
+  @override
+  String get profileProductsEmpty => 'This business hasn\'t added any products yet.';
+
+  @override
+  String get profileProductsLoadFailed => 'Could not load this business\'s products.';
+
+  @override
+  String get profileInfoType => 'Business type';
+
+  @override
+  String get profileInfoLocation => 'Location';
+
+  @override
+  String get profileInfoPhone => 'Phone';
+
+  @override
+  String get profileGridLoadingLabel => 'Loading content';
 }

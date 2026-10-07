@@ -4,31 +4,38 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:social_commerce_app/core/network/api_failure.dart';
 import 'package:social_commerce_app/core/network/paginated_response.dart';
 import 'package:social_commerce_app/core/widgets/app_button.dart';
+import 'package:social_commerce_app/core/widgets/grid_tile_media.dart';
 import 'package:social_commerce_app/features/business_profile/data/business_profile_public_repository.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_public_repository.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_public_screen.dart';
+import 'package:social_commerce_app/features/business_profile/presentation/own_business_id_provider.dart';
 import 'package:social_commerce_app/features/content/data/post_public_repository.dart';
 import 'package:social_commerce_app/features/content/data/reel_public_repository.dart';
 import 'package:social_commerce_app/features/content/domain/post_public_repository.dart';
 import 'package:social_commerce_app/features/content/domain/public_post_entity.dart';
 import 'package:social_commerce_app/features/content/domain/public_reel_entity.dart';
 import 'package:social_commerce_app/features/content/domain/reel_public_repository.dart';
-import 'package:social_commerce_app/features/content/presentation/post_card.dart';
-import 'package:social_commerce_app/features/content/presentation/reel_card.dart';
 import 'package:social_commerce_app/features/products/data/product_public_repository.dart';
 import 'package:social_commerce_app/features/products/domain/product_entity.dart';
 import 'package:social_commerce_app/features/products/domain/product_public_repository.dart';
+import 'package:social_commerce_app/features/stories/data/story_public_repository.dart';
+import 'package:social_commerce_app/features/stories/domain/public_story_entity.dart';
+import 'package:social_commerce_app/features/stories/domain/story_public_repository.dart';
 
-/// Part P-045 (STEP 7) scope: covers this part's own explicit acceptance
-/// criterion — "the business profile screen's new section ... only ever
-/// requests/displays what the public repository returns ... confirm the
-/// screen trusts and correctly displays whatever the public endpoint
-/// returns, without needing its own redundant filter." A profile fetch
-/// is resolved once, fixed, in every test here — only the Post/Reel
-/// repositories vary — so these tests isolate [_PostsSection]/
-/// [_ReelsSection] behavior from `business_profile_public_screen_test.dart`'s
-/// own header-focused assertions.
+/// Part P-045 (STEP 7), rewritten in Part P-114 STEP 3.
+///
+/// Covers the acceptance criterion "the business profile screen only ever
+/// requests/displays what the public repository returns, without needing its
+/// own redundant filter".
+///
+/// WHAT CHANGED IN P-114 STEP 3 (documented test change): the Posts and
+/// Reels sections used to be lists of PostCard / ReelCard stacked on the
+/// profile. They are now the Posts and Reels TABS of the Instagram-style
+/// profile, drawn as 3-column grids of [GridTileMedia]. So these tests count
+/// grid tiles instead of cards, open the Reels tab before looking at reels,
+/// and no longer look for captions (a grid tile shows no caption). The
+/// trust-the-repository, empty-state and retry assertions are unchanged.
 
 class _FixedBusinessProfilePublicRepository
     implements BusinessProfilePublicRepository {
@@ -47,11 +54,22 @@ class _EmptyProductPublicRepository implements ProductPublicRepository {
       const PaginatedResponse<Product>(results: [], next: null, previous: null);
 }
 
-/// Configurable fake: [postsResult] is handed back verbatim as the
-/// `/public/` list page — exactly the "backend already only returns
-/// published rows" contract `PostPublicRepositoryImpl.fetchBusinessPosts`
-/// (Part P-045, STEP 1) is built on. [postsError], when set, is thrown
-/// as-is, same convention as this project's other hand-rolled fakes.
+/// The profile avatar asks for the business's stories (story ring). No
+/// stories here, so no ring and no real request.
+class _NoStoriesRepository implements StoryPublicRepository {
+  @override
+  Future<PaginatedResponse<PublicStory>> fetchBusinessStories(
+    int businessId,
+  ) async => const PaginatedResponse<PublicStory>(
+    results: [],
+    next: null,
+    previous: null,
+  );
+
+  @override
+  Future<void> recordView(int storyId) async {}
+}
+
 class _FakePostPublicRepository implements PostPublicRepository {
   _FakePostPublicRepository({this.postsResult = const [], this.postsError});
 
@@ -78,7 +96,6 @@ class _FakePostPublicRepository implements PostPublicRepository {
   }
 }
 
-/// See [_FakePostPublicRepository]'s doc — identical shape, for Reel.
 class _FakeReelPublicRepository implements ReelPublicRepository {
   _FakeReelPublicRepository({this.reelsResult = const [], this.reelsError});
 
@@ -131,6 +148,8 @@ Future<void> _pumpScreen(
         ),
         postPublicRepositoryProvider.overrideWithValue(postRepository),
         reelPublicRepositoryProvider.overrideWithValue(reelRepository),
+        storyPublicRepositoryProvider.overrideWithValue(_NoStoriesRepository()),
+        ownBusinessIdProvider.overrideWithValue(null),
       ],
       child: const MaterialApp(
         home: BusinessProfilePublicScreen(businessId: '7'),
@@ -139,11 +158,16 @@ Future<void> _pumpScreen(
   );
 }
 
+Future<void> _openReelsTab(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Reels'));
+  await tester.pumpAndSettle();
+}
+
 void main() {
-  group('BusinessProfilePublicScreen — Posts section', () {
+  group('BusinessProfilePublicScreen - Posts tab', () {
     testWidgets(
-      'lists every post the repository returns, trusting it as already '
-      'published — no client-side re-filtering',
+      'shows one grid tile per post the repository returns, trusting it as '
+      'already published - no client-side re-filtering',
       (tester) async {
         final postRepository = _FakePostPublicRepository(
           postsResult: const [
@@ -160,15 +184,14 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byType(PostCard), findsNWidgets(3));
-        expect(find.text('First post.'), findsOneWidget);
-        expect(find.text('Second post.'), findsOneWidget);
-        expect(find.text('Third post.'), findsOneWidget);
+        expect(find.byType(GridTileMedia), findsNWidgets(3));
+        expect(find.byKey(const ValueKey<String>('profile_post_501')), findsOneWidget);
+        expect(find.byKey(const ValueKey<String>('profile_post_503')), findsOneWidget);
       },
     );
 
     testWidgets(
-      'an empty Posts result shows the section\'s own empty state, not a '
+      'an empty Posts result shows the tab\'s own empty state, not a '
       'spinner or a generic error',
       (tester) async {
         await _pumpScreen(
@@ -182,13 +205,13 @@ void main() {
           find.text('This business hasn\'t shared any posts yet.'),
           findsOneWidget,
         );
-        expect(find.byType(PostCard), findsNothing);
+        expect(find.byType(GridTileMedia), findsNothing);
       },
     );
 
     testWidgets(
       'a Posts fetch failure shows an inline, retryable error scoped to '
-      'the Posts section, without hiding the rest of the profile',
+      'the Posts tab, without hiding the rest of the profile',
       (tester) async {
         final postRepository = _FakePostPublicRepository(
           postsError: const ServerFailure(message: 'Posts unavailable.'),
@@ -201,7 +224,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // The rest of the profile still renders — a Posts failure never
+        // The rest of the profile still renders - a Posts failure never
         // replaces the whole screen.
         expect(find.text('Al Ananka Store'), findsOneWidget);
         expect(find.text('Posts unavailable.'), findsOneWidget);
@@ -214,12 +237,8 @@ void main() {
           PublicPost(id: 501, businessId: 7, caption: 'Now it loads.'),
         ];
 
-        // The screen is a single tall SingleChildScrollView (profile
-        // header + Products + Posts + Reels sections), so the Retry
-        // button can render below the default test viewport's fold.
-        // ensureVisible scrolls it into view before tapping — tapping a
-        // widget that exists in the tree but isn't hit-testable at its
-        // current screen position throws, exactly what failed here.
+        // The screen is one tall scroll view, so the Retry button can render
+        // below the fold of the default test viewport.
         await tester.ensureVisible(retryButtons);
         await tester.pumpAndSettle();
 
@@ -227,15 +246,15 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(postRepository.fetchBusinessPostsCallCount, 2);
-        expect(find.text('Now it loads.'), findsOneWidget);
+        expect(find.byType(GridTileMedia), findsOneWidget);
       },
     );
   });
 
-  group('BusinessProfilePublicScreen — Reels section', () {
+  group('BusinessProfilePublicScreen - Reels tab', () {
     testWidgets(
-      'lists every reel the repository returns, trusting it as already '
-      'published and fully processed — no client-side re-filtering',
+      'shows one grid tile per reel the repository returns, trusting it as '
+      'already published and fully processed - no client-side re-filtering',
       (tester) async {
         final reelRepository = _FakeReelPublicRepository(
           reelsResult: const [
@@ -250,34 +269,35 @@ void main() {
           reelRepository: reelRepository,
         );
         await tester.pumpAndSettle();
+        await _openReelsTab(tester);
 
-        expect(find.byType(ReelCard), findsNWidgets(2));
-        expect(find.text('First reel.'), findsOneWidget);
-        expect(find.text('Second reel.'), findsOneWidget);
+        expect(find.byType(GridTileMedia), findsNWidgets(2));
+        expect(find.byKey(const ValueKey<String>('profile_reel_601')), findsOneWidget);
+        expect(find.byKey(const ValueKey<String>('profile_reel_602')), findsOneWidget);
       },
     );
 
-    testWidgets(
-      'an empty Reels result shows the section\'s own empty state',
-      (tester) async {
-        await _pumpScreen(
-          tester,
-          postRepository: _FakePostPublicRepository(),
-          reelRepository: _FakeReelPublicRepository(),
-        );
-        await tester.pumpAndSettle();
+    testWidgets('an empty Reels result shows the tab\'s own empty state', (
+      tester,
+    ) async {
+      await _pumpScreen(
+        tester,
+        postRepository: _FakePostPublicRepository(),
+        reelRepository: _FakeReelPublicRepository(),
+      );
+      await tester.pumpAndSettle();
+      await _openReelsTab(tester);
 
-        expect(
-          find.text('This business hasn\'t shared any reels yet.'),
-          findsOneWidget,
-        );
-        expect(find.byType(ReelCard), findsNothing);
-      },
-    );
+      expect(
+        find.text('This business hasn\'t shared any reels yet.'),
+        findsOneWidget,
+      );
+      expect(find.byType(GridTileMedia), findsNothing);
+    });
 
     testWidgets(
       'a Reels fetch failure shows an inline, retryable error scoped to '
-      'the Reels section only',
+      'the Reels tab only',
       (tester) async {
         final reelRepository = _FakeReelPublicRepository(
           reelsError: const ServerFailure(message: 'Reels unavailable.'),
@@ -289,9 +309,11 @@ void main() {
           reelRepository: reelRepository,
         );
         await tester.pumpAndSettle();
+        await _openReelsTab(tester);
 
         expect(find.text('Al Ananka Store'), findsOneWidget);
         expect(find.text('Reels unavailable.'), findsOneWidget);
+        expect(find.widgetWithText(AppButton, 'Retry'), findsOneWidget);
       },
     );
   });

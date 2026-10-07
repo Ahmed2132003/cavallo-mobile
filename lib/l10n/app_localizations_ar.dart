@@ -521,4 +521,108 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get feedLoadingLabel => 'جارٍ تحميل خلاصتك';
+
+  @override
+  String get profileScreenTitle => 'نشاط تجاري';
+
+  @override
+  String get profileStatPosts => 'المنشورات';
+
+  @override
+  String get profileStatFollowers => 'المتابعون';
+
+  @override
+  String get profileStatProducts => 'المنتجات';
+
+  @override
+  String get profileTabPosts => 'المنشورات';
+
+  @override
+  String get profileTabReels => 'الريلز';
+
+  @override
+  String get profileTabProducts => 'المنتجات';
+
+  @override
+  String get profileTabInfo => 'معلومات';
+
+  @override
+  String get followButtonFollow => 'متابعة';
+
+  @override
+  String get followButtonFollowing => 'متابَع';
+
+  @override
+  String followersCountLine(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted متابع',
+      many: '$formatted متابعًا',
+      few: '$formatted متابعين',
+      two: 'متابعان',
+      one: 'متابع واحد',
+      zero: '$formatted متابع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileMessageButton => 'مراسلة';
+
+  @override
+  String get profileMessageStarted => 'بدأت المحادثة. افتحها من الرسائل.';
+
+  @override
+  String get profileMessageFailed => 'تعذّر بدء المحادثة. حاول مرة أخرى.';
+
+  @override
+  String get profileNotFound => 'لم يتم العثور على النشاط التجاري.\nربما تمت إزالته.';
+
+  @override
+  String get profileLoadFailed => 'تعذّر تحميل ملف هذا النشاط التجاري.';
+
+  @override
+  String get profileNoDescription => 'لم يضف هذا النشاط التجاري وصفًا بعد.';
+
+  @override
+  String profileLocation(String city, String country) {
+    return '$city، $country';
+  }
+
+  @override
+  String get businessTypeTrader => 'تاجر';
+
+  @override
+  String get businessTypeFactory => 'مصنع';
+
+  @override
+  String get profilePostsEmpty => 'لم يشارك هذا النشاط التجاري أي منشورات بعد.';
+
+  @override
+  String get profilePostsLoadFailed => 'تعذّر تحميل منشورات هذا النشاط التجاري.';
+
+  @override
+  String get profileReelsEmpty => 'لم يشارك هذا النشاط التجاري أي ريلز بعد.';
+
+  @override
+  String get profileReelsLoadFailed => 'تعذّر تحميل ريلز هذا النشاط التجاري.';
+
+  @override
+  String get profileProductsEmpty => 'لم يضف هذا النشاط التجاري أي منتجات بعد.';
+
+  @override
+  String get profileProductsLoadFailed => 'تعذّر تحميل منتجات هذا النشاط التجاري.';
+
+  @override
+  String get profileInfoType => 'نوع النشاط';
+
+  @override
+  String get profileInfoLocation => 'الموقع';
+
+  @override
+  String get profileInfoPhone => 'الهاتف';
+
+  @override
+  String get profileGridLoadingLabel => 'جارٍ تحميل المحتوى';
 }

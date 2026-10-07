@@ -638,5 +638,141 @@
   "feedLoadingLabel": "Loading your feed",
   "@feedLoadingLabel": {
     "description": "Home feed: screen-reader label of the skeleton shown while the first page loads."
+  },
+  "profileScreenTitle": "Business",
+  "@profileScreenTitle": {
+    "description": "App bar title of the public business profile screen."
+  },
+  "profileStatPosts": "Posts",
+  "@profileStatPosts": {
+    "description": "Business profile stats row: label under the number of posts."
+  },
+  "profileStatFollowers": "Followers",
+  "@profileStatFollowers": {
+    "description": "Business profile stats row: label under the number of followers."
+  },
+  "profileStatProducts": "Products",
+  "@profileStatProducts": {
+    "description": "Business profile stats row: label under the number of products."
+  },
+  "profileTabPosts": "Posts",
+  "@profileTabPosts": {
+    "description": "Business profile: tooltip and screen-reader label of the Posts grid tab."
+  },
+  "profileTabReels": "Reels",
+  "@profileTabReels": {
+    "description": "Business profile: tooltip and screen-reader label of the Reels grid tab."
+  },
+  "profileTabProducts": "Products",
+  "@profileTabProducts": {
+    "description": "Business profile: tooltip and screen-reader label of the Products grid tab."
+  },
+  "profileTabInfo": "Info",
+  "@profileTabInfo": {
+    "description": "Business profile: tooltip and screen-reader label of the Info tab."
+  },
+  "followButtonFollow": "Follow",
+  "@followButtonFollow": {
+    "description": "Label of the Follow button on a business."
+  },
+  "followButtonFollowing": "Following",
+  "@followButtonFollowing": {
+    "description": "Label of the button once the business is followed (tap to unfollow)."
+  },
+  "followersCountLine": "{count, plural, one{{formatted} follower} other{{formatted} followers}}",
+  "@followersCountLine": {
+    "description": "Followers line under the Follow button. count is the exact number (plural form); formatted is the compact text.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "formatted": {
+        "type": "String"
+      }
+    }
+  },
+  "profileMessageButton": "Message",
+  "@profileMessageButton": {
+    "description": "Business profile: button that opens a conversation with the business."
+  },
+  "profileMessageStarted": "Conversation started. Open it from Messages.",
+  "@profileMessageStarted": {
+    "description": "Snackbar shown when the conversation was started but could not be opened directly."
+  },
+  "profileMessageFailed": "Could not start the conversation. Please try again.",
+  "@profileMessageFailed": {
+    "description": "Snackbar shown when starting a conversation with the business failed."
+  },
+  "profileNotFound": "Business not found.\nIt may have been removed.",
+  "@profileNotFound": {
+    "description": "Business profile: message when the business does not exist."
+  },
+  "profileLoadFailed": "Could not load this business profile.",
+  "@profileLoadFailed": {
+    "description": "Business profile: fallback message when loading failed."
+  },
+  "profileNoDescription": "This business hasn't added a description yet.",
+  "@profileNoDescription": {
+    "description": "Business profile: text shown when the bio is empty."
+  },
+  "profileLocation": "{city}, {country}",
+  "@profileLocation": {
+    "description": "City and country of a business.",
+    "placeholders": {
+      "city": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "businessTypeTrader": "Trader",
+  "@businessTypeTrader": {
+    "description": "Business type label: trader."
+  },
+  "businessTypeFactory": "Factory",
+  "@businessTypeFactory": {
+    "description": "Business type label: factory."
+  },
+  "profilePostsEmpty": "This business hasn't shared any posts yet.",
+  "@profilePostsEmpty": {
+    "description": "Business profile, Posts tab: empty state."
+  },
+  "profilePostsLoadFailed": "Could not load this business's posts.",
+  "@profilePostsLoadFailed": {
+    "description": "Business profile, Posts tab: fallback error message."
+  },
+  "profileReelsEmpty": "This business hasn't shared any reels yet.",
+  "@profileReelsEmpty": {
+    "description": "Business profile, Reels tab: empty state."
+  },
+  "profileReelsLoadFailed": "Could not load this business's reels.",
+  "@profileReelsLoadFailed": {
+    "description": "Business profile, Reels tab: fallback error message."
+  },
+  "profileProductsEmpty": "This business hasn't added any products yet.",
+  "@profileProductsEmpty": {
+    "description": "Business profile, Products tab: empty state."
+  },
+  "profileProductsLoadFailed": "Could not load this business's products.",
+  "@profileProductsLoadFailed": {
+    "description": "Business profile, Products tab: fallback error message."
+  },
+  "profileInfoType": "Business type",
+  "@profileInfoType": {
+    "description": "Business profile, Info tab: label of the business type row."
+  },
+  "profileInfoLocation": "Location",
+  "@profileInfoLocation": {
+    "description": "Business profile, Info tab: label of the location row."
+  },
+  "profileInfoPhone": "Phone",
+  "@profileInfoPhone": {
+    "description": "Business profile, Info tab: label of the phone row."
+  },
+  "profileGridLoadingLabel": "Loading content",
+  "@profileGridLoadingLabel": {
+    "description": "Screen-reader label of the skeleton tiles shown while a profile tab loads."
   }
 }

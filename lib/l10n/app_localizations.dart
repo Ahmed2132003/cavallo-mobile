@@ -898,6 +898,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading your feed'**
   String get feedLoadingLabel;
+
+  /// App bar title of the public business profile screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Business'**
+  String get profileScreenTitle;
+
+  /// Business profile stats row: label under the number of posts.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts'**
+  String get profileStatPosts;
+
+  /// Business profile stats row: label under the number of followers.
+  ///
+  /// In en, this message translates to:
+  /// **'Followers'**
+  String get profileStatFollowers;
+
+  /// Business profile stats row: label under the number of products.
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get profileStatProducts;
+
+  /// Business profile: tooltip and screen-reader label of the Posts grid tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts'**
+  String get profileTabPosts;
+
+  /// Business profile: tooltip and screen-reader label of the Reels grid tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Reels'**
+  String get profileTabReels;
+
+  /// Business profile: tooltip and screen-reader label of the Products grid tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get profileTabProducts;
+
+  /// Business profile: tooltip and screen-reader label of the Info tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get profileTabInfo;
+
+  /// Label of the Follow button on a business.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow'**
+  String get followButtonFollow;
+
+  /// Label of the button once the business is followed (tap to unfollow).
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get followButtonFollowing;
+
+  /// Followers line under the Follow button. count is the exact number (plural form); formatted is the compact text.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{formatted} follower} other{{formatted} followers}}'**
+  String followersCountLine(int count, String formatted);
+
+  /// Business profile: button that opens a conversation with the business.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get profileMessageButton;
+
+  /// Snackbar shown when the conversation was started but could not be opened directly.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation started. Open it from Messages.'**
+  String get profileMessageStarted;
+
+  /// Snackbar shown when starting a conversation with the business failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not start the conversation. Please try again.'**
+  String get profileMessageFailed;
+
+  /// Business profile: message when the business does not exist.
+  ///
+  /// In en, this message translates to:
+  /// **'Business not found.\nIt may have been removed.'**
+  String get profileNotFound;
+
+  /// Business profile: fallback message when loading failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this business profile.'**
+  String get profileLoadFailed;
+
+  /// Business profile: text shown when the bio is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'This business hasn\'t added a description yet.'**
+  String get profileNoDescription;
+
+  /// City and country of a business.
+  ///
+  /// In en, this message translates to:
+  /// **'{city}, {country}'**
+  String profileLocation(String city, String country);
+
+  /// Business type label: trader.
+  ///
+  /// In en, this message translates to:
+  /// **'Trader'**
+  String get businessTypeTrader;
+
+  /// Business type label: factory.
+  ///
+  /// In en, this message translates to:
+  /// **'Factory'**
+  String get businessTypeFactory;
+
+  /// Business profile, Posts tab: empty state.
+  ///
+  /// In en, this message translates to:
+  /// **'This business hasn\'t shared any posts yet.'**
+  String get profilePostsEmpty;
+
+  /// Business profile, Posts tab: fallback error message.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this business\'s posts.'**
+  String get profilePostsLoadFailed;
+
+  /// Business profile, Reels tab: empty state.
+  ///
+  /// In en, this message translates to:
+  /// **'This business hasn\'t shared any reels yet.'**
+  String get profileReelsEmpty;
+
+  /// Business profile, Reels tab: fallback error message.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this business\'s reels.'**
+  String get profileReelsLoadFailed;
+
+  /// Business profile, Products tab: empty state.
+  ///
+  /// In en, this message translates to:
+  /// **'This business hasn\'t added any products yet.'**
+  String get profileProductsEmpty;
+
+  /// Business profile, Products tab: fallback error message.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this business\'s products.'**
+  String get profileProductsLoadFailed;
+
+  /// Business profile, Info tab: label of the business type row.
+  ///
+  /// In en, this message translates to:
+  /// **'Business type'**
+  String get profileInfoType;
+
+  /// Business profile, Info tab: label of the location row.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get profileInfoLocation;
+
+  /// Business profile, Info tab: label of the phone row.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get profileInfoPhone;
+
+  /// Screen-reader label of the skeleton tiles shown while a profile tab loads.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading content'**
+  String get profileGridLoadingLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

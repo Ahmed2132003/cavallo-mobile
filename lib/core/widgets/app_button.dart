@@ -2,51 +2,84 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
-/// Part P-006 scope: the one button every feature screen should use
-/// instead of a raw [ElevatedButton]/[FilledButton], so the whole app
-/// picks up a consistent look - and any future brand restyle of
-/// [AppTheme] - automatically, in one place.
+/// Visual weight of an [AppButton].
 ///
-/// Part P-111: look comes from the `filledButtonTheme` in AppTheme (brand
-/// fill, white label, pill shape, 44 px minimum height). The only
-/// token read here is the spinner colour.
+/// Part P-114 STEP 3: [neutral] (grey, used by "Following") and [outlined]
+/// (used by "Message") were added next to the original filled button.
+enum AppButtonVariant {
+  /// Filled brand button: the primary action. This is the default.
+  filled,
+
+  /// Filled with the neutral surface colour: a secondary state such as
+  /// "Following".
+  neutral,
+
+  /// Hairline outline, no fill: a secondary action such as "Message".
+  outlined,
+}
+
+/// The one button of the app (Part P-006, extended by P-114 STEP 3).
+///
+/// Every variant is still an [AppButton], so tests and callers that look for
+/// an [AppButton] with a label keep working whatever the variant is.
 class AppButton extends StatelessWidget {
   const AppButton({
     super.key,
     required this.label,
     required this.onPressed,
     this.isLoading = false,
+    this.variant = AppButtonVariant.filled,
   });
 
-  /// Text shown on the button. Replaced by a small spinner while
-  /// [isLoading] is true.
   final String label;
 
-  /// Called when the button is tapped. Ignored while [isLoading] is
-  /// true - pass `null` directly to disable the button for any other
-  /// reason (e.g. an invalid form).
   final VoidCallback? onPressed;
 
-  /// When true, shows a spinner instead of [label] and disables the
-  /// button, so a slow request can't be double-submitted by an
-  /// impatient tap.
+  /// Shows a small spinner instead of the label and disables the button.
   final bool isLoading;
+
+  final AppButtonVariant variant;
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton(
-      onPressed: isLoading ? null : onPressed,
-      child:
-          isLoading
-              ? SizedBox(
-                height: 18,
-                width: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: context.appColors.brandText,
-                ),
-              )
-              : Text(label),
-    );
+    final AppColors colors = context.appColors;
+    final VoidCallback? handler = isLoading ? null : onPressed;
+    final Widget child =
+        isLoading
+            ? SizedBox(
+              height: 18,
+              width: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color:
+                    variant == AppButtonVariant.filled
+                        ? colors.brandText
+                        : colors.textPrimary,
+              ),
+            )
+            : Text(label);
+
+    switch (variant) {
+      case AppButtonVariant.filled:
+        return FilledButton(onPressed: handler, child: child);
+      case AppButtonVariant.neutral:
+        return FilledButton(
+          onPressed: handler,
+          style: FilledButton.styleFrom(
+            backgroundColor: colors.surfaceVariant,
+            foregroundColor: colors.textPrimary,
+          ),
+          child: child,
+        );
+      case AppButtonVariant.outlined:
+        return OutlinedButton(
+          onPressed: handler,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: colors.textPrimary,
+            side: BorderSide(color: colors.outline),
+          ),
+          child: child,
+        );
+    }
   }
 }

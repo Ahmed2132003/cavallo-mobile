@@ -20,6 +20,10 @@ import 'package:social_commerce_app/features/products/data/product_public_reposi
 import 'package:social_commerce_app/features/products/domain/product_entity.dart';
 import 'package:social_commerce_app/features/products/domain/product_public_repository.dart';
 import 'package:social_commerce_app/features/social/data/social_interaction_repository_impl.dart';
+import 'package:social_commerce_app/core/widgets/stat_item.dart';
+import 'package:social_commerce_app/features/stories/data/story_public_repository.dart';
+import 'package:social_commerce_app/features/stories/domain/public_story_entity.dart';
+import 'package:social_commerce_app/features/stories/domain/story_public_repository.dart';
 
 
 import '../../social/fake_social_interaction_repository.dart';
@@ -127,6 +131,22 @@ class _EmptyReelPublicRepository implements ReelPublicRepository {
   );
 }
 
+/// Part P-114 STEP 3: the profile avatar asks for the business's stories (story
+/// ring). No stories here: no ring and no real request.
+class _EmptyStoryPublicRepository implements StoryPublicRepository {
+  @override
+  Future<PaginatedResponse<PublicStory>> fetchBusinessStories(
+    int businessId,
+  ) async => const PaginatedResponse<PublicStory>(
+    results: [],
+    next: null,
+    previous: null,
+  );
+
+  @override
+  Future<void> recordView(int storyId) async {}
+}
+
 const _profile = BusinessProfile(
   id: 7,
   businessName: 'Al Ananka Store',
@@ -172,6 +192,9 @@ Future<void> _pumpScreen(
         ),
         reelPublicRepositoryProvider.overrideWithValue(
           _EmptyReelPublicRepository(),
+        ),
+        storyPublicRepositoryProvider.overrideWithValue(
+          _EmptyStoryPublicRepository(),
         ),
       ],
       child: MaterialApp(
@@ -251,7 +274,13 @@ void main() {
         expect(find.byIcon(Icons.verified), findsOneWidget);
 
         expect(find.widgetWithText(AppButton, 'Follow'), findsOneWidget);
-        expect(find.text('12 followers'), findsOneWidget);
+        // Part P-114 STEP 3: the count is the Followers cell of the stats row.
+        expect(
+          tester
+              .widget<StatItem>(find.widgetWithText(StatItem, 'Followers'))
+              .value,
+          '12',
+        );
         expect(find.text('(coming soon)'), findsNothing);
 
         // Part P-045 (STEP 6): the Posts/Reels sections render their own
@@ -261,6 +290,9 @@ void main() {
           find.text('This business hasn\'t shared any posts yet.'),
           findsOneWidget,
         );
+        // Part P-114 STEP 3: Reels is its own tab now; open it first.
+        await tester.tap(find.byTooltip('Reels'));
+        await tester.pumpAndSettle();
         expect(
           find.text('This business hasn\'t shared any reels yet.'),
           findsOneWidget,
@@ -303,7 +335,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.widgetWithText(AppButton, 'Following'), findsOneWidget);
-      expect(find.text('13 followers'), findsOneWidget);
+      // Part P-114 STEP 3: the count after Follow is the Followers cell.
+      expect(
+        tester
+            .widget<StatItem>(find.widgetWithText(StatItem, 'Followers'))
+            .value,
+        '13',
+      );
       expect(social.calls, ['follow:7']);
       // The profile stays on screen (no reload flash after a toggle).
       expect(find.text('Al Ananka Store'), findsOneWidget);
