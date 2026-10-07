@@ -564,5 +564,79 @@
   "captionMore": "more",
   "@captionMore": {
     "description": "Button that expands a cut-off post or reel caption in place."
+  },
+  "actionLike": "Like",
+  "@actionLike": {
+    "description": "Tooltip and screen-reader label of the Like button on posts and reels."
+  },
+  "actionComment": "Comment",
+  "@actionComment": {
+    "description": "Tooltip and screen-reader label of the Comment button on posts and reels."
+  },
+  "actionShare": "Share",
+  "@actionShare": {
+    "description": "Tooltip and screen-reader label of the Share button on posts and reels."
+  },
+  "actionSave": "Save",
+  "@actionSave": {
+    "description": "Tooltip and screen-reader label of the Save (bookmark) button on posts and reels."
+  },
+  "feedLikesLine": "{count, plural, one{{formatted} like} other{{formatted} likes}}",
+  "@feedLikesLine": {
+    "description": "Likes line under the action row of a post card. count is the exact number (it picks the plural form); formatted is the compact text (for example 1.2K) shown to the user.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "formatted": {
+        "type": "String"
+      }
+    }
+  },
+  "feedViewAllComments": "{count, plural, one{View 1 comment} other{View all {formatted} comments}}",
+  "@feedViewAllComments": {
+    "description": "Link under the caption of a post card that opens the comments. count is the exact number (plural form); formatted is the compact text.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "formatted": {
+        "type": "String"
+      }
+    }
+  },
+  "feedVerifiedLabel": "Verified",
+  "@feedVerifiedLabel": {
+    "description": "Screen-reader label of the blue Verified mark after a business name."
+  },
+  "feedPostMediaLabel": "Post by {name}",
+  "@feedPostMediaLabel": {
+    "description": "Screen-reader label of the picture of a post card.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "feedReelMediaLabel": "Reel by {name}",
+  "@feedReelMediaLabel": {
+    "description": "Screen-reader label of the media of a reel card.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "feedEmptyMessage": "Your feed is empty right now.\nFollow some businesses, or check back soon.",
+  "@feedEmptyMessage": {
+    "description": "Home feed: message shown when there is nothing to show yet."
+  },
+  "feedLoadFailed": "Could not load your feed.",
+  "@feedLoadFailed": {
+    "description": "Home feed: message shown when the first page could not be loaded (next to the Retry button)."
+  },
+  "feedLoadingLabel": "Loading your feed",
+  "@feedLoadingLabel": {
+    "description": "Home feed: screen-reader label of the skeleton shown while the first page loads."
   }
 }

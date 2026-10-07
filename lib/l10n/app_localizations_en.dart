@@ -445,4 +445,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get captionMore => 'more';
+
+  @override
+  String get actionLike => 'Like';
+
+  @override
+  String get actionComment => 'Comment';
+
+  @override
+  String get actionShare => 'Share';
+
+  @override
+  String get actionSave => 'Save';
+
+  @override
+  String feedLikesLine(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted likes',
+      one: '$formatted like',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String feedViewAllComments(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'View all $formatted comments',
+      one: 'View 1 comment',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get feedVerifiedLabel => 'Verified';
+
+  @override
+  String feedPostMediaLabel(String name) {
+    return 'Post by $name';
+  }
+
+  @override
+  String feedReelMediaLabel(String name) {
+    return 'Reel by $name';
+  }
+
+  @override
+  String get feedEmptyMessage => 'Your feed is empty right now.\nFollow some businesses, or check back soon.';
+
+  @override
+  String get feedLoadFailed => 'Could not load your feed.';
+
+  @override
+  String get feedLoadingLabel => 'Loading your feed';
 }

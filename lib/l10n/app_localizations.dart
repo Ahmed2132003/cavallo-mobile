@@ -826,6 +826,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'more'**
   String get captionMore;
+
+  /// Tooltip and screen-reader label of the Like button on posts and reels.
+  ///
+  /// In en, this message translates to:
+  /// **'Like'**
+  String get actionLike;
+
+  /// Tooltip and screen-reader label of the Comment button on posts and reels.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get actionComment;
+
+  /// Tooltip and screen-reader label of the Share button on posts and reels.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get actionShare;
+
+  /// Tooltip and screen-reader label of the Save (bookmark) button on posts and reels.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get actionSave;
+
+  /// Likes line under the action row of a post card. count is the exact number (it picks the plural form); formatted is the compact text (for example 1.2K) shown to the user.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{formatted} like} other{{formatted} likes}}'**
+  String feedLikesLine(int count, String formatted);
+
+  /// Link under the caption of a post card that opens the comments. count is the exact number (plural form); formatted is the compact text.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{View 1 comment} other{View all {formatted} comments}}'**
+  String feedViewAllComments(int count, String formatted);
+
+  /// Screen-reader label of the blue Verified mark after a business name.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get feedVerifiedLabel;
+
+  /// Screen-reader label of the picture of a post card.
+  ///
+  /// In en, this message translates to:
+  /// **'Post by {name}'**
+  String feedPostMediaLabel(String name);
+
+  /// Screen-reader label of the media of a reel card.
+  ///
+  /// In en, this message translates to:
+  /// **'Reel by {name}'**
+  String feedReelMediaLabel(String name);
+
+  /// Home feed: message shown when there is nothing to show yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Your feed is empty right now.\nFollow some businesses, or check back soon.'**
+  String get feedEmptyMessage;
+
+  /// Home feed: message shown when the first page could not be loaded (next to the Retry button).
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your feed.'**
+  String get feedLoadFailed;
+
+  /// Home feed: screen-reader label of the skeleton shown while the first page loads.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your feed'**
+  String get feedLoadingLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

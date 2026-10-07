@@ -152,7 +152,12 @@ void main() {
       await tester.pumpWidget(_wrap(fake));
       await tester.pump();
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      // Part P-114 STEP 2: a skeleton, not a spinner, while the first page loads.
+      expect(
+        find.byKey(const ValueKey<String>('home_feed_skeleton')),
+        findsOneWidget,
+      );
+      expect(find.byType(CircularProgressIndicator), findsNothing);
 
       fake.firstCallGate!.complete();
       await tester.pumpAndSettle();

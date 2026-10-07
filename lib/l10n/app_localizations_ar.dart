@@ -457,4 +457,68 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get captionMore => 'المزيد';
+
+  @override
+  String get actionLike => 'إعجاب';
+
+  @override
+  String get actionComment => 'تعليق';
+
+  @override
+  String get actionShare => 'مشاركة';
+
+  @override
+  String get actionSave => 'حفظ';
+
+  @override
+  String feedLikesLine(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$formatted إعجاب',
+      many: '$formatted إعجابًا',
+      few: '$formatted إعجابات',
+      two: 'إعجابان',
+      one: 'إعجاب واحد',
+      zero: '$formatted إعجاب',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String feedViewAllComments(int count, String formatted) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'عرض كل $formatted تعليق',
+      many: 'عرض كل $formatted تعليقًا',
+      few: 'عرض كل $formatted تعليقات',
+      two: 'عرض التعليقين',
+      one: 'عرض التعليق',
+      zero: 'عرض كل $formatted تعليق',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get feedVerifiedLabel => 'موثّق';
+
+  @override
+  String feedPostMediaLabel(String name) {
+    return 'منشور من $name';
+  }
+
+  @override
+  String feedReelMediaLabel(String name) {
+    return 'ريل من $name';
+  }
+
+  @override
+  String get feedEmptyMessage => 'خلاصتك فارغة حاليًا.\nتابع بعض الأنشطة التجارية، أو عد لاحقًا.';
+
+  @override
+  String get feedLoadFailed => 'تعذّر تحميل خلاصتك.';
+
+  @override
+  String get feedLoadingLabel => 'جارٍ تحميل خلاصتك';
 }

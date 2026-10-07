@@ -113,7 +113,8 @@ void main() {
         // The "server" has not answered yet (the gate is still closed).
         expect(find.byIcon(Icons.favorite), findsOneWidget);
         expect(find.byIcon(Icons.favorite_border), findsNothing);
-        expect(find.text('1'), findsOneWidget);
+        // Part P-114 STEP 2: the count is now the likes line under the icons.
+        expect(find.text('1 like'), findsOneWidget);
 
         fake.gate!.complete();
         await tester.pumpAndSettle();
@@ -140,7 +141,7 @@ void main() {
 
         expect(find.byIcon(Icons.favorite_border), findsOneWidget);
         expect(find.byIcon(Icons.favorite), findsNothing);
-        expect(find.text('1'), findsNothing);
+        expect(find.text('1 like'), findsNothing);
         expect(
           find.text('Something went wrong. Please try again.'),
           findsOneWidget,

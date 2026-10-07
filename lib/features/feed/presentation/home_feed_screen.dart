@@ -11,6 +11,9 @@
 /// sections already do — same `businessName` + `onTap` shape, same
 /// `context.pushNamed(RouteNames.postDetail / reelDetail, ...)`
 /// navigation convention. Neither card was touched by this part.
+/// (Part P-114 STEP 2 restyled both cards in place; the feed still hands them
+/// the same `post`/`reel`, `businessName` and `onTap`, plus the optional
+/// `isBusinessVerified` flag it reads from the same business lookup.)
 ///
 /// ### `businessName` resolution — per item, non-blocking
 ///
@@ -37,8 +40,9 @@
 /// `AsyncValue.loading()` with no attached previous data — Riverpod's
 /// `copyWithPrevious` is an internal member this project's own analyzer
 /// pass already ruled out. That means this screen's top-level `switch`
-/// briefly renders [LoadingIndicator] instead of the list for the
-/// duration of a manual refresh, rather than keeping the old items
+/// briefly renders [FeedSkeletonList] instead of the list for the
+/// duration of a manual refresh (now as the skeleton, Part P-114 STEP 2),
+/// rather than keeping the old items
 /// visible under the pull spinner. Flagged rather than silently
 /// patched: fixing it properly means changing `FeedState`/the
 /// provider's contract, which is out of this screen's own scope.
@@ -51,16 +55,25 @@
 /// and chats), the stories tray at the top of this feed, and the Profile and
 /// Settings hub (Business tools, language, appearance, log out). The
 /// navigation manifest and its reachability test keep it that way.
+///
+/// ### Instagram-style assembly (Part P-114 STEP 2)
+///
+/// Presentation only: every provider call, route and callback is unchanged.
+/// The list is full width (no side padding): the stories tray, a hairline,
+/// then post and reel cards that carry their own hairline. The first load
+/// shows [FeedSkeletonList] and loading more shows one [FeedPostSkeleton]
+/// instead of spinners. The empty and error messages come from the ARB files.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/shell/home_top_bar.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
-import '../../../core/widgets/loading_indicator.dart';
 import '../../../routing/route_names.dart';
 import '../../auth/domain/user_entity.dart';
 import '../../auth/presentation/session_provider.dart';
@@ -74,6 +87,7 @@ import '../../discover/presentation/discover_provider.dart';
 import '../../discover/presentation/stories_bar_widget.dart';
 import '../../notifications/presentation/notification_list_provider.dart';
 import '../domain/feed_item_entity.dart';
+import 'feed_skeleton.dart';
 import 'home_feed_provider.dart';
 
 class HomeFeedScreen extends ConsumerStatefulWidget {
@@ -131,7 +145,9 @@ class _HomeFeedScreenState extends ConsumerState<HomeFeedScreen> {
           scrollController: _scrollController,
         ),
         AsyncError(:final error) => _LoadErrorView(error: error),
-        _ => const LoadingIndicator(),
+        _ => const FeedSkeletonList(
+          key: ValueKey<String>('home_feed_skeleton'),
+        ),
       },
     );
   }
@@ -164,13 +180,11 @@ class _FeedBody extends ConsumerWidget {
         onRefresh: handleRefresh,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          children: const [
-            _HomeStoriesTray(),
-            SizedBox(height: 96),
+          children: [
+            const _HomeStoriesTray(),
+            const SizedBox(height: 96),
             EmptyStateWidget(
-              message:
-                  'Your feed is empty right now.\n'
-                  'Follow some businesses, or check back soon.',
+              message: context.l10n.feedEmptyMessage,
               icon: Icons.dynamic_feed_outlined,
             ),
           ],
@@ -186,7 +200,7 @@ class _FeedBody extends ConsumerWidget {
       child: ListView.builder(
         controller: scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.zero,
         itemCount: itemCount,
         itemBuilder: (context, index) {
           if (index == 0) {
@@ -194,15 +208,9 @@ class _FeedBody extends ConsumerWidget {
           }
           final itemIndex = index - 1;
           if (itemIndex >= state.items.length) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2.5),
-                ),
-              ),
+            // Part P-114 STEP 2: a skeleton card instead of a spinner.
+            return const FeedPostSkeleton(
+              key: ValueKey<String>('home_feed_loading_more'),
             );
           }
           return _FeedListItem(item: state.items[itemIndex]);
@@ -228,33 +236,40 @@ class _FeedListItem extends ConsumerWidget {
     );
     final businessName = switch (profileAsync) {
       AsyncData(value: final profile) =>
-        profile?.businessName ?? 'Unknown business',
+        profile?.businessName ?? context.l10n.businessUnknownName,
       _ => '',
     };
+    // Part P-114 STEP 2: the same lookup also tells whether to show the blue
+    // Verified mark (false while loading or when the profile is unknown).
+    final bool isVerified = switch (profileAsync) {
+      AsyncData(value: final profile) => profile?.isVerified ?? false,
+      _ => false,
+    };
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: switch (item) {
-        PostFeedItem(:final post) => PostCard(
-          post: post,
-          businessName: businessName,
-          onTap:
-              () => context.pushNamed(
-                RouteNames.postDetail,
-                pathParameters: {RouteNames.idParam: '${post.id}'},
-              ),
-        ),
-        ReelFeedItem(:final reel) => ReelCard(
-          reel: reel,
-          businessName: businessName,
-          onTap:
-              () => context.pushNamed(
-                RouteNames.reelDetail,
-                pathParameters: {RouteNames.idParam: '${reel.id}'},
-              ),
-        ),
-      },
-    );
+    // Part P-114 STEP 2: no wrapper padding; each card carries its own
+    // bottom hairline (full-width Instagram list).
+    return switch (item) {
+      PostFeedItem(:final post) => PostCard(
+        post: post,
+        businessName: businessName,
+        isBusinessVerified: isVerified,
+        onTap:
+            () => context.pushNamed(
+              RouteNames.postDetail,
+              pathParameters: {RouteNames.idParam: '${post.id}'},
+            ),
+      ),
+      ReelFeedItem(:final reel) => ReelCard(
+        reel: reel,
+        businessName: businessName,
+        isBusinessVerified: isVerified,
+        onTap:
+            () => context.pushNamed(
+              RouteNames.reelDetail,
+              pathParameters: {RouteNames.idParam: '${reel.id}'},
+            ),
+      ),
+    };
   }
 }
 
@@ -272,7 +287,7 @@ class _LoadErrorView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ErrorStateWidget(
-      message: 'Could not load your feed.',
+      message: context.l10n.feedLoadFailed,
       onRetry: () => ref.invalidate(homeFeedProvider),
     );
   }
@@ -307,9 +322,16 @@ class _HomeStoriesTray extends ConsumerWidget {
         },
       ),
     );
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: StoriesBarWidget(showOwnStoryTile: isBusiness),
+    // Part P-114 STEP 2: a hairline separates the tray from the first card.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: StoriesBarWidget(showOwnStoryTile: isBusiness),
+        ),
+        Divider(height: 0.5, thickness: 0.5, color: context.appColors.outline),
+      ],
     );
   }
 }

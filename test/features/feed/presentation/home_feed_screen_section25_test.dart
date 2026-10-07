@@ -212,7 +212,12 @@ void main() {
         position.jumpTo(position.maxScrollExtent);
         await tester.pump();
 
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        // Part P-114 STEP 2: the bottom row is a skeleton card, not a spinner.
+        expect(
+          find.byKey(const ValueKey<String>('home_feed_loading_more')),
+          findsOneWidget,
+        );
+        expect(find.byType(CircularProgressIndicator), findsNothing);
         // Not a full-screen reload: page 1's last item is still there.
         expect(find.text('Post caption 10'), findsOneWidget);
 
@@ -230,7 +235,10 @@ void main() {
         gate.complete(FeedPage(items: [_post(99)], nextCursor: null));
         await tester.pumpAndSettle();
 
-        expect(find.byType(CircularProgressIndicator), findsNothing);
+        expect(
+          find.byKey(const ValueKey<String>('home_feed_loading_more')),
+          findsNothing,
+        );
         position = _position(tester);
         position.jumpTo(position.maxScrollExtent);
         await tester.pump();
