@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/formatters.dart';
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_avatar.dart';
+import '../../../core/widgets/app_shimmer_box.dart';
 import '../domain/comment_entity.dart';
 import 'comment_list_provider.dart';
 import 'content_interaction_key.dart';
 import 'content_overflow_menu.dart';
 
-/// Part P-058: the comment list for one Post/Reel. Renders exactly what the
-/// backend returns (no client-side hidden-comment filtering). A comment with
-/// `isHidden: true` is only ever present for its own author or a moderator,
-/// so it gets a subtle "pending review" marker.
+/// Part P-058 + P-114 STEP 4B: the comment list for one Post/Reel. Renders
+/// exactly what the backend returns (no client-side hidden-comment
+/// filtering). A comment with `isHidden: true` is only ever present for its
+/// own author or a moderator, so it gets a subtle "pending review" marker.
+///
+/// P-114: avatar rows (AppAvatar), relative time (AppFormatters), a skeleton
+/// instead of a spinner, every text from the ARB files. No provider, repository
+/// or callback changed.
 ///
 /// KNOWN GAP: the backend `user` field is a bare id (no username/avatar), so
-/// authors render as "User # plus the id" until a backend part adds an author object.
+/// authors render as "User #id" with the neutral avatar until a backend part
+/// adds an author object.
 class CommentListWidget extends ConsumerStatefulWidget {
   const CommentListWidget({
     super.key,
@@ -47,11 +57,21 @@ class _CommentListWidgetState extends ConsumerState<CommentListWidget> {
     final state = ref.watch(commentListProvider(_key));
     final notifier = ref.read(commentListProvider(_key).notifier);
     final error = state.error;
+    final colors = context.appColors;
+    final l10n = context.l10n;
 
     if (state.isLoading && state.items.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(24),
-        child: Center(child: CircularProgressIndicator()),
+      return Semantics(
+        label: l10n.commentsLoadingLabel,
+        child: const ExcludeSemantics(
+          child: Column(
+            children: [
+              _CommentSkeletonRow(),
+              _CommentSkeletonRow(),
+              _CommentSkeletonRow(),
+            ],
+          ),
+        ),
       );
     }
 
@@ -63,7 +83,7 @@ class _CommentListWidgetState extends ConsumerState<CommentListWidget> {
             Text(error, textAlign: TextAlign.center),
             TextButton(
               onPressed: notifier.loadFirstPage,
-              child: const Text('Retry'),
+              child: Text(l10n.commonRetry),
             ),
           ],
         ),
@@ -71,9 +91,17 @@ class _CommentListWidgetState extends ConsumerState<CommentListWidget> {
     }
 
     if (state.items.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(24),
-        child: Center(child: Text('No comments yet. Be the first to comment.')),
+      return Padding(
+        padding: const EdgeInsets.all(24),
+        child: Center(
+          child: Text(
+            l10n.commentsEmpty,
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: colors.textSecondary),
+          ),
+        ),
       );
     }
 
@@ -85,33 +113,49 @@ class _CommentListWidgetState extends ConsumerState<CommentListWidget> {
         if (error != null)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              error,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
+            child: Text(error, style: TextStyle(color: colors.dangerText)),
           ),
         if (state.nextUrl != null)
-          Center(
-            child: state.isLoadingMore
-                ? const Padding(
-                    padding: EdgeInsets.all(12),
-                    child: CircularProgressIndicator(),
-                  )
-                : TextButton(
+          state.isLoadingMore
+              ? const _CommentSkeletonRow()
+              : Center(
+                  child: TextButton(
                     onPressed: notifier.loadMore,
-                    child: const Text('Load more comments'),
+                    child: Text(l10n.commentsLoadMore),
                   ),
-          ),
+                ),
       ],
     );
   }
 }
 
-String _formatDate(DateTime value) {
-  final local = value.toLocal();
-  String two(int v) => v.toString().padLeft(2, '0');
-  return '${local.year}-${two(local.month)}-${two(local.day)} '
-      '${two(local.hour)}:${two(local.minute)}';
+/// Skeleton of one comment row (avatar + two text lines).
+class _CommentSkeletonRow extends StatelessWidget {
+  const _CommentSkeletonRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppShimmerBox.circle(size: 36),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppShimmerBox(width: 110, height: 12, borderRadius: 6),
+                SizedBox(height: 8),
+                AppShimmerBox(width: double.infinity, height: 12, borderRadius: 6),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _CommentTile extends StatelessWidget {
@@ -122,44 +166,63 @@ class _CommentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final muted = theme.colorScheme.onSurfaceVariant;
+    final colors = context.appColors;
+    final l10n = context.l10n;
+    final author = l10n.commentsAuthorFallback(comment.userId.toString());
+    final time = AppFormatters(l10n).relativeTime(comment.createdAt);
+    final metaStyle = theme.textTheme.labelSmall?.copyWith(
+      color: colors.textSecondary,
+    );
 
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: const CircleAvatar(child: Icon(Icons.person_outline)),
-      title: Text('User #${comment.userId}', style: theme.textTheme.labelLarge),
-      subtitle: Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(comment.text),
-          const SizedBox(height: 2),
-          Text(
-            _formatDate(comment.createdAt),
-            style: theme.textTheme.labelSmall?.copyWith(color: muted),
-          ),
-          if (comment.isHidden)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Row(
-                children: [
-                  Icon(Icons.visibility_off_outlined, size: 14, color: muted),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      'Pending review: hidden from other users',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: muted,
-                      ),
+          AppAvatar(size: 36, semanticLabel: author),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  author,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: colors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  comment.text,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(time, style: metaStyle),
+                if (comment.isHidden)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.visibility_off_outlined,
+                          size: 14,
+                          color: colors.textSecondary,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(l10n.commentsPendingReview, style: metaStyle),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+              ],
             ),
+          ),
+          ContentOverflowMenu(contentType: 'comment', objectId: comment.id),
         ],
-      ),
-      trailing: ContentOverflowMenu(
-        contentType: 'comment',
-        objectId: comment.id,
       ),
     );
   }

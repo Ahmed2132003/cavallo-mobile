@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/l10n/rtl_helpers.dart';
+import '../../../core/theme/app_colors.dart';
 import '../data/social_interaction_repository_impl.dart';
 import 'comment_list_provider.dart';
 import 'content_interaction_key.dart';
 import 'social_error_message.dart';
 import 'social_interaction_provider.dart';
 
-/// Part P-058: text field + send button. On success the new comment is put
-/// on top of the local list and the comment counter is bumped. On failure
-/// the text is kept and a SnackBar explains why.
+/// Part P-058 + P-114 STEP 4B: pill-shaped text field + send button. On
+/// success the new comment is put on top of the local list and the comment
+/// counter is bumped. On failure the text is kept and a SnackBar explains
+/// why. Behaviour is unchanged; only the look, the localized texts and the
+/// 44 px send target are new.
 class CommentInputWidget extends ConsumerStatefulWidget {
   const CommentInputWidget({
     super.key,
@@ -65,6 +70,13 @@ class _CommentInputWidgetState extends ConsumerState<CommentInputWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final l10n = context.l10n;
+    final pill = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(24),
+      borderSide: BorderSide.none,
+    );
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -75,28 +87,44 @@ class _CommentInputWidgetState extends ConsumerState<CommentInputWidget> {
             minLines: 1,
             maxLines: 4,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-              hintText: 'Add a comment...',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintText: l10n.commentsInputHint,
               isDense: true,
+              filled: true,
+              fillColor: colors.surfaceVariant,
+              contentPadding: const EdgeInsetsDirectional.fromSTEB(
+                16,
+                12,
+                16,
+                12,
+              ),
+              border: pill,
+              enabledBorder: pill,
+              disabledBorder: pill,
+              focusedBorder: pill.copyWith(
+                borderSide: BorderSide(color: colors.brand),
+              ),
             ),
           ),
         ),
         const SizedBox(width: 8),
-        _sending
-            ? const Padding(
-                padding: EdgeInsets.all(12),
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+        SizedBox(
+          width: 44,
+          height: 44,
+          child: _sending
+              ? const Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              : IconButton(
+                  icon: DirectionalIcon(Icons.send, color: colors.brandText),
+                  tooltip: l10n.commentsPostTooltip,
+                  onPressed: _submit,
                 ),
-              )
-            : IconButton(
-                icon: const Icon(Icons.send),
-                tooltip: 'Post comment',
-                onPressed: _submit,
-              ),
+        ),
       ],
     );
   }

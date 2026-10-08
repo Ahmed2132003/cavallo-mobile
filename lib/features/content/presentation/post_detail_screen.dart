@@ -134,14 +134,8 @@ class _PostDetailView extends StatefulWidget {
 class _PostDetailViewState extends State<_PostDetailView> {
   final GlobalKey _commentsKey = GlobalKey();
 
-  void _scrollToComments() {
-    final target = _commentsKey.currentContext;
-    if (target == null) return;
-    Scrollable.ensureVisible(
-      target,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+  void _openComments() {
+    showCommentsSheet(context, contentType: 'post', objectId: widget.post.id);
   }
 
   @override
@@ -167,7 +161,7 @@ class _PostDetailViewState extends State<_PostDetailView> {
                 ContentActionRow(
                   contentType: 'post',
                   objectId: post.id,
-                  onCommentTap: _scrollToComments,
+                  onCommentTap: _openComments,
                   isLiked: post.isLiked,
                   isSaved: post.isSaved,
                   likesCount: post.likesCount,

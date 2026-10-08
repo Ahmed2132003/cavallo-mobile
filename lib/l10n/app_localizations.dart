@@ -1282,6 +1282,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading product'**
   String get productLoadingLabel;
+
+  /// Heading of the comments bottom sheet and of the inline comments block on post and reel detail screens.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get commentsTitle;
+
+  /// Hint of the comment input field.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a comment...'**
+  String get commentsInputHint;
+
+  /// Tooltip and screen-reader label of the send button of the comment input.
+  ///
+  /// In en, this message translates to:
+  /// **'Post comment'**
+  String get commentsPostTooltip;
+
+  /// Empty state of the comment list.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet. Be the first to comment.'**
+  String get commentsEmpty;
+
+  /// Marker under a comment that is hidden pending moderation; only its author or a moderator sees it.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending review: hidden from other users'**
+  String get commentsPendingReview;
+
+  /// Button that loads the next page of comments.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more comments'**
+  String get commentsLoadMore;
+
+  /// Author name of a comment while the backend gives only the user id. id is the user id.
+  ///
+  /// In en, this message translates to:
+  /// **'User #{id}'**
+  String commentsAuthorFallback(String id);
+
+  /// Screen-reader label of the comment list loading skeleton.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading comments'**
+  String get commentsLoadingLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

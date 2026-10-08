@@ -717,4 +717,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get productLoadingLabel => 'Loading product';
+
+  @override
+  String get commentsTitle => 'Comments';
+
+  @override
+  String get commentsInputHint => 'Add a comment...';
+
+  @override
+  String get commentsPostTooltip => 'Post comment';
+
+  @override
+  String get commentsEmpty => 'No comments yet. Be the first to comment.';
+
+  @override
+  String get commentsPendingReview => 'Pending review: hidden from other users';
+
+  @override
+  String get commentsLoadMore => 'Load more comments';
+
+  @override
+  String commentsAuthorFallback(String id) {
+    return 'User #$id';
+  }
+
+  @override
+  String get commentsLoadingLabel => 'Loading comments';
 }

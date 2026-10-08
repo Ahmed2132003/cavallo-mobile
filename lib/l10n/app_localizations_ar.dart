@@ -745,4 +745,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get productLoadingLabel => 'جارٍ تحميل المنتج';
+
+  @override
+  String get commentsTitle => 'التعليقات';
+
+  @override
+  String get commentsInputHint => 'أضف تعليقًا...';
+
+  @override
+  String get commentsPostTooltip => 'نشر التعليق';
+
+  @override
+  String get commentsEmpty => 'لا توجد تعليقات بعد. كن أول من يعلّق.';
+
+  @override
+  String get commentsPendingReview => 'قيد المراجعة: مخفي عن المستخدمين الآخرين';
+
+  @override
+  String get commentsLoadMore => 'تحميل المزيد من التعليقات';
+
+  @override
+  String commentsAuthorFallback(String id) {
+    return 'مستخدم رقم $id';
+  }
+
+  @override
+  String get commentsLoadingLabel => 'جارٍ تحميل التعليقات';
 }

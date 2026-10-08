@@ -933,5 +933,42 @@
   "productLoadingLabel": "Loading product",
   "@productLoadingLabel": {
     "description": "Screen-reader label of the product detail loading skeleton."
+  },
+  "commentsTitle": "Comments",
+  "@commentsTitle": {
+    "description": "Heading of the comments bottom sheet and of the inline comments block on post and reel detail screens."
+  },
+  "commentsInputHint": "Add a comment...",
+  "@commentsInputHint": {
+    "description": "Hint of the comment input field."
+  },
+  "commentsPostTooltip": "Post comment",
+  "@commentsPostTooltip": {
+    "description": "Tooltip and screen-reader label of the send button of the comment input."
+  },
+  "commentsEmpty": "No comments yet. Be the first to comment.",
+  "@commentsEmpty": {
+    "description": "Empty state of the comment list."
+  },
+  "commentsPendingReview": "Pending review: hidden from other users",
+  "@commentsPendingReview": {
+    "description": "Marker under a comment that is hidden pending moderation; only its author or a moderator sees it."
+  },
+  "commentsLoadMore": "Load more comments",
+  "@commentsLoadMore": {
+    "description": "Button that loads the next page of comments."
+  },
+  "commentsAuthorFallback": "User #{id}",
+  "@commentsAuthorFallback": {
+    "description": "Author name of a comment while the backend gives only the user id. id is the user id.",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsLoadingLabel": "Loading comments",
+  "@commentsLoadingLabel": {
+    "description": "Screen-reader label of the comment list loading skeleton."
   }
 }

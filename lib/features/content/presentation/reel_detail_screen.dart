@@ -136,14 +136,8 @@ class _ReelDetailView extends StatefulWidget {
 class _ReelDetailViewState extends State<_ReelDetailView> {
   final GlobalKey _commentsKey = GlobalKey();
 
-  void _scrollToComments() {
-    final target = _commentsKey.currentContext;
-    if (target == null) return;
-    Scrollable.ensureVisible(
-      target,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+  void _openComments() {
+    showCommentsSheet(context, contentType: 'reel', objectId: widget.reel.id);
   }
 
   @override
@@ -179,7 +173,7 @@ class _ReelDetailViewState extends State<_ReelDetailView> {
                 ContentActionRow(
                   contentType: 'reel',
                   objectId: reel.id,
-                  onCommentTap: _scrollToComments,
+                  onCommentTap: _openComments,
                   isLiked: reel.isLiked,
                   isSaved: reel.isSaved,
                   likesCount: reel.likesCount,
