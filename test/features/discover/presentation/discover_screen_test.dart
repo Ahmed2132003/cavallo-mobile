@@ -18,6 +18,9 @@ import 'package:social_commerce_app/features/stories/data/story_public_repositor
 import 'package:social_commerce_app/features/stories/domain/public_story_entity.dart';
 import 'package:social_commerce_app/features/stories/domain/story_public_repository.dart';
 import 'package:social_commerce_app/core/network/paginated_response.dart';
+import 'package:social_commerce_app/core/widgets/app_shimmer_box.dart';
+import 'package:social_commerce_app/core/widgets/featured_badge.dart';
+import 'package:social_commerce_app/l10n/app_localizations.dart';
 
 /// Part P-062 scope (STEP 6 tests). Hand-rolled fakes only, mirroring
 /// `home_feed_screen_test.dart`'s (Part P-061) exact convention — no
@@ -149,6 +152,7 @@ Widget _wrap(
   _FakeDiscoverRepository discoverRepository, {
   Map<int, String> businessNames = const {1: 'Test Business'},
   Map<int, List<PublicStory>> storiesByBusiness = const {},
+  Locale? locale,
 }) {
   return ProviderScope(
     overrides: [
@@ -163,7 +167,18 @@ Widget _wrap(
         _FakeStoryPublicRepository(storiesByBusiness),
       ),
     ],
-    child: const MaterialApp(home: DiscoverScreen()),
+    // Part P-114 STEP 3B: [locale] is only given by the RTL tests; every
+    // other test keeps the bare English fallback it always had.
+    child: MaterialApp(
+      locale: locale,
+      localizationsDelegates: locale == null
+          ? null
+          : AppLocalizations.localizationsDelegates,
+      supportedLocales: locale == null
+          ? const [Locale('en', 'US')]
+          : AppLocalizations.supportedLocales,
+      home: const DiscoverScreen(),
+    ),
   );
 }
 
@@ -188,12 +203,14 @@ void main() {
       await tester.pumpWidget(_wrap(fake));
       await tester.pump();
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      // Part P-114 STEP 3B: a grid of skeleton tiles replaces the spinner.
+      expect(find.byType(AppShimmerBox), findsWidgets);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
 
       fake.firstCallGate!.complete();
       await tester.pumpAndSettle();
 
-      expect(find.text('Post caption 1'), findsOneWidget);
+      expect(find.byKey(const ValueKey<String>('discover-post-1')), findsOneWidget);
     });
 
     testWidgets(
@@ -231,7 +248,7 @@ void main() {
         await tester.tap(find.text('Retry'));
         await tester.pumpAndSettle();
 
-        expect(find.text('Post caption 1'), findsOneWidget);
+        expect(find.byKey(const ValueKey<String>('discover-post-1')), findsOneWidget);
         expect(find.text('Could not load Discover right now.'), findsNothing);
       },
     );
@@ -244,7 +261,9 @@ void main() {
       (tester) async {
         _useTallSurface(tester);
 
-        final page1Items = List.generate(10, (i) => _post(i + 1));
+        // Part P-114 STEP 3B: 3 tiles per row, so 30 items (10 rows) are
+        // needed to be taller than the 800 px test surface.
+        final page1Items = List.generate(30, (i) => _post(i + 1));
         final fake = _FakeDiscoverRepository(
           pages: {
             null: FeedPage(items: page1Items, nextCursor: 'cursor-a'),
@@ -256,18 +275,18 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(fake.cursorsRequested, [null]);
-        expect(find.text('Post caption 99'), findsNothing);
+        expect(find.byKey(const ValueKey<String>('discover-post-99'), skipOffstage: false), findsNothing);
 
         // Drag the list well past 80% of its scroll extent.
         await tester.fling(
-          find.byType(ListView),
+          find.byType(CustomScrollView),
           const Offset(0, -4000),
           3000,
         );
         await tester.pumpAndSettle();
 
         expect(fake.cursorsRequested, [null, 'cursor-a']);
-        expect(find.text('Post caption 99'), findsOneWidget);
+        expect(find.byKey(const ValueKey<String>('discover-post-99'), skipOffstage: false), findsOneWidget);
       },
     );
   });
@@ -291,8 +310,8 @@ void main() {
         await tester.pumpWidget(_wrap(fake));
         await tester.pumpAndSettle();
 
-        expect(find.text('Post caption 1'), findsOneWidget);
-        expect(find.text('Post caption 2'), findsOneWidget);
+        expect(find.byKey(const ValueKey<String>('discover-post-1')), findsOneWidget);
+        expect(find.byKey(const ValueKey<String>('discover-post-2')), findsOneWidget);
 
         // The next `fetchDiscoverFeed(cursor: null)` call (triggered by
         // the refresh below) returns a DIFFERENT first page — if
@@ -300,12 +319,12 @@ void main() {
         // would be visible together afterwards.
         fake.pages[null] = FeedPage(items: [_post(7)], nextCursor: null);
 
-        await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
+        await tester.fling(find.byType(CustomScrollView), const Offset(0, 300), 1000);
         await tester.pumpAndSettle();
 
-        expect(find.text('Post caption 7'), findsOneWidget);
-        expect(find.text('Post caption 1'), findsNothing);
-        expect(find.text('Post caption 2'), findsNothing);
+        expect(find.byKey(const ValueKey<String>('discover-post-7')), findsOneWidget);
+        expect(find.byKey(const ValueKey<String>('discover-post-1')), findsNothing);
+        expect(find.byKey(const ValueKey<String>('discover-post-2')), findsNothing);
         expect(fake.cursorsRequested, [null, null]);
       },
     );
@@ -338,14 +357,13 @@ void main() {
         expect(fake.groupsCallCount, 1);
 
         // With the stories bar actually rendering a ring, there are now
-        // TWO `ListView`s in the tree: the outer vertical Recommended
-        // list (`.first`, an ANCESTOR of everything else on screen —
-        // ordinary widget-tree ancestors are found before their
-        // descendants) and `StoriesBarWidget`'s own horizontal
-        // `ListView.separated`. `.first` disambiguates to the outer,
-        // vertical one — the one `RefreshIndicator` actually wraps.
+        // Part P-114 STEP 3B: the outer scrollable is now one
+        // `CustomScrollView` (stories sliver + grid sliver), the one
+        // `RefreshIndicator` wraps; `StoriesBarWidget`'s own horizontal
+        // `ListView.separated` is a different widget type, so there is
+        // exactly one match.
         await tester.fling(
-          find.byType(ListView).first,
+          find.byType(CustomScrollView),
           const Offset(0, 300),
           1000,
         );
@@ -361,7 +379,7 @@ void main() {
   });
 
   group('mixed content', () {
-    testWidgets('renders both post and reel items via PostCard/ReelCard', (
+    testWidgets('renders both post and reel items as grid tiles', (
       tester,
     ) async {
       _useTallSurface(tester);
@@ -375,8 +393,8 @@ void main() {
       await tester.pumpWidget(_wrap(fake));
       await tester.pumpAndSettle();
 
-      expect(find.text('Post caption 1'), findsOneWidget);
-      expect(find.text('Reel caption 2'), findsOneWidget);
+      expect(find.byKey(const ValueKey<String>('discover-post-1')), findsOneWidget);
+      expect(find.byKey(const ValueKey<String>('discover-reel-2')), findsOneWidget);
     });
   });
 
@@ -406,7 +424,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Alpha Traders'), findsOneWidget);
-        expect(find.text('Post caption 1'), findsOneWidget);
+        expect(find.byKey(const ValueKey<String>('discover-post-1')), findsOneWidget);
       },
     );
 
@@ -422,8 +440,140 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(CircleAvatar), findsNothing);
-        expect(find.text('Post caption 1'), findsOneWidget);
+        expect(find.byKey(const ValueKey<String>('discover-post-1')), findsOneWidget);
       },
     );
+  });
+
+  group('P-114 STEP 3B: 3-column grid', () {
+    Finder post(int id) => find.byKey(ValueKey<String>('discover-post-$id'));
+    Finder reel(int id) => find.byKey(ValueKey<String>('discover-reel-$id'));
+
+    testWidgets('tiles are laid out 3 per row, all the same size', (
+      tester,
+    ) async {
+      _useTallSurface(tester);
+      final fake = _FakeDiscoverRepository(
+        pages: {
+          null: FeedPage(
+            items: [for (var i = 1; i <= 6; i++) _post(i)],
+            nextCursor: null,
+          ),
+        },
+      );
+
+      await tester.pumpWidget(_wrap(fake));
+      await tester.pumpAndSettle();
+
+      final first = tester.getTopLeft(post(1));
+      expect(tester.getTopLeft(post(2)).dy, first.dy);
+      expect(tester.getTopLeft(post(3)).dy, first.dy);
+      expect(tester.getTopLeft(post(4)).dy, greaterThan(first.dy));
+      expect(tester.getTopLeft(post(2)).dx, greaterThan(first.dx));
+      expect(tester.getSize(post(1)), tester.getSize(post(5)));
+      expect(tester.getSize(post(1)).width, tester.getSize(post(1)).height);
+    });
+
+    testWidgets('a reel tile carries the video badge, a post tile does not', (
+      tester,
+    ) async {
+      _useTallSurface(tester);
+      final fake = _FakeDiscoverRepository(
+        pages: {
+          null: FeedPage(items: [_post(1), _reel(2)], nextCursor: null),
+        },
+      );
+
+      await tester.pumpWidget(_wrap(fake));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.descendant(
+          of: reel(2),
+          matching: find.byIcon(Icons.play_arrow),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: post(1),
+          matching: find.byIcon(Icons.play_arrow),
+        ),
+        findsNothing,
+      );
+    });
+
+    testWidgets('only tiles of a Featured business carry the Featured badge, '
+        'and every tile stays in the grid', (tester) async {
+      _useTallSurface(tester);
+      final fake = _FakeDiscoverRepository(
+        pages: {
+          null: FeedPage(
+            items: [
+              _post(1),
+              PostFeedItem(
+                PublicPost(
+                  id: 2,
+                  businessId: 1,
+                  caption: 'Post caption 2',
+                  isFeatured: true,
+                ),
+              ),
+              _post(3),
+            ],
+            nextCursor: null,
+          ),
+        },
+      );
+
+      await tester.pumpWidget(_wrap(fake));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.descendant(of: post(2), matching: find.byType(FeaturedBadge)),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: post(1), matching: find.byType(FeaturedBadge)),
+        findsNothing,
+      );
+      expect(post(1), findsOneWidget);
+      expect(post(3), findsOneWidget);
+    });
+
+    testWidgets('Arabic RTL: the first tile is at the right edge', (
+      tester,
+    ) async {
+      _useTallSurface(tester);
+      final fake = _FakeDiscoverRepository(
+        pages: {
+          null: FeedPage(items: [_post(1), _post(2)], nextCursor: null),
+        },
+      );
+
+      await tester.pumpWidget(_wrap(fake, locale: const Locale('ar')));
+      await tester.pumpAndSettle();
+
+      final BuildContext context = tester.element(find.byType(DiscoverScreen));
+      expect(Directionality.of(context), TextDirection.rtl);
+      expect(
+        tester.getTopLeft(post(1)).dx,
+        greaterThan(tester.getTopLeft(post(2)).dx),
+      );
+    });
+
+    testWidgets('Arabic: the empty state is localized', (tester) async {
+      final fake = _FakeDiscoverRepository(
+        pages: {null: const FeedPage(items: [], nextCursor: null)},
+      );
+
+      await tester.pumpWidget(_wrap(fake, locale: const Locale('ar')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(lookupAppLocalizations(const Locale('ar')).discoverEmpty),
+        findsOneWidget,
+      );
+    });
   });
 }

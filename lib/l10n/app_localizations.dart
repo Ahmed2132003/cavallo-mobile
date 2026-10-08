@@ -1078,6 +1078,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading content'**
   String get profileGridLoadingLabel;
+
+  /// Text of the amber Featured badge (Featured / Sponsored businesses).
+  ///
+  /// In en, this message translates to:
+  /// **'Featured'**
+  String get featuredBadgeLabel;
+
+  /// Hint of the search field on the Search screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Search traders, factories, products...'**
+  String get searchFieldHint;
+
+  /// Tooltip / screen-reader label of the clear button inside the search field.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get searchClearTooltip;
+
+  /// Search screen: label of the chip that opens the filter sheet (no filter active).
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get searchFiltersChip;
+
+  /// Search screen: label of the chip that opens the filter sheet when some filters are active. count is how many.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters ({count})'**
+  String searchFiltersChipActive(int count);
+
+  /// Search screen: prompt before any search was made.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for traders, factories, and products.\nType a keyword or set a filter to get started.'**
+  String get searchIdlePrompt;
+
+  /// Search screen: a search finished with zero results.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found. Try a different search or adjust your filters.'**
+  String get searchNoResults;
+
+  /// Search screen: error message when a search fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load search results.'**
+  String get searchLoadFailed;
+
+  /// Screen-reader label of the skeleton rows shown while search results load.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading results'**
+  String get searchResultsLoadingLabel;
+
+  /// Discover screen: empty state.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to discover yet.\nCheck back soon for new businesses.'**
+  String get discoverEmpty;
+
+  /// Discover screen: error message when the first load fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load Discover right now.'**
+  String get discoverLoadFailed;
+
+  /// Title of the filter bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get searchFilterTitle;
+
+  /// Filter sheet: label of the category field; also the text of the category chip when a category filter is active.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get searchFilterCategory;
+
+  /// Filter sheet: the dropdown entry meaning no category filter.
+  ///
+  /// In en, this message translates to:
+  /// **'All categories'**
+  String get searchFilterCategoryAll;
+
+  /// Filter sheet: the category list failed to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load categories.'**
+  String get searchFilterCategoriesFailed;
+
+  /// Filter sheet: country field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get searchFilterCountry;
+
+  /// Filter sheet: city field label.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get searchFilterCity;
+
+  /// Filter sheet: title of the business type chips.
+  ///
+  /// In en, this message translates to:
+  /// **'Business type'**
+  String get searchFilterBusinessType;
+
+  /// Filter sheet: the option meaning no restriction (business type, rating).
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get searchFilterAny;
+
+  /// Filter sheet: title of the minimum rating dropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum rating'**
+  String get searchFilterMinRating;
+
+  /// Filter sheet: one option of the minimum rating dropdown, also the text of the rating chip. stars is 1 to 4.
+  ///
+  /// In en, this message translates to:
+  /// **'{stars, plural, one{{stars} star & up} other{{stars} stars & up}}'**
+  String searchFilterMinRatingOption(int stars);
+
+  /// Filter sheet: label of the Featured-only switch; also the text of its chip.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured only'**
+  String get searchFilterFeaturedOnly;
+
+  /// Filter sheet: button that resets every filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get searchFilterClear;
+
+  /// Filter sheet: button that applies the filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get searchFilterApply;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

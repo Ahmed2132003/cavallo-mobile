@@ -1,36 +1,36 @@
-/// Part P-065 STEP 4 scope: [SearchFilterPanel] — the filter form shown
+/// Part P-065 STEP 4 scope: [SearchFilterPanel] - the filter form shown
 /// as a modal bottom sheet from `SearchScreen`. Presented via
 /// `showModalBottomSheet<SearchFilters>`; pops the [SearchFilters] the
 /// user built ("Apply"), a fresh `const SearchFilters()` ("Clear"), or
-/// `null` if dismissed without either (swipe-down/tap-outside) — the
+/// `null` if dismissed without either (swipe-down/tap-outside) - the
 /// caller (`SearchScreen`) treats `null` as "keep whatever filters were
 /// already active."
 ///
 /// ### Why a bottom sheet, not an expandable section
 ///
-/// No filter-panel precedent already exists elsewhere in this project
-/// to follow, so this is a new, flagged decision: a modal sheet keeps
-/// the results list's own scroll position and loaded items completely
-/// untouched while filters are being edited, and gives the filter form
-/// its own full-height space to lay out — an inline expandable section
-/// would either cramp the fields or need to shrink the results list
-/// underneath it.
+/// A modal sheet keeps the results list's own scroll position and loaded
+/// items completely untouched while filters are being edited, and gives the
+/// filter form its own full-height space to lay out.
 ///
-/// ### Category picker — the exact `product_form_screen.dart` (P-033)
+/// ### Category picker - the exact `product_form_screen.dart` (P-033)
 /// pattern, duplicated, not imported
 ///
-/// No shared `CategoryPicker` widget exists yet — `product_form_screen.
-/// dart`'s own "simple flattened dropdown with indentation" is the only
-/// precedent. [_flattenCategories] here is a private, verbatim copy of
-/// that file's own private helper of the same name (harmless — each is
-/// private to its own library), with one addition: an "All categories"
-/// entry mapping to `null`, since a category filter (unlike the product
-/// form's required field) must support "no category filter applied."
+/// [_flattenCategories] is a private copy of that file's helper of the same
+/// name, with one addition: an "All categories" entry mapping to `null`.
+///
+/// ### Part P-114 STEP 3B (presentation only)
+///
+/// Same fields, same keys, same result contract, same pops. Changed: every
+/// string comes from the ARB files, padding is directional, the section
+/// titles use the token text styles, the rating options are formatted by one
+/// plural message, and Clear uses the outlined [AppButton] variant.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../categories/domain/category_entity.dart';
@@ -89,57 +89,66 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
   @override
   Widget build(BuildContext context) {
     final categoriesAsync = ref.watch(categoryTreeProvider);
+    final l10n = context.l10n;
+    final ThemeData theme = Theme.of(context);
+    final AppColors colors = context.appColors;
+    final TextStyle? sectionStyle = theme.textTheme.labelLarge?.copyWith(
+      color: colors.textSecondary,
+    );
 
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 16,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+        padding: EdgeInsetsDirectional.fromSTEB(
+          16,
+          16,
+          16,
+          MediaQuery.of(context).viewInsets.bottom + 16,
         ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Filters', style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                l10n.searchFilterTitle,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const SizedBox(height: 16),
               _buildCategoryField(categoriesAsync),
               const SizedBox(height: 12),
               AppTextField(
                 key: const Key('searchFilterPanel_countryField'),
-                label: 'Country',
+                label: l10n.searchFilterCountry,
                 controller: _countryController,
               ),
               const SizedBox(height: 12),
               AppTextField(
                 key: const Key('searchFilterPanel_cityField'),
-                label: 'City',
+                label: l10n.searchFilterCity,
                 controller: _cityController,
               ),
               const SizedBox(height: 16),
-              Text(
-                'Business type',
-                style: Theme.of(context).textTheme.labelLarge,
-              ),
+              Text(l10n.searchFilterBusinessType, style: sectionStyle),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
+                runSpacing: 4,
                 children: [
                   ChoiceChip(
-                    label: const Text('Any'),
+                    label: Text(l10n.searchFilterAny),
                     selected: _businessType == null,
                     onSelected: (_) => setState(() => _businessType = null),
                   ),
                   ChoiceChip(
-                    label: const Text('Trader'),
+                    label: Text(l10n.businessTypeTrader),
                     selected: _businessType == 'trader',
                     onSelected: (_) =>
                         setState(() => _businessType = 'trader'),
                   ),
                   ChoiceChip(
-                    label: const Text('Factory'),
+                    label: Text(l10n.businessTypeFactory),
                     selected: _businessType == 'factory',
                     onSelected: (_) =>
                         setState(() => _businessType = 'factory'),
@@ -147,21 +156,23 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
                 ],
               ),
               const SizedBox(height: 16),
-              Text(
-                'Minimum rating',
-                style: Theme.of(context).textTheme.labelLarge,
-              ),
+              Text(l10n.searchFilterMinRating, style: sectionStyle),
               const SizedBox(height: 8),
               DropdownButtonFormField<String?>(
                 key: const Key('searchFilterPanel_minRatingDropdown'),
                 value: _minRating,
-                decoration: const InputDecoration(border: OutlineInputBorder()),
-                items: const [
-                  DropdownMenuItem(value: null, child: Text('Any')),
-                  DropdownMenuItem(value: '4', child: Text('4 stars & up')),
-                  DropdownMenuItem(value: '3', child: Text('3 stars & up')),
-                  DropdownMenuItem(value: '2', child: Text('2 stars & up')),
-                  DropdownMenuItem(value: '1', child: Text('1 star & up')),
+                isExpanded: true,
+                decoration: const InputDecoration(),
+                items: [
+                  DropdownMenuItem(
+                    value: null,
+                    child: Text(l10n.searchFilterAny),
+                  ),
+                  for (final stars in const <int>[4, 3, 2, 1])
+                    DropdownMenuItem(
+                      value: '$stars',
+                      child: Text(l10n.searchFilterMinRatingOption(stars)),
+                    ),
                 ],
                 onChanged: (value) => setState(() => _minRating = value),
               ),
@@ -169,7 +180,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
               SwitchListTile(
                 key: const Key('searchFilterPanel_featuredSwitch'),
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Featured only'),
+                title: Text(l10n.searchFilterFeaturedOnly),
                 value: _featuredOnly,
                 onChanged: (value) => setState(() => _featuredOnly = value),
               ),
@@ -177,16 +188,17 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
+                    child: AppButton(
+                      label: l10n.searchFilterClear,
+                      variant: AppButtonVariant.outlined,
                       onPressed: () =>
                           Navigator.of(context).pop(const SearchFilters()),
-                      child: const Text('Clear'),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppButton(
-                      label: 'Apply',
+                      label: l10n.searchFilterApply,
                       onPressed: () =>
                           Navigator.of(context).pop(_buildFilters()),
                     ),
@@ -201,21 +213,23 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
   }
 
   Widget _buildCategoryField(AsyncValue<List<CategoryNode>> categoriesAsync) {
+    final l10n = context.l10n;
     return switch (categoriesAsync) {
       AsyncData(:final value) => DropdownButtonFormField<int?>(
         key: const Key('searchFilterPanel_categoryDropdown'),
         value: _categoryId,
-        decoration: const InputDecoration(
-          labelText: 'Category',
-          border: OutlineInputBorder(),
-        ),
+        isExpanded: true,
+        decoration: InputDecoration(labelText: l10n.searchFilterCategory),
         items: [
-          const DropdownMenuItem(value: null, child: Text('All categories')),
+          DropdownMenuItem(
+            value: null,
+            child: Text(l10n.searchFilterCategoryAll),
+          ),
           for (final entry in _flattenCategories(value))
             DropdownMenuItem(
               value: entry.$1.id,
               child: Text(
-                '${'—' * entry.$2}${entry.$2 > 0 ? ' ' : ''}${entry.$1.name}',
+                '${'\u2014' * entry.$2}${entry.$2 > 0 ? ' ' : ''}${entry.$1.name}',
               ),
             ),
         ],
@@ -223,10 +237,10 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
       ),
       AsyncError() => Row(
         children: [
-          const Expanded(child: Text('Could not load categories.')),
+          Expanded(child: Text(l10n.searchFilterCategoriesFailed)),
           TextButton(
             onPressed: () => ref.invalidate(categoryTreeProvider),
-            child: const Text('Retry'),
+            child: Text(l10n.commonRetry),
           ),
         ],
       ),
@@ -238,10 +252,8 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
   }
 }
 
-/// See this file's module docstring — a deliberate, verbatim duplicate
-/// of `product_form_screen.dart`'s own private `_flattenCategories`,
-/// plus this filter's own "All categories" entry handled separately
-/// above (not inside this helper, which only ever flattens real nodes).
+/// See this file's module docstring - a deliberate, verbatim duplicate
+/// of `product_form_screen.dart`'s own private `_flattenCategories`.
 List<(CategoryNode, int)> _flattenCategories(
   List<CategoryNode> nodes, [
   int depth = 0,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n_context.dart';
 import '../theme/app_colors.dart';
 
 /// Part P-110: the single, reusable, READ-ONLY "Featured" badge (a star icon
@@ -22,10 +23,15 @@ import '../theme/app_colors.dart';
 /// Part P-111: amber `featured` fill with the dark `onFeatured` label, taken
 /// from [AppColors]. Amber is reserved for Featured/Sponsored so it is never
 /// confused with the blue brand or the blue Follow action.
+///
+/// Part P-114 STEP 3B: the visible word now comes from the ARB files
+/// (`featuredBadgeLabel`), so Arabic shows the Arabic word. English is still
+/// exactly [label].
 class FeaturedBadge extends StatelessWidget {
   const FeaturedBadge({super.key});
 
-  /// The visible (and screen-reader) text. Public so tests can reference it.
+  /// The English text. Public so tests can reference it. In another language
+  /// the badge shows `featuredBadgeLabel` of that language instead.
   static const String label = 'Featured';
 
   @override
@@ -45,7 +51,7 @@ class FeaturedBadge extends StatelessWidget {
           Icon(Icons.star, size: 14, color: colors.onFeatured),
           const SizedBox(width: 4),
           Text(
-            label,
+            context.l10n.featuredBadgeLabel,
             style: labelStyle?.copyWith(
               color: colors.onFeatured,
               fontWeight: FontWeight.w600,

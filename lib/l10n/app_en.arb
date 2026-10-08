@@ -774,5 +774,111 @@
   "profileGridLoadingLabel": "Loading content",
   "@profileGridLoadingLabel": {
     "description": "Screen-reader label of the skeleton tiles shown while a profile tab loads."
+  },
+  "featuredBadgeLabel": "Featured",
+  "@featuredBadgeLabel": {
+    "description": "Text of the amber Featured badge (Featured / Sponsored businesses)."
+  },
+  "searchFieldHint": "Search traders, factories, products...",
+  "@searchFieldHint": {
+    "description": "Hint of the search field on the Search screen."
+  },
+  "searchClearTooltip": "Clear search",
+  "@searchClearTooltip": {
+    "description": "Tooltip / screen-reader label of the clear button inside the search field."
+  },
+  "searchFiltersChip": "Filters",
+  "@searchFiltersChip": {
+    "description": "Search screen: label of the chip that opens the filter sheet (no filter active)."
+  },
+  "searchFiltersChipActive": "Filters ({count})",
+  "@searchFiltersChipActive": {
+    "description": "Search screen: label of the chip that opens the filter sheet when some filters are active. count is how many.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchIdlePrompt": "Search for traders, factories, and products.\nType a keyword or set a filter to get started.",
+  "@searchIdlePrompt": {
+    "description": "Search screen: prompt before any search was made."
+  },
+  "searchNoResults": "No results found. Try a different search or adjust your filters.",
+  "@searchNoResults": {
+    "description": "Search screen: a search finished with zero results."
+  },
+  "searchLoadFailed": "Could not load search results.",
+  "@searchLoadFailed": {
+    "description": "Search screen: error message when a search fails."
+  },
+  "searchResultsLoadingLabel": "Loading results",
+  "@searchResultsLoadingLabel": {
+    "description": "Screen-reader label of the skeleton rows shown while search results load."
+  },
+  "discoverEmpty": "Nothing to discover yet.\nCheck back soon for new businesses.",
+  "@discoverEmpty": {
+    "description": "Discover screen: empty state."
+  },
+  "discoverLoadFailed": "Could not load Discover right now.",
+  "@discoverLoadFailed": {
+    "description": "Discover screen: error message when the first load fails."
+  },
+  "searchFilterTitle": "Filters",
+  "@searchFilterTitle": {
+    "description": "Title of the filter bottom sheet."
+  },
+  "searchFilterCategory": "Category",
+  "@searchFilterCategory": {
+    "description": "Filter sheet: label of the category field; also the text of the category chip when a category filter is active."
+  },
+  "searchFilterCategoryAll": "All categories",
+  "@searchFilterCategoryAll": {
+    "description": "Filter sheet: the dropdown entry meaning no category filter."
+  },
+  "searchFilterCategoriesFailed": "Could not load categories.",
+  "@searchFilterCategoriesFailed": {
+    "description": "Filter sheet: the category list failed to load."
+  },
+  "searchFilterCountry": "Country",
+  "@searchFilterCountry": {
+    "description": "Filter sheet: country field label."
+  },
+  "searchFilterCity": "City",
+  "@searchFilterCity": {
+    "description": "Filter sheet: city field label."
+  },
+  "searchFilterBusinessType": "Business type",
+  "@searchFilterBusinessType": {
+    "description": "Filter sheet: title of the business type chips."
+  },
+  "searchFilterAny": "Any",
+  "@searchFilterAny": {
+    "description": "Filter sheet: the option meaning no restriction (business type, rating)."
+  },
+  "searchFilterMinRating": "Minimum rating",
+  "@searchFilterMinRating": {
+    "description": "Filter sheet: title of the minimum rating dropdown."
+  },
+  "searchFilterMinRatingOption": "{stars, plural, one{{stars} star & up} other{{stars} stars & up}}",
+  "@searchFilterMinRatingOption": {
+    "description": "Filter sheet: one option of the minimum rating dropdown, also the text of the rating chip. stars is 1 to 4.",
+    "placeholders": {
+      "stars": {
+        "type": "int"
+      }
+    }
+  },
+  "searchFilterFeaturedOnly": "Featured only",
+  "@searchFilterFeaturedOnly": {
+    "description": "Filter sheet: label of the Featured-only switch; also the text of its chip."
+  },
+  "searchFilterClear": "Clear",
+  "@searchFilterClear": {
+    "description": "Filter sheet: button that resets every filter."
+  },
+  "searchFilterApply": "Apply",
+  "@searchFilterApply": {
+    "description": "Filter sheet: button that applies the filters."
   }
 }

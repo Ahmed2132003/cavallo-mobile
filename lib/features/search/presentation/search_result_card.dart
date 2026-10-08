@@ -1,36 +1,44 @@
-/// Part P-065 STEP 4 scope: [SearchResultCard] — renders one row of the
+/// Part P-065 STEP 4 scope: [SearchResultCard] - renders one row of the
 /// Search results list, dispatching on [SearchResult]'s two variants
 /// (STEP 1). [onTap] is a plain [VoidCallback], not a `context.pushNamed`
-/// call made internally — same convention `PostCard`/`ReelCard`
+/// call made internally - same convention `PostCard`/`ReelCard`
 /// (Part P-045) already use, and for the same reason: it keeps this
 /// widget free of any `GoRouter` dependency, and lets a widget test
-/// verify a tap without needing a real router in the tree (see
-/// `HomeFeedScreen._FeedListItem`, which wires the actual
-/// `context.pushNamed` call itself, one layer up).
+/// verify a tap without needing a real router in the tree.
 ///
-/// ### Price — always through [ProductPriceFraming] (Part P-034)
+/// ### Price - always through [ProductPriceFraming] (Part P-034)
 ///
 /// The product row's price is rendered ONLY via [ProductPriceFraming]
-/// (`products/presentation/product_price_framing.dart`), which that
-/// file's own docstring already earmarks for exactly this reuse
-/// ("Phase 11 (Search results) MUST reuse this widget/copy"). No new
-/// price text is written here — reusing the real widget rather than a
-/// copy of its wording is a stronger guarantee of "matching P-034's
-/// precedent exactly" than a hand-copied string ever could be.
+/// (`products/presentation/product_price_framing.dart`). No new price text is
+/// written here.
 ///
-/// ### Business row — only real fields, no invented ones
+/// ### Business row - only real fields, no invented ones
 ///
-/// `BusinessProfile` (Part P-028A) has no `rating`/`logo` field today —
-/// confirmed against the real entity, not assumed from the product
-/// deck's mockup (which shows both). This row deliberately shows only
-/// what the entity actually carries: name, [BusinessType], city/country,
-/// `isVerified`, and `followerCount`. Flagged here rather than silently
-/// matching the mockup with fake data.
+/// `BusinessProfile` has no `rating`/`logo` field today, so this row shows
+/// only what the entity carries: name, type, city/country, `isVerified`,
+/// `isFeatured` and `followerCount`.
+///
+/// ### Part P-114 STEP 3B (presentation only)
+///
+/// * Instagram-style row: [AppAvatar], name with Verified mark and the single
+///   [FeaturedBadge], a secondary line, a hairline under the row (no Card).
+/// * Featured results carry the amber badge with the word "Featured"; organic
+///   results use exactly the same row without it (nothing is hidden or
+///   re-ordered here).
+/// * Every string comes from the ARB files; counts use [AppFormatters].
+/// * Directional layout only; the chevron mirrors in Arabic.
+/// * Each row is at least 72 logical pixels tall (tap target >= 44).
 library;
 
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/formatters.dart';
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/l10n/rtl_helpers.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_avatar.dart';
 import '../../../core/widgets/featured_badge.dart';
+import '../../../core/widgets/grid_tile_media.dart';
 import '../../business_profile/domain/business_profile_entity.dart';
 import '../../products/domain/product_entity.dart';
 import '../../products/presentation/product_price_framing.dart';
@@ -57,6 +65,43 @@ class SearchResultCard extends StatelessWidget {
   }
 }
 
+/// The shared frame of both rows: tappable, 72 px minimum, hairline below.
+class _ResultRowFrame extends StatelessWidget {
+  const _ResultRowFrame({required this.onTap, required this.child});
+
+  final VoidCallback onTap;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors colors = context.appColors;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: colors.outline, width: 0.5)),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 72),
+          child: Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 10, 16, 10),
+            child: Row(
+              children: <Widget>[
+                Expanded(child: child),
+                const SizedBox(width: 8),
+                DirectionalIcon(
+                  Icons.chevron_right,
+                  color: colors.textSecondary,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _BusinessResultRow extends StatelessWidget {
   const _BusinessResultRow({required this.business, required this.onTap});
 
@@ -65,83 +110,93 @@ class _BusinessResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final typeLabel = business.businessType == BusinessType.trader
-        ? 'Trader'
-        : 'Factory';
-    final locationLabel = [
-      business.city,
-      business.country,
-    ].where((s) => s.isNotEmpty).join(', ');
+    final ThemeData theme = Theme.of(context);
+    final AppColors colors = context.appColors;
+    final l10n = context.l10n;
+    final AppFormatters formatters = AppFormatters(l10n);
 
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 28,
-                child: Text(
-                  business.businessName.isNotEmpty
-                      ? business.businessName[0].toUpperCase()
-                      : '?',
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            business.businessName,
-                            style: theme.textTheme.titleMedium,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+    final String typeLabel = business.businessType == BusinessType.trader
+        ? l10n.businessTypeTrader
+        : l10n.businessTypeFactory;
+    final String locationLabel;
+    if (business.city.isNotEmpty && business.country.isNotEmpty) {
+      locationLabel = l10n.profileLocation(business.city, business.country);
+    } else {
+      locationLabel = business.city.isNotEmpty ? business.city : business.country;
+    }
+    final String subtitle = locationLabel.isEmpty
+        ? typeLabel
+        : '$typeLabel \u2022 $locationLabel';
+    final int followers = business.followerCount;
+
+    return _ResultRowFrame(
+      onTap: onTap,
+      child: Row(
+        children: <Widget>[
+          AppAvatar(
+            name: business.businessName,
+            size: 52,
+            ringGapColor: colors.background,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      child: Text(
+                        business.businessName,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
-                        if (business.isVerified) ...[
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.verified,
-                            size: 16,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ],
-                        // Part P-110: display-only Featured badge.
-                        if (business.isFeatured) ...[
-                          const SizedBox(width: 6),
-                          const FeaturedBadge(),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      locationLabel.isEmpty
-                          ? typeLabel
-                          : '$typeLabel • $locationLabel',
-                      style: theme.textTheme.bodySmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${business.followerCount} followers',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    if (business.isVerified) ...<Widget>[
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.verified,
+                        size: 16,
+                        color: colors.brand,
+                        semanticLabel: l10n.feedVerifiedLabel,
+                      ),
+                    ],
+                    // Part P-110: display-only Featured badge.
+                    if (business.isFeatured) ...<Widget>[
+                      const SizedBox(width: 6),
+                      const FeaturedBadge(),
+                    ],
                   ],
                 ),
-              ),
-              const Icon(Icons.chevron_right),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l10n.followersCountLine(
+                    followers,
+                    formatters.compactCount(followers),
+                  ),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -155,99 +210,62 @@ class _ProductResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
 
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _SearchProductThumbnail(imageUrl: product.imageUrl),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            product.name,
-                            style: theme.textTheme.titleMedium,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+    return _ResultRowFrame(
+      onTap: onTap,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(
+            width: 64,
+            height: 64,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: GridTileMedia(
+                imageUrl: product.imageUrl,
+                semanticLabel: product.name,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      child: Text(
+                        product.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
-                        // Part P-110: display-only; reflects whether the
-                        // OWNING BUSINESS is Featured.
-                        if (product.isFeatured) ...[
-                          const SizedBox(width: 6),
-                          const FeaturedBadge(),
-                        ],
-                      ],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    const SizedBox(height: 6),
-                    // The ONLY place this row renders a price — always
-                    // through ProductPriceFraming (Part P-034). See this
-                    // file's module docstring.
-                    ProductPriceFraming(
-                      price: product.price,
-                      currency: product.currency,
-                      compact: true,
-                    ),
+                    // Part P-110: display-only; reflects whether the
+                    // OWNING BUSINESS is Featured.
+                    if (product.isFeatured) ...<Widget>[
+                      const SizedBox(width: 6),
+                      const FeaturedBadge(),
+                    ],
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 6),
+                // The ONLY place this row renders a price - always through
+                // ProductPriceFraming (Part P-034).
+                ProductPriceFraming(
+                  price: product.price,
+                  currency: product.currency,
+                  compact: true,
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Identical shape to `product_list_screen.dart`'s own private
-/// `_ProductThumbnail` (56px, rounded corners, network image with an
-/// error fallback) — duplicated here under its own name rather than
-/// exported and shared, same convention as this part's STEP 2 DTO
-/// mapping duplication (a small, private, per-file helper rather than
-/// touching an already-completed part's file for a single new caller).
-class _SearchProductThumbnail extends StatelessWidget {
-  const _SearchProductThumbnail({required this.imageUrl});
-
-  final String? imageUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    const size = 56.0;
-    final url = imageUrl;
-    if (url == null || url.isEmpty) {
-      return Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: const Icon(Icons.inventory_2_outlined),
-      );
-    }
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Image.network(
-        url,
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => Container(
-          width: size,
-          height: size,
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: const Icon(Icons.broken_image_outlined),
-        ),
+        ],
       ),
     );
   }

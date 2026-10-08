@@ -601,4 +601,86 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileGridLoadingLabel => 'Loading content';
+
+  @override
+  String get featuredBadgeLabel => 'Featured';
+
+  @override
+  String get searchFieldHint => 'Search traders, factories, products...';
+
+  @override
+  String get searchClearTooltip => 'Clear search';
+
+  @override
+  String get searchFiltersChip => 'Filters';
+
+  @override
+  String searchFiltersChipActive(int count) {
+    return 'Filters ($count)';
+  }
+
+  @override
+  String get searchIdlePrompt => 'Search for traders, factories, and products.\nType a keyword or set a filter to get started.';
+
+  @override
+  String get searchNoResults => 'No results found. Try a different search or adjust your filters.';
+
+  @override
+  String get searchLoadFailed => 'Could not load search results.';
+
+  @override
+  String get searchResultsLoadingLabel => 'Loading results';
+
+  @override
+  String get discoverEmpty => 'Nothing to discover yet.\nCheck back soon for new businesses.';
+
+  @override
+  String get discoverLoadFailed => 'Could not load Discover right now.';
+
+  @override
+  String get searchFilterTitle => 'Filters';
+
+  @override
+  String get searchFilterCategory => 'Category';
+
+  @override
+  String get searchFilterCategoryAll => 'All categories';
+
+  @override
+  String get searchFilterCategoriesFailed => 'Could not load categories.';
+
+  @override
+  String get searchFilterCountry => 'Country';
+
+  @override
+  String get searchFilterCity => 'City';
+
+  @override
+  String get searchFilterBusinessType => 'Business type';
+
+  @override
+  String get searchFilterAny => 'Any';
+
+  @override
+  String get searchFilterMinRating => 'Minimum rating';
+
+  @override
+  String searchFilterMinRatingOption(int stars) {
+    String _temp0 = intl.Intl.pluralLogic(
+      stars,
+      locale: localeName,
+      other: '$stars stars & up',
+      one: '$stars star & up',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchFilterFeaturedOnly => 'Featured only';
+
+  @override
+  String get searchFilterClear => 'Clear';
+
+  @override
+  String get searchFilterApply => 'Apply';
 }

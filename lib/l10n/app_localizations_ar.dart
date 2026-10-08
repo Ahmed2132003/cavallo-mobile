@@ -625,4 +625,90 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileGridLoadingLabel => 'جارٍ تحميل المحتوى';
+
+  @override
+  String get featuredBadgeLabel => 'مميّز';
+
+  @override
+  String get searchFieldHint => 'ابحث عن تجار ومصانع ومنتجات...';
+
+  @override
+  String get searchClearTooltip => 'مسح البحث';
+
+  @override
+  String get searchFiltersChip => 'الفلاتر';
+
+  @override
+  String searchFiltersChipActive(int count) {
+    return 'الفلاتر ($count)';
+  }
+
+  @override
+  String get searchIdlePrompt => 'ابحث عن تجار ومصانع ومنتجات.\nاكتب كلمة أو اختر فلترًا للبدء.';
+
+  @override
+  String get searchNoResults => 'لم يتم العثور على نتائج. جرّب بحثًا مختلفًا أو عدّل الفلاتر.';
+
+  @override
+  String get searchLoadFailed => 'تعذّر تحميل نتائج البحث.';
+
+  @override
+  String get searchResultsLoadingLabel => 'جارٍ تحميل النتائج';
+
+  @override
+  String get discoverEmpty => 'لا يوجد ما يمكن اكتشافه بعد.\nعد قريبًا لترى أنشطة تجارية جديدة.';
+
+  @override
+  String get discoverLoadFailed => 'تعذّر تحميل صفحة الاستكشاف الآن.';
+
+  @override
+  String get searchFilterTitle => 'الفلاتر';
+
+  @override
+  String get searchFilterCategory => 'التصنيف';
+
+  @override
+  String get searchFilterCategoryAll => 'كل التصنيفات';
+
+  @override
+  String get searchFilterCategoriesFailed => 'تعذّر تحميل التصنيفات.';
+
+  @override
+  String get searchFilterCountry => 'الدولة';
+
+  @override
+  String get searchFilterCity => 'المدينة';
+
+  @override
+  String get searchFilterBusinessType => 'نوع النشاط';
+
+  @override
+  String get searchFilterAny => 'الكل';
+
+  @override
+  String get searchFilterMinRating => 'الحد الأدنى للتقييم';
+
+  @override
+  String searchFilterMinRatingOption(int stars) {
+    String _temp0 = intl.Intl.pluralLogic(
+      stars,
+      locale: localeName,
+      other: '$stars نجمة فأكثر',
+      many: '$stars نجمة فأكثر',
+      few: '$stars نجوم فأكثر',
+      two: 'نجمتان فأكثر',
+      one: 'نجمة فأكثر',
+      zero: '$stars نجمة فأكثر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchFilterFeaturedOnly => 'المميّز فقط';
+
+  @override
+  String get searchFilterClear => 'مسح';
+
+  @override
+  String get searchFilterApply => 'تطبيق';
 }
