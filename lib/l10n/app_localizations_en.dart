@@ -683,4 +683,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchFilterApply => 'Apply';
+
+  @override
+  String get productDetailTitle => 'Product';
+
+  @override
+  String productPriceHeadline(String price, String currency) {
+    return 'Starting from $price $currency';
+  }
+
+  @override
+  String get productPriceNote => 'Approximate price, negotiable directly with the business. Message the business to confirm.';
+
+  @override
+  String get productNotFoundMessage => 'Product not found.\nIt may have been removed.';
+
+  @override
+  String get productLoadFailed => 'Could not load this product.';
+
+  @override
+  String get productNoDescription => 'This business hasn\'t added a description yet.';
+
+  @override
+  String get productVariantsTitle => 'Variants';
+
+  @override
+  String get productMessageBusiness => 'Message Business';
+
+  @override
+  String productShareText(String name) {
+    return 'Check out $name on Cavallo';
+  }
+
+  @override
+  String get productLoadingLabel => 'Loading product';
 }

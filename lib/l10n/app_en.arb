@@ -880,5 +880,58 @@
   "searchFilterApply": "Apply",
   "@searchFilterApply": {
     "description": "Filter sheet: button that applies the filters."
+  },
+  "productDetailTitle": "Product",
+  "@productDetailTitle": {
+    "description": "Title of the product detail screen (app bar)."
+  },
+  "productPriceHeadline": "Starting from {price} {currency}",
+  "@productPriceHeadline": {
+    "description": "Price line of a product. price is the backend decimal text, currency is the currency code. It is a discovery price, never a checkout total.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "productPriceNote": "Approximate price, negotiable directly with the business. Message the business to confirm.",
+  "@productPriceNote": {
+    "description": "Mandatory note under every product price: the price is approximate and negotiated with the business (architecture Section 20)."
+  },
+  "productNotFoundMessage": "Product not found.\nIt may have been removed.",
+  "@productNotFoundMessage": {
+    "description": "Empty state of the product detail screen when the product does not exist or is no longer available."
+  },
+  "productLoadFailed": "Could not load this product.",
+  "@productLoadFailed": {
+    "description": "Fallback error text of the product detail screen when the failure has no message of its own."
+  },
+  "productNoDescription": "This business hasn't added a description yet.",
+  "@productNoDescription": {
+    "description": "Shown on the product detail screen when the product has no description."
+  },
+  "productVariantsTitle": "Variants",
+  "@productVariantsTitle": {
+    "description": "Heading of the read-only variants list on the product detail screen."
+  },
+  "productMessageBusiness": "Message Business",
+  "@productMessageBusiness": {
+    "description": "Primary button on the product detail screen: starts a conversation with the business. Not a purchase action."
+  },
+  "productShareText": "Check out {name} on Cavallo",
+  "@productShareText": {
+    "description": "Text sent by the native share sheet when sharing a product. name is the product name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "productLoadingLabel": "Loading product",
+  "@productLoadingLabel": {
+    "description": "Screen-reader label of the product detail loading skeleton."
   }
 }

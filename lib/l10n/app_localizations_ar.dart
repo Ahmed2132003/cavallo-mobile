@@ -711,4 +711,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get searchFilterApply => 'تطبيق';
+
+  @override
+  String get productDetailTitle => 'المنتج';
+
+  @override
+  String productPriceHeadline(String price, String currency) {
+    return 'ابتداءً من $price $currency';
+  }
+
+  @override
+  String get productPriceNote => 'السعر تقريبي وقابل للتفاوض مباشرة مع النشاط التجاري. راسل النشاط التجاري للتأكيد.';
+
+  @override
+  String get productNotFoundMessage => 'لم يتم العثور على المنتج.\nربما تمت إزالته.';
+
+  @override
+  String get productLoadFailed => 'تعذّر تحميل هذا المنتج.';
+
+  @override
+  String get productNoDescription => 'لم يضف هذا النشاط التجاري وصفًا بعد.';
+
+  @override
+  String get productVariantsTitle => 'الخيارات';
+
+  @override
+  String get productMessageBusiness => 'مراسلة النشاط التجاري';
+
+  @override
+  String productShareText(String name) {
+    return 'شاهد $name على كافالو';
+  }
+
+  @override
+  String get productLoadingLabel => 'جارٍ تحميل المنتج';
 }

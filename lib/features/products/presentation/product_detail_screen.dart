@@ -4,15 +4,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_shimmer_box.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
-import '../../../core/widgets/loading_indicator.dart';
+import '../../../core/widgets/featured_badge.dart';
+import '../../../core/widgets/media_carousel.dart';
 import '../../../routing/route_names.dart';
 import '../../chat/data/conversation_repository.dart';
 import '../../chat/domain/shared_content.dart';
 import '../../chat/presentation/share_to_conversation_sheet.dart';
+import '../../social/presentation/content_interaction_key.dart';
+import '../../social/presentation/social_error_message.dart';
+import '../../social/presentation/social_interaction_provider.dart';
 import '../domain/product_entity.dart';
 import 'product_price_framing.dart';
 import 'product_public_providers.dart';
@@ -34,12 +41,22 @@ import 'product_public_providers.dart';
 ///
 /// Nothing on this screen may resemble a purchase flow: no cart icon, no
 /// "Buy Now" button, no quantity selector. The only body action is
-/// "Message Business". It was a deliberately DISABLED stub from Part
-/// P-034 until Part P-077 activated it: it now starts (or resumes) a
-/// real conversation with the business's owner
+/// "Message Business" (Part P-077): it starts (or resumes) a real
+/// conversation with the business's owner
 /// (`ConversationRepository.startConversationWithBusiness`) and opens
-/// that conversation's thread. Part P-077 also added the AppBar Share
-/// action ("Share to conversation" / native share sheet).
+/// that conversation's thread. The AppBar carries Save and Share.
+///
+/// ## Part P-114 STEP 4A (presentation only)
+///
+/// Instagram-style layout: a full-width 1:1 image, then name (with the
+/// read-only [FeaturedBadge] when the product is featured), price framing,
+/// description, variants as read-only pills and the primary
+/// "Message Business" button. Loading shows a skeleton instead of a
+/// spinner. Every string comes from the ARB files and every color from
+/// `context.appColors`. No provider, repository, route or callback was
+/// changed. Save reuses the existing `contentInteractionProvider` with
+/// content type `product` (the same toggle the Saved tab already relies
+/// on); see the STEP 4A notes about its initial state.
 ///
 /// ## States
 ///
@@ -61,15 +78,14 @@ class ProductDetailScreen extends ConsumerWidget {
   /// (unchanged style, no share tracking: P-056's endpoint covers only
   /// Post/Reel) or "Share to conversation".
   void _share(BuildContext context, Product product) {
+    final String shareText = context.l10n.productShareText(product.name);
     showShareOptionsSheet(
       context,
       contentType: SharedContentType.product,
       objectId: product.id,
       onNativeShare: () async {
         try {
-          await SharePlus.instance.share(
-            ShareParams(text: 'Check out ${product.name} on Cavallo'),
-          );
+          await SharePlus.instance.share(ShareParams(text: shareText));
         } catch (_) {}
       },
     );
@@ -77,13 +93,15 @@ class ProductDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+
     // The backend route is `<int:pk>/`, so a non-numeric id can never
     // identify a product — nothing to fetch. Resolve it to not-found
     // here instead of firing a request guaranteed to fail.
     final id = int.tryParse(productId);
     if (id == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Product')),
+        appBar: AppBar(title: Text(l10n.productDetailTitle)),
         body: const SafeArea(child: _NotFoundView()),
       );
     }
@@ -92,14 +110,16 @@ class ProductDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product'),
+        title: Text(l10n.productDetailTitle),
         actions: [
-          if (productAsync case AsyncData(value: final Product product))
+          if (productAsync case AsyncData(value: final Product product)) ...[
+            _SaveAction(productId: product.id),
             IconButton(
               icon: const Icon(Icons.share_outlined),
-              tooltip: 'Share',
+              tooltip: l10n.actionShare,
               onPressed: () => _share(context, product),
             ),
+          ],
         ],
       ),
       body: switch (productAsync) {
@@ -108,8 +128,94 @@ class ProductDetailScreen extends ConsumerWidget {
         ),
         AsyncData(value: null) => const _NotFoundView(),
         AsyncError(:final error) => _LoadErrorView(error: error, id: id),
-        _ => const LoadingIndicator(),
+        _ => const _ProductSkeleton(),
       },
+    );
+  }
+}
+
+/// Save (bookmark) for the product, through the existing
+/// `contentInteractionProvider` (content type `product`). The bookmark is
+/// not mirrored in RTL. A failed toggle is rolled back by the notifier and
+/// explained in a SnackBar.
+///
+/// KNOWN GAP: the product endpoint does not say whether the viewer already
+/// saved this product, so the icon starts as "not saved". Saving is
+/// idempotent on the server, so tapping always ends in the right state.
+class _SaveAction extends ConsumerWidget {
+  const _SaveAction({required this.productId});
+
+  final int productId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ContentInteractionKey key = (
+      contentType: 'product',
+      objectId: productId,
+    );
+    final bool saved = ref.watch(
+      contentInteractionProvider(key).select((state) => state.isSaved),
+    );
+    final l10n = context.l10n;
+
+    return IconButton(
+      icon: Icon(saved ? Icons.bookmark : Icons.bookmark_border),
+      tooltip: saved ? l10n.savedUnsave : l10n.actionSave,
+      onPressed: () async {
+        final messenger = ScaffoldMessenger.of(context);
+        try {
+          await ref.read(contentInteractionProvider(key).notifier).toggleSave();
+        } catch (e) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(socialErrorMessage(e))),
+          );
+        }
+      },
+    );
+  }
+}
+
+/// Loading placeholder with the same proportions as the real screen (a 1:1
+/// image block, then text lines and a button), so nothing jumps when the
+/// product arrives. Replaces the spinner.
+class _ProductSkeleton extends StatelessWidget {
+  const _ProductSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: context.l10n.productLoadingLabel,
+      child: const SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AspectRatio(
+              aspectRatio: 1,
+              child: AppShimmerBox(borderRadius: 0),
+            ),
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(16, 16, 16, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppShimmerBox(width: 220, height: 24),
+                  SizedBox(height: 12),
+                  AppShimmerBox(width: 160, height: 20),
+                  SizedBox(height: 8),
+                  AppShimmerBox(height: 14),
+                  SizedBox(height: 16),
+                  AppShimmerBox(height: 14),
+                  SizedBox(height: 8),
+                  AppShimmerBox(width: 200, height: 14),
+                  SizedBox(height: 24),
+                  AppShimmerBox(height: 48, borderRadius: 24),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -121,8 +227,8 @@ class _NotFoundView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const EmptyStateWidget(
-      message: 'Product not found.\nIt may have been removed.',
+    return EmptyStateWidget(
+      message: context.l10n.productNotFoundMessage,
       icon: Icons.inventory_2_outlined,
     );
   }
@@ -141,12 +247,11 @@ class _LoadErrorView extends ConsumerWidget {
     // `business_profile_public_screen.dart`'s `_LoadErrorView` and
     // `product_list_screen.dart`'s `_apiFailureMessage`): production
     // throws a DioException carrying the typed ApiFailure in `.error`;
-    // hand-rolled test fakes throw a bare ApiFailure. Duplicated here
-    // rather than shared — flagged in this part's PROJECT_PROGRESS entry.
+    // hand-rolled test fakes throw a bare ApiFailure.
     final message = switch (error) {
       DioException(error: final ApiFailure failure) => failure.message,
       ApiFailure(:final message) => message,
-      _ => 'Could not load this product.',
+      _ => context.l10n.productLoadFailed,
     };
 
     return ErrorStateWidget(
@@ -173,14 +278,15 @@ class _ProductViewState extends ConsumerState<_ProductView> {
   /// Part P-077: "Message Business". Starts (or resumes) the
   /// conversation with this product's business, then opens its thread.
   ///
-  /// The router and messenger are captured BEFORE the await so they are
-  /// still valid afterwards. A second tap while a request is in flight
-  /// is ignored, so it can't start two.
+  /// The router, messenger and localizations are captured BEFORE the await
+  /// so they are still valid afterwards. A second tap while a request is in
+  /// flight is ignored, so it can't start two.
   Future<void> _messageBusiness() async {
     if (_isStartingConversation) return;
 
     final router = GoRouter.of(context);
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     setState(() => _isStartingConversation = true);
 
     try {
@@ -192,9 +298,7 @@ class _ProductViewState extends ConsumerState<_ProductView> {
 
       if (conversation == null) {
         messenger.showSnackBar(
-          const SnackBar(
-            content: Text('Conversation started. Open it from Messages.'),
-          ),
+          SnackBar(content: Text(l10n.profileMessageStarted)),
         );
         return;
       }
@@ -209,11 +313,7 @@ class _ProductViewState extends ConsumerState<_ProductView> {
       setState(() => _isStartingConversation = false);
       messenger.showSnackBar(
         SnackBar(
-          content: Text(
-            e is ApiFailure
-                ? e.message
-                : 'Could not start the conversation. Please try again.',
-          ),
+          content: Text(e is ApiFailure ? e.message : l10n.profileMessageFailed),
         ),
       );
     }
@@ -222,89 +322,153 @@ class _ProductViewState extends ConsumerState<_ProductView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final AppColors colors = context.appColors;
+    final l10n = context.l10n;
     final product = widget.product;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ProductImage(imageUrl: product.imageUrl),
-          const SizedBox(height: 16),
-          Text(product.name, style: theme.textTheme.headlineSmall),
-          const SizedBox(height: 12),
-          // The ONLY place the price is rendered on this screen — always
-          // together with its mandatory framing note (Section 20).
-          ProductPriceFraming(price: product.price, currency: product.currency),
-          const SizedBox(height: 16),
-          Text(
-            product.description.isEmpty
-                ? 'This business hasn\'t added a description yet.'
-                : product.description,
-            style: theme.textTheme.bodyMedium,
-          ),
-          if (product.variants.isNotEmpty) ...[
-            const SizedBox(height: 24),
-            Text('Variants', style: theme.textTheme.titleMedium),
-            const SizedBox(height: 8),
-            // Read-only info — a customer cannot select or configure a
-            // variant (that would imply a purchase flow).
-            for (final variant in product.variants)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  '${variant.name}: ${variant.value}',
-                  style: theme.textTheme.bodyMedium,
+          _ProductImage(imageUrl: product.imageUrl, label: product.name),
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        product.name,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          color: colors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    if (product.isFeatured) ...[
+                      const SizedBox(width: 8),
+                      const Padding(
+                        padding: EdgeInsetsDirectional.only(top: 6),
+                        child: FeaturedBadge(),
+                      ),
+                    ],
+                  ],
                 ),
-              ),
-          ],
-          const SizedBox(height: 24),
-          // Part P-077: the stub from P-034, now real.
-          AppButton(
-            label: 'Message Business',
-            isLoading: _isStartingConversation,
-            onPressed: _messageBusiness,
+                const SizedBox(height: 12),
+                // The ONLY place the price is rendered on this screen —
+                // always together with its mandatory framing note
+                // (Section 20).
+                ProductPriceFraming(
+                  price: product.price,
+                  currency: product.currency,
+                ),
+                const SizedBox(height: 16),
+                Divider(height: 1, thickness: 0.5, color: colors.outline),
+                const SizedBox(height: 16),
+                Text(
+                  product.description.isEmpty
+                      ? l10n.productNoDescription
+                      : product.description,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.textPrimary,
+                  ),
+                ),
+                if (product.variants.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  Text(
+                    l10n.productVariantsTitle,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colors.textPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Read-only info — a customer cannot select or configure
+                  // a variant (that would imply a purchase flow). Plain
+                  // containers, deliberately not chips or buttons.
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final variant in product.variants)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.surfaceVariant,
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: colors.outline,
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Text(
+                            '${variant.name}: ${variant.value}',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colors.textPrimary,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 24),
+                // Part P-077: the primary action. Its ancestor stays the
+                // scroll view, which tests rely on.
+                AppButton(
+                  label: l10n.productMessageBusiness,
+                  isLoading: _isStartingConversation,
+                  onPressed: _messageBusiness,
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 }
+
 /// The product's single primary image (the backend has one `image`
-/// field, not a gallery — Part P-032). Falls back to a neutral
-/// placeholder when there is no image or the URL fails to load.
+/// field, not a gallery — Part P-032), full width in a fixed 1:1 frame so
+/// the page never jumps while it loads. Falls back to a neutral
+/// placeholder when there is no image; [MediaCarousel] handles load and
+/// error states for a real URL and shows page dots only for 2+ images.
 class _ProductImage extends StatelessWidget {
-  const _ProductImage({required this.imageUrl});
+  const _ProductImage({required this.imageUrl, required this.label});
 
   final String? imageUrl;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    final surface = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final AppColors colors = context.appColors;
     final url = imageUrl;
 
-    Widget placeholder(IconData icon) => Container(
-      color: surface,
-      alignment: Alignment.center,
-      child: Icon(icon, size: 48),
-    );
+    if (url == null || url.isEmpty) {
+      return AspectRatio(
+        aspectRatio: 1,
+        child: Container(
+          color: colors.surfaceVariant,
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.inventory_2_outlined,
+            size: 48,
+            color: colors.textSecondary,
+          ),
+        ),
+      );
+    }
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: AspectRatio(
-        aspectRatio: 4 / 3,
-        child:
-            (url == null || url.isEmpty)
-                ? placeholder(Icons.inventory_2_outlined)
-                : Image.network(
-                  url,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  errorBuilder:
-                      (context, error, stackTrace) =>
-                          placeholder(Icons.broken_image_outlined),
-                ),
-      ),
+    return MediaCarousel(
+      imageUrls: [url],
+      aspectRatio: 1,
+      semanticLabel: label,
     );
   }
 }

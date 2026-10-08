@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/theme/app_colors.dart';
 import '../domain/product_entity.dart';
 
 /// Part P-034 scope: the single source of truth for the price-framing
@@ -15,13 +17,14 @@ import '../domain/product_entity.dart';
 ///
 /// * Part P-034: `ProductDetailScreen` and the products section of the
 ///   public business profile screen.
-/// * Phase 11 (Search results) MUST reuse this widget/copy for any
-///   product shown in a result list — see this part's PROJECT_PROGRESS
-///   entry, which records the exact wording below.
+/// * Phase 11 (Search results) reuses this widget for any product shown
+///   in a result list.
 ///
-/// Wording is English for now; bilingual UI is a planned, separate
-/// change. When it happens, only this class's strings need to move to
-/// the localization layer.
+/// Part P-114 STEP 4A: the wording now comes from the ARB files
+/// (`productPriceHeadline`, `productPriceNote`), so it is shown in Arabic
+/// and English. [ProductPriceCopy] keeps the English wording as plain
+/// constants: tests and any non-widget caller can still read it, and it
+/// must stay identical to the English ARB text.
 abstract final class ProductPriceCopy {
   /// e.g. `Starting from 199.99 EGP`. [price] is the backend's raw
   /// decimal string, passed through untouched (see `Product.price`).
@@ -42,6 +45,10 @@ abstract final class ProductPriceCopy {
 ///
 /// [compact] only shrinks the text styles for use inside list/grid
 /// cards; the copy itself is identical in both modes.
+///
+/// The price number is the backend's raw decimal string, passed through
+/// untouched on purpose (Part P-034): it is NOT run through
+/// `AppFormatters.price`, which groups thousands and drops `.00`.
 class ProductPriceFraming extends StatelessWidget {
   const ProductPriceFraming({
     super.key,
@@ -57,20 +64,26 @@ class ProductPriceFraming extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final headlineStyle =
-        compact ? theme.textTheme.titleSmall : theme.textTheme.titleLarge;
+    final AppColors colors = context.appColors;
+    final headlineStyle = (compact
+            ? theme.textTheme.titleSmall
+            : theme.textTheme.titleLarge)
+        ?.copyWith(fontWeight: FontWeight.w700, color: colors.textPrimary);
     final noteStyle = (compact
             ? theme.textTheme.bodySmall
             : theme.textTheme.bodyMedium)
-        ?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+        ?.copyWith(color: colors.textSecondary);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(ProductPriceCopy.headline(price, currency), style: headlineStyle),
+        Text(
+          context.l10n.productPriceHeadline(price, currency.toWire()),
+          style: headlineStyle,
+        ),
         SizedBox(height: compact ? 2 : 4),
-        Text(ProductPriceCopy.note, style: noteStyle),
+        Text(context.l10n.productPriceNote, style: noteStyle),
       ],
     );
   }

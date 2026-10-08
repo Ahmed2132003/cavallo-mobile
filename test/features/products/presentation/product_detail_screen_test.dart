@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:social_commerce_app/core/network/api_failure.dart';
 import 'package:social_commerce_app/core/network/paginated_response.dart';
 import 'package:social_commerce_app/core/widgets/app_button.dart';
+import 'package:social_commerce_app/core/widgets/app_shimmer_box.dart';
 import 'package:social_commerce_app/features/products/data/product_public_repository.dart';
 import 'package:social_commerce_app/features/products/domain/product_entity.dart';
 import 'package:social_commerce_app/features/products/domain/product_public_repository.dart';
@@ -120,7 +121,9 @@ void main() {
       await _pumpScreen(tester, productId: '10', repository: repository);
       await tester.pump();
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      // Part P-114 STEP 4A: a skeleton replaces the spinner.
+      expect(find.byType(AppShimmerBox), findsWidgets);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
 
       // Resolve it and confirm the screen actually moves on — guards
       // against a false pass where loading renders only because nothing
@@ -257,7 +260,8 @@ void main() {
         find.widgetWithIcon(IconButton, Icons.share_outlined),
         findsOneWidget,
       );
-      expect(find.byType(IconButton), findsOneWidget);
+      // Part P-114 STEP 4A: Save (bookmark) now sits next to Share.
+      expect(find.byType(IconButton), findsNWidgets(2));
 
       // The ONLY button on the screen is the disabled "Message
       // Business" stub.
@@ -273,13 +277,13 @@ void main() {
       // "Message Business" stub. Split by location so the body check
       // stays as strict as before: the body still has exactly ONE
       // button, and it is still the disabled stub.
-      expect(find.bySubtype<ButtonStyleButton>(), findsNWidgets(2));
+      expect(find.bySubtype<ButtonStyleButton>(), findsNWidgets(3));
       expect(
         find.descendant(
           of: find.byType(AppBar),
           matching: find.bySubtype<ButtonStyleButton>(),
         ),
-        findsOneWidget,
+        findsNWidgets(2),
       );
 
       final bodyButtons = find.descendant(

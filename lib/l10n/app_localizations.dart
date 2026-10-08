@@ -1222,6 +1222,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Apply'**
   String get searchFilterApply;
+
+  /// Title of the product detail screen (app bar).
+  ///
+  /// In en, this message translates to:
+  /// **'Product'**
+  String get productDetailTitle;
+
+  /// Price line of a product. price is the backend decimal text, currency is the currency code. It is a discovery price, never a checkout total.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting from {price} {currency}'**
+  String productPriceHeadline(String price, String currency);
+
+  /// Mandatory note under every product price: the price is approximate and negotiated with the business (architecture Section 20).
+  ///
+  /// In en, this message translates to:
+  /// **'Approximate price, negotiable directly with the business. Message the business to confirm.'**
+  String get productPriceNote;
+
+  /// Empty state of the product detail screen when the product does not exist or is no longer available.
+  ///
+  /// In en, this message translates to:
+  /// **'Product not found.\nIt may have been removed.'**
+  String get productNotFoundMessage;
+
+  /// Fallback error text of the product detail screen when the failure has no message of its own.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this product.'**
+  String get productLoadFailed;
+
+  /// Shown on the product detail screen when the product has no description.
+  ///
+  /// In en, this message translates to:
+  /// **'This business hasn\'t added a description yet.'**
+  String get productNoDescription;
+
+  /// Heading of the read-only variants list on the product detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Variants'**
+  String get productVariantsTitle;
+
+  /// Primary button on the product detail screen: starts a conversation with the business. Not a purchase action.
+  ///
+  /// In en, this message translates to:
+  /// **'Message Business'**
+  String get productMessageBusiness;
+
+  /// Text sent by the native share sheet when sharing a product. name is the product name.
+  ///
+  /// In en, this message translates to:
+  /// **'Check out {name} on Cavallo'**
+  String productShareText(String name);
+
+  /// Screen-reader label of the product detail loading skeleton.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading product'**
+  String get productLoadingLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
