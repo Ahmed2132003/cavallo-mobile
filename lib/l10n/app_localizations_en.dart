@@ -743,4 +743,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commentsLoadingLabel => 'Loading comments';
+
+  @override
+  String get chatListTitle => 'Messages';
+
+  @override
+  String get chatListEmpty => 'No conversations yet';
+
+  @override
+  String get chatListNoMessages => 'No messages yet';
+
+  @override
+  String get chatListUnknownUser => 'Unknown';
+
+  @override
+  String get chatListPreviewPhoto => 'Photo';
+
+  @override
+  String get chatListPreviewVideo => 'Video';
+
+  @override
+  String get chatListPreviewSharedPost => 'Shared a post';
+
+  @override
+  String get chatListPreviewSharedReel => 'Shared a reel';
+
+  @override
+  String get chatListPreviewSharedProduct => 'Shared a product';
+
+  @override
+  String get chatListLoadingLabel => 'Loading conversations';
+
+  @override
+  String get chatListNewChatTest => 'New chat (test)';
+
+  @override
+  String get chatTestDialogTitle => 'Start test conversation';
+
+  @override
+  String get chatTestUserIdLabel => 'Other account\'s user id';
+
+  @override
+  String get chatTestUserIdHint => 'e.g. 7';
+
+  @override
+  String get chatTestCancel => 'Cancel';
+
+  @override
+  String get chatTestStart => 'Start';
+
+  @override
+  String chatListUnreadLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count unread messages',
+      one: '$count unread message',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String chatTestUserPlaceholder(int id) {
+    return 'User #$id';
+  }
 }

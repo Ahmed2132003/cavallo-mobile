@@ -771,4 +771,72 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get commentsLoadingLabel => 'جارٍ تحميل التعليقات';
+
+  @override
+  String get chatListTitle => 'الرسائل';
+
+  @override
+  String get chatListEmpty => 'لا توجد محادثات بعد';
+
+  @override
+  String get chatListNoMessages => 'لا توجد رسائل بعد';
+
+  @override
+  String get chatListUnknownUser => 'غير معروف';
+
+  @override
+  String get chatListPreviewPhoto => 'صورة';
+
+  @override
+  String get chatListPreviewVideo => 'فيديو';
+
+  @override
+  String get chatListPreviewSharedPost => 'شارك منشورًا';
+
+  @override
+  String get chatListPreviewSharedReel => 'شارك ريلًا';
+
+  @override
+  String get chatListPreviewSharedProduct => 'شارك منتجًا';
+
+  @override
+  String get chatListLoadingLabel => 'جارٍ تحميل المحادثات';
+
+  @override
+  String get chatListNewChatTest => 'محادثة جديدة (تجريبية)';
+
+  @override
+  String get chatTestDialogTitle => 'بدء محادثة تجريبية';
+
+  @override
+  String get chatTestUserIdLabel => 'رقم مستخدم الحساب الآخر';
+
+  @override
+  String get chatTestUserIdHint => 'مثال: 7';
+
+  @override
+  String get chatTestCancel => 'إلغاء';
+
+  @override
+  String get chatTestStart => 'بدء';
+
+  @override
+  String chatListUnreadLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count رسالة غير مقروءة',
+      many: '$count رسالة غير مقروءة',
+      few: '$count رسائل غير مقروءة',
+      two: 'رسالتان غير مقروءتان',
+      one: 'رسالة واحدة غير مقروءة',
+      zero: 'لا رسائل غير مقروءة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String chatTestUserPlaceholder(int id) {
+    return 'مستخدم رقم $id';
+  }
 }

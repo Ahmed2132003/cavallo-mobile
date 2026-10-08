@@ -1330,6 +1330,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading comments'**
   String get commentsLoadingLabel;
+
+  /// Title of the chat list screen (top bar).
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get chatListTitle;
+
+  /// Empty state of the chat list.
+  ///
+  /// In en, this message translates to:
+  /// **'No conversations yet'**
+  String get chatListEmpty;
+
+  /// Row preview of a conversation that has no messages yet.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet'**
+  String get chatListNoMessages;
+
+  /// Row name when the other participant is missing (should never happen).
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get chatListUnknownUser;
+
+  /// Row preview when the last message is a photo with no text.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get chatListPreviewPhoto;
+
+  /// Row preview when the last message is a video with no text.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get chatListPreviewVideo;
+
+  /// Row preview when the last message shares a post with no text.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared a post'**
+  String get chatListPreviewSharedPost;
+
+  /// Row preview when the last message shares a reel with no text.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared a reel'**
+  String get chatListPreviewSharedReel;
+
+  /// Row preview when the last message shares a product with no text.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared a product'**
+  String get chatListPreviewSharedProduct;
+
+  /// Screen-reader label of the chat list loading skeleton.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading conversations'**
+  String get chatListLoadingLabel;
+
+  /// Label of the temporary manual-testing button on the chat list.
+  ///
+  /// In en, this message translates to:
+  /// **'New chat (test)'**
+  String get chatListNewChatTest;
+
+  /// Title of the temporary test-conversation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Start test conversation'**
+  String get chatTestDialogTitle;
+
+  /// Field label in the temporary test-conversation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Other account\'s user id'**
+  String get chatTestUserIdLabel;
+
+  /// Field hint in the temporary test-conversation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 7'**
+  String get chatTestUserIdHint;
+
+  /// Cancel button of the temporary test-conversation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get chatTestCancel;
+
+  /// Confirm button of the temporary test-conversation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get chatTestStart;
+
+  /// Screen-reader label of the unread-count badge on a chat row.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} unread message} other{{count} unread messages}}'**
+  String chatListUnreadLabel(int count);
+
+  /// Temporary placeholder name of a test conversation. id is the user id.
+  ///
+  /// In en, this message translates to:
+  /// **'User #{id}'**
+  String chatTestUserPlaceholder(int id);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

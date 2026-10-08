@@ -970,5 +970,87 @@
   "commentsLoadingLabel": "Loading comments",
   "@commentsLoadingLabel": {
     "description": "Screen-reader label of the comment list loading skeleton."
+  },
+  "chatListTitle": "Messages",
+  "@chatListTitle": {
+    "description": "Title of the chat list screen (top bar)."
+  },
+  "chatListEmpty": "No conversations yet",
+  "@chatListEmpty": {
+    "description": "Empty state of the chat list."
+  },
+  "chatListNoMessages": "No messages yet",
+  "@chatListNoMessages": {
+    "description": "Row preview of a conversation that has no messages yet."
+  },
+  "chatListUnknownUser": "Unknown",
+  "@chatListUnknownUser": {
+    "description": "Row name when the other participant is missing (should never happen)."
+  },
+  "chatListPreviewPhoto": "Photo",
+  "@chatListPreviewPhoto": {
+    "description": "Row preview when the last message is a photo with no text."
+  },
+  "chatListPreviewVideo": "Video",
+  "@chatListPreviewVideo": {
+    "description": "Row preview when the last message is a video with no text."
+  },
+  "chatListPreviewSharedPost": "Shared a post",
+  "@chatListPreviewSharedPost": {
+    "description": "Row preview when the last message shares a post with no text."
+  },
+  "chatListPreviewSharedReel": "Shared a reel",
+  "@chatListPreviewSharedReel": {
+    "description": "Row preview when the last message shares a reel with no text."
+  },
+  "chatListPreviewSharedProduct": "Shared a product",
+  "@chatListPreviewSharedProduct": {
+    "description": "Row preview when the last message shares a product with no text."
+  },
+  "chatListLoadingLabel": "Loading conversations",
+  "@chatListLoadingLabel": {
+    "description": "Screen-reader label of the chat list loading skeleton."
+  },
+  "chatListNewChatTest": "New chat (test)",
+  "@chatListNewChatTest": {
+    "description": "Label of the temporary manual-testing button on the chat list."
+  },
+  "chatTestDialogTitle": "Start test conversation",
+  "@chatTestDialogTitle": {
+    "description": "Title of the temporary test-conversation dialog."
+  },
+  "chatTestUserIdLabel": "Other account's user id",
+  "@chatTestUserIdLabel": {
+    "description": "Field label in the temporary test-conversation dialog."
+  },
+  "chatTestUserIdHint": "e.g. 7",
+  "@chatTestUserIdHint": {
+    "description": "Field hint in the temporary test-conversation dialog."
+  },
+  "chatTestCancel": "Cancel",
+  "@chatTestCancel": {
+    "description": "Cancel button of the temporary test-conversation dialog."
+  },
+  "chatTestStart": "Start",
+  "@chatTestStart": {
+    "description": "Confirm button of the temporary test-conversation dialog."
+  },
+  "chatListUnreadLabel": "{count, plural, one{{count} unread message} other{{count} unread messages}}",
+  "@chatListUnreadLabel": {
+    "description": "Screen-reader label of the unread-count badge on a chat row.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatTestUserPlaceholder": "User #{id}",
+  "@chatTestUserPlaceholder": {
+    "description": "Temporary placeholder name of a test conversation. id is the user id.",
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
   }
 }

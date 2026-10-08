@@ -2,10 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/error_messages.dart';
+import '../../../core/l10n/formatters.dart';
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_avatar.dart';
+import '../../../core/widgets/app_shimmer_box.dart';
+import '../../../core/widgets/empty_state_widget.dart';
+import '../../../core/widgets/error_state_widget.dart';
 import '../../../routing/route_names.dart';
 import '../data/conversation_repository.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/conversation.dart';
+import '../domain/message.dart';
+import '../domain/shared_content.dart';
 
 /// Part P-074 STEP 3 — the Conversation List screen (`/chat`), replacing
 /// P-007's placeholder IN PLACE (same file, same class name — per rule
@@ -24,6 +35,16 @@ import '../domain/conversation.dart';
 /// See [_ChatListScreenState._startTestConversation]'s own doc comment
 /// for why this exists and why it is explicitly a manual-testing aid,
 /// not a designed product entry point.
+///
+/// ### Part P-115 STEP 2 — restyle only
+/// Presentation only: every field of the state, every repository call, the
+/// pagination cursor logic and the navigation callback are unchanged.
+/// Rows use the P-111 components ([AppAvatar], [AppShimmerBox],
+/// [EmptyStateWidget], [ErrorStateWidget]) and `context.appColors`; every
+/// user-facing string comes from the ARB files. The spec's "online dot" is NOT
+/// drawn: neither the backend nor [ConversationParticipantSummary] carries
+/// presence data (see the note in `chat_thread_screen.dart`), and P-115 forbids
+/// new features and backend changes.
 class ChatListScreen extends ConsumerStatefulWidget {
   const ChatListScreen({super.key});
 
@@ -104,9 +125,9 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     } on ApiFailure catch (e) {
       if (!mounted) return;
       setState(() => _isLoadingMore = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.message)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(localizedApiError(context.l10n, e))),
+      );
     }
   }
 
@@ -157,25 +178,24 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
       builder: (dialogContext) {
         final controller = TextEditingController();
         return AlertDialog(
-          title: const Text('Start test conversation'),
+          title: Text(dialogContext.l10n.chatTestDialogTitle),
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
             autofocus: true,
-            decoration: const InputDecoration(
-              labelText: "Other account's user id",
-              hintText: 'e.g. 7',
+            decoration: InputDecoration(
+              labelText: dialogContext.l10n.chatTestUserIdLabel,
+              hintText: dialogContext.l10n.chatTestUserIdHint,
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
+              child: Text(dialogContext.l10n.chatTestCancel),
             ),
             TextButton(
-              onPressed: () =>
-                  Navigator.of(dialogContext).pop(controller.text),
-              child: const Text('Start'),
+              onPressed: () => Navigator.of(dialogContext).pop(controller.text),
+              child: Text(dialogContext.l10n.chatTestStart),
             ),
           ],
         );
@@ -198,7 +218,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
         otherParticipant: ConversationParticipantSummary(
           id: recipientId,
           accountType: 'unknown',
-          displayName: 'User #$recipientId',
+          displayName: context.l10n.chatTestUserPlaceholder(recipientId),
         ),
         lastMessage: null,
         unreadCount: 0,
@@ -213,49 +233,57 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     } on ApiFailure catch (e) {
       if (!mounted) return;
       setState(() => _isStartingTestConversation = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.message)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(localizedApiError(context.l10n, e))),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Messages')),
-      body: _buildBody(),
+      appBar: AppBar(title: Text(l10n.chatListTitle)),
+      body: _buildBody(context),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _isStartingTestConversation
-            ? null
-            : _startTestConversation,
-        icon: _isStartingTestConversation
-            ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Icon(Icons.add_comment_outlined),
-        label: const Text('New chat (test)'),
+        onPressed: _isStartingTestConversation ? null : _startTestConversation,
+        icon:
+            _isStartingTestConversation
+                ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+                : const Icon(Icons.add_comment_outlined),
+        label: Text(l10n.chatListNewChatTest),
       ),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     if (_isLoadingFirstPage) {
-      return const Center(child: CircularProgressIndicator());
+      return const _ConversationListSkeleton();
     }
     if (_error != null && _conversations.isEmpty) {
-      return _ErrorRetry(message: _error!.message, onRetry: _loadFirstPage);
+      return ErrorStateWidget(
+        message: localizedApiError(l10n, _error),
+        onRetry: _loadFirstPage,
+      );
     }
     if (_conversations.isEmpty) {
-      return const Center(child: Text('No conversations yet'));
+      return EmptyStateWidget(
+        icon: Icons.chat_bubble_outline,
+        message: l10n.chatListEmpty,
+      );
     }
     return RefreshIndicator(
       onRefresh: _loadFirstPage,
       child: ListView.separated(
         controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
         itemCount: _conversations.length + (_nextCursor != null ? 1 : 0),
-        separatorBuilder: (_, _) => const Divider(height: 1),
+        separatorBuilder: (_, _) => const _RowDivider(),
         itemBuilder: (context, index) {
           if (index >= _conversations.length) {
             return const Padding(
@@ -274,6 +302,55 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   }
 }
 
+/// Avatar diameter and gaps shared by the real row and its skeleton, so the
+/// loading state does not jump when the data arrives.
+const double _avatarSize = 52;
+const double _rowGap = 12;
+const double _rowPadding = 16;
+
+/// Hairline between rows, inset so it starts under the text, not the avatar
+/// (`indent` is directional: it flips in Arabic).
+class _RowDivider extends StatelessWidget {
+  const _RowDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      indent: _rowPadding + _avatarSize + _rowGap,
+      color: context.appColors.outline,
+    );
+  }
+}
+
+/// What the row shows under the name. Text always wins; a media-only or
+/// shared-content-only message falls back to a localized label. Mirrors
+/// [LastMessagePreview.previewText] (domain, English only, left untouched)
+/// with ARB strings.
+String _previewLabel(AppLocalizations l10n, LastMessagePreview? last) {
+  if (last == null) return l10n.chatListNoMessages;
+  if (last.text.isNotEmpty) return last.text;
+  switch (last.mediaType) {
+    case ChatMediaType.image:
+      return l10n.chatListPreviewPhoto;
+    case ChatMediaType.video:
+      return l10n.chatListPreviewVideo;
+    case null:
+      break;
+  }
+  switch (last.sharedContentType) {
+    case SharedContentType.post:
+      return l10n.chatListPreviewSharedPost;
+    case SharedContentType.reel:
+      return l10n.chatListPreviewSharedReel;
+    case SharedContentType.product:
+      return l10n.chatListPreviewSharedProduct;
+    case null:
+      return l10n.chatListNoMessages;
+  }
+}
+
 class _ConversationTile extends StatelessWidget {
   const _ConversationTile({required this.conversation, required this.onTap});
 
@@ -282,63 +359,184 @@ class _ConversationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final other = conversation.otherParticipant;
-    final displayName = other?.displayName ?? 'Unknown';
-    final lastMessage = conversation.lastMessage;
-    final hasUnread = conversation.unreadCount > 0;
+    final AppLocalizations l10n = context.l10n;
+    final AppColors colors = context.appColors;
+    final TextTheme text = Theme.of(context).textTheme;
 
-    return ListTile(
+    final other = conversation.otherParticipant;
+    final String displayName = other?.displayName ?? l10n.chatListUnknownUser;
+    final LastMessagePreview? lastMessage = conversation.lastMessage;
+    final int unread = conversation.unreadCount;
+    final bool hasUnread = unread > 0;
+
+    return InkWell(
       onTap: onTap,
-      leading: CircleAvatar(
-        child: Text(
-          displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
+      child: Padding(
+        padding: const EdgeInsetsDirectional.symmetric(
+          horizontal: _rowPadding,
+          vertical: 10,
         ),
-      ),
-      title: Text(
-        displayName,
-        style: TextStyle(
-          fontWeight: hasUnread ? FontWeight.bold : FontWeight.normal,
-        ),
-      ),
-      subtitle: Text(
-        lastMessage?.previewText ?? 'No messages yet',
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          fontWeight: hasUnread ? FontWeight.bold : FontWeight.normal,
-        ),
-      ),
-      trailing: hasUnread
-          ? CircleAvatar(
-              radius: 10,
-              child: Text(
-                conversation.unreadCount > 99
-                    ? '99+'
-                    : conversation.unreadCount.toString(),
-                style: const TextStyle(fontSize: 10),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            AppAvatar(
+              name: displayName,
+              size: _avatarSize,
+              ringGapColor: colors.background,
+            ),
+            const SizedBox(width: _rowGap),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: text.titleSmall?.copyWith(
+                            color: colors.textPrimary,
+                            fontWeight:
+                                hasUnread ? FontWeight.w700 : FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      if (lastMessage != null) ...<Widget>[
+                        const SizedBox(width: 8),
+                        Text(
+                          AppFormatters.of(
+                            context,
+                          ).relativeTime(lastMessage.createdAt),
+                          maxLines: 1,
+                          style: text.bodySmall?.copyWith(
+                            color:
+                                hasUnread
+                                    ? colors.brandText
+                                    : colors.textSecondary,
+                            fontWeight:
+                                hasUnread ? FontWeight.w600 : FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          _previewLabel(l10n, lastMessage),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: text.bodyMedium?.copyWith(
+                            color:
+                                hasUnread
+                                    ? colors.textPrimary
+                                    : colors.textSecondary,
+                            fontWeight:
+                                hasUnread ? FontWeight.w600 : FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      if (hasUnread) ...<Widget>[
+                        const SizedBox(width: 8),
+                        _UnreadBadge(count: unread),
+                      ],
+                    ],
+                  ),
+                ],
               ),
-            )
-          : null,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class _ErrorRetry extends StatelessWidget {
-  const _ErrorRetry({required this.message, required this.onRetry});
+/// Brand-blue pill with the unread count (capped at `99+`). The count is also
+/// spoken as a full sentence, so the meaning never depends on colour alone.
+class _UnreadBadge extends StatelessWidget {
+  const _UnreadBadge({required this.count});
 
-  final String message;
-  final VoidCallback onRetry;
+  final int count;
+
+  static const int _cap = 99;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: 12),
-          ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
-        ],
+    final AppColors colors = context.appColors;
+    final String label = count > _cap ? '$_cap+' : '$count';
+    return Semantics(
+      label: context.l10n.chatListUnreadLabel(count),
+      excludeSemantics: true,
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+        padding: const EdgeInsetsDirectional.symmetric(horizontal: 6),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: colors.brand,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: colors.onBrand,
+            fontWeight: FontWeight.w700,
+            height: 1.2,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// First-load placeholder: the same row anatomy as [_ConversationTile] built
+/// from [AppShimmerBox], instead of a spinner.
+class _ConversationListSkeleton extends StatelessWidget {
+  const _ConversationListSkeleton();
+
+  static const int _rows = 8;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: context.l10n.chatListLoadingLabel,
+      child: ExcludeSemantics(
+        child: ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _rows,
+          itemBuilder:
+              (context, index) => const Padding(
+                padding: EdgeInsetsDirectional.symmetric(
+                  horizontal: _rowPadding,
+                  vertical: 10,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    AppShimmerBox.circle(size: _avatarSize),
+                    SizedBox(width: _rowGap),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          AppShimmerBox(
+                            width: 140,
+                            height: 14,
+                            borderRadius: 6,
+                          ),
+                          SizedBox(height: 8),
+                          AppShimmerBox(height: 12, borderRadius: 6),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+        ),
       ),
     );
   }

@@ -6,11 +6,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:social_commerce_app/core/network/api_failure.dart';
 import 'package:social_commerce_app/core/network/paginated_response.dart';
+import 'package:social_commerce_app/core/widgets/app_avatar.dart';
+import 'package:social_commerce_app/core/theme/app_theme.dart';
+import 'package:social_commerce_app/core/widgets/app_shimmer_box.dart';
+import 'package:social_commerce_app/features/chat/domain/shared_content.dart';
 import 'package:social_commerce_app/features/chat/data/conversation_repository.dart';
 import 'package:social_commerce_app/features/chat/domain/conversation.dart';
 import 'package:social_commerce_app/features/chat/domain/message.dart';
 import 'package:social_commerce_app/features/chat/domain/message_status.dart';
 import 'package:social_commerce_app/features/chat/presentation/chat_list_screen.dart';
+import 'package:social_commerce_app/l10n/app_localizations.dart';
 
 /// Part P-074 STEP 4 — widget tests for [ChatListScreen].
 ///
@@ -112,6 +117,8 @@ LastMessagePreview _preview(
   String text, {
   MessageStatus status = MessageStatus.delivered,
   int senderId = 142,
+  ChatMediaType? mediaType,
+  SharedContentType? sharedContentType,
 }) {
   return LastMessagePreview(
     id: 501,
@@ -119,6 +126,8 @@ LastMessagePreview _preview(
     senderId: senderId,
     status: status,
     createdAt: DateTime(2026, 9, 20, 10),
+    mediaType: mediaType,
+    sharedContentType: sharedContentType,
   );
 }
 
@@ -134,9 +143,7 @@ Future<void> _pumpScreen(
 }) async {
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
-        conversationRepositoryProvider.overrideWithValue(repository),
-      ],
+      overrides: [conversationRepositoryProvider.overrideWithValue(repository)],
       child: const MaterialApp(home: ChatListScreen()),
     ),
   );
@@ -147,25 +154,27 @@ void main() {
     testWidgets('shows a loading indicator before the first page resolves', (
       tester,
     ) async {
-      final repository =
-          _FakeConversationRepository(
-              firstPage: [
-                _conversation(
-                  id: 1,
-                  displayName: 'Acme Traders',
-                  lastMessage: _preview('hi'),
-                ),
-              ],
-            )
-            ..firstCallGate = Completer<void>();
+      final repository = _FakeConversationRepository(
+        firstPage: [
+          _conversation(
+            id: 1,
+            displayName: 'Acme Traders',
+            lastMessage: _preview('hi'),
+          ),
+        ],
+      )..firstCallGate = Completer<void>();
 
       await _pumpScreen(tester, repository: repository);
       await tester.pump();
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      // P-115 STEP 2: the first load is a skeleton, not a spinner.
+      expect(find.byType(AppShimmerBox), findsWidgets);
+      expect(find.text('Acme Traders'), findsNothing);
 
       repository.firstCallGate!.complete();
       await tester.pumpAndSettle();
+
+      expect(find.byType(AppShimmerBox), findsNothing);
 
       expect(find.text('Acme Traders'), findsOneWidget);
     });
@@ -212,9 +221,7 @@ void main() {
       'placeholder',
       (tester) async {
         final repository = _FakeConversationRepository(
-          firstPage: [
-            _conversation(id: 2, displayName: 'jane@example.com'),
-          ],
+          firstPage: [_conversation(id: 2, displayName: 'jane@example.com')],
         );
 
         await _pumpScreen(tester, repository: repository);
@@ -242,13 +249,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('3'), findsOneWidget);
-      // Leading avatar (initial letter) + trailing unread badge = 2.
-      expect(find.byType(CircleAvatar), findsNWidgets(2));
+      // P-115 STEP 2: one AppAvatar per row; the badge is a pill, not an avatar.
+      expect(find.byType(AppAvatar), findsOneWidget);
     });
 
-    testWidgets('shows no unread badge when unread_count is 0', (
-      tester,
-    ) async {
+    testWidgets('shows no unread badge when unread_count is 0', (tester) async {
       final repository = _FakeConversationRepository(
         firstPage: [
           _conversation(
@@ -262,13 +267,12 @@ void main() {
       await _pumpScreen(tester, repository: repository);
       await tester.pumpAndSettle();
 
-      // Only the leading avatar — no trailing unread-count badge.
-      expect(find.byType(CircleAvatar), findsOneWidget);
+      // No unread-count badge: no count text in the row.
+      expect(find.byType(AppAvatar), findsOneWidget);
+      expect(find.text('0'), findsNothing);
     });
 
-    testWidgets('a very high unread count is capped at "99+"', (
-      tester,
-    ) async {
+    testWidgets('a very high unread count is capped at "99+"', (tester) async {
       final repository = _FakeConversationRepository(
         firstPage: [
           _conversation(
@@ -287,6 +291,109 @@ void main() {
     });
   });
 
+  group('ChatListScreen — P-115 restyle', () {
+    testWidgets('shows the Messages title', (tester) async {
+      await _pumpScreen(
+        tester,
+        repository: _FakeConversationRepository(firstPage: const []),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Messages'), findsOneWidget);
+    });
+
+    testWidgets('media-only and shared-only messages show a label', (
+      tester,
+    ) async {
+      final repository = _FakeConversationRepository(
+        firstPage: [
+          _conversation(
+            id: 1,
+            displayName: 'A',
+            lastMessage: _preview('', mediaType: ChatMediaType.image),
+          ),
+          _conversation(
+            id: 2,
+            displayName: 'B',
+            lastMessage: _preview('', mediaType: ChatMediaType.video),
+          ),
+          _conversation(
+            id: 3,
+            displayName: 'C',
+            lastMessage: _preview(
+              '',
+              sharedContentType: SharedContentType.reel,
+            ),
+          ),
+        ],
+      );
+
+      await _pumpScreen(tester, repository: repository);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Photo'), findsOneWidget);
+      expect(find.text('Video'), findsOneWidget);
+      expect(find.text('Shared a reel'), findsOneWidget);
+    });
+
+    testWidgets('text wins over the media label', (tester) async {
+      final repository = _FakeConversationRepository(
+        firstPage: [
+          _conversation(
+            id: 1,
+            displayName: 'A',
+            lastMessage: _preview('nice', mediaType: ChatMediaType.image),
+          ),
+        ],
+      );
+
+      await _pumpScreen(tester, repository: repository);
+      await tester.pumpAndSettle();
+
+      expect(find.text('nice'), findsOneWidget);
+      expect(find.text('Photo'), findsNothing);
+    });
+
+    testWidgets('renders in dark theme and in Arabic RTL without errors', (
+      tester,
+    ) async {
+      final repository = _FakeConversationRepository(
+        firstPage: [
+          _conversation(
+            id: 1,
+            displayName: 'Acme Traders',
+            lastMessage: _preview('hi'),
+            unreadCount: 120,
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            conversationRepositoryProvider.overrideWithValue(repository),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.dark,
+            locale: const Locale('ar'),
+            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            home: const ChatListScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('99+'), findsOneWidget);
+      expect(find.text('الرسائل'), findsOneWidget);
+      expect(
+        Directionality.of(tester.element(find.byType(ChatListScreen))),
+        TextDirection.rtl,
+      );
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   group('ChatListScreen — error', () {
     testWidgets(
       'a genuine failure shows the backend message and a Retry button; '
@@ -298,8 +405,13 @@ void main() {
         await _pumpScreen(tester, repository: repository);
         await tester.pumpAndSettle();
 
-        expect(find.text('Something broke.'), findsOneWidget);
-        expect(find.widgetWithText(ElevatedButton, 'Retry'), findsOneWidget);
+        // P-115 STEP 2: the message is the localized one (P-112), not the raw
+        // backend text, and the retry button is the shared AppButton.
+        expect(
+          find.text('Something went wrong on our end. Please try again later.'),
+          findsOneWidget,
+        );
+        expect(find.widgetWithText(FilledButton, 'Retry'), findsOneWidget);
 
         repository.error = null;
         repository.currentConversations = [
@@ -310,7 +422,7 @@ void main() {
           ),
         ];
 
-        await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
+        await tester.tap(find.widgetWithText(FilledButton, 'Retry'));
         await tester.pumpAndSettle();
 
         expect(find.text('Acme Traders'), findsOneWidget);
