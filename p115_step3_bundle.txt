@@ -1,0 +1,1850 @@
+﻿
+########## FILE: lib\features\chat\presentation\chat_thread_screen.dart ##########
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../../core/chat/chat_connection_manager.dart';
+import '../../../core/chat/chat_event.dart';
+import '../../../core/network/api_failure.dart';
+import '../data/conversation_repository.dart';
+import '../data/message_repository.dart';
+import '../domain/conversation.dart';
+import '../domain/message.dart';
+import '../domain/message_status.dart';
+import '../domain/shared_content.dart';
+import 'message_bubble_widget.dart';
+import 'outbound_message_queue_provider.dart';
+
+/// Part P-074 STEP 3 — the Message Thread screen (`/chat/:id`), replacing
+/// P-007's placeholder IN PLACE (same file; class renamed only in its
+/// constructor signature — see this class's own note below on why
+/// `chatId` became `conversation`).
+///
+/// ### Why this takes a full [Conversation], not just an id
+/// Determining "is this message mine or theirs" needs
+/// `conversation.otherParticipant.id` (STEP 2) — in a 1:1 conversation,
+/// `message.senderId != otherParticipant.id` is sufficient and means
+/// this screen never needs to know its own signed-in user id at all.
+/// That requires the full [Conversation], not just its id, so
+/// `chat_list_screen.dart` now passes the whole tapped [Conversation] as
+/// `extra:` (the same convention `app_router.dart` already uses for
+/// `QueueItem`/`Product`/`businessName`). `app_router.dart`'s `redirect`
+/// now guarantees `extra` is a [Conversation] before this screen is ever
+/// built — see that file's own STEP 3 diff — mirroring
+/// `moderationReview`'s existing `QueueItem` guard exactly.
+///
+/// ### Fetch strategy — documented, per this part's execution prompt
+/// - **Opening this screen** (this `State`'s `initState`, i.e. every
+///   time the user navigates into a conversation): [ConversationRepository.fetchMessageHistory]
+///   — a full, current snapshot from the server. No "resume" logic is
+///   needed here because a fresh screen instance always fetches fresh.
+/// - **A WebSocket reconnect while this screen stays open**
+///   ([ChatConnectionState] transitioning back to `connected` from
+///   `reconnecting`, P-073's own STEP 3 backoff/retry): [MessageRepository.fetchMessagesSince]
+///   using the highest message id already loaded, to fill exactly the
+///   gap the disconnect may have caused without re-fetching everything.
+///
+/// ### mark_delivered / mark_read — MVP choices, per this part's own
+/// execution prompt ("document your choice")
+/// - **delivered**: sent for every one of the OTHER participant's
+///   messages not already `delivered`/`read`, the moment they're
+///   fetched (history, fetch-since) or received (`MessageReceived`).
+/// - **read**: uses the simpler of the two offered approximations —
+///   everything currently loaded from the other participant, not
+///   already `read`, is marked read whenever this screen is mounted AND
+///   the app is in the foreground (tracked via [WidgetsBindingObserver],
+///   not a real per-bubble `VisibilityDetector`).
+///
+/// ### Presence — flagged gap, not fabricated
+/// The verified `chat_event.dart` contract (P-073) has exactly three
+/// server-push event shapes, none of which carries the OTHER
+/// participant's online/offline state, and `ConversationParticipantSummary`
+/// (STEP 2) carries no presence field either. The small label under the
+/// app bar title below therefore shows THIS DEVICE'S OWN socket
+/// connection state (`ChatConnectionState`), not real per-user presence
+/// — see that label's own inline comment.
+///
+/// ### Sending — Part P-075 STEP 3 (optimistic UI + outbound queue)
+/// Pressing send no longer awaits the REST call here. The text is
+/// handed to [OutboundMessageQueueNotifier.enqueueMessage] and the
+/// field is cleared immediately; the message shows up right away as a
+/// local [OutboundMessageBubbleWidget] at the bottom of the thread
+/// (sending / retrying / failed-tap-to-retry). When the queue reports
+/// success on [OutboundMessageQueueNotifier.sentStream], the
+/// server-confirmed [Message] is upserted into [_messagesById] and the
+/// local bubble is already gone (the queue removes it first).
+///
+/// The queue provider is NOT autoDispose (P-051's same choice), so a
+/// message still retrying when the user leaves this screen keeps
+/// retrying; on re-entry its pending bubble reappears from the queue.
+/// If it succeeds while no thread screen is open, nothing is lost — the
+/// next open's history fetch includes it.
+///
+/// Only pending bubbles for THIS conversation are shown. If history
+/// failed to load but pending messages exist, the message list is shown
+/// (with those pending bubbles) instead of the history-error view, so a
+/// failed send is never hidden behind an error screen.
+///
+/// ### BUGFIX (found by P-075 STEP 4's widget tests)
+/// `dispose()` used to call `ref.read(chatConnectionManagerProvider)`.
+/// Riverpod 3 forbids using `ref` once the element is being unmounted
+/// (`Bad state: Using "ref" when a widget is about to or has been
+/// unmounted is unsafe`), so that line threw and the REST of `dispose()`
+/// never ran: the WebSocket was never disconnected and the text/scroll
+/// controllers were never disposed. The manager is now cached in
+/// [_chatManager] during `initState` (when `ref` is still valid) and
+/// `dispose()` uses that field instead.
+class ChatThreadScreen extends ConsumerStatefulWidget {
+  const ChatThreadScreen({super.key, required this.conversation});
+
+  final Conversation conversation;
+
+  @override
+  ConsumerState<ChatThreadScreen> createState() => _ChatThreadScreenState();
+}
+
+class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
+    with WidgetsBindingObserver {
+  final _textController = TextEditingController();
+  final _scrollController = ScrollController();
+
+  /// Cached in `initState` so `dispose()` never has to touch `ref`
+  /// (see this class's BUGFIX note above).
+  late final ChatConnectionManager _chatManager;
+
+  /// Keyed by message id — makes upsert/dedupe O(1) and cheaply absorbs
+  /// a `MessageReceived` echo of a message this device itself just sent
+  /// via REST (flagged: `chat_event.dart`'s own doc comment only
+  /// confirms self-exclusion for `typing_indicator` specifically, not
+  /// `chat_message` — this dedupe is a defensive choice, not an assumed
+  /// guarantee either way).
+  final Map<int, Message> _messagesById = {};
+
+  StreamSubscription<ChatEvent>? _eventSubscription;
+  StreamSubscription<ChatConnectionState>? _connectionSubscription;
+  StreamSubscription<OutboundMessageSent>? _sentSubscription;
+  ChatConnectionState _connectionState = ChatConnectionState.disconnected;
+  bool _hasConnectedOnce = false;
+
+  bool _isLoadingHistory = true;
+  bool _isAppInForeground = true;
+  bool _otherIsTyping = false;
+  Timer? _typingTimeoutTimer;
+  Timer? _stopTypingTimer;
+
+  ApiFailure? _historyError;
+
+  int get _conversationId => widget.conversation.id;
+  int? get _otherParticipantId => widget.conversation.otherParticipant?.id;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _chatManager = ref.read(chatConnectionManagerProvider);
+    _sentSubscription = ref
+        .read(outboundMessageQueueProvider.notifier)
+        .sentStream
+        .listen(_handleOutboundSent);
+    _connect();
+    _loadHistory();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _typingTimeoutTimer?.cancel();
+    _stopTypingTimer?.cancel();
+    _eventSubscription?.cancel();
+    _connectionSubscription?.cancel();
+    _sentSubscription?.cancel();
+    // Uses the cached [_chatManager], NOT `ref.read` — `ref` is unsafe
+    // to use during dispose (see this class's BUGFIX note).
+    _chatManager.sendTyping(false);
+    // A deliberate close, per this part's execution prompt ("On leaving
+    // the screen, call disconnect()"). Fire-and-forget is correct here —
+    // this widget is already unmounting.
+    unawaited(_chatManager.disconnect());
+    _textController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _isAppInForeground = state == AppLifecycleState.resumed;
+    if (_isAppInForeground) {
+      _markVisibleMessagesAsRead();
+    }
+  }
+
+  void _connect() {
+    final manager = _chatManager;
+    _connectionSubscription = manager.connectionState.listen((state) {
+      if (!mounted) return;
+      final wasConnected = _connectionState == ChatConnectionState.connected;
+      setState(() => _connectionState = state);
+      if (state == ChatConnectionState.connected) {
+        if (_hasConnectedOnce && !wasConnected) {
+          _catchUpAfterReconnect();
+        }
+        _hasConnectedOnce = true;
+      }
+    });
+    _eventSubscription = manager.eventStream.listen(_handleEvent);
+    unawaited(manager.connect(_conversationId));
+  }
+
+  Future<void> _loadHistory() async {
+    setState(() {
+      _isLoadingHistory = true;
+      _historyError = null;
+    });
+    try {
+      final page = await ref
+          .read(conversationRepositoryProvider)
+          .fetchMessageHistory(_conversationId);
+      if (!mounted) return;
+      // Wire order is newest-first — reversed here into oldest-to-newest
+      // (the on-screen order), exactly as `fetchMessageHistory`'s own
+      // doc comment says is this layer's job, not the data layer's.
+      for (final message in page.results.reversed) {
+        _messagesById[message.id] = message;
+      }
+      setState(() => _isLoadingHistory = false);
+      _markDeliveredForLoadedMessages();
+      _markVisibleMessagesAsRead();
+      _scrollToBottomSoon();
+    } on ApiFailure catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _historyError = e;
+        _isLoadingHistory = false;
+      });
+    }
+  }
+
+  Future<void> _catchUpAfterReconnect() async {
+    if (_messagesById.isEmpty) return;
+    final maxId = _messagesById.keys.reduce((a, b) => a > b ? a : b);
+    try {
+      final missed = await ref
+          .read(messageRepositoryProvider)
+          .fetchMessagesSince(
+            conversationId: _conversationId,
+            sinceMessageId: maxId,
+          );
+      if (!mounted || missed.isEmpty) return;
+      setState(() {
+        for (final message in missed) {
+          _messagesById[message.id] = message;
+        }
+      });
+      _markDeliveredForLoadedMessages();
+      _markVisibleMessagesAsRead();
+      _scrollToBottomSoon();
+    } on ApiFailure catch (_) {
+      // Best-effort: a fresh screen open, or the next reconnect, will
+      // retry. Not surfaced as an error banner — from the user's
+      // perspective the connection is back up.
+    }
+  }
+
+  void _markDeliveredForLoadedMessages() {
+    final manager = _chatManager;
+    for (final message in _messagesById.values) {
+      if (message.senderId == _otherParticipantId &&
+          message.status == MessageStatus.sent) {
+        manager.sendMarkDelivered(message.id);
+      }
+    }
+  }
+
+  void _markVisibleMessagesAsRead() {
+    if (!_isAppInForeground) return;
+    final manager = _chatManager;
+    for (final message in _messagesById.values) {
+      if (message.senderId == _otherParticipantId &&
+          message.status != MessageStatus.read) {
+        manager.sendMarkRead(message.id);
+      }
+    }
+  }
+
+  void _handleEvent(ChatEvent event) {
+    if (!mounted) return;
+    switch (event) {
+      case MessageReceived():
+        setState(() {
+          _messagesById[event.id] = Message(
+            id: event.id,
+            conversationId: event.conversationId,
+            senderId: event.senderId,
+            text: event.text,
+            status: MessageStatus.fromRaw(event.status),
+            createdAt: event.createdAt,
+            mediaUrl: event.mediaUrl,
+            mediaType: ChatMediaType.fromRaw(event.mediaType),
+            sharedContent: SharedContent.tryParse(event.sharedContent),
+          );
+        });
+        _markDeliveredForLoadedMessages();
+        _markVisibleMessagesAsRead();
+        _scrollToBottomSoon();
+      case StatusUpdate():
+        final existing = _messagesById[event.messageId];
+        if (existing != null) {
+          setState(() {
+            _messagesById[event.messageId] = existing.copyWithStatus(
+              MessageStatus.fromRaw(event.status),
+            );
+          });
+        }
+      case TypingIndicator():
+        _typingTimeoutTimer?.cancel();
+        setState(() => _otherIsTyping = event.isTyping);
+        if (event.isTyping) {
+          // Safety net if the paired "false" frame never arrives —
+          // comfortably longer than _onTextChanged's own 2s debounce.
+          _typingTimeoutTimer = Timer(const Duration(seconds: 5), () {
+            if (mounted) setState(() => _otherIsTyping = false);
+          });
+        }
+    }
+  }
+
+  /// Part P-075 STEP 3 — a queued message reached the server. The queue
+  /// has already removed its local pending bubble; this puts the real,
+  /// server-confirmed [Message] into the thread. Ignores messages that
+  /// belong to a different conversation (the queue is app-wide).
+  void _handleOutboundSent(OutboundMessageSent event) {
+    if (!mounted) return;
+    if (event.message.conversationId != _conversationId) return;
+    setState(() {
+      _messagesById[event.message.id] = event.message;
+    });
+    _scrollToBottomSoon();
+  }
+
+  void _onTextChanged(String text) {
+    final manager = _chatManager;
+    _stopTypingTimer?.cancel();
+    if (text.isEmpty) {
+      manager.sendTyping(false);
+      return;
+    }
+    manager.sendTyping(true);
+    _stopTypingTimer = Timer(
+      const Duration(seconds: 2),
+      () => manager.sendTyping(false),
+    );
+  }
+
+  /// Part P-075 STEP 3 — optimistic send: hands the text to the
+  /// outbound queue and clears the field immediately. The queue owns
+  /// the real REST call, retries and the failed state.
+  void _sendMessage() {
+    final text = _textController.text.trim();
+    if (text.isEmpty) return;
+
+    _stopTypingTimer?.cancel();
+    _chatManager.sendTyping(false);
+
+    ref
+        .read(outboundMessageQueueProvider.notifier)
+        .enqueueMessage(conversationId: _conversationId, text: text);
+    _textController.clear();
+    _scrollToBottomSoon();
+  }
+
+  /// Part P-076 — client-side size caps. MUST stay in sync with the
+  /// backend's `CHAT_IMAGE_MAX_BYTES` / `CHAT_VIDEO_MAX_BYTES`
+  /// (`chat/serializers.py`): 5 MB image / 25 MB video. The backend is
+  /// still the final authority (`validate_upload()`); this pre-check only
+  /// avoids uploading a file that is already known to be rejected.
+  static const _maxImageBytes = 5 * 1024 * 1024;
+  static const _maxVideoBytes = 25 * 1024 * 1024;
+
+  /// Part P-076 — the attach button: a small sheet to choose Photo or
+  /// Video, then [_pickAndEnqueueMedia].
+  Future<void> _showAttachSheet() async {
+    final choice = await showModalBottomSheet<ChatMediaType>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              key: const Key('chatAttach_photo'),
+              leading: const Icon(Icons.photo_outlined),
+              title: const Text('Photo'),
+              onTap: () => Navigator.of(sheetContext).pop(ChatMediaType.image),
+            ),
+            ListTile(
+              key: const Key('chatAttach_video'),
+              leading: const Icon(Icons.videocam_outlined),
+              title: const Text('Video'),
+              onTap: () => Navigator.of(sheetContext).pop(ChatMediaType.video),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (choice == null || !mounted) return;
+    await _pickAndEnqueueMedia(choice);
+  }
+
+  /// Part P-076 — picks a file (same `image_picker` calls as
+  /// `story_creation_screen.dart`), rejects an over-cap file with a
+  /// SnackBar, and otherwise hands it to the SAME outbound queue as text
+  /// messages. Whatever is typed in the composer is sent as the caption.
+  Future<void> _pickAndEnqueueMedia(ChatMediaType type) async {
+    final picker = ImagePicker();
+    final XFile? picked = type == ChatMediaType.image
+        ? await picker.pickImage(
+            source: ImageSource.gallery,
+            imageQuality: 85,
+            maxWidth: 1920,
+          )
+        : await picker.pickVideo(source: ImageSource.gallery);
+    if (picked == null || !mounted) return;
+
+    final size = await File(picked.path).length();
+    if (!mounted) return;
+    final limit = type == ChatMediaType.image ? _maxImageBytes : _maxVideoBytes;
+    if (size > limit) {
+      final label = type == ChatMediaType.image ? 'Photo' : 'Video';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$label is too large (max ${limit ~/ (1024 * 1024)} MB).'),
+        ),
+      );
+      return;
+    }
+
+    _stopTypingTimer?.cancel();
+    _chatManager.sendTyping(false);
+
+    final caption = _textController.text.trim();
+    ref
+        .read(outboundMessageQueueProvider.notifier)
+        .enqueueMediaMessage(
+          conversationId: _conversationId,
+          text: caption,
+          mediaPath: picked.path,
+          mediaType: type,
+        );
+    _textController.clear();
+    _scrollToBottomSoon();
+  }
+
+  void _scrollToBottomSoon() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
+  String _connectionLabel() {
+    switch (_connectionState) {
+      case ChatConnectionState.connected:
+        return 'Online';
+      case ChatConnectionState.connecting:
+        return 'Connecting…';
+      case ChatConnectionState.reconnecting:
+        return 'Reconnecting…';
+      case ChatConnectionState.disconnected:
+        return 'Offline';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final displayName =
+        widget.conversation.otherParticipant?.displayName ?? 'Chat';
+    final sortedMessages = _messagesById.values.toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final pending =
+        ref
+            .watch(outboundMessageQueueProvider)
+            .where((m) => m.conversationId == _conversationId)
+            .toList()
+          ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(displayName),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(20),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            // See this class's own top doc comment ("Presence — flagged
+            // gap, not fabricated"): this is OUR OWN socket state, not
+            // the other participant's real presence.
+            child: Text(
+              _otherIsTyping ? 'typing…' : _connectionLabel(),
+              style: const TextStyle(fontSize: 12),
+            ),
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(child: _buildMessageList(sortedMessages, pending)),
+          _buildComposer(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessageList(
+    List<Message> messages,
+    List<OutboundMessage> pending,
+  ) {
+    if (_isLoadingHistory) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_historyError != null && messages.isEmpty && pending.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(_historyError!.message, textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _loadHistory,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+    if (messages.isEmpty && pending.isEmpty) {
+      return const Center(child: Text('No messages yet — say hi!'));
+    }
+
+    final queue = ref.read(outboundMessageQueueProvider.notifier);
+    return ListView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: messages.length + pending.length,
+      itemBuilder: (context, index) {
+        if (index < messages.length) {
+          final message = messages[index];
+          return MessageBubbleWidget(
+            message: message,
+            isMine: message.senderId != _otherParticipantId,
+          );
+        }
+        final outbound = pending[index - messages.length];
+        return OutboundMessageBubbleWidget(
+          key: ValueKey('outbound_bubble_${outbound.id}'),
+          outbound: outbound,
+          onRetry: () => queue.retryFailedMessage(outbound.id),
+          onDiscard: () => queue.discardFailedMessage(outbound.id),
+        );
+      },
+    );
+  }
+
+  Widget _buildComposer() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Row(
+          children: [
+            IconButton(
+              key: const Key('chatComposer_attachButton'),
+              icon: const Icon(Icons.attach_file),
+              onPressed: _showAttachSheet,
+            ),
+            Expanded(
+              child: TextField(
+                controller: _textController,
+                onChanged: _onTextChanged,
+                textInputAction: TextInputAction.send,
+                onSubmitted: (_) => _sendMessage(),
+                decoration: const InputDecoration(
+                  hintText: 'Message…',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.send),
+              onPressed: _sendMessage,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+########## FILE: lib\features\chat\presentation\message_bubble_widget.dart ##########
+import 'dart:io';
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+
+import '../domain/message.dart';
+import '../domain/message_status.dart';
+import '../domain/shared_content.dart';
+import 'outbound_message_queue_provider.dart';
+import 'shared_content_card.dart';
+
+/// Part P-074 STEP 3 — renders a single message bubble inside the
+/// message thread screen (kept as `chat_thread_screen.dart`'s
+/// `ChatThreadScreen`, not renamed — see that file's own doc comment
+/// for why no new screen file/class was created for P-007's existing
+/// placeholders).
+///
+/// [isMine] is supplied by the caller, not computed here: in a 1:1
+/// conversation, `message.senderId != conversation.otherParticipant.id`
+/// is enough to know "this is my own message" without this app ever
+/// needing to know its own signed-in user id — see
+/// `chat_thread_screen.dart`'s own doc comment for why that's a
+/// deliberate design choice, not an oversight.
+///
+/// Part P-075 STEP 3: this file now also holds
+/// [OutboundMessageBubbleWidget] — the bubble for a message that is
+/// still in the local outbound queue (sending / retrying / failed).
+/// Both widgets share one private layout ([_BubbleShell]) so a pending
+/// bubble looks like a real one. [MessageBubbleWidget]'s own API is
+/// unchanged.
+///
+/// Part P-076: both bubbles can now show media above the text. An image
+/// renders as a thumbnail; a video renders as a neutral placeholder with
+/// a play icon (same visual language as `ReelCard`'s play overlay — the
+/// backend produces no thumbnail for chat video and this project has no
+/// video-playback package, so there is no inline playback). A
+/// media-only message simply shows no text.
+///
+/// Part P-077 STEP 3: a delivered message that shares platform content
+/// ([Message.sharedContent]) renders a [SharedContentCard] (PostCard /
+/// ReelCard reused unmodified, or a compact product card) ABOVE a
+/// regular text bubble. That text bubble carries the optional text
+/// ("check this out!") plus the time / delivery-status footer, so the
+/// footer looks exactly like every other bubble's. The backend never
+/// combines shared content with media, so the two layouts never mix.
+class MessageBubbleWidget extends StatelessWidget {
+  const MessageBubbleWidget({
+    super.key,
+    required this.message,
+    required this.isMine,
+  });
+
+  final Message message;
+  final bool isMine;
+
+  @override
+  Widget build(BuildContext context) {
+    final shared = message.sharedContent;
+    if (shared != null) {
+      return _SharedContentBubble(
+        message: message,
+        shared: shared,
+        isMine: isMine,
+      );
+    }
+
+    final mediaType = message.mediaType;
+    return _BubbleShell(
+      text: message.text,
+      isMine: isMine,
+      media: mediaType == null
+          ? null
+          : _MediaPreview(type: mediaType, networkUrl: message.mediaUrl),
+      footerBuilder: (textColor) =>
+          _deliveredFooter(message, isMine, textColor),
+    );
+  }
+}
+
+/// Time + (for my own messages) the delivery-status icon. Shared by the
+/// regular bubble and the shared-content bubble.
+Widget _deliveredFooter(Message message, bool isMine, Color textColor) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(
+        _formatTime(message.createdAt),
+        style: TextStyle(color: textColor.withValues(alpha: 0.7), fontSize: 11),
+      ),
+      if (isMine) ...[
+        const SizedBox(width: 4),
+        _StatusIcon(status: message.status, color: textColor),
+      ],
+    ],
+  );
+}
+
+/// Part P-077 STEP 3 — a delivered message that shares Post / Reel /
+/// Product content: the card on top, then a normal text bubble (text,
+/// if any, plus the footer) aligned to the same side.
+class _SharedContentBubble extends StatelessWidget {
+  const _SharedContentBubble({
+    required this.message,
+    required this.shared,
+    required this.isMine,
+  });
+
+  final Message message;
+  final SharedContent shared;
+  final bool isMine;
+
+  @override
+  Widget build(BuildContext context) {
+    // Same 75%-of-screen rule as the text bubble, capped so a card is
+    // never absurdly wide on a tablet.
+    final cardWidth = math.min(MediaQuery.of(context).size.width * 0.75, 300.0);
+
+    return Column(
+      crossAxisAlignment: isMine
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+          child: SizedBox(
+            width: cardWidth,
+            child: SharedContentCard(sharedContent: shared),
+          ),
+        ),
+        _BubbleShell(
+          text: message.text,
+          isMine: isMine,
+          footerBuilder: (textColor) =>
+              _deliveredFooter(message, isMine, textColor),
+        ),
+      ],
+    );
+  }
+}
+
+/// Part P-075 STEP 3 — the bubble for a locally-queued outbound message
+/// ([OutboundMessage]). Always rendered as the sender's own bubble.
+///
+/// - [OutboundMessageStatus.sending]: clock icon.
+/// - [OutboundMessageStatus.retrying]: clock icon + "Retrying…".
+/// - [OutboundMessageStatus.failed]: error-colored bubble with
+///   "Failed to send · Tap to retry"; tapping ANYWHERE on the bubble
+///   calls [onRetry], and the small × calls [onDiscard].
+///
+/// Part P-076: a queued media message shows its local file as the
+/// thumbnail (video: placeholder + play icon) with the same three states.
+class OutboundMessageBubbleWidget extends StatelessWidget {
+  const OutboundMessageBubbleWidget({
+    super.key,
+    required this.outbound,
+    required this.onRetry,
+    required this.onDiscard,
+  });
+
+  final OutboundMessage outbound;
+  final VoidCallback onRetry;
+  final VoidCallback onDiscard;
+
+  @override
+  Widget build(BuildContext context) {
+    final isFailed = outbound.status == OutboundMessageStatus.failed;
+    final mediaType = outbound.mediaType;
+
+    return _BubbleShell(
+      text: outbound.text,
+      isMine: true,
+      isFailed: isFailed,
+      onTap: isFailed ? onRetry : null,
+      tapKey: isFailed ? ValueKey('outbound_retry_${outbound.id}') : null,
+      media: mediaType == null
+          ? null
+          : _MediaPreview(type: mediaType, localPath: outbound.mediaPath),
+      footerBuilder: (textColor) {
+        if (isFailed) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.error_outline, size: 14, color: textColor),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      'Failed to send · Tap to retry',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    key: ValueKey('outbound_discard_${outbound.id}'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onDiscard,
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Icon(Icons.close, size: 16, color: textColor),
+                    ),
+                  ),
+                ],
+              ),
+              if (outbound.errorMessage != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  outbound.errorMessage!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(
+                    color: textColor.withValues(alpha: 0.7),
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ],
+          );
+        }
+
+        final isRetrying = outbound.status == OutboundMessageStatus.retrying;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _formatTime(outbound.createdAt),
+              style: TextStyle(
+                color: textColor.withValues(alpha: 0.7),
+                fontSize: 11,
+              ),
+            ),
+            if (isRetrying) ...[
+              const SizedBox(width: 4),
+              Text(
+                'Retrying…',
+                style: TextStyle(
+                  color: textColor.withValues(alpha: 0.7),
+                  fontSize: 11,
+                ),
+              ),
+            ],
+            const SizedBox(width: 4),
+            Icon(
+              Icons.schedule,
+              size: 14,
+              color: textColor.withValues(alpha: 0.85),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+String _formatTime(DateTime dt) {
+  final local = dt.toLocal();
+  final hour = local.hour.toString().padLeft(2, '0');
+  final minute = local.minute.toString().padLeft(2, '0');
+  return '$hour:$minute';
+}
+
+/// The shared bubble layout (alignment, colors, shape, media, text,
+/// footer). [footerBuilder] receives the resolved text color so each
+/// caller's footer matches the bubble. When [isFailed] the bubble uses
+/// the theme's error container colors; when [onTap] is non-null the
+/// whole bubble is tappable ([tapKey] lets tests find that tap target).
+///
+/// Part P-076: [media], when non-null, is drawn above the text; the text
+/// line is skipped entirely when [text] is empty (a media-only message).
+class _BubbleShell extends StatelessWidget {
+  const _BubbleShell({
+    required this.text,
+    required this.isMine,
+    required this.footerBuilder,
+    this.media,
+    this.isFailed = false,
+    this.onTap,
+    this.tapKey,
+  });
+
+  final String text;
+  final bool isMine;
+  final Widget Function(Color textColor) footerBuilder;
+  final Widget? media;
+  final bool isFailed;
+  final VoidCallback? onTap;
+  final Key? tapKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bubbleColor = isFailed
+        ? theme.colorScheme.errorContainer
+        : isMine
+        ? theme.colorScheme.primary
+        : theme.colorScheme.surfaceContainerHighest;
+    final textColor = isFailed
+        ? theme.colorScheme.onErrorContainer
+        : isMine
+        ? theme.colorScheme.onPrimary
+        : theme.colorScheme.onSurface;
+
+    final bubble = Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        color: bubbleColor,
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(16),
+          topRight: const Radius.circular(16),
+          bottomLeft: Radius.circular(isMine ? 16 : 4),
+          bottomRight: Radius.circular(isMine ? 4 : 16),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (media != null) media!,
+          if (media != null && text.isNotEmpty) const SizedBox(height: 6),
+          if (text.isNotEmpty)
+            Text(text, style: TextStyle(color: textColor, fontSize: 15)),
+          const SizedBox(height: 4),
+          footerBuilder(textColor),
+        ],
+      ),
+    );
+
+    return Align(
+      alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
+      child: onTap == null
+          ? bubble
+          : GestureDetector(
+              key: tapKey,
+              behavior: HitTestBehavior.opaque,
+              onTap: onTap,
+              child: bubble,
+            ),
+    );
+  }
+}
+
+/// Part P-076 — the image thumbnail / video placeholder shown inside a
+/// bubble. Exactly one of [networkUrl] (a delivered message) or
+/// [localPath] (a still-queued message) is normally set.
+///
+/// - image: `Image.file` for a local path, `Image.network` for a URL,
+///   with the same neutral broken-image fallback convention as
+///   `PostCard`/`ReelCard` (never throws on a bad/expired URL).
+/// - video: a neutral placeholder plus a play icon (the `ReelCard`
+///   overlay look). No thumbnail exists for chat video and there is no
+///   video-playback package in this project, so it is not playable
+///   inline — flagged limitation, not silently omitted.
+///
+/// The root carries `ValueKey('chatMedia_image')` / `'chatMedia_video'`
+/// so widget tests can find it.
+class _MediaPreview extends StatelessWidget {
+  const _MediaPreview({required this.type, this.networkUrl, this.localPath});
+
+  final ChatMediaType type;
+  final String? networkUrl;
+  final String? localPath;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = Theme.of(context).colorScheme.surfaceContainerHighest;
+
+    Widget placeholder(IconData icon) => Container(
+      color: surface,
+      alignment: Alignment.center,
+      child: Icon(icon, size: 40),
+    );
+
+    final Widget content;
+    final path = localPath;
+    final url = networkUrl;
+    if (type == ChatMediaType.video) {
+      content = Stack(
+        fit: StackFit.expand,
+        children: [placeholder(Icons.movie_outlined), const _PlayIconOverlay()],
+      );
+    } else if (path != null) {
+      content = Image.file(
+        File(path),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) =>
+            placeholder(Icons.broken_image_outlined),
+      );
+    } else if (url != null && url.isNotEmpty) {
+      content = Image.network(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) =>
+            placeholder(Icons.broken_image_outlined),
+      );
+    } else {
+      content = placeholder(Icons.image_outlined);
+    }
+
+    return ConstrainedBox(
+      key: ValueKey('chatMedia_${type.name}'),
+      constraints: const BoxConstraints(maxWidth: 200),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: AspectRatio(aspectRatio: 4 / 3, child: content),
+      ),
+    );
+  }
+}
+
+/// Same look as `ReelCard`'s private `_PlayIconOverlay` — deliberately
+/// duplicated (that widget is private to `reel_card.dart`, and this
+/// project's own convention for such small visuals is duplication over
+/// cross-feature coupling; see that file's own comment).
+class _PlayIconOverlay extends StatelessWidget {
+  const _PlayIconOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.45),
+          shape: BoxShape.circle,
+        ),
+        padding: const EdgeInsets.all(10),
+        child: const Icon(Icons.play_arrow, color: Colors.white, size: 32),
+      ),
+    );
+  }
+}
+
+/// Sent -> single check. Delivered -> double check. Read -> double
+/// check, tinted with the theme's own tertiary color rather than a
+/// hardcoded blue (this file has no knowledge of the app's palette).
+/// [MessageStatus.unknown] falls back to a single check — same
+/// never-block-rendering-on-an-unrecognized-value rationale as
+/// `MessageStatus.unknown` itself.
+class _StatusIcon extends StatelessWidget {
+  const _StatusIcon({required this.status, required this.color});
+
+  final MessageStatus status;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (status) {
+      case MessageStatus.read:
+        return Icon(
+          Icons.done_all,
+          size: 14,
+          color: Theme.of(context).colorScheme.tertiary,
+        );
+      case MessageStatus.delivered:
+        return Icon(
+          Icons.done_all,
+          size: 14,
+          color: color.withValues(alpha: 0.85),
+        );
+      case MessageStatus.sent:
+      case MessageStatus.unknown:
+        return Icon(Icons.done, size: 14, color: color.withValues(alpha: 0.85));
+    }
+  }
+}
+
+########## FILE: lib\features\chat\presentation\shared_content_card.dart ##########
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../routing/route_names.dart';
+import '../../content/domain/public_post_entity.dart';
+import '../../content/domain/public_reel_entity.dart';
+import '../../content/presentation/content_public_providers.dart';
+import '../../content/presentation/post_card.dart';
+import '../../content/presentation/reel_card.dart';
+import '../domain/shared_content.dart';
+
+/// Part P-077 STEP 3 — renders the platform content a chat message
+/// shares (Post / Reel / Product) as a tappable card.
+///
+/// ### Reuse, zero modification elsewhere
+/// - Post  -> the existing [PostCard], fed by `postPublicDetailProvider`.
+/// - Reel  -> the existing [ReelCard], fed by `reelPublicDetailProvider`.
+/// - Product -> a compact preview card ([_PreviewCard]). No dedicated
+///   `ProductCard` exists in this project, and the part spec explicitly
+///   allows "a lightweight product-card" in that case.
+/// Neither `post_card.dart` nor `reel_card.dart` is touched.
+///
+/// ### Why the live entity is fetched here
+/// The message's `shared_content` payload is viewer-INDEPENDENT (see
+/// `build_shared_content_payload()` in the backend's `chat/serializers.py`):
+/// it has no is_liked / is_saved. `PostCard`/`ReelCard` need the live,
+/// per-viewer entity, so it is fetched by id through the same public
+/// providers the detail screens use.
+///
+/// ### States (Post / Reel)
+/// - `shared.available == false` -> [_UnavailableCard], NO network call.
+/// - loading or fetch error -> [_PreviewCard] built from the payload's
+///   own preview (never a blank bubble; still tappable).
+/// - fetched `null` (taken down since the payload was built) ->
+///   [_UnavailableCard].
+/// - fetched entity -> the real card.
+///
+/// Tapping opens the content's existing detail screen via
+/// `context.pushNamed(...)`, the same convention as `HomeFeedScreen`.
+class SharedContentCard extends ConsumerWidget {
+  const SharedContentCard({super.key, required this.sharedContent});
+
+  final SharedContent sharedContent;
+
+  void _open(BuildContext context) {
+    final params = {RouteNames.idParam: '${sharedContent.objectId}'};
+    switch (sharedContent.type) {
+      case SharedContentType.post:
+        context.pushNamed(RouteNames.postDetail, pathParameters: params);
+      case SharedContentType.reel:
+        context.pushNamed(RouteNames.reelDetail, pathParameters: params);
+      case SharedContentType.product:
+        context.pushNamed(RouteNames.productDetail, pathParameters: params);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final shared = sharedContent;
+    if (!shared.available) return const _UnavailableCard();
+
+    final businessName = shared.businessName ?? '';
+    Widget preview() =>
+        _PreviewCard(shared: shared, onTap: () => _open(context));
+
+    switch (shared.type) {
+      case SharedContentType.post:
+        final async = ref.watch(postPublicDetailProvider(shared.objectId));
+        return switch (async) {
+          AsyncData(value: final PublicPost post) => PostCard(
+            post: post,
+            businessName: businessName,
+            onTap: () => _open(context),
+          ),
+          AsyncData(value: null) => const _UnavailableCard(),
+          _ => preview(),
+        };
+      case SharedContentType.reel:
+        final async = ref.watch(reelPublicDetailProvider(shared.objectId));
+        return switch (async) {
+          AsyncData(value: final PublicReel reel) => ReelCard(
+            reel: reel,
+            businessName: businessName,
+            onTap: () => _open(context),
+          ),
+          AsyncData(value: null) => const _UnavailableCard(),
+          _ => preview(),
+        };
+      case SharedContentType.product:
+        return preview();
+    }
+  }
+}
+
+String _typeLabel(SharedContentType type) {
+  switch (type) {
+    case SharedContentType.post:
+      return 'Post';
+    case SharedContentType.reel:
+      return 'Reel';
+    case SharedContentType.product:
+      return 'Product';
+  }
+}
+
+IconData _typeIcon(SharedContentType type) {
+  switch (type) {
+    case SharedContentType.post:
+      return Icons.image_outlined;
+    case SharedContentType.reel:
+      return Icons.play_circle_outline;
+    case SharedContentType.product:
+      return Icons.inventory_2_outlined;
+  }
+}
+
+/// Compact tappable card built ONLY from the message payload's own
+/// preview (image + text + business name). Used for Products, and as
+/// the loading / error fallback for Posts and Reels.
+///
+/// Root key: `sharedContent_preview_<post|reel|product>`.
+class _PreviewCard extends StatelessWidget {
+  const _PreviewCard({required this.shared, required this.onTap});
+
+  final SharedContent shared;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final previewText = shared.previewText;
+    final title = (previewText != null && previewText.isNotEmpty)
+        ? previewText
+        : _typeLabel(shared.type);
+    final businessName = shared.businessName;
+
+    return Card(
+      key: ValueKey('sharedContent_preview_${shared.type.name}'),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Row(
+          children: [
+            SizedBox(
+              width: 72,
+              height: 72,
+              child: _PreviewThumbnail(
+                url: shared.previewImageUrl,
+                icon: _typeIcon(shared.type),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          _typeIcon(shared.type),
+                          size: 14,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _typeLabel(shared.type),
+                          style: theme.textTheme.labelSmall,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelLarge,
+                    ),
+                    if (businessName != null && businessName.isNotEmpty)
+                      Text(
+                        businessName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Neutral placeholder for "no image" and for a URL that fails to load
+/// (same convention as `PostCard`'s `_PostImage`).
+class _PreviewThumbnail extends StatelessWidget {
+  const _PreviewThumbnail({required this.url, required this.icon});
+
+  final String? url;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = Theme.of(context).colorScheme.surfaceContainerHighest;
+
+    Widget placeholder(IconData data) => Container(
+      color: surface,
+      alignment: Alignment.center,
+      child: Icon(data, size: 28),
+    );
+
+    final imageUrl = url;
+    if (imageUrl == null || imageUrl.isEmpty) return placeholder(icon);
+    return Image.network(
+      imageUrl,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) =>
+          placeholder(Icons.broken_image_outlined),
+    );
+  }
+}
+
+/// Shown when the shared content was unpublished / deactivated /
+/// deleted after being shared. Not tappable: there is nothing to open,
+/// and no details of the taken-down item are shown.
+///
+/// Root key: `sharedContent_unavailable`.
+class _UnavailableCard extends StatelessWidget {
+  const _UnavailableCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      key: const ValueKey('sharedContent_unavailable'),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            Icon(
+              Icons.block_outlined,
+              size: 20,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'This content is no longer available',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+########## FILE: lib\features\chat\presentation\share_to_conversation_sheet.dart ##########
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/network/api_failure.dart';
+import '../../../routing/route_names.dart';
+import '../data/conversation_repository.dart';
+import '../data/message_repository.dart';
+import '../domain/conversation.dart';
+import '../domain/shared_content.dart';
+
+/// Part P-077 STEP 4 — the conversations offered as share targets.
+///
+/// Reuses `ConversationRepository.listConversations()` (P-074), first
+/// page only (the backend currently answers a plain array, so there is
+/// no second page). `autoDispose`, so the list is re-fetched every time
+/// the picker is opened and never shows a stale conversation list.
+final shareTargetConversationsProvider =
+    FutureProvider.autoDispose<List<Conversation>>((ref) async {
+      final page = await ref
+          .watch(conversationRepositoryProvider)
+          .listConversations();
+      return page.results;
+    });
+
+/// Part P-077 STEP 4 — the two-option sheet behind every Share icon
+/// (Post / Reel / Product):
+///
+/// - "Share via…" -> [onNativeShare], the caller's EXISTING share flow,
+///   unchanged (for Post/Reel: share tracking + native share sheet).
+/// - "Share to conversation" -> a conversation picker; picking a row
+///   POSTs the shared reference via
+///   `MessageRepository.sendSharedContentMessage`, then calls
+///   [onSharedToConversation] (best-effort share tracking, its errors
+///   are the caller's to swallow) and opens that conversation's thread.
+///
+/// The router and messenger are captured from [context] BEFORE the
+/// sheets open, so navigation and error snackbars still work after the
+/// sheets have been popped.
+Future<void> showShareOptionsSheet(
+  BuildContext context, {
+  required SharedContentType contentType,
+  required int objectId,
+  required Future<void> Function() onNativeShare,
+  Future<void> Function()? onSharedToConversation,
+}) {
+  final router = GoRouter.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+
+  return showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    builder: (sheetContext) {
+      return SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              key: const ValueKey('shareOption_native'),
+              leading: const Icon(Icons.ios_share),
+              title: const Text('Share via…'),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                unawaited(onNativeShare());
+              },
+            ),
+            ListTile(
+              key: const ValueKey('shareOption_conversation'),
+              leading: const Icon(Icons.chat_bubble_outline),
+              title: const Text('Share to conversation'),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                if (!context.mounted) return;
+                unawaited(
+                  showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    showDragHandle: true,
+                    builder: (_) => _ConversationPickerSheet(
+                      contentType: contentType,
+                      objectId: objectId,
+                      router: router,
+                      messenger: messenger,
+                      onSent: onSharedToConversation,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+class _ConversationPickerSheet extends ConsumerStatefulWidget {
+  const _ConversationPickerSheet({
+    required this.contentType,
+    required this.objectId,
+    required this.router,
+    required this.messenger,
+    required this.onSent,
+  });
+
+  final SharedContentType contentType;
+  final int objectId;
+  final GoRouter router;
+  final ScaffoldMessengerState messenger;
+  final Future<void> Function()? onSent;
+
+  @override
+  ConsumerState<_ConversationPickerSheet> createState() =>
+      _ConversationPickerSheetState();
+}
+
+class _ConversationPickerSheetState
+    extends ConsumerState<_ConversationPickerSheet> {
+  /// The conversation currently being sent to (its row shows a spinner
+  /// and every row ignores taps, so a double tap can't send twice).
+  int? _sendingId;
+
+  Future<void> _send(Conversation conversation) async {
+    if (_sendingId != null) return;
+    setState(() => _sendingId = conversation.id);
+
+    // Captured up-front: this State is disposed once the sheet pops.
+    final router = widget.router;
+    final messenger = widget.messenger;
+    final onSent = widget.onSent;
+
+    try {
+      await ref
+          .read(messageRepositoryProvider)
+          .sendSharedContentMessage(
+            conversationId: conversation.id,
+            contentType: widget.contentType,
+            objectId: widget.objectId,
+          );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _sendingId = null);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            e is ApiFailure ? e.message : 'Could not share. Please try again.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    Navigator.of(context).pop();
+
+    if (onSent != null) {
+      try {
+        await onSent();
+      } catch (_) {
+        // Tracking is best-effort: the message is already delivered.
+      }
+    }
+
+    unawaited(
+      router.pushNamed(
+        RouteNames.chatThread,
+        pathParameters: {RouteNames.idParam: conversation.id.toString()},
+        extra: conversation,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final async = ref.watch(shareTargetConversationsProvider);
+    final theme = Theme.of(context);
+
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.6,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Text(
+              'Share to conversation',
+              style: theme.textTheme.titleMedium,
+            ),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: switch (async) {
+              AsyncData(:final value) =>
+                value.isEmpty
+                    ? const Center(
+                        key: ValueKey('sharePicker_empty'),
+                        child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Text(
+                            'No conversations yet.\n'
+                            'Start one from the Messages tab first.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
+                        itemCount: value.length,
+                        separatorBuilder: (_, _) => const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final conversation = value[index];
+                          final name =
+                              conversation.otherParticipant?.displayName ??
+                              'Unknown';
+                          return ListTile(
+                            key: ValueKey(
+                              'sharePicker_conversation_${conversation.id}',
+                            ),
+                            enabled: _sendingId == null,
+                            onTap: () => _send(conversation),
+                            leading: CircleAvatar(
+                              child: Text(
+                                name.isNotEmpty ? name[0].toUpperCase() : '?',
+                              ),
+                            ),
+                            title: Text(name),
+                            trailing: _sendingId == conversation.id
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : null,
+                          );
+                        },
+                      ),
+              AsyncError() => Center(
+                key: const ValueKey('sharePicker_error'),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Could not load your conversations.'),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () =>
+                          ref.invalidate(shareTargetConversationsProvider),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+              _ => const Center(child: CircularProgressIndicator()),
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+########## FILE: lib\features\chat\domain\conversation.dart ##########
+import 'message_status.dart';
+import 'message.dart';
+import 'shared_content.dart';
+
+/// Part P-074 STEP 2 — the other participant in a 1:1 conversation, as
+/// shown on the Conversation List screen.
+///
+/// Mirrors `ConversationListSerializer.get_other_participant`'s exact
+/// JSON shape (`chat/serializers.py`): `{id, account_type,
+/// display_name}`.
+class ConversationParticipantSummary {
+  const ConversationParticipantSummary({
+    required this.id,
+    required this.accountType,
+    required this.displayName,
+  });
+
+  final int id;
+
+  /// Raw backend account-type string (e.g. `"business"` / `"customer"`)
+  /// — kept as a raw `String` rather than a shared enum: this project
+  /// already owns an account-type concept elsewhere (the `accounts`
+  /// app), and duplicating/importing it into `features/chat/domain` is
+  /// out of this part's scope.
+  final String accountType;
+
+  /// Already fully resolved server-side by
+  /// `_resolve_conversation_participant_display_name` (business name,
+  /// then customer display name, then email, in that order) — this
+  /// layer does not re-derive it.
+  final String displayName;
+
+  factory ConversationParticipantSummary.fromJson(Map<String, dynamic> json) {
+    return ConversationParticipantSummary(
+      id: json['id'] as int,
+      accountType: json['account_type'] as String,
+      displayName: json['display_name'] as String,
+    );
+  }
+}
+
+/// A conversation's last message, as shown as the list-row preview.
+/// Mirrors `ConversationListSerializer.get_last_message`'s exact JSON
+/// shape.
+class LastMessagePreview {
+  const LastMessagePreview({
+    required this.id,
+    required this.text,
+    required this.senderId,
+    required this.status,
+    required this.createdAt,
+    this.mediaType,
+    this.sharedContentType,
+  });
+
+  final int id;
+  final String text;
+
+  /// Part P-076. `null` for a text-only last message.
+  final ChatMediaType? mediaType;
+
+  /// Part P-077. `null` when the last message shares nothing. Parsed
+  /// from the backend's `shared_content_type` string (`"post"` /
+  /// `"reel"` / `"product"` / `""`).
+  final SharedContentType? sharedContentType;
+  final int senderId;
+  final MessageStatus status;
+  final DateTime createdAt;
+
+  factory LastMessagePreview.fromJson(Map<String, dynamic> json) {
+    return LastMessagePreview(
+      id: json['id'] as int,
+      text: json['text'] as String,
+      senderId: json['sender_id'] as int,
+      status: MessageStatus.fromRaw(json['status'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String),
+      mediaType: ChatMediaType.fromRaw(json['media_type'] as String?),
+      sharedContentType: SharedContentType.fromRaw(
+        json['shared_content_type'] as String?,
+      ),
+    );
+  }
+
+  /// Part P-076 / P-077 — what the conversation-list row shows. A
+  /// media-only or shared-content-only message has blank [text], so it
+  /// falls back to a short label instead of an empty subtitle. Text
+  /// always wins when present (a captioned photo, or "check this out!"
+  /// sent together with a shared product, shows its text).
+  String get previewText {
+    if (text.isNotEmpty) return text;
+    switch (mediaType) {
+      case ChatMediaType.image:
+        return 'Photo';
+      case ChatMediaType.video:
+        return 'Video';
+      case null:
+        break;
+    }
+    switch (sharedContentType) {
+      case SharedContentType.post:
+        return 'Shared a post';
+      case SharedContentType.reel:
+        return 'Shared a reel';
+      case SharedContentType.product:
+        return 'Shared a product';
+      case null:
+        return text;
+    }
+  }
+}
+
+/// Part P-074 STEP 2 — one row on the Conversation List screen.
+///
+/// Mirrors `ConversationListSerializer`'s exact JSON shape
+/// (`chat/serializers.py`): `{id, other_participant, last_message,
+/// unread_count, created_at}`. Deliberately distinct from the plain
+/// `ConversationSerializer` shape `ConversationStartView` returns
+/// (`{id, created_at, updated_at, participant_ids}`) — see
+/// `ConversationRepository.startConversation`'s own doc comment for why
+/// that response is not parsed into this class.
+class Conversation {
+  const Conversation({
+    required this.id,
+    required this.otherParticipant,
+    required this.lastMessage,
+    required this.unreadCount,
+    required this.createdAt,
+  });
+
+  final int id;
+
+  /// Null only in the defensive fallback the backend itself documents as
+  /// "should never happen" (`get_other_participant` returning `None`) —
+  /// every real `Conversation` always has exactly 2 participants per
+  /// P-066's creation flow.
+  final ConversationParticipantSummary? otherParticipant;
+
+  /// Null for a brand-new conversation with no messages sent yet.
+  final LastMessagePreview? lastMessage;
+
+  final int unreadCount;
+  final DateTime createdAt;
+
+  factory Conversation.fromJson(Map<String, dynamic> json) {
+    final otherParticipantRaw =
+        json['other_participant'] as Map<String, dynamic>?;
+    final lastMessageRaw = json['last_message'] as Map<String, dynamic>?;
+
+    return Conversation(
+      id: json['id'] as int,
+      otherParticipant: otherParticipantRaw == null
+          ? null
+          : ConversationParticipantSummary.fromJson(otherParticipantRaw),
+      lastMessage: lastMessageRaw == null
+          ? null
+          : LastMessagePreview.fromJson(lastMessageRaw),
+      unreadCount: json['unread_count'] as int,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+  }
+}
+
+########## product_form_screen.dart 520-532 ##########
+ 520|                         child: Text(currency.toWire()),
+ 521|                       ),
+ 522|                   ],
+ 523|                   onChanged: (currency) => setState(() => _currency = currency),
+ 524|                   validator: (currency) {
+ 525|                     if (_currencyError != null) return _currencyError;
+ 526|                     if (currency == null)
+ 527|                       return context.l10n.productFormCurrencyRequired;
+ 528|                     return null;
+ 529|                   },
+ 530|                 ),
+ 531|                 const SizedBox(height: 16),
+ 532|                 _buildCategoryField(categoriesAsync),
+
+########## chat files ##########
+lib\features\chat\data\conversation_repository.dart
+lib\features\chat\data\message_repository.dart
+lib\features\chat\domain\conversation.dart
+lib\features\chat\domain\message.dart
+lib\features\chat\domain\message_status.dart
+lib\features\chat\domain\shared_content.dart
+lib\features\chat\presentation\chat_list_screen.dart
+lib\features\chat\presentation\chat_thread_screen.dart
+lib\features\chat\presentation\chat_unread_provider.dart
+lib\features\chat\presentation\message_bubble_widget.dart
+lib\features\chat\presentation\outbound_message_queue_provider.dart
+lib\features\chat\presentation\shared_content_card.dart
+lib\features\chat\presentation\share_to_conversation_sheet.dart
+test\features\chat\data\conversation_repository_test.dart
+test\features\chat\data\fake_http_client_adapter.dart
+test\features\chat\data\message_media_repository_test.dart
+test\features\chat\data\message_repository_test.dart
+test\features\chat\data\shared_content_data_test.dart
+test\features\chat\data\start_conversation_with_business_test.dart
+test\features\chat\presentation\chat_list_screen_test.dart
+test\features\chat\presentation\chat_thread_screen_outbound_test.dart
+test\features\chat\presentation\chat_unread_provider_test.dart
+test\features\chat\presentation\media_message_bubble_widget_test.dart
+test\features\chat\presentation\outbound_media_queue_test.dart
+test\features\chat\presentation\outbound_message_bubble_widget_test.dart
+test\features\chat\presentation\outbound_message_queue_provider_test.dart
+test\features\chat\presentation\shared_content_bubble_widget_test.dart
+test\features\chat\presentation\share_to_conversation_sheet_test.dart
+
+########## l10n.yaml ##########
+# Part P-112: Flutter gen-l10n configuration.
+# Generated files are written NEXT TO the ARB files (no synthetic package),
+# are committed to git, and are imported as
+#   package:social_commerce_app/l10n/app_localizations.dart
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-dir: lib/l10n
+synthetic-package: false
+nullable-getter: false
+# Arabic first: it is the app's fallback language (Phase 23 overview).
+preferred-supported-locales: [ar, en]
+
+########## AppColors tokens ##########
+app_colors.dart
+app_theme.dart
+app_typography.dart
+theme_mode_provider.dart
+
+########## AppAvatar signature ##########
+class AppAvatar extends StatelessWidget {
+const AppAvatar({
+final String? imageUrl;
+final String? name;
+final double size;
+final AppAvatarRing ring;
+final Color? ringGapColor;
+final VoidCallback? onTap;
+final String? semanticLabel;
+final List<String> parts =
+final AppColors colors = context.appColors;
+final Widget photo = SizedBox.square(
+final Color gapColor = ringGapColor ?? colors.background;
+final Widget framed;
+final Widget fallback = _buildFallback(colors);
+final String? url = imageUrl;
+final int cacheSize =
+final String initials = initialsOf(name);

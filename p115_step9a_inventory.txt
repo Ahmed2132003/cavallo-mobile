@@ -1,0 +1,155 @@
+﻿P-115 STEP 9a inventory - 2026-10-09 15:38:04
+TOTAL CANDIDATES: 100
+(candidates only - a human decides which are user-visible; non-UI strings are expected)
+
+--- COUNT PER FILE ---
+   7  lib\features\products\presentation\product_form_screen.dart
+   5  lib\features\chat\domain\conversation.dart
+   5  lib\features\products\domain\product_entity.dart
+   5  lib\features\chat\presentation\chat_thread_screen.dart
+   4  lib\features\search\domain\search_result_entity.dart
+   4  lib\features\business_profile\presentation\business_profile_edit_screen.dart
+   4  lib\features\social\domain\report_reason.dart
+   4  lib\features\content\domain\content_item_entity.dart
+   4  lib\features\feed\domain\feed_item_entity.dart
+   4  lib\core\network\interceptors\error_interceptor.dart
+   3  lib\features\content\presentation\reel_form_screen.dart
+   3  lib\features\moderation\domain\queue_item_entity.dart
+   3  lib\features\chat\presentation\shared_content_card.dart
+   3  lib\features\business_profile\presentation\business_onboarding_screen.dart
+   3  lib\core\theme\theme_mode_provider.dart
+   3  lib\core\config\app_config.dart
+   3  lib\features\business_profile\domain\business_profile_entity.dart
+   3  lib\core\chat\chat_event.dart
+   3  lib\features\business_console\data\analytics_repository.dart
+   3  lib\features\auth\domain\user_entity.dart
+   2  lib\features\content\presentation\post_form_screen.dart
+   2  lib\core\push\fcm_service.dart
+   2  lib\features\business_console\data\dtos\daily_stats_response_dto.dart
+   2  lib\features\content\presentation\reel_detail_screen.dart
+   1  lib\features\stories\domain\public_story_entity.dart
+   1  lib\features\products\domain\product_variant_entity.dart
+   1  lib\features\social\presentation\content_action_row.dart
+   1  lib\features\stories\domain\own_story_entity.dart
+   1  lib\features\social\presentation\social_error_message.dart
+   1  lib\core\network\api_failure.dart
+   1  lib\core\widgets\featured_badge.dart
+   1  lib\core\l10n\locale_provider.dart
+   1  lib\core\chat\chat_connection_manager.dart
+   1  lib\core\l10n\formatters.dart
+   1  lib\features\business_console\presentation\analytics_provider.dart
+   1  lib\features\content\domain\public_reel_entity.dart
+   1  lib\features\content\presentation\post_detail_screen.dart
+   1  lib\features\content\domain\public_post_entity.dart
+   1  lib\features\chat\presentation\message_bubble_widget.dart
+   1  lib\features\chat\presentation\share_to_conversation_sheet.dart
+
+--- COUNT PER CATEGORY ---
+   5  ternary with sentence
+  28  arrow getter string
+  46  validator/return string
+   6  assigned message variable
+   8  named arg with sentence
+   7  Exception/StateError message
+
+--- FULL LIST ---
+lib\core\chat\chat_connection_manager.dart:432 [ternary with sentence] final wsScheme = base.scheme == 'https' ? 'wss' : 'ws';
+lib\core\chat\chat_event.dart:285 [arrow getter string] String toString() => 'StatusUpdate(messageId: $messageId, status: $status)';
+lib\core\chat\chat_event.dart:306 [arrow getter string] String toString() => 'TypingIndicator(isTyping: $isTyping)';
+lib\core\chat\chat_event.dart:320 [arrow getter string] String toString() => 'ChatEventParseException: $message (payload: $json)';
+lib\core\config\app_config.dart:95 [validator/return string] return 'http://localhost:$_devBackendPort';
+lib\core\config\app_config.dart:101 [validator/return string] return 'http://10.0.2.2:$_devBackendPort';
+lib\core\config\app_config.dart:103 [validator/return string] return 'http://localhost:$_devBackendPort';
+lib\core\l10n\formatters.dart:137 [validator/return string] return '$hour:$minute';
+lib\core\l10n\locale_provider.dart:34 [ternary with sentence] locale == null ? 'system' : locale.languageCode;
+lib\core\network\api_failure.dart:33 [assigned message variable] static const String networkError = 'NETWORK_ERROR';
+lib\core\network\interceptors\error_interceptor.dart:47 [named arg with sentence] message: 'Network error. Please check your connection and try '
+lib\core\network\interceptors\error_interceptor.dart:54 [named arg with sentence] message: 'A secure connection to the server could not be '
+lib\core\network\interceptors\error_interceptor.dart:61 [named arg with sentence] message: 'Request was cancelled.',
+lib\core\network\interceptors\error_interceptor.dart:75 [named arg with sentence] message: 'Network error. Please check your connection and '
+lib\core\push\fcm_service.dart:219 [validator/return string] return 'android';
+lib\core\push\fcm_service.dart:221 [validator/return string] return 'ios';
+lib\core\theme\theme_mode_provider.dart:25 [validator/return string] return 'light';
+lib\core\theme\theme_mode_provider.dart:27 [validator/return string] return 'dark';
+lib\core\theme\theme_mode_provider.dart:29 [validator/return string] return 'system';
+lib\core\widgets\featured_badge.dart:35 [assigned message variable] static const String label = 'Featured';
+lib\features\auth\domain\user_entity.dart:38 [Exception/StateError message] throw FormatException('Unknown account_type from backend: $value');
+lib\features\auth\domain\user_entity.dart:47 [validator/return string] return 'customer';
+lib\features\auth\domain\user_entity.dart:49 [validator/return string] return 'business';
+lib\features\business_console\data\analytics_repository.dart:127 [Exception/StateError message] throw const FormatException('Daily stats pagination did not terminate.');
+lib\features\business_console\data\analytics_repository.dart:134 [named arg with sentence] message: 'Unexpected analytics response: ${e.message}',
+lib\features\business_console\data\analytics_repository.dart:138 [named arg with sentence] message: 'Unexpected analytics response shape.',
+lib\features\business_console\data\dtos\daily_stats_response_dto.dart:105 [Exception/StateError message] throw FormatException('Expected date as YYYY-MM-DD, got "$raw".');
+lib\features\business_console\data\dtos\daily_stats_response_dto.dart:112 [Exception/StateError message] throw FormatException('Not a real calendar date: "$raw".');
+lib\features\business_console\presentation\analytics_provider.dart:43 [arrow getter string] String toString() => 'AnalyticsBusinessUnavailableException: $message';
+lib\features\business_profile\domain\business_profile_entity.dart:72 [Exception/StateError message] throw FormatException('Unknown business_type from backend: $value');
+lib\features\business_profile\domain\business_profile_entity.dart:81 [validator/return string] return 'trader';
+lib\features\business_profile\domain\business_profile_entity.dart:83 [validator/return string] return 'factory';
+lib\features\business_profile\presentation\business_onboarding_screen.dart:271 [validator/return string] return 'Business name is required.';
+lib\features\business_profile\presentation\business_onboarding_screen.dart:312 [validator/return string] return 'Country is required.';
+lib\features\business_profile\presentation\business_onboarding_screen.dart:324 [validator/return string] return 'City is required.';
+lib\features\business_profile\presentation\business_profile_edit_screen.dart:185 [arrow getter string] _ => 'Could not load your business profile.',
+lib\features\business_profile\presentation\business_profile_edit_screen.dart:449 [validator/return string] return 'Business name is required.';
+lib\features\business_profile\presentation\business_profile_edit_screen.dart:490 [validator/return string] return 'Country is required.';
+lib\features\business_profile\presentation\business_profile_edit_screen.dart:502 [validator/return string] return 'City is required.';
+lib\features\chat\domain\conversation.dart:93 [validator/return string] return 'Photo';
+lib\features\chat\domain\conversation.dart:95 [validator/return string] return 'Video';
+lib\features\chat\domain\conversation.dart:101 [validator/return string] return 'Shared a post';
+lib\features\chat\domain\conversation.dart:103 [validator/return string] return 'Shared a reel';
+lib\features\chat\domain\conversation.dart:105 [validator/return string] return 'Shared a product';
+lib\features\chat\presentation\chat_thread_screen.dart:418 [ternary with sentence] final label = type == ChatMediaType.image ? 'Photo' : 'Video';
+lib\features\chat\presentation\chat_thread_screen.dart:457 [validator/return string] return 'Online';
+lib\features\chat\presentation\chat_thread_screen.dart:459 [validator/return string] return 'Connecting…';
+lib\features\chat\presentation\chat_thread_screen.dart:461 [validator/return string] return 'Reconnecting…';
+lib\features\chat\presentation\chat_thread_screen.dart:463 [validator/return string] return 'Offline';
+lib\features\chat\presentation\message_bubble_widget.dart:267 [validator/return string] return '$hour:$minute';
+lib\features\chat\presentation\share_to_conversation_sheet.dart:148 [named arg with sentence] e is ApiFailure ? e.message : 'Could not share. Please try again.',
+lib\features\chat\presentation\shared_content_card.dart:99 [validator/return string] return 'Post';
+lib\features\chat\presentation\shared_content_card.dart:101 [validator/return string] return 'Reel';
+lib\features\chat\presentation\shared_content_card.dart:103 [validator/return string] return 'Product';
+lib\features\content\domain\content_item_entity.dart:61 [arrow getter string] String get type => 'post';
+lib\features\content\domain\content_item_entity.dart:84 [arrow getter string] String toString() => 'PostContentItem($post)';
+lib\features\content\domain\content_item_entity.dart:93 [arrow getter string] String get type => 'reel';
+lib\features\content\domain\content_item_entity.dart:116 [arrow getter string] String toString() => 'ReelContentItem($reel)';
+lib\features\content\domain\public_post_entity.dart:141 [arrow getter string] String toString() => 'PublicPost(id: $id, businessId: $businessId)';
+lib\features\content\domain\public_reel_entity.dart:148 [arrow getter string] String toString() => 'PublicReel(id: $id, businessId: $businessId)';
+lib\features\content\presentation\post_detail_screen.dart:118 [arrow getter string] _ => 'Could not load this post.',
+lib\features\content\presentation\post_form_screen.dart:133 [assigned message variable] _generalError = 'Something went wrong. Please try again.';
+lib\features\content\presentation\post_form_screen.dart:244 [validator/return string] return 'Caption is required.';
+lib\features\content\presentation\reel_detail_screen.dart:120 [arrow getter string] _ => 'Could not load this reel.',
+lib\features\content\presentation\reel_detail_screen.dart:213 [validator/return string] return '$minutes:${seconds.toString().padLeft(2, '0')}';
+lib\features\content\presentation\reel_form_screen.dart:131 [assigned message variable] setState(() => _videoError = 'A video is required.');
+lib\features\content\presentation\reel_form_screen.dart:158 [assigned message variable] _generalError = 'Something went wrong. Please try again.';
+lib\features\content\presentation\reel_form_screen.dart:292 [validator/return string] return 'Caption is required.';
+lib\features\feed\domain\feed_item_entity.dart:38 [arrow getter string] String get contentType => 'post';
+lib\features\feed\domain\feed_item_entity.dart:52 [arrow getter string] String toString() => 'PostFeedItem($post)';
+lib\features\feed\domain\feed_item_entity.dart:61 [arrow getter string] String get contentType => 'reel';
+lib\features\feed\domain\feed_item_entity.dart:75 [arrow getter string] String toString() => 'ReelFeedItem($reel)';
+lib\features\moderation\domain\queue_item_entity.dart:46 [validator/return string] return 'normal';
+lib\features\moderation\domain\queue_item_entity.dart:48 [validator/return string] return 'fast_path';
+lib\features\moderation\domain\queue_item_entity.dart:73 [Exception/StateError message] throw FormatException('Unknown moderation status from backend: $value');
+lib\features\products\domain\product_entity.dart:64 [Exception/StateError message] throw FormatException('Unknown currency from backend: $value');
+lib\features\products\domain\product_entity.dart:73 [validator/return string] return 'EGP';
+lib\features\products\domain\product_entity.dart:75 [validator/return string] return 'SAR';
+lib\features\products\domain\product_entity.dart:77 [validator/return string] return 'AED';
+lib\features\products\domain\product_entity.dart:79 [validator/return string] return 'JOD';
+lib\features\products\domain\product_variant_entity.dart:47 [arrow getter string] String toString() => 'ProductVariant(id: $id, name: $name, value: $value)';
+lib\features\products\presentation\product_form_screen.dart:268 [assigned message variable] _generalError = 'Something went wrong. Please try again.';
+lib\features\products\presentation\product_form_screen.dart:454 [ternary with sentence] title: Text(widget.isEditing ? 'Edit product' : 'Create product'),
+lib\features\products\presentation\product_form_screen.dart:471 [validator/return string] return 'Name is required.';
+lib\features\products\presentation\product_form_screen.dart:485 [validator/return string] return 'Description is required.';
+lib\features\products\presentation\product_form_screen.dart:501 [validator/return string] if (text.isEmpty) return 'Price is required.';
+lib\features\products\presentation\product_form_screen.dart:503 [validator/return string] return 'Enter a valid price (e.g. 199.99).';
+lib\features\products\presentation\product_form_screen.dart:569 [ternary with sentence] label: widget.isEditing ? 'Save changes' : 'Create product',
+lib\features\search\domain\search_result_entity.dart:35 [arrow getter string] String get resultType => 'business';
+lib\features\search\domain\search_result_entity.dart:48 [arrow getter string] String toString() => 'BusinessSearchResult($business)';
+lib\features\search\domain\search_result_entity.dart:57 [arrow getter string] String get resultType => 'product';
+lib\features\search\domain\search_result_entity.dart:70 [arrow getter string] String toString() => 'ProductSearchResult($product)';
+lib\features\social\domain\report_reason.dart:15 [arrow getter string] ReportReason.spam => 'spam',
+lib\features\social\domain\report_reason.dart:16 [arrow getter string] ReportReason.inappropriate => 'inappropriate',
+lib\features\social\domain\report_reason.dart:17 [arrow getter string] ReportReason.misleading => 'misleading',
+lib\features\social\domain\report_reason.dart:18 [arrow getter string] ReportReason.other => 'other',
+lib\features\social\presentation\content_action_row.dart:259 [named arg with sentence] text: 'Check out this ${widget.contentType} on Cavallo',
+lib\features\social\presentation\social_error_message.dart:13 [validator/return string] return 'Something went wrong. Please try again.';
+lib\features\stories\domain\own_story_entity.dart:155 [arrow getter string] String toString() => 'OwnStory(id: $id, status: ${status.name})';
+lib\features\stories\domain\public_story_entity.dart:111 [arrow getter string] String toString() => 'PublicStory(id: $id, businessId: $businessId)';

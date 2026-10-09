@@ -1,0 +1,9 @@
+00:00 +0: loading D:/Cavallo/social_commerce_app/test/l10n/no_hardcoded_strings_test.dart
+00:00 +0: scanner self-test finds literals in the user-facing positions
+00:00 +1: scanner self-test ignores localized text, numbers, comments and other layers
+00:00 +2: repository scan (setUpAll)
+00:00 +2: repository scan no user-facing hardcoded string outside the allowlist
+00:00 +3: repository scan every allowlist entry has a reason and is still needed
+00:00 +4: repository scan every pending-migration file still has literals
+00:00 +5: repository scan (tearDownAll)
+00:00 +5: All tests passed!

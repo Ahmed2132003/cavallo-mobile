@@ -1,0 +1,5 @@
+Analyzing social_commerce_app...                                
+
+   info - Statements in an if should be enclosed in a block - lib\features\products\presentation\product_form_screen.dart:527:23 - curly_braces_in_flow_control_structures
+
+1 issue found. (ran in 11.9s)

@@ -1,0 +1,457 @@
+﻿##### lib\core\widgets\featured_badge.dart:35
+imports: import '../l10n/l10n_context.dart';
+  27| /// Part P-114 STEP 3B: the visible word now comes from the ARB files
+  28| /// (`featuredBadgeLabel`), so Arabic shows the Arabic word. English is still
+  29| /// exactly [label].
+  30| class FeaturedBadge extends StatelessWidget {
+  31|   const FeaturedBadge({super.key});
+  32| 
+  33|   /// The English text. Public so tests can reference it. In another language
+  34|   /// the badge shows `featuredBadgeLabel` of that language instead.
+  35|   static const String label = 'Featured';
+  36| 
+  37|   @override
+  38|   Widget build(BuildContext context) {
+  39|     final AppColors colors = context.appColors;
+  40|     final TextStyle? labelStyle = Theme.of(context).textTheme.labelSmall;
+
+##### lib\features\business_profile\presentation\business_onboarding_screen.dart:271
+imports: import '../../../core/l10n/l10n_context.dart';
+ 263|                   AppTextField(
+ 264|                     label: context.l10n.bizFieldName,
+ 265|                     controller: _businessNameController,
+ 266|                     validator: (value) {
+ 267|                       if (_businessNameError != null) {
+ 268|                         return _businessNameError;
+ 269|                       }
+ 270|                       if ((value ?? '').trim().isEmpty) {
+ 271|                         return 'Business name is required.';
+ 272|                       }
+ 273|                       return null;
+ 274|                     },
+ 275|                   ),
+ 276|                   const SizedBox(height: 20),
+
+##### lib\features\business_profile\presentation\business_onboarding_screen.dart:312
+imports: import '../../../core/l10n/l10n_context.dart';
+ 304|                   ],
+ 305|                   const SizedBox(height: 16),
+ 306|                   AppTextField(
+ 307|                     label: context.l10n.searchFilterCountry,
+ 308|                     controller: _countryController,
+ 309|                     validator: (value) {
+ 310|                       if (_countryError != null) return _countryError;
+ 311|                       if ((value ?? '').trim().isEmpty) {
+ 312|                         return 'Country is required.';
+ 313|                       }
+ 314|                       return null;
+ 315|                     },
+ 316|                   ),
+ 317|                   const SizedBox(height: 16),
+
+##### lib\features\business_profile\presentation\business_onboarding_screen.dart:324
+imports: import '../../../core/l10n/l10n_context.dart';
+ 316|                   ),
+ 317|                   const SizedBox(height: 16),
+ 318|                   AppTextField(
+ 319|                     label: context.l10n.searchFilterCity,
+ 320|                     controller: _cityController,
+ 321|                     validator: (value) {
+ 322|                       if (_cityError != null) return _cityError;
+ 323|                       if ((value ?? '').trim().isEmpty) {
+ 324|                         return 'City is required.';
+ 325|                       }
+ 326|                       return null;
+ 327|                     },
+ 328|                   ),
+ 329|                   const SizedBox(height: 16),
+
+##### lib\features\business_profile\presentation\business_profile_edit_screen.dart:185
+imports: import '../../../core/l10n/l10n_context.dart';
+ 177|   const _ErrorView({required this.error});
+ 178| 
+ 179|   final Object error;
+ 180| 
+ 181|   @override
+ 182|   Widget build(BuildContext context, WidgetRef ref) {
+ 183|     final message = switch (error) {
+ 184|       ApiFailure(:final message) => message,
+ 185|       _ => 'Could not load your business profile.',
+ 186|     };
+ 187|     return Center(
+ 188|       child: Padding(
+ 189|         padding: const EdgeInsets.all(24),
+ 190|         child: Column(
+
+##### lib\features\business_profile\presentation\business_profile_edit_screen.dart:449
+imports: import '../../../core/l10n/l10n_context.dart';
+ 441|             crossAxisAlignment: CrossAxisAlignment.stretch,
+ 442|             children: [
+ 443|               AppTextField(
+ 444|                 label: context.l10n.bizFieldName,
+ 445|                 controller: _businessNameController,
+ 446|                 validator: (value) {
+ 447|                   if (_businessNameError != null) return _businessNameError;
+ 448|                   if ((value ?? '').trim().isEmpty) {
+ 449|                     return 'Business name is required.';
+ 450|                   }
+ 451|                   return null;
+ 452|                 },
+ 453|               ),
+ 454|               const SizedBox(height: 20),
+
+##### lib\features\business_profile\presentation\business_profile_edit_screen.dart:490
+imports: import '../../../core/l10n/l10n_context.dart';
+ 482|               ],
+ 483|               const SizedBox(height: 16),
+ 484|               AppTextField(
+ 485|                 label: context.l10n.searchFilterCountry,
+ 486|                 controller: _countryController,
+ 487|                 validator: (value) {
+ 488|                   if (_countryError != null) return _countryError;
+ 489|                   if ((value ?? '').trim().isEmpty) {
+ 490|                     return 'Country is required.';
+ 491|                   }
+ 492|                   return null;
+ 493|                 },
+ 494|               ),
+ 495|               const SizedBox(height: 16),
+
+##### lib\features\business_profile\presentation\business_profile_edit_screen.dart:502
+imports: import '../../../core/l10n/l10n_context.dart';
+ 494|               ),
+ 495|               const SizedBox(height: 16),
+ 496|               AppTextField(
+ 497|                 label: context.l10n.searchFilterCity,
+ 498|                 controller: _cityController,
+ 499|                 validator: (value) {
+ 500|                   if (_cityError != null) return _cityError;
+ 501|                   if ((value ?? '').trim().isEmpty) {
+ 502|                     return 'City is required.';
+ 503|                   }
+ 504|                   return null;
+ 505|                 },
+ 506|               ),
+ 507|               const SizedBox(height: 16),
+
+##### lib\features\content\presentation\post_detail_screen.dart:118
+imports: import '../../../core/l10n/l10n_context.dart';
+ 110|   Widget build(BuildContext context, WidgetRef ref) {
+ 111|     // Both error shapes are handled on purpose (see
+ 112|     // `ProductDetailScreen`'s own `_LoadErrorView`): production throws a
+ 113|     // DioException carrying the typed ApiFailure in `.error`; hand-rolled
+ 114|     // test fakes throw a bare ApiFailure.
+ 115|     final message = switch (error) {
+ 116|       DioException(error: final ApiFailure failure) => failure.message,
+ 117|       ApiFailure(:final message) => message,
+ 118|       _ => 'Could not load this post.',
+ 119|     };
+ 120| 
+ 121|     return ErrorStateWidget(
+ 122|       message: message,
+ 123|       // Automatic retry is disabled on the provider by design, so this
+
+##### lib\features\content\presentation\reel_detail_screen.dart:120
+imports: import '../../../core/l10n/l10n_context.dart';
+ 112| 
+ 113|   @override
+ 114|   Widget build(BuildContext context, WidgetRef ref) {
+ 115|     // Same dual-shape handling as PostDetailScreen/ProductDetailScreen's
+ 116|     // own `_LoadErrorView` — see either for why both shapes are checked.
+ 117|     final message = switch (error) {
+ 118|       DioException(error: final ApiFailure failure) => failure.message,
+ 119|       ApiFailure(:final message) => message,
+ 120|       _ => 'Could not load this reel.',
+ 121|     };
+ 122| 
+ 123|     return ErrorStateWidget(
+ 124|       message: message,
+ 125|       // Automatic retry is disabled on the provider by design, so this
+
+##### lib\features\content\presentation\reel_detail_screen.dart:213
+imports: import '../../../core/l10n/l10n_context.dart';
+ 205| 
+ 206| /// `mm:ss` — good enough for this MVP's short-form Reels (never expected to
+ 207| /// reach an hour). `Duration.toString()` isn't used directly since it always
+ 208| /// includes a leading `0:` hour segment and a microseconds suffix this UI has
+ 209| /// no use for.
+ 210| String _formatDuration(int totalSeconds) {
+ 211|   final minutes = totalSeconds ~/ 60;
+ 212|   final seconds = totalSeconds % 60;
+ 213|   return '$minutes:${seconds.toString().padLeft(2, '0')}';
+ 214| }
+ 215| 
+ 216| /// Larger, full-width version of `ReelCard`'s `_ReelThumbnail` — same
+ 217| /// neutral-fallback + play-icon-overlay convention, deliberately duplicated
+ 218| /// rather than shared (this project's `_ProductThumbnail` precedent for
+
+##### lib\features\content\presentation\post_form_screen.dart:133
+imports: import '../../../core/l10n/l10n_context.dart';
+ 125|       final failure = switch (error) {
+ 126|         DioException(error: final ApiFailure f) => f,
+ 127|         ApiFailure() => error,
+ 128|         _ => null,
+ 129|       };
+ 130|       if (!mounted) return;
+ 131|       setState(() {
+ 132|         if (failure == null) {
+ 133|           _generalError = 'Something went wrong. Please try again.';
+ 134|           return;
+ 135|         }
+ 136|         switch (failure) {
+ 137|           case ValidationFailure(:final fields):
+ 138|             _captionError = fields['caption']?.join(' ');
+
+##### lib\features\content\presentation\post_form_screen.dart:244
+imports: import '../../../core/l10n/l10n_context.dart';
+ 236|                 AppTextField(
+ 237|                   key: const Key('postForm_captionField'),
+ 238|                   label: context.l10n.contentFormCaption,
+ 239|                   controller: _captionController,
+ 240|                   maxLines: 4,
+ 241|                   validator: (value) {
+ 242|                     if (_captionError != null) return _captionError;
+ 243|                     if ((value ?? '').trim().isEmpty) {
+ 244|                       return 'Caption is required.';
+ 245|                     }
+ 246|                     return null;
+ 247|                   },
+ 248|                 ),
+ 249|                 const SizedBox(height: 16),
+
+##### lib\features\content\presentation\reel_form_screen.dart:131
+imports: import '../../../core/l10n/l10n_context.dart';
+ 123| 
+ 124|     final formValid = _formKey.currentState?.validate() ?? false;
+ 125|     // `video` has no Form-registered field to carry this error the way
+ 126|     // `AppTextField`'s `validator` does for `caption` — checked here,
+ 127|     // explicitly, before ever calling the repository. See this class's
+ 128|     // module docstring.
+ 129|     final videoMissing = _videoFile == null;
+ 130|     if (videoMissing) {
+ 131|       setState(() => _videoError = 'A video is required.');
+ 132|     }
+ 133|     if (!formValid || videoMissing) {
+ 134|       return;
+ 135|     }
+ 136| 
+
+##### lib\features\content\presentation\reel_form_screen.dart:158
+imports: import '../../../core/l10n/l10n_context.dart';
+ 150|       final failure = switch (error) {
+ 151|         DioException(error: final ApiFailure f) => f,
+ 152|         ApiFailure() => error,
+ 153|         _ => null,
+ 154|       };
+ 155|       if (!mounted) return;
+ 156|       setState(() {
+ 157|         if (failure == null) {
+ 158|           _generalError = 'Something went wrong. Please try again.';
+ 159|           return;
+ 160|         }
+ 161|         switch (failure) {
+ 162|           case ValidationFailure(:final fields):
+ 163|             _captionError = fields['caption']?.join(' ');
+
+##### lib\features\content\presentation\reel_form_screen.dart:292
+imports: import '../../../core/l10n/l10n_context.dart';
+ 284|                 AppTextField(
+ 285|                   key: const Key('reelForm_captionField'),
+ 286|                   label: context.l10n.contentFormCaption,
+ 287|                   controller: _captionController,
+ 288|                   maxLines: 4,
+ 289|                   validator: (value) {
+ 290|                     if (_captionError != null) return _captionError;
+ 291|                     if ((value ?? '').trim().isEmpty) {
+ 292|                       return 'Caption is required.';
+ 293|                     }
+ 294|                     return null;
+ 295|                   },
+ 296|                 ),
+ 297|                 const SizedBox(height: 16),
+
+##### lib\features\products\presentation\product_form_screen.dart:268
+imports: import '../../../core/l10n/l10n_context.dart';
+ 260|       final failure = switch (error) {
+ 261|         DioException(error: final ApiFailure f) => f,
+ 262|         ApiFailure() => error,
+ 263|         _ => null,
+ 264|       };
+ 265|       if (!mounted) return;
+ 266|       setState(() {
+ 267|         if (failure == null) {
+ 268|           _generalError = 'Something went wrong. Please try again.';
+ 269|           return;
+ 270|         }
+ 271|         switch (failure) {
+ 272|           case ValidationFailure(:final fields):
+ 273|             _nameError = fields['name']?.join(' ');
+
+##### lib\features\products\presentation\product_form_screen.dart:454
+imports: import '../../../core/l10n/l10n_context.dart';
+ 446|   }
+ 447| 
+ 448|   @override
+ 449|   Widget build(BuildContext context) {
+ 450|     final categoriesAsync = ref.watch(categoryTreeProvider);
+ 451| 
+ 452|     return Scaffold(
+ 453|       appBar: AppBar(
+ 454|         title: Text(widget.isEditing ? 'Edit product' : 'Create product'),
+ 455|       ),
+ 456|       body: SafeArea(
+ 457|         child: SingleChildScrollView(
+ 458|           padding: const EdgeInsets.all(24),
+ 459|           child: Form(
+
+##### lib\features\products\presentation\product_form_screen.dart:471
+imports: import '../../../core/l10n/l10n_context.dart';
+ 463|               children: [
+ 464|                 AppTextField(
+ 465|                   key: const Key('productForm_nameField'),
+ 466|                   label: context.l10n.productFormName,
+ 467|                   controller: _nameController,
+ 468|                   validator: (value) {
+ 469|                     if (_nameError != null) return _nameError;
+ 470|                     if ((value ?? '').trim().isEmpty) {
+ 471|                       return 'Name is required.';
+ 472|                     }
+ 473|                     return null;
+ 474|                   },
+ 475|                 ),
+ 476|                 const SizedBox(height: 16),
+
+##### lib\features\products\presentation\product_form_screen.dart:485
+imports: import '../../../core/l10n/l10n_context.dart';
+ 477|                 AppTextField(
+ 478|                   key: const Key('productForm_descriptionField'),
+ 479|                   label: context.l10n.productFormDescription,
+ 480|                   controller: _descriptionController,
+ 481|                   maxLines: 4,
+ 482|                   validator: (value) {
+ 483|                     if (_descriptionError != null) return _descriptionError;
+ 484|                     if ((value ?? '').trim().isEmpty) {
+ 485|                       return 'Description is required.';
+ 486|                     }
+ 487|                     return null;
+ 488|                   },
+ 489|                 ),
+ 490|                 const SizedBox(height: 16),
+
+##### lib\features\products\presentation\product_form_screen.dart:501
+imports: import '../../../core/l10n/l10n_context.dart';
+ 493|                   label: context.l10n.productFormPrice,
+ 494|                   controller: _priceController,
+ 495|                   keyboardType: const TextInputType.numberWithOptions(
+ 496|                     decimal: true,
+ 497|                   ),
+ 498|                   validator: (value) {
+ 499|                     if (_priceError != null) return _priceError;
+ 500|                     final text = (value ?? '').trim();
+ 501|                     if (text.isEmpty) return 'Price is required.';
+ 502|                     if (double.tryParse(text) == null) {
+ 503|                       return 'Enter a valid price (e.g. 199.99).';
+ 504|                     }
+ 505|                     return null;
+ 506|                   },
+
+##### lib\features\products\presentation\product_form_screen.dart:503
+imports: import '../../../core/l10n/l10n_context.dart';
+ 495|                   keyboardType: const TextInputType.numberWithOptions(
+ 496|                     decimal: true,
+ 497|                   ),
+ 498|                   validator: (value) {
+ 499|                     if (_priceError != null) return _priceError;
+ 500|                     final text = (value ?? '').trim();
+ 501|                     if (text.isEmpty) return 'Price is required.';
+ 502|                     if (double.tryParse(text) == null) {
+ 503|                       return 'Enter a valid price (e.g. 199.99).';
+ 504|                     }
+ 505|                     return null;
+ 506|                   },
+ 507|                 ),
+ 508|                 const SizedBox(height: 16),
+
+##### lib\features\products\presentation\product_form_screen.dart:569
+imports: import '../../../core/l10n/l10n_context.dart';
+ 561|                     style: TextStyle(
+ 562|                       color: Theme.of(context).colorScheme.error,
+ 563|                     ),
+ 564|                   ),
+ 565|                 ],
+ 566|                 const SizedBox(height: 24),
+ 567|                 AppButton(
+ 568|                   key: const Key('productForm_submitButton'),
+ 569|                   label: widget.isEditing ? 'Save changes' : 'Create product',
+ 570|                   isLoading: _isSubmitting,
+ 571|                   onPressed: _submit,
+ 572|                 ),
+ 573|               ],
+ 574|             ),
+
+##### lib\features\social\presentation\content_action_row.dart:259
+imports: import '../../../core/l10n/formatters.dart'; | import '../../../core/l10n/l10n_context.dart'; | import '../../../l10n/app_localizations.dart';
+ 251|     void onShare() {
+ 252|       // The pre-existing P-058 flow, byte-for-byte the same
+ 253|       // behavior: track the share, then open the native sheet.
+ 254|       Future<void> nativeShare() => guarded(() async {
+ 255|         await notifier.share();
+ 256|         if (context.mounted) {
+ 257|           await SharePlus.instance.share(
+ 258|             ShareParams(
+ 259|               text: 'Check out this ${widget.contentType} on Cavallo',
+ 260|             ),
+ 261|           );
+ 262|         }
+ 263|       });
+ 264| 
+
+##### lib\features\social\presentation\social_error_message.dart:13
+imports: 
+   5| /// Part P-058: turns whatever a repository call threw into a short,
+   6| /// user-facing message. `ErrorInterceptor` (P-004) stores a typed
+   7| /// [ApiFailure] on `DioException.error`, so unwrap that first.
+   8| String socialErrorMessage(Object error) {
+   9|   final Object inner = (error is DioException && error.error != null)
+  10|       ? error.error!
+  11|       : error;
+  12|   if (inner is ApiFailure) return inner.message;
+  13|   return 'Something went wrong. Please try again.';
+  14| }
+
+##### l10n setup
+# Part P-112: Flutter gen-l10n configuration.
+# Generated files are written NEXT TO the ARB files (no synthetic package),
+# are committed to git, and are imported as
+#   package:social_commerce_app/l10n/app_localizations.dart
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-dir: lib/l10n
+synthetic-package: false
+nullable-getter: false
+# Arabic first: it is the app's fallback language (Phase 23 overview).
+preferred-supported-locales: [ar, en]
+--- app_en.arb head ---
+{
+  "@@locale": "en",
+  "appTitle": "Social Commerce Discovery Platform",
+  "@appTitle": {
+    "description": "Application title shown in the OS task switcher."
+  },
+  "relativeJustNow": "just now",
+  "@relativeJustNow": {
+    "description": "Relative time shown for something that happened less than a minute ago."
+  },
+  "relativeMinutesAgo": "{count, plural, one{{count} minute ago} other{{count} minutes ago}}",
+  "@relativeMinutesAgo": {
+    "description": "Relative time in minutes (1 to 59).",
+    "placeholders": {
+--- extension context.l10n ---
+error_messages.dart
+formatters.dart
+l10n_context.dart
+locale_provider.dart
+rtl_helpers.dart
+extension AppL10nContext on BuildContext {
+AppLocalizations get l10n =>
