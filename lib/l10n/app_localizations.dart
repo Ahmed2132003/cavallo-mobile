@@ -1438,6 +1438,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'User #{id}'**
   String chatTestUserPlaceholder(int id);
+
+  /// Title of the notification center screen (app bar).
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifTitle;
+
+  /// Title of the notification preferences screen and tooltip of the settings button in the notification center.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification settings'**
+  String get notifSettingsTitle;
+
+  /// Snackbar shown when the next page of notifications fails to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load more notifications.'**
+  String get notifLoadMoreFailed;
+
+  /// Error message of the notification center when the first page fails to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your notifications.'**
+  String get notifLoadFailed;
+
+  /// Empty state of the notification center.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet.'**
+  String get notifEmpty;
+
+  /// Notification center section header for notifications received today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get notifSectionToday;
+
+  /// Notification center section header for notifications from the previous 6 days.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get notifSectionThisWeek;
+
+  /// Notification center section header for notifications older than a week.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier'**
+  String get notifSectionEarlier;
+
+  /// Screen reader label of the unread dot on a notification row.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get notifUnreadLabel;
+
+  /// Screen reader label of the notification skeleton loaders.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading notifications'**
+  String get notifLoadingLabel;
+
+  /// Small header above the group of notification switches.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify me about'**
+  String get notifPrefsSectionHeader;
+
+  /// Notification preference title: chat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat messages'**
+  String get notifPrefChatTitle;
+
+  /// Notification preference description: chat.
+  ///
+  /// In en, this message translates to:
+  /// **'New messages in your conversations.'**
+  String get notifPrefChatSubtitle;
+
+  /// Notification preference title: moderation.
+  ///
+  /// In en, this message translates to:
+  /// **'Content review'**
+  String get notifPrefModerationTitle;
+
+  /// Notification preference description: moderation.
+  ///
+  /// In en, this message translates to:
+  /// **'When your content is approved or rejected.'**
+  String get notifPrefModerationSubtitle;
+
+  /// Notification preference title: social.
+  ///
+  /// In en, this message translates to:
+  /// **'Social activity'**
+  String get notifPrefSocialTitle;
+
+  /// Notification preference description: social.
+  ///
+  /// In en, this message translates to:
+  /// **'New followers, comments, likes, shares and ratings.'**
+  String get notifPrefSocialSubtitle;
+
+  /// Snackbar shown when saving a notification preference fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save your preference. Please try again.'**
+  String get notifPrefsSaveFailed;
+
+  /// Error message of the notification preferences screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your notification settings.'**
+  String get notifPrefsLoadFailed;
+
+  /// Footer under the switches: system announcements cannot be turned off.
+  ///
+  /// In en, this message translates to:
+  /// **'Important system announcements are always delivered.'**
+  String get notifPrefsSystemFooter;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

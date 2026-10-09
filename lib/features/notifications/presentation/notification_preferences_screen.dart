@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_shimmer_box.dart';
 import '../../../core/widgets/error_state_widget.dart';
-import '../../../core/widgets/loading_indicator.dart';
 import '../domain/notification_preferences.dart';
 import 'notification_preferences_provider.dart';
 
@@ -18,26 +20,22 @@ import 'notification_preferences_provider.dart';
 ///
 /// `system_announcement` has no switch: it is always delivered, and the
 /// footer says so.
+///
+/// Part P-115 (STEP 4): restyle only. The three switches sit in one rounded
+/// group with hairline dividers, all colours come from the design tokens and
+/// all text from the ARB files. The provider and the toggle logic are
+/// unchanged, and each switch keeps its `notification-preference-<name>` key.
 class NotificationPreferencesScreen extends ConsumerWidget {
   const NotificationPreferencesScreen({super.key});
 
-  static const _tiles =
-      <({NotificationCategory category, String title, String subtitle})>[
-        (
-          category: NotificationCategory.chat,
-          title: 'Chat messages',
-          subtitle: 'New messages in your conversations.',
-        ),
+  static const List<({NotificationCategory category, IconData icon})> _tiles =
+      <({NotificationCategory category, IconData icon})>[
+        (category: NotificationCategory.chat, icon: Icons.chat_bubble_outline),
         (
           category: NotificationCategory.moderation,
-          title: 'Content review',
-          subtitle: 'When your content is approved or rejected.',
+          icon: Icons.shield_outlined,
         ),
-        (
-          category: NotificationCategory.social,
-          title: 'Social activity',
-          subtitle: 'New followers, comments, likes, shares and ratings.',
-        ),
+        (category: NotificationCategory.social, icon: Icons.favorite_border),
       ];
 
   Future<void> _toggle(
@@ -55,46 +53,146 @@ class NotificationPreferencesScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          const SnackBar(
-            content: Text('Could not save your preference. Please try again.'),
-          ),
+          SnackBar(content: Text(context.l10n.notifPrefsSaveFailed)),
         );
     }
   }
 
+  String _titleFor(
+    BuildContext context,
+    NotificationCategory category,
+  ) => switch (category) {
+    NotificationCategory.chat => context.l10n.notifPrefChatTitle,
+    NotificationCategory.moderation => context.l10n.notifPrefModerationTitle,
+    NotificationCategory.social => context.l10n.notifPrefSocialTitle,
+  };
+
+  String _subtitleFor(
+    BuildContext context,
+    NotificationCategory category,
+  ) => switch (category) {
+    NotificationCategory.chat => context.l10n.notifPrefChatSubtitle,
+    NotificationCategory.moderation => context.l10n.notifPrefModerationSubtitle,
+    NotificationCategory.social => context.l10n.notifPrefSocialSubtitle,
+  };
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final preferencesAsync = ref.watch(notificationPreferencesProvider);
+    final AppColors colors = context.appColors;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Notification settings')),
+      appBar: AppBar(title: Text(context.l10n.notifSettingsTitle)),
       body: switch (preferencesAsync) {
         AsyncData(value: final preferences) => ListView(
+          padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 24),
           children: [
-            for (final tile in _tiles)
-              SwitchListTile(
-                key: ValueKey('notification-preference-${tile.category.name}'),
-                title: Text(tile.title),
-                subtitle: Text(tile.subtitle),
-                value: preferences.isEnabled(tile.category),
-                onChanged:
-                    (value) =>
-                        unawaited(_toggle(context, ref, tile.category, value)),
-              ),
-            const Padding(
-              padding: EdgeInsets.all(16),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(4, 0, 4, 8),
               child: Text(
-                'Important system announcements are always delivered.',
+                context.l10n.notifPrefsSectionHeader,
+                style: textTheme.labelLarge?.copyWith(
+                  color: colors.textSecondary,
+                ),
+              ),
+            ),
+            Material(
+              color: colors.surface,
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: colors.outline),
+              ),
+              child: Column(
+                children: [
+                  for (int i = 0; i < _tiles.length; i++) ...[
+                    if (i > 0)
+                      Divider(
+                        height: 1,
+                        thickness: 1,
+                        indent: 16,
+                        endIndent: 16,
+                        color: colors.outline,
+                      ),
+                    SwitchListTile(
+                      key: ValueKey(
+                        'notification-preference-${_tiles[i].category.name}',
+                      ),
+                      contentPadding: const EdgeInsetsDirectional.fromSTEB(
+                        16,
+                        4,
+                        16,
+                        4,
+                      ),
+                      secondary: Icon(
+                        _tiles[i].icon,
+                        color: colors.textSecondary,
+                      ),
+                      title: Text(
+                        _titleFor(context, _tiles[i].category),
+                        style: (textTheme.titleSmall ?? const TextStyle())
+                            .copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: colors.textPrimary,
+                            ),
+                      ),
+                      subtitle: Text(
+                        _subtitleFor(context, _tiles[i].category),
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colors.textSecondary,
+                        ),
+                      ),
+                      value: preferences.isEnabled(_tiles[i].category),
+                      onChanged:
+                          (value) => unawaited(
+                            _toggle(context, ref, _tiles[i].category, value),
+                          ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(4, 12, 4, 0),
+              child: Text(
+                context.l10n.notifPrefsSystemFooter,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colors.textSecondary,
+                ),
               ),
             ),
           ],
         ),
         AsyncError() => ErrorStateWidget(
-          message: 'Could not load your notification settings.',
+          message: context.l10n.notifPrefsLoadFailed,
           onRetry: () => ref.invalidate(notificationPreferencesProvider),
         ),
-        _ => const LoadingIndicator(),
+        _ => const _PreferencesSkeleton(),
       },
+    );
+  }
+}
+
+/// Skeleton for the preferences group while the server values load.
+class _PreferencesSkeleton extends StatelessWidget {
+  const _PreferencesSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: context.l10n.notifLoadingLabel,
+      child: ListView(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 24),
+        children: const [
+          AppShimmerBox(height: 72, borderRadius: 16),
+          SizedBox(height: 12),
+          AppShimmerBox(height: 72, borderRadius: 16),
+          SizedBox(height: 12),
+          AppShimmerBox(height: 72, borderRadius: 16),
+        ],
+      ),
     );
   }
 }

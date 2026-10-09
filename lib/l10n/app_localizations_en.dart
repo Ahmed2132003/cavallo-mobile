@@ -807,4 +807,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String chatTestUserPlaceholder(int id) {
     return 'User #$id';
   }
+
+  @override
+  String get notifTitle => 'Notifications';
+
+  @override
+  String get notifSettingsTitle => 'Notification settings';
+
+  @override
+  String get notifLoadMoreFailed => 'Could not load more notifications.';
+
+  @override
+  String get notifLoadFailed => 'Could not load your notifications.';
+
+  @override
+  String get notifEmpty => 'No notifications yet.';
+
+  @override
+  String get notifSectionToday => 'Today';
+
+  @override
+  String get notifSectionThisWeek => 'This week';
+
+  @override
+  String get notifSectionEarlier => 'Earlier';
+
+  @override
+  String get notifUnreadLabel => 'Unread';
+
+  @override
+  String get notifLoadingLabel => 'Loading notifications';
+
+  @override
+  String get notifPrefsSectionHeader => 'Notify me about';
+
+  @override
+  String get notifPrefChatTitle => 'Chat messages';
+
+  @override
+  String get notifPrefChatSubtitle => 'New messages in your conversations.';
+
+  @override
+  String get notifPrefModerationTitle => 'Content review';
+
+  @override
+  String get notifPrefModerationSubtitle => 'When your content is approved or rejected.';
+
+  @override
+  String get notifPrefSocialTitle => 'Social activity';
+
+  @override
+  String get notifPrefSocialSubtitle => 'New followers, comments, likes, shares and ratings.';
+
+  @override
+  String get notifPrefsSaveFailed => 'Could not save your preference. Please try again.';
+
+  @override
+  String get notifPrefsLoadFailed => 'Could not load your notification settings.';
+
+  @override
+  String get notifPrefsSystemFooter => 'Important system announcements are always delivered.';
 }

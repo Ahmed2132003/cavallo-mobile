@@ -839,4 +839,64 @@ class AppLocalizationsAr extends AppLocalizations {
   String chatTestUserPlaceholder(int id) {
     return 'مستخدم رقم $id';
   }
+
+  @override
+  String get notifTitle => 'الإشعارات';
+
+  @override
+  String get notifSettingsTitle => 'إعدادات الإشعارات';
+
+  @override
+  String get notifLoadMoreFailed => 'تعذّر تحميل المزيد من الإشعارات.';
+
+  @override
+  String get notifLoadFailed => 'تعذّر تحميل إشعاراتك.';
+
+  @override
+  String get notifEmpty => 'لا توجد إشعارات بعد';
+
+  @override
+  String get notifSectionToday => 'اليوم';
+
+  @override
+  String get notifSectionThisWeek => 'هذا الأسبوع';
+
+  @override
+  String get notifSectionEarlier => 'سابقًا';
+
+  @override
+  String get notifUnreadLabel => 'غير مقروء';
+
+  @override
+  String get notifLoadingLabel => 'جارٍ تحميل الإشعارات';
+
+  @override
+  String get notifPrefsSectionHeader => 'أخطرني بشأن';
+
+  @override
+  String get notifPrefChatTitle => 'رسائل المحادثات';
+
+  @override
+  String get notifPrefChatSubtitle => 'رسائل جديدة في محادثاتك.';
+
+  @override
+  String get notifPrefModerationTitle => 'مراجعة المحتوى';
+
+  @override
+  String get notifPrefModerationSubtitle => 'عند الموافقة على محتواك أو رفضه.';
+
+  @override
+  String get notifPrefSocialTitle => 'النشاط الاجتماعي';
+
+  @override
+  String get notifPrefSocialSubtitle => 'متابعون وتعليقات وإعجابات ومشاركات وتقييمات جديدة.';
+
+  @override
+  String get notifPrefsSaveFailed => 'تعذّر حفظ تفضيلك. حاول مرة أخرى.';
+
+  @override
+  String get notifPrefsLoadFailed => 'تعذّر تحميل إعدادات الإشعارات.';
+
+  @override
+  String get notifPrefsSystemFooter => 'إعلانات النظام المهمة تصلك دائمًا.';
 }

@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/formatters.dart';
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_shimmer_box.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
-import '../../../core/widgets/loading_indicator.dart';
 import '../../../routing/route_names.dart';
 import '../domain/app_notification.dart';
+import 'notification_grouping.dart';
 import 'notification_list_provider.dart';
 import 'notification_navigator.dart';
 
@@ -25,6 +29,17 @@ import 'notification_navigator.dart';
 ///   [NotificationNavigator.openNotification], the single navigation
 ///   point shared with the foreground banner and push taps. This screen
 ///   never builds a route itself.
+///
+/// Part P-115 (STEP 4): restyle only. Rows are grouped into Today / This
+/// week / Earlier ([groupNotificationsByRecency]), use the design tokens
+/// (`context.appColors`), hairline dividers, a skeleton loader and
+/// localized text. The provider, the paging, the mark-read call and the
+/// navigation call are exactly the P-082 ones.
+///
+/// The backend notification carries no actor avatar and no thumbnail
+/// (`AppNotification` has exactly the eight serializer fields), so the
+/// leading circle is the notification-type icon. Adding an avatar or a
+/// thumbnail needs a backend field and is out of scope for P-115.
 class NotificationCenterScreen extends ConsumerStatefulWidget {
   const NotificationCenterScreen({super.key});
 
@@ -68,7 +83,7 @@ class _NotificationCenterScreenState
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          const SnackBar(content: Text('Could not load more notifications.')),
+          SnackBar(content: Text(context.l10n.notifLoadMoreFailed)),
         );
     }
   }
@@ -91,11 +106,11 @@ class _NotificationCenterScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Text(context.l10n.notifTitle),
         actions: [
           IconButton(
             key: const ValueKey('notification-preferences-button'),
-            tooltip: 'Notification settings',
+            tooltip: context.l10n.notifSettingsTitle,
             icon: const Icon(Icons.settings_outlined),
             onPressed:
                 () => unawaited(
@@ -111,13 +126,30 @@ class _NotificationCenterScreenState
           onTap: _onTapNotification,
         ),
         AsyncError() => ErrorStateWidget(
-          message: 'Could not load your notifications.',
+          message: context.l10n.notifLoadFailed,
           onRetry: () => ref.invalidate(notificationListProvider),
         ),
-        _ => const LoadingIndicator(),
+        _ => const _NotificationSkeleton(),
       },
     );
   }
+}
+
+/// One line of the grouped list: a section header or a notification.
+sealed class _Row {
+  const _Row();
+}
+
+final class _HeaderRow extends _Row {
+  const _HeaderRow(this.section);
+
+  final NotificationSection section;
+}
+
+final class _ItemRow extends _Row {
+  const _ItemRow(this.notification);
+
+  final AppNotification notification;
 }
 
 class _NotificationListBody extends ConsumerWidget {
@@ -141,10 +173,10 @@ class _NotificationListBody extends ConsumerWidget {
         onRefresh: handleRefresh,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          children: const [
-            SizedBox(height: 96),
+          children: [
+            const SizedBox(height: 96),
             EmptyStateWidget(
-              message: 'No notifications yet.',
+              message: context.l10n.notifEmpty,
               icon: Icons.notifications_none_outlined,
             ),
           ],
@@ -152,7 +184,16 @@ class _NotificationListBody extends ConsumerWidget {
       );
     }
 
-    final itemCount = state.items.length + (state.isLoadingMore ? 1 : 0);
+    final List<_Row> rows = <_Row>[
+      for (final NotificationGroup group in groupNotificationsByRecency(
+        state.items,
+        DateTime.now(),
+      )) ...<_Row>[
+        _HeaderRow(group.section),
+        for (final AppNotification item in group.items) _ItemRow(item),
+      ],
+    ];
+    final itemCount = rows.length + (state.isLoadingMore ? 1 : 0);
 
     return RefreshIndicator(
       onRefresh: handleRefresh,
@@ -161,7 +202,7 @@ class _NotificationListBody extends ConsumerWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: itemCount,
         itemBuilder: (context, index) {
-          if (index >= state.items.length) {
+          if (index >= rows.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
               child: Center(
@@ -173,13 +214,43 @@ class _NotificationListBody extends ConsumerWidget {
               ),
             );
           }
-          final notification = state.items[index];
-          return _NotificationTile(
-            key: ValueKey('notification-item-${notification.id}'),
-            notification: notification,
-            onTap: () => onTap(notification),
-          );
+          return switch (rows[index]) {
+            _HeaderRow(:final section) => _SectionHeader(section: section),
+            _ItemRow(:final notification) => _NotificationTile(
+              key: ValueKey('notification-item-${notification.id}'),
+              notification: notification,
+              onTap: () => onTap(notification),
+            ),
+          };
         },
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.section});
+
+  final NotificationSection section;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors colors = context.appColors;
+    final String label = switch (section) {
+      NotificationSection.today => context.l10n.notifSectionToday,
+      NotificationSection.thisWeek => context.l10n.notifSectionThisWeek,
+      NotificationSection.earlier => context.l10n.notifSectionEarlier,
+    };
+    return Semantics(
+      header: true,
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(16, 20, 16, 8),
+        child: Text(
+          label,
+          key: ValueKey('notification-section-${section.name}'),
+          style: (Theme.of(context).textTheme.titleMedium ?? const TextStyle())
+              .copyWith(fontWeight: FontWeight.w700, color: colors.textPrimary),
+        ),
       ),
     );
   }
@@ -195,57 +266,148 @@ class _NotificationTile extends StatelessWidget {
   final AppNotification notification;
   final VoidCallback onTap;
 
+  static const double _leadingSize = 44;
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final unread = !notification.isRead;
+    final ThemeData theme = Theme.of(context);
+    final AppColors colors = context.appColors;
+    final bool unread = !notification.isRead;
+    final AppFormatters formatters = AppFormatters(context.l10n);
 
+    // Unread is carried by THREE signals, never by colour alone: the tinted
+    // row, the bold title and the dot (which also has a semantic label).
     return Material(
-      color:
-          unread
-              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.35)
-              : Colors.transparent,
-      child: ListTile(
-        onTap: onTap,
-        leading: CircleAvatar(
-          child: Icon(_iconFor(notification.notificationType)),
-        ),
-        title: Text(
-          notification.title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: unread ? FontWeight.w700 : FontWeight.w400,
-          ),
-        ),
-        subtitle: Text(
-          notification.body,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              _timeAgo(notification.createdAt),
-              style: theme.textTheme.bodySmall,
+      color: unread ? colors.brandSubtle : Colors.transparent,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: _leadingSize,
+                    height: _leadingSize,
+                    decoration: BoxDecoration(
+                      color: colors.surfaceVariant,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _iconFor(notification.notificationType),
+                      size: 22,
+                      color: unread ? colors.brandText : colors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notification.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: (theme.textTheme.titleSmall ??
+                                  const TextStyle())
+                              .copyWith(
+                                fontWeight:
+                                    unread ? FontWeight.w700 : FontWeight.w400,
+                                color: colors.textPrimary,
+                              ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          notification.body,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        formatters.relativeTime(notification.createdAt),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      if (unread)
+                        Semantics(
+                          label: context.l10n.notifUnreadLabel,
+                          child: Container(
+                            key: ValueKey(
+                              'notification-unread-dot-${notification.id}',
+                            ),
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: colors.brand,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        )
+                      else
+                        const SizedBox(height: 10),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 6),
-            if (unread)
-              Container(
-                key: ValueKey('notification-unread-dot-${notification.id}'),
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  shape: BoxShape.circle,
-                ),
-              )
-            else
-              const SizedBox(height: 10),
-          ],
-        ),
+          ),
+          Divider(
+            height: 1,
+            thickness: 1,
+            indent: 16 + _leadingSize + 12,
+            color: colors.outline,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Skeleton shown while the first page loads (instead of a spinner).
+class _NotificationSkeleton extends StatelessWidget {
+  const _NotificationSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: context.l10n.notifLoadingLabel,
+      child: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 8,
+        itemBuilder:
+            (context, index) => Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 12),
+              child: Row(
+                children: [
+                  const AppShimmerBox.circle(size: 44),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        AppShimmerBox(height: 14, width: 160),
+                        SizedBox(height: 8),
+                        AppShimmerBox(height: 12, width: double.infinity),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
       ),
     );
   }
@@ -266,13 +428,4 @@ IconData _iconFor(String notificationType) {
     return Icons.shield_outlined;
   }
   return Icons.notifications_outlined;
-}
-
-String _timeAgo(DateTime createdAt) {
-  final diff = DateTime.now().difference(createdAt);
-  if (diff.inMinutes < 1) return 'now';
-  if (diff.inMinutes < 60) return '${diff.inMinutes}m';
-  if (diff.inHours < 24) return '${diff.inHours}h';
-  if (diff.inDays < 7) return '${diff.inDays}d';
-  return '${(diff.inDays / 7).floor()}w';
 }

@@ -1052,5 +1052,85 @@
         "type": "int"
       }
     }
+  },
+  "notifTitle": "Notifications",
+  "@notifTitle": {
+    "description": "Title of the notification center screen (app bar)."
+  },
+  "notifSettingsTitle": "Notification settings",
+  "@notifSettingsTitle": {
+    "description": "Title of the notification preferences screen and tooltip of the settings button in the notification center."
+  },
+  "notifLoadMoreFailed": "Could not load more notifications.",
+  "@notifLoadMoreFailed": {
+    "description": "Snackbar shown when the next page of notifications fails to load."
+  },
+  "notifLoadFailed": "Could not load your notifications.",
+  "@notifLoadFailed": {
+    "description": "Error message of the notification center when the first page fails to load."
+  },
+  "notifEmpty": "No notifications yet.",
+  "@notifEmpty": {
+    "description": "Empty state of the notification center."
+  },
+  "notifSectionToday": "Today",
+  "@notifSectionToday": {
+    "description": "Notification center section header for notifications received today."
+  },
+  "notifSectionThisWeek": "This week",
+  "@notifSectionThisWeek": {
+    "description": "Notification center section header for notifications from the previous 6 days."
+  },
+  "notifSectionEarlier": "Earlier",
+  "@notifSectionEarlier": {
+    "description": "Notification center section header for notifications older than a week."
+  },
+  "notifUnreadLabel": "Unread",
+  "@notifUnreadLabel": {
+    "description": "Screen reader label of the unread dot on a notification row."
+  },
+  "notifLoadingLabel": "Loading notifications",
+  "@notifLoadingLabel": {
+    "description": "Screen reader label of the notification skeleton loaders."
+  },
+  "notifPrefsSectionHeader": "Notify me about",
+  "@notifPrefsSectionHeader": {
+    "description": "Small header above the group of notification switches."
+  },
+  "notifPrefChatTitle": "Chat messages",
+  "@notifPrefChatTitle": {
+    "description": "Notification preference title: chat."
+  },
+  "notifPrefChatSubtitle": "New messages in your conversations.",
+  "@notifPrefChatSubtitle": {
+    "description": "Notification preference description: chat."
+  },
+  "notifPrefModerationTitle": "Content review",
+  "@notifPrefModerationTitle": {
+    "description": "Notification preference title: moderation."
+  },
+  "notifPrefModerationSubtitle": "When your content is approved or rejected.",
+  "@notifPrefModerationSubtitle": {
+    "description": "Notification preference description: moderation."
+  },
+  "notifPrefSocialTitle": "Social activity",
+  "@notifPrefSocialTitle": {
+    "description": "Notification preference title: social."
+  },
+  "notifPrefSocialSubtitle": "New followers, comments, likes, shares and ratings.",
+  "@notifPrefSocialSubtitle": {
+    "description": "Notification preference description: social."
+  },
+  "notifPrefsSaveFailed": "Could not save your preference. Please try again.",
+  "@notifPrefsSaveFailed": {
+    "description": "Snackbar shown when saving a notification preference fails."
+  },
+  "notifPrefsLoadFailed": "Could not load your notification settings.",
+  "@notifPrefsLoadFailed": {
+    "description": "Error message of the notification preferences screen."
+  },
+  "notifPrefsSystemFooter": "Important system announcements are always delivered.",
+  "@notifPrefsSystemFooter": {
+    "description": "Footer under the switches: system announcements cannot be turned off."
   }
 }
