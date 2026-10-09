@@ -268,7 +268,7 @@ class _BusinessOnboardingScreenState
                         return _businessNameError;
                       }
                       if ((value ?? '').trim().isEmpty) {
-                        return 'Business name is required.';
+                        return context.l10n.validationBusinessNameRequired;
                       }
                       return null;
                     },
@@ -309,7 +309,7 @@ class _BusinessOnboardingScreenState
                     validator: (value) {
                       if (_countryError != null) return _countryError;
                       if ((value ?? '').trim().isEmpty) {
-                        return 'Country is required.';
+                        return context.l10n.validationCountryRequired;
                       }
                       return null;
                     },
@@ -321,7 +321,7 @@ class _BusinessOnboardingScreenState
                     validator: (value) {
                       if (_cityError != null) return _cityError;
                       if ((value ?? '').trim().isEmpty) {
-                        return 'City is required.';
+                        return context.l10n.validationCityRequired;
                       }
                       return null;
                     },

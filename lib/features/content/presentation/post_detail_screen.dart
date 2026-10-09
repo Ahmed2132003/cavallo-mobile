@@ -115,7 +115,7 @@ class _LoadErrorView extends ConsumerWidget {
     final message = switch (error) {
       DioException(error: final ApiFailure failure) => failure.message,
       ApiFailure(:final message) => message,
-      _ => 'Could not load this post.',
+      _ => context.l10n.postLoadError,
     };
 
     return ErrorStateWidget(

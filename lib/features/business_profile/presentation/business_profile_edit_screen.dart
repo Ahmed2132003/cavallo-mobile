@@ -182,7 +182,7 @@ class _ErrorView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final message = switch (error) {
       ApiFailure(:final message) => message,
-      _ => 'Could not load your business profile.',
+      _ => context.l10n.businessProfileLoadError,
     };
     return Center(
       child: Padding(
@@ -446,7 +446,7 @@ class _BusinessProfileEditFormState
                 validator: (value) {
                   if (_businessNameError != null) return _businessNameError;
                   if ((value ?? '').trim().isEmpty) {
-                    return 'Business name is required.';
+                    return context.l10n.validationBusinessNameRequired;
                   }
                   return null;
                 },
@@ -487,7 +487,7 @@ class _BusinessProfileEditFormState
                 validator: (value) {
                   if (_countryError != null) return _countryError;
                   if ((value ?? '').trim().isEmpty) {
-                    return 'Country is required.';
+                    return context.l10n.validationCountryRequired;
                   }
                   return null;
                 },
@@ -499,7 +499,7 @@ class _BusinessProfileEditFormState
                 validator: (value) {
                   if (_cityError != null) return _cityError;
                   if ((value ?? '').trim().isEmpty) {
-                    return 'City is required.';
+                    return context.l10n.validationCityRequired;
                   }
                   return null;
                 },

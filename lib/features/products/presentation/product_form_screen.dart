@@ -265,7 +265,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
       if (!mounted) return;
       setState(() {
         if (failure == null) {
-          _generalError = 'Something went wrong. Please try again.';
+          _generalError = context.l10n.commonGenericError;
           return;
         }
         switch (failure) {
@@ -451,7 +451,11 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isEditing ? 'Edit product' : 'Create product'),
+        title: Text(
+          widget.isEditing
+              ? context.l10n.productFormEditTitle
+              : context.l10n.productFormCreate,
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -468,7 +472,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                   validator: (value) {
                     if (_nameError != null) return _nameError;
                     if ((value ?? '').trim().isEmpty) {
-                      return 'Name is required.';
+                      return context.l10n.validationProductNameRequired;
                     }
                     return null;
                   },
@@ -482,7 +486,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                   validator: (value) {
                     if (_descriptionError != null) return _descriptionError;
                     if ((value ?? '').trim().isEmpty) {
-                      return 'Description is required.';
+                      return context.l10n.validationDescriptionRequired;
                     }
                     return null;
                   },
@@ -498,9 +502,10 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                   validator: (value) {
                     if (_priceError != null) return _priceError;
                     final text = (value ?? '').trim();
-                    if (text.isEmpty) return 'Price is required.';
+                    if (text.isEmpty)
+                      return context.l10n.validationPriceRequired;
                     if (double.tryParse(text) == null) {
-                      return 'Enter a valid price (e.g. 199.99).';
+                      return context.l10n.validationPriceInvalid;
                     }
                     return null;
                   },
@@ -566,7 +571,10 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                 const SizedBox(height: 24),
                 AppButton(
                   key: const Key('productForm_submitButton'),
-                  label: widget.isEditing ? 'Save changes' : 'Create product',
+                  label:
+                      widget.isEditing
+                          ? context.l10n.productFormSaveChanges
+                          : context.l10n.productFormCreate,
                   isLoading: _isSubmitting,
                   onPressed: _submit,
                 ),

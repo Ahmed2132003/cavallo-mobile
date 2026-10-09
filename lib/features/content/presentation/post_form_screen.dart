@@ -130,7 +130,7 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
       if (!mounted) return;
       setState(() {
         if (failure == null) {
-          _generalError = 'Something went wrong. Please try again.';
+          _generalError = context.l10n.commonGenericError;
           return;
         }
         switch (failure) {
@@ -241,7 +241,7 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
                   validator: (value) {
                     if (_captionError != null) return _captionError;
                     if ((value ?? '').trim().isEmpty) {
-                      return 'Caption is required.';
+                      return context.l10n.validationCaptionRequired;
                     }
                     return null;
                   },
