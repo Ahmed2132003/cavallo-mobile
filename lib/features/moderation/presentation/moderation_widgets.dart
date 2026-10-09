@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:social_commerce_app/core/theme/app_colors.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/widgets/app_status_chip.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/queue_item_entity.dart';
 import '../domain/queue_sla.dart';
 
@@ -20,32 +22,51 @@ import '../domain/queue_sla.dart';
 /// skew between server and device can't produce one - `age` is computed
 /// server-side and clamped at 0 - but this stays safe regardless) is
 /// treated as zero.
-String formatQueueAge(Duration age) {
+///
+/// Part P-115 (STEP 8A): the words come from the ARB files. [l10n] is the
+/// active language; without it the English texts are used (plain unit
+/// tests have no widget tree).
+String formatQueueAge(Duration age, {AppLocalizations? l10n}) {
+  final texts = l10n ?? lookupAppLocalizations(const Locale('en'));
   final totalMinutes = age.isNegative ? 0 : age.inMinutes;
   if (totalMinutes < 1) {
-    return '<1 min';
+    return texts.moderationAgeUnderMinute;
   }
   if (totalMinutes < 60) {
-    return '$totalMinutes min';
+    return texts.moderationAgeMinutes(totalMinutes);
   }
   final totalHours = totalMinutes ~/ 60;
   if (totalHours < 24) {
     final minutes = totalMinutes % 60;
-    return minutes == 0 ? '$totalHours h' : '$totalHours h $minutes min';
+    return minutes == 0
+        ? texts.moderationAgeHours(totalHours)
+        : texts.moderationAgeHoursMinutes(totalHours, minutes);
   }
   final days = totalHours ~/ 24;
   final hours = totalHours % 24;
-  return hours == 0 ? '$days d' : '$days d $hours h';
+  return hours == 0
+      ? texts.moderationAgeDays(days)
+      : texts.moderationAgeDaysHours(days, hours);
 }
 
 /// Display label for the backend's content-type model name
-/// (`"post"` -> `"Post"`). Deliberately generic - no per-type table - so a
-/// content type added in Phase 7/8 needs no change here.
-String contentTypeLabel(String contentType) {
+/// (`"post"` -> `"Post"`). The three known types are localized; any content
+/// type added later falls back to its capitalized backend name, so it needs
+/// no change here to show up.
+///
+/// Part P-115 (STEP 8A): [l10n] is the active language; without it the
+/// English texts are used.
+String contentTypeLabel(String contentType, {AppLocalizations? l10n}) {
+  final texts = l10n ?? lookupAppLocalizations(const Locale('en'));
   if (contentType.isEmpty) {
-    return 'Unknown';
+    return texts.moderationContentTypeUnknown;
   }
-  return contentType[0].toUpperCase() + contentType.substring(1);
+  return switch (contentType) {
+    'post' => texts.moderationContentTypePost,
+    'reel' => texts.moderationContentTypeReel,
+    'story' => texts.moderationContentTypeStory,
+    _ => contentType[0].toUpperCase() + contentType.substring(1),
+  };
 }
 
 /// Priority badge. `fast_path` is filled with the brand colour and carries a
@@ -76,7 +97,7 @@ class PriorityBadge extends StatelessWidget {
             Icon(Icons.bolt, size: 14, color: colors.onBrand),
             const SizedBox(width: 2),
             Text(
-              'Fast path',
+              context.l10n.moderationPriorityFast,
               style: textTheme.labelSmall?.copyWith(
                 color: colors.onBrand,
                 fontWeight: FontWeight.bold,
@@ -95,7 +116,7 @@ class PriorityBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        'Normal',
+        context.l10n.moderationPriorityNormal,
         style: textTheme.labelSmall?.copyWith(color: colors.textSecondary),
       ),
     );
@@ -119,10 +140,12 @@ class QueueAgeChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final urgency = ModerationSla.urgencyFor(priority: priority, age: age);
 
+    final l10n = context.l10n;
+    final ageText = formatQueueAge(age, l10n: l10n);
     final label =
         urgency == QueueUrgency.breached
-            ? '${formatQueueAge(age)} \u00B7 overdue'
-            : formatQueueAge(age);
+            ? l10n.moderationAgeOverdue(ageText)
+            : ageText;
 
     final (IconData icon, AppStatusTone tone) = switch (urgency) {
       QueueUrgency.onTrack => (Icons.schedule, AppStatusTone.success),

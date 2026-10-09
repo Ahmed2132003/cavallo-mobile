@@ -1033,4 +1033,262 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get consoleStoryTimeLeftLess => 'Less than 1m left';
+
+  @override
+  String get commonRefresh => 'Refresh';
+
+  @override
+  String get commonCancel => 'Cancel';
+
+  @override
+  String get moderationQueueTitle => 'Moderation queue';
+
+  @override
+  String get moderationQueueEmpty => 'The queue is clear.\nNothing is waiting for review.';
+
+  @override
+  String get moderationNotAllowed => 'Your account is not allowed to review content. If it should be, ask an admin to add it to the Moderator group.';
+
+  @override
+  String get moderationQueueLoadFailed => 'Could not load the moderation queue.';
+
+  @override
+  String moderationSummaryPending(int count) {
+    return '$count pending';
+  }
+
+  @override
+  String moderationSummaryPendingFast(int count, int fast) {
+    return '$count pending · $fast fast path';
+  }
+
+  @override
+  String get moderationNoPreview => 'No preview available';
+
+  @override
+  String get moderationPriorityFast => 'Fast path';
+
+  @override
+  String get moderationPriorityNormal => 'Normal';
+
+  @override
+  String get moderationAgeUnderMinute => '<1 min';
+
+  @override
+  String moderationAgeMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String moderationAgeHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String moderationAgeHoursMinutes(int hours, int minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String moderationAgeDays(int days) {
+    return '$days d';
+  }
+
+  @override
+  String moderationAgeDaysHours(int days, int hours) {
+    return '$days d $hours h';
+  }
+
+  @override
+  String moderationAgeOverdue(String age) {
+    return '$age · overdue';
+  }
+
+  @override
+  String get moderationContentTypePost => 'Post';
+
+  @override
+  String get moderationContentTypeReel => 'Reel';
+
+  @override
+  String get moderationContentTypeStory => 'Story';
+
+  @override
+  String get moderationContentTypeUnknown => 'Unknown';
+
+  @override
+  String get moderationReviewTitle => 'Review content';
+
+  @override
+  String get moderationPreview => 'Preview';
+
+  @override
+  String get moderationDetailType => 'Type';
+
+  @override
+  String get moderationDetailSubmittedBy => 'Submitted by';
+
+  @override
+  String get moderationDetailPriority => 'Priority';
+
+  @override
+  String get moderationDetailWaiting => 'Waiting';
+
+  @override
+  String get moderationDetailQueueItem => 'Queue item';
+
+  @override
+  String get moderationWaitingNote => 'Waiting time is as of the last queue refresh.';
+
+  @override
+  String get moderationReject => 'Reject';
+
+  @override
+  String get moderationApprove => 'Approve';
+
+  @override
+  String get moderationItemApproved => 'Item approved';
+
+  @override
+  String get moderationItemRejected => 'Item rejected';
+
+  @override
+  String get moderationApproveFailed => 'Could not approve this item. Please try again.';
+
+  @override
+  String get moderationRejectFailed => 'Could not reject this item. Please try again.';
+
+  @override
+  String get moderationAlreadyHandled => 'This item was already handled by someone else, or no longer exists. It has been removed from your queue.';
+
+  @override
+  String get moderationRejectTitle => 'Reject content';
+
+  @override
+  String get moderationRejectNote => 'The business will see this reason.';
+
+  @override
+  String get moderationRejectReasonLabel => 'Reason (required)';
+
+  @override
+  String get moderationRejectReasonRequired => 'A reason is required.';
+
+  @override
+  String get analyticsLoadFailed => 'Could not load your analytics.';
+
+  @override
+  String analyticsEmpty(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'No activity has been recorded for the last $days days yet.',
+      one: 'No activity has been recorded for the last day yet.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String analyticsDaysWithData(int withData, int days) {
+    return 'Days with data: $withData of $days';
+  }
+
+  @override
+  String get analyticsUtcNote => 'Days are counted in UTC. Days without a recorded row are not drawn as zero.';
+
+  @override
+  String get analyticsChartFollowersTitle => 'New followers by day';
+
+  @override
+  String analyticsChartFollowersSemantics(int days, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'New followers: $total total over $days days',
+      one: 'New followers: $total total over 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get analyticsChartLikesTitle => 'Likes received by day';
+
+  @override
+  String analyticsChartLikesSemantics(int days, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Likes received: $total total over $days days',
+      one: 'Likes received: $total total over 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get analyticsRatingsHeading => 'Ratings';
+
+  @override
+  String get analyticsRatingEmpty => 'No rating has been recorded yet, so there is no rating trend to draw.';
+
+  @override
+  String get analyticsChartRatingTitle => 'Average rating by day';
+
+  @override
+  String analyticsChartRatingSemantics(int days, String average) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Average rating: latest $average over $days days',
+      one: 'Average rating: latest $average over 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get analyticsRatingNote => 'Each point is the average rating stored when that day was rolled up. Days before the first rating are not drawn.';
+
+  @override
+  String get analyticsCatalogHeading => 'Catalog size';
+
+  @override
+  String analyticsCatalogAsOf(int day, int month) {
+    return 'As of $day/$month (UTC). These are totals recorded by the daily rollup, not daily changes.';
+  }
+
+  @override
+  String analyticsRangeDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '$days day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get analyticsNewFollowers => 'New followers';
+
+  @override
+  String get analyticsLikesReceived => 'Likes received';
+
+  @override
+  String get analyticsCommentsReceived => 'Comments received';
+
+  @override
+  String get analyticsStoryViews => 'Story views';
+
+  @override
+  String get analyticsNewRatings => 'New ratings';
+
+  @override
+  String get analyticsAverageRating => 'Average rating';
+
+  @override
+  String get analyticsActiveProducts => 'Active products';
+
+  @override
+  String get analyticsPublishedPosts => 'Published posts';
+
+  @override
+  String get analyticsPublishedReels => 'Published reels';
 }

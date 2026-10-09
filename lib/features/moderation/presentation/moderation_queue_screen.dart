@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/empty_state_widget.dart';
@@ -49,21 +50,22 @@ class ModerationQueueScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Moderation queue'),
+        title: Text(context.l10n.moderationQueueTitle),
         actions: [
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: context.l10n.commonRefresh,
             icon: const Icon(Icons.refresh),
             onPressed:
                 () => ref.read(moderationQueueProvider.notifier).refresh(),
           ),
         ],
       ),
-      body: _buildBody(ref, queueAsync, items),
+      body: _buildBody(context, ref, queueAsync, items),
     );
   }
 
   Widget _buildBody(
+    BuildContext context,
     WidgetRef ref,
     AsyncValue<List<QueueItem>> queueAsync,
     List<QueueItem>? items,
@@ -74,7 +76,7 @@ class ModerationQueueScreen extends ConsumerWidget {
     // loading indicator so pressing Retry visibly does something.
     if (queueAsync.hasError && !queueAsync.isLoading) {
       return ErrorStateWidget(
-        message: _loadErrorMessage(queueAsync.error),
+        message: _loadErrorMessage(context, queueAsync.error),
         onRetry: () => ref.read(moderationQueueProvider.notifier).refresh(),
       );
     }
@@ -82,8 +84,8 @@ class ModerationQueueScreen extends ConsumerWidget {
       return const LoadingIndicator();
     }
     if (items.isEmpty) {
-      return const EmptyStateWidget(
-        message: 'The queue is clear.\nNothing is waiting for review.',
+      return EmptyStateWidget(
+        message: context.l10n.moderationQueueEmpty,
         icon: Icons.task_alt,
       );
     }
@@ -97,13 +99,12 @@ class ModerationQueueScreen extends ConsumerWidget {
 /// flags, but the API requires the `can_moderate_content` permission,
 /// which comes from Group membership - an account with the flag but not
 /// the Group lands here (see the P-040 gap note in PROJECT_PROGRESS.md).
-String _loadErrorMessage(Object? error) {
+String _loadErrorMessage(BuildContext context, Object? error) {
+  final l10n = context.l10n;
   return switch (error) {
-    DioException(error: AuthFailure()) =>
-      'Your account is not allowed to review content. If it should be, '
-          'ask an admin to add it to the Moderator group.',
+    DioException(error: AuthFailure()) => l10n.moderationNotAllowed,
     DioException(error: final ApiFailure failure) => failure.message,
-    _ => 'Could not load the moderation queue.',
+    _ => l10n.moderationQueueLoadFailed,
   };
 }
 
@@ -149,10 +150,11 @@ class _SummaryBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fastPathCount = items.where((item) => item.isFastPath).length;
+    final l10n = context.l10n;
     final text =
         fastPathCount == 0
-            ? '${items.length} pending'
-            : '${items.length} pending \u00B7 $fastPathCount fast path';
+            ? l10n.moderationSummaryPending(items.length)
+            : l10n.moderationSummaryPendingFast(items.length, fastPathCount);
 
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 8),
@@ -183,12 +185,12 @@ class _QueueRow extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final previewText = item.previewText;
     final hasPreview = previewText != null && previewText.isNotEmpty;
-    final String shownText = hasPreview ? previewText : 'No preview available';
+    final String shownText =
+        hasPreview ? previewText : context.l10n.moderationNoPreview;
     final submitter = item.submitterBusinessName;
+    final typeLabel = contentTypeLabel(item.contentType, l10n: context.l10n);
     final typeLine =
-        submitter == null
-            ? contentTypeLabel(item.contentType)
-            : '${contentTypeLabel(item.contentType)} \u00B7 $submitter';
+        submitter == null ? typeLabel : '$typeLabel \u00B7 $submitter';
 
     return Material(
       key: ValueKey('queue-row-${item.id}'),

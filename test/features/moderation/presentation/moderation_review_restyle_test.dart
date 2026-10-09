@@ -15,8 +15,9 @@ import 'package:social_commerce_app/l10n/app_localizations.dart';
 /// (approve, reject, errors, already handled) stay in the P-040 file, which is
 /// unchanged.
 ///
-/// Strings stay English on purpose (localizing the moderation feature is
-/// STEP 8, together with the old test harnesses).
+/// The moderation strings are localized (STEP 8A). The English tests use
+/// English finders; the Arabic tests read their expected text from the
+/// generated Arabic localizations (this file stays ASCII).
 
 class _FixedQueue extends ModerationQueueNotifier {
   _FixedQueue(this._items);
@@ -185,9 +186,10 @@ void main() {
       tester.getCenter(_reject).dx,
       greaterThan(tester.getCenter(_approve).dx),
     );
+    final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
     expect(
-      tester.getCenter(find.text('Type')).dx,
-      greaterThan(tester.getCenter(find.text('Post')).dx),
+      tester.getCenter(find.text(ar.moderationDetailType)).dx,
+      greaterThan(tester.getCenter(find.text(ar.moderationContentTypePost)).dx),
     );
     expect(tester.takeException(), isNull);
   });

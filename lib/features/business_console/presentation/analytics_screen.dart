@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
@@ -44,7 +45,7 @@ class AnalyticsScreen extends ConsumerWidget {
     final statsAsync = ref.watch(analyticsStatsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Analytics')),
+      appBar: AppBar(title: Text(context.l10n.consoleNavAnalytics)),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(analyticsStatsProvider);
@@ -82,6 +83,7 @@ class AnalyticsScreen extends ConsumerWidget {
     AsyncValue<List<DailyStats>> statsAsync,
     int days,
   ) {
+    final l10n = context.l10n;
     // A finished failure wins over any stale value; while a retry or a
     // range change is in flight, show loading so the action visibly does
     // something and N never disagrees with the rows shown.
@@ -96,7 +98,7 @@ class AnalyticsScreen extends ConsumerWidget {
     if (statsAsync.hasError) {
       return [
         _ErrorView(
-          message: _loadErrorMessage(statsAsync.error),
+          message: _loadErrorMessage(context, statsAsync.error),
           onRetry: () => ref.invalidate(analyticsStatsProvider),
         ),
       ];
@@ -109,8 +111,7 @@ class AnalyticsScreen extends ConsumerWidget {
           height: 240,
           child: EmptyStateWidget(
             key: const ValueKey('analytics-empty'),
-            message:
-                'No activity has been recorded for the last $days days yet.',
+            message: l10n.analyticsEmpty(days),
             icon: Icons.bar_chart,
           ),
         ),
@@ -127,54 +128,54 @@ class AnalyticsScreen extends ConsumerWidget {
       _TotalsGrid(totals: totals),
       const SizedBox(height: 8),
       Text(
-        'Days with data: $withData of $days',
+        l10n.analyticsDaysWithData(withData, days),
         key: const ValueKey('analytics-days-with-data'),
         style: Theme.of(context).textTheme.bodySmall,
       ),
-      Text(
-        'Days are counted in UTC. Days without a recorded row are not '
-        'drawn as zero.',
-        style: Theme.of(context).textTheme.bodySmall,
-      ),
+      Text(l10n.analyticsUtcNote, style: Theme.of(context).textTheme.bodySmall),
       const SizedBox(height: 16),
       AnalyticsLineChart(
         key: const ValueKey('analytics-chart-new-followers'),
-        title: 'New followers by day',
-        semanticsLabel:
-            'New followers: ${totals.newFollowers} total over $days days',
+        title: l10n.analyticsChartFollowersTitle,
+        semanticsLabel: l10n.analyticsChartFollowersSemantics(
+          days,
+          totals.newFollowers,
+        ),
         rows: rows,
         valueOf: (row) => row.newFollowers,
       ),
       const SizedBox(height: 16),
       AnalyticsLineChart(
         key: const ValueKey('analytics-chart-total-likes'),
-        title: 'Likes received by day',
-        semanticsLabel:
-            'Likes received: ${totals.likesReceived} total over $days days',
+        title: l10n.analyticsChartLikesTitle,
+        semanticsLabel: l10n.analyticsChartLikesSemantics(
+          days,
+          totals.likesReceived,
+        ),
         rows: rows,
         valueOf: (row) => row.totalLikesReceived,
         color: context.appColors.warningText,
         dashArray: const [8, 4],
       ),
       const SizedBox(height: 24),
-      const _SectionHeading('Ratings'),
+      _SectionHeading(l10n.analyticsRatingsHeading),
       const SizedBox(height: 8),
       _RatingCards(summary: ratings),
       const SizedBox(height: 12),
       if (rated.isEmpty)
         Text(
-          'No rating has been recorded yet, so there is no rating trend '
-          'to draw.',
+          l10n.analyticsRatingEmpty,
           key: const ValueKey('analytics-rating-empty'),
           style: Theme.of(context).textTheme.bodySmall,
         )
       else ...[
         AnalyticsLineChart(
           key: const ValueKey('analytics-chart-rating-trend'),
-          title: 'Average rating by day',
-          semanticsLabel:
-              'Average rating: latest '
-              '${ratings.latestAverage?.toStringAsFixed(2)} over $days days',
+          title: l10n.analyticsChartRatingTitle,
+          semanticsLabel: l10n.analyticsChartRatingSemantics(
+            days,
+            ratings.latestAverage?.toStringAsFixed(2) ?? '',
+          ),
           rows: rated,
           valueOf: (row) => row.averageRatingSnapshot,
           fixedMaxY: 5,
@@ -184,18 +185,16 @@ class AnalyticsScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'Each point is the average rating stored when that day was rolled '
-          'up. Days before the first rating are not drawn.',
+          l10n.analyticsRatingNote,
           style: Theme.of(context).textTheme.bodySmall,
         ),
       ],
       if (catalog != null) ...[
         const SizedBox(height: 24),
-        const _SectionHeading('Catalog size'),
+        _SectionHeading(l10n.analyticsCatalogHeading),
         const SizedBox(height: 4),
         Text(
-          'As of ${catalog.asOf.day}/${catalog.asOf.month} (UTC). These are '
-          'totals recorded by the daily rollup, not daily changes.',
+          l10n.analyticsCatalogAsOf(catalog.asOf.day, catalog.asOf.month),
           key: const ValueKey('analytics-catalog-as-of'),
           style: Theme.of(context).textTheme.bodySmall,
         ),
@@ -207,10 +206,10 @@ class AnalyticsScreen extends ConsumerWidget {
 }
 
 /// Maps a load failure to what the business owner should read.
-String _loadErrorMessage(Object? error) {
+String _loadErrorMessage(BuildContext context, Object? error) {
   return switch (error) {
     DioException(error: final ApiFailure failure) => failure.message,
-    _ => 'Could not load your analytics.',
+    _ => context.l10n.analyticsLoadFailed,
   };
 }
 
@@ -222,20 +221,30 @@ class _RangeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return SegmentedButton<int>(
       showSelectedIcon: false,
-      segments: const [
+      segments: [
         ButtonSegment(
           value: 7,
-          label: Text('7 days', key: ValueKey('analytics-range-7')),
+          label: Text(
+            l10n.analyticsRangeDays(7),
+            key: const ValueKey('analytics-range-7'),
+          ),
         ),
         ButtonSegment(
           value: 14,
-          label: Text('14 days', key: ValueKey('analytics-range-14')),
+          label: Text(
+            l10n.analyticsRangeDays(14),
+            key: const ValueKey('analytics-range-14'),
+          ),
         ),
         ButtonSegment(
           value: 30,
-          label: Text('30 days', key: ValueKey('analytics-range-30')),
+          label: Text(
+            l10n.analyticsRangeDays(30),
+            key: const ValueKey('analytics-range-30'),
+          ),
         ),
       ],
       selected: {selected},
@@ -251,6 +260,7 @@ class _TotalsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       children: [
         Row(
@@ -258,7 +268,7 @@ class _TotalsGrid extends StatelessWidget {
             Expanded(
               child: _TotalCard(
                 key: const ValueKey('analytics-total-new-followers'),
-                label: 'New followers',
+                label: l10n.analyticsNewFollowers,
                 value: '${totals.newFollowers}',
                 icon: Icons.person_add_alt_1,
               ),
@@ -267,7 +277,7 @@ class _TotalsGrid extends StatelessWidget {
             Expanded(
               child: _TotalCard(
                 key: const ValueKey('analytics-total-likes-received'),
-                label: 'Likes received',
+                label: l10n.analyticsLikesReceived,
                 value: '${totals.likesReceived}',
                 icon: Icons.favorite_border,
               ),
@@ -280,7 +290,7 @@ class _TotalsGrid extends StatelessWidget {
             Expanded(
               child: _TotalCard(
                 key: const ValueKey('analytics-total-comments-received'),
-                label: 'Comments received',
+                label: l10n.analyticsCommentsReceived,
                 value: '${totals.commentsReceived}',
                 icon: Icons.chat_bubble_outline,
               ),
@@ -289,7 +299,7 @@ class _TotalsGrid extends StatelessWidget {
             Expanded(
               child: _TotalCard(
                 key: const ValueKey('analytics-total-story-views'),
-                label: 'Story views',
+                label: l10n.analyticsStoryViews,
                 value: '${totals.storyViews}',
                 icon: Icons.visibility_outlined,
               ),
@@ -322,12 +332,13 @@ class _RatingCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final latest = summary.latestAverage;
+    final l10n = context.l10n;
     return Row(
       children: [
         Expanded(
           child: _TotalCard(
             key: const ValueKey('analytics-total-new-ratings'),
-            label: 'New ratings',
+            label: l10n.analyticsNewRatings,
             value: '${summary.newRatings}',
             icon: Icons.star_border,
           ),
@@ -336,7 +347,7 @@ class _RatingCards extends StatelessWidget {
         Expanded(
           child: _TotalCard(
             key: const ValueKey('analytics-rating-latest'),
-            label: 'Average rating',
+            label: l10n.analyticsAverageRating,
             value: latest == null ? '\u2014' : latest.toStringAsFixed(2),
             icon: Icons.star,
           ),
@@ -354,12 +365,13 @@ class _CatalogRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Row(
       children: [
         Expanded(
           child: _TotalCard(
             key: const ValueKey('analytics-catalog-active-products'),
-            label: 'Active products',
+            label: l10n.analyticsActiveProducts,
             value: '${catalog.activeProducts}',
             icon: Icons.inventory_2_outlined,
           ),
@@ -368,7 +380,7 @@ class _CatalogRow extends StatelessWidget {
         Expanded(
           child: _TotalCard(
             key: const ValueKey('analytics-catalog-published-posts'),
-            label: 'Published posts',
+            label: l10n.analyticsPublishedPosts,
             value: '${catalog.publishedPosts}',
             icon: Icons.article_outlined,
           ),
@@ -377,7 +389,7 @@ class _CatalogRow extends StatelessWidget {
         Expanded(
           child: _TotalCard(
             key: const ValueKey('analytics-catalog-published-reels'),
-            label: 'Published reels',
+            label: l10n.analyticsPublishedReels,
             value: '${catalog.publishedReels}',
             icon: Icons.movie_outlined,
           ),
@@ -444,7 +456,7 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 16),
           AppButton(
             key: const ValueKey('analytics-retry-button'),
-            label: 'Retry',
+            label: context.l10n.commonRetry,
             onPressed: onRetry,
           ),
         ],

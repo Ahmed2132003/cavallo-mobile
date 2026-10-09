@@ -1834,6 +1834,402 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Less than 1m left'**
   String get consoleStoryTimeLeftLess;
+
+  /// Generic refresh button / tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get commonRefresh;
+
+  /// Generic cancel button of a dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get commonCancel;
+
+  /// Staff: title of the moderation queue screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderation queue'**
+  String get moderationQueueTitle;
+
+  /// Staff: empty state of the moderation queue.
+  ///
+  /// In en, this message translates to:
+  /// **'The queue is clear.\nNothing is waiting for review.'**
+  String get moderationQueueEmpty;
+
+  /// Staff: shown when the API answers 403 for a moderation call.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is not allowed to review content. If it should be, ask an admin to add it to the Moderator group.'**
+  String get moderationNotAllowed;
+
+  /// Staff: generic load failure of the moderation queue.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the moderation queue.'**
+  String get moderationQueueLoadFailed;
+
+  /// Staff: queue summary line. count is the number of pending items.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} pending'**
+  String moderationSummaryPending(int count);
+
+  /// Staff: queue summary line when some items are fast path.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} pending · {fast} fast path'**
+  String moderationSummaryPendingFast(int count, int fast);
+
+  /// Staff: placeholder when a queue item has no preview text.
+  ///
+  /// In en, this message translates to:
+  /// **'No preview available'**
+  String get moderationNoPreview;
+
+  /// Staff: priority badge of a fast path item.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast path'**
+  String get moderationPriorityFast;
+
+  /// Staff: priority badge of a normal item.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get moderationPriorityNormal;
+
+  /// Staff: waiting time shorter than one minute.
+  ///
+  /// In en, this message translates to:
+  /// **'<1 min'**
+  String get moderationAgeUnderMinute;
+
+  /// Staff: waiting time in minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String moderationAgeMinutes(int minutes);
+
+  /// Staff: waiting time in whole hours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h'**
+  String moderationAgeHours(int hours);
+
+  /// Staff: waiting time in hours and minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h {minutes} min'**
+  String moderationAgeHoursMinutes(int hours, int minutes);
+
+  /// Staff: waiting time in whole days.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} d'**
+  String moderationAgeDays(int days);
+
+  /// Staff: waiting time in days and hours.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} d {hours} h'**
+  String moderationAgeDaysHours(int days, int hours);
+
+  /// Staff: waiting time chip text when the SLA is breached. age is the already formatted waiting time.
+  ///
+  /// In en, this message translates to:
+  /// **'{age} · overdue'**
+  String moderationAgeOverdue(String age);
+
+  /// Staff: content type label.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get moderationContentTypePost;
+
+  /// Staff: content type label.
+  ///
+  /// In en, this message translates to:
+  /// **'Reel'**
+  String get moderationContentTypeReel;
+
+  /// Staff: content type label.
+  ///
+  /// In en, this message translates to:
+  /// **'Story'**
+  String get moderationContentTypeStory;
+
+  /// Staff: content type label when the backend sent none.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get moderationContentTypeUnknown;
+
+  /// Staff: title of the review screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Review content'**
+  String get moderationReviewTitle;
+
+  /// Staff: caption above the preview text on the review screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get moderationPreview;
+
+  /// Staff: review details row label.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get moderationDetailType;
+
+  /// Staff: review details row label.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted by'**
+  String get moderationDetailSubmittedBy;
+
+  /// Staff: review details row label.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority'**
+  String get moderationDetailPriority;
+
+  /// Staff: review details row label.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting'**
+  String get moderationDetailWaiting;
+
+  /// Staff: review details row label.
+  ///
+  /// In en, this message translates to:
+  /// **'Queue item'**
+  String get moderationDetailQueueItem;
+
+  /// Staff: note under the review details.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting time is as of the last queue refresh.'**
+  String get moderationWaitingNote;
+
+  /// Staff: reject button and confirm button.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get moderationReject;
+
+  /// Staff: approve button.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get moderationApprove;
+
+  /// Staff: snackbar after approving.
+  ///
+  /// In en, this message translates to:
+  /// **'Item approved'**
+  String get moderationItemApproved;
+
+  /// Staff: snackbar after rejecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Item rejected'**
+  String get moderationItemRejected;
+
+  /// Staff: fallback error when approving fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not approve this item. Please try again.'**
+  String get moderationApproveFailed;
+
+  /// Staff: fallback error when rejecting fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reject this item. Please try again.'**
+  String get moderationRejectFailed;
+
+  /// Staff: snackbar when the item is no longer pending.
+  ///
+  /// In en, this message translates to:
+  /// **'This item was already handled by someone else, or no longer exists. It has been removed from your queue.'**
+  String get moderationAlreadyHandled;
+
+  /// Staff: title of the reject dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject content'**
+  String get moderationRejectTitle;
+
+  /// Staff: note in the reject dialog. The rejection reason is always visible to the business.
+  ///
+  /// In en, this message translates to:
+  /// **'The business will see this reason.'**
+  String get moderationRejectNote;
+
+  /// Staff: label of the reason field in the reject dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason (required)'**
+  String get moderationRejectReasonLabel;
+
+  /// Staff: validation text under the reason field.
+  ///
+  /// In en, this message translates to:
+  /// **'A reason is required.'**
+  String get moderationRejectReasonRequired;
+
+  /// Business: analytics load failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your analytics.'**
+  String get analyticsLoadFailed;
+
+  /// Business: analytics empty state. days is the exact range (it picks the plural form).
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{No activity has been recorded for the last day yet.} other{No activity has been recorded for the last {days} days yet.}}'**
+  String analyticsEmpty(int days);
+
+  /// Business: how many days of the range have a recorded row.
+  ///
+  /// In en, this message translates to:
+  /// **'Days with data: {withData} of {days}'**
+  String analyticsDaysWithData(int withData, int days);
+
+  /// Business: note under the analytics totals.
+  ///
+  /// In en, this message translates to:
+  /// **'Days are counted in UTC. Days without a recorded row are not drawn as zero.'**
+  String get analyticsUtcNote;
+
+  /// Business: chart title.
+  ///
+  /// In en, this message translates to:
+  /// **'New followers by day'**
+  String get analyticsChartFollowersTitle;
+
+  /// Business: screen reader summary of the followers chart. days picks the plural form.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{New followers: {total} total over 1 day} other{New followers: {total} total over {days} days}}'**
+  String analyticsChartFollowersSemantics(int days, int total);
+
+  /// Business: chart title.
+  ///
+  /// In en, this message translates to:
+  /// **'Likes received by day'**
+  String get analyticsChartLikesTitle;
+
+  /// Business: screen reader summary of the likes chart. days picks the plural form.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{Likes received: {total} total over 1 day} other{Likes received: {total} total over {days} days}}'**
+  String analyticsChartLikesSemantics(int days, int total);
+
+  /// Business: section heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Ratings'**
+  String get analyticsRatingsHeading;
+
+  /// Business: shown when there is no rating in the range.
+  ///
+  /// In en, this message translates to:
+  /// **'No rating has been recorded yet, so there is no rating trend to draw.'**
+  String get analyticsRatingEmpty;
+
+  /// Business: chart title.
+  ///
+  /// In en, this message translates to:
+  /// **'Average rating by day'**
+  String get analyticsChartRatingTitle;
+
+  /// Business: screen reader summary of the rating chart. days picks the plural form; average is the formatted latest average.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{Average rating: latest {average} over 1 day} other{Average rating: latest {average} over {days} days}}'**
+  String analyticsChartRatingSemantics(int days, String average);
+
+  /// Business: note under the rating chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Each point is the average rating stored when that day was rolled up. Days before the first rating are not drawn.'**
+  String get analyticsRatingNote;
+
+  /// Business: section heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalog size'**
+  String get analyticsCatalogHeading;
+
+  /// Business: note above the catalog size cards.
+  ///
+  /// In en, this message translates to:
+  /// **'As of {day}/{month} (UTC). These are totals recorded by the daily rollup, not daily changes.'**
+  String analyticsCatalogAsOf(int day, int month);
+
+  /// Business: label of a range segment (7 / 14 / 30 days).
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{{days} day} other{{days} days}}'**
+  String analyticsRangeDays(int days);
+
+  /// Business: analytics card label.
+  ///
+  /// In en, this message translates to:
+  /// **'New followers'**
+  String get analyticsNewFollowers;
+
+  /// Business: analytics card label.
+  ///
+  /// In en, this message translates to:
+  /// **'Likes received'**
+  String get analyticsLikesReceived;
+
+  /// Business: analytics card label.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments received'**
+  String get analyticsCommentsReceived;
+
+  /// Business: analytics card label.
+  ///
+  /// In en, this message translates to:
+  /// **'Story views'**
+  String get analyticsStoryViews;
+
+  /// Business: analytics card label.
+  ///
+  /// In en, this message translates to:
+  /// **'New ratings'**
+  String get analyticsNewRatings;
+
+  /// Business: analytics card label.
+  ///
+  /// In en, this message translates to:
+  /// **'Average rating'**
+  String get analyticsAverageRating;
+
+  /// Business: analytics card label.
+  ///
+  /// In en, this message translates to:
+  /// **'Active products'**
+  String get analyticsActiveProducts;
+
+  /// Business: analytics card label.
+  ///
+  /// In en, this message translates to:
+  /// **'Published posts'**
+  String get analyticsPublishedPosts;
+
+  /// Business: analytics card label.
+  ///
+  /// In en, this message translates to:
+  /// **'Published reels'**
+  String get analyticsPublishedReels;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

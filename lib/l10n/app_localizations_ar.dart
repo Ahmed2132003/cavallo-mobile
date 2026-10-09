@@ -1073,4 +1073,282 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get consoleStoryTimeLeftLess => 'متبقّي أقل من دقيقة';
+
+  @override
+  String get commonRefresh => 'تحديث';
+
+  @override
+  String get commonCancel => 'إلغاء';
+
+  @override
+  String get moderationQueueTitle => 'قائمة المراجعة';
+
+  @override
+  String get moderationQueueEmpty => 'القائمة فارغة.\nلا يوجد شيء بانتظار المراجعة.';
+
+  @override
+  String get moderationNotAllowed => 'حسابك غير مسموح له بمراجعة المحتوى. إذا كان يجب أن يُسمح له، فاطلب من المسؤول إضافته إلى مجموعة المراجعين.';
+
+  @override
+  String get moderationQueueLoadFailed => 'تعذّر تحميل قائمة المراجعة.';
+
+  @override
+  String moderationSummaryPending(int count) {
+    return '$count بانتظار المراجعة';
+  }
+
+  @override
+  String moderationSummaryPendingFast(int count, int fast) {
+    return '$count بانتظار المراجعة · $fast مسار سريع';
+  }
+
+  @override
+  String get moderationNoPreview => 'لا توجد معاينة';
+
+  @override
+  String get moderationPriorityFast => 'مسار سريع';
+
+  @override
+  String get moderationPriorityNormal => 'عادي';
+
+  @override
+  String get moderationAgeUnderMinute => 'أقل من دقيقة';
+
+  @override
+  String moderationAgeMinutes(int minutes) {
+    return '$minutes د';
+  }
+
+  @override
+  String moderationAgeHours(int hours) {
+    return '$hours س';
+  }
+
+  @override
+  String moderationAgeHoursMinutes(int hours, int minutes) {
+    return '$hours س $minutes د';
+  }
+
+  @override
+  String moderationAgeDays(int days) {
+    return '$days يوم';
+  }
+
+  @override
+  String moderationAgeDaysHours(int days, int hours) {
+    return '$days يوم $hours س';
+  }
+
+  @override
+  String moderationAgeOverdue(String age) {
+    return '$age · متأخر';
+  }
+
+  @override
+  String get moderationContentTypePost => 'منشور';
+
+  @override
+  String get moderationContentTypeReel => 'ريل';
+
+  @override
+  String get moderationContentTypeStory => 'ستوري';
+
+  @override
+  String get moderationContentTypeUnknown => 'غير معروف';
+
+  @override
+  String get moderationReviewTitle => 'مراجعة المحتوى';
+
+  @override
+  String get moderationPreview => 'المعاينة';
+
+  @override
+  String get moderationDetailType => 'النوع';
+
+  @override
+  String get moderationDetailSubmittedBy => 'أرسله';
+
+  @override
+  String get moderationDetailPriority => 'الأولوية';
+
+  @override
+  String get moderationDetailWaiting => 'مدة الانتظار';
+
+  @override
+  String get moderationDetailQueueItem => 'عنصر القائمة';
+
+  @override
+  String get moderationWaitingNote => 'مدة الانتظار محسوبة حتى آخر تحديث للقائمة.';
+
+  @override
+  String get moderationReject => 'رفض';
+
+  @override
+  String get moderationApprove => 'موافقة';
+
+  @override
+  String get moderationItemApproved => 'تمت الموافقة على العنصر';
+
+  @override
+  String get moderationItemRejected => 'تم رفض العنصر';
+
+  @override
+  String get moderationApproveFailed => 'تعذّرت الموافقة على هذا العنصر. حاول مرة أخرى.';
+
+  @override
+  String get moderationRejectFailed => 'تعذّر رفض هذا العنصر. حاول مرة أخرى.';
+
+  @override
+  String get moderationAlreadyHandled => 'تمت معالجة هذا العنصر بواسطة شخص آخر أو لم يعد موجودًا. تمت إزالته من قائمتك.';
+
+  @override
+  String get moderationRejectTitle => 'رفض المحتوى';
+
+  @override
+  String get moderationRejectNote => 'سيرى النشاط التجاري هذا السبب.';
+
+  @override
+  String get moderationRejectReasonLabel => 'السبب (مطلوب)';
+
+  @override
+  String get moderationRejectReasonRequired => 'السبب مطلوب.';
+
+  @override
+  String get analyticsLoadFailed => 'تعذّر تحميل التحليلات.';
+
+  @override
+  String analyticsEmpty(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'لم يتم تسجيل أي نشاط خلال آخر $days يوم بعد.',
+      many: 'لم يتم تسجيل أي نشاط خلال آخر $days يومًا بعد.',
+      few: 'لم يتم تسجيل أي نشاط خلال آخر $days أيام بعد.',
+      two: 'لم يتم تسجيل أي نشاط خلال آخر يومين بعد.',
+      one: 'لم يتم تسجيل أي نشاط خلال آخر يوم بعد.',
+      zero: 'لم يتم تسجيل أي نشاط خلال آخر $days يوم بعد.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String analyticsDaysWithData(int withData, int days) {
+    return 'أيام بها بيانات: $withData من $days';
+  }
+
+  @override
+  String get analyticsUtcNote => 'تُحتسب الأيام بالتوقيت العالمي المنسّق (UTC). الأيام التي لا يوجد لها سجل لا تُرسم على أنها صفر.';
+
+  @override
+  String get analyticsChartFollowersTitle => 'المتابعون الجدد حسب اليوم';
+
+  @override
+  String analyticsChartFollowersSemantics(int days, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'المتابعون الجدد: $total إجمالًا خلال $days يوم',
+      many: 'المتابعون الجدد: $total إجمالًا خلال $days يومًا',
+      few: 'المتابعون الجدد: $total إجمالًا خلال $days أيام',
+      two: 'المتابعون الجدد: $total إجمالًا خلال يومين',
+      one: 'المتابعون الجدد: $total إجمالًا خلال يوم واحد',
+      zero: 'المتابعون الجدد: $total إجمالًا خلال $days يوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get analyticsChartLikesTitle => 'الإعجابات المستلمة حسب اليوم';
+
+  @override
+  String analyticsChartLikesSemantics(int days, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'الإعجابات المستلمة: $total إجمالًا خلال $days يوم',
+      many: 'الإعجابات المستلمة: $total إجمالًا خلال $days يومًا',
+      few: 'الإعجابات المستلمة: $total إجمالًا خلال $days أيام',
+      two: 'الإعجابات المستلمة: $total إجمالًا خلال يومين',
+      one: 'الإعجابات المستلمة: $total إجمالًا خلال يوم واحد',
+      zero: 'الإعجابات المستلمة: $total إجمالًا خلال $days يوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get analyticsRatingsHeading => 'التقييمات';
+
+  @override
+  String get analyticsRatingEmpty => 'لم يتم تسجيل أي تقييم بعد، لذلك لا يوجد اتجاه تقييم لرسمه.';
+
+  @override
+  String get analyticsChartRatingTitle => 'متوسط التقييم حسب اليوم';
+
+  @override
+  String analyticsChartRatingSemantics(int days, String average) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'متوسط التقييم: الأحدث $average خلال $days يوم',
+      many: 'متوسط التقييم: الأحدث $average خلال $days يومًا',
+      few: 'متوسط التقييم: الأحدث $average خلال $days أيام',
+      two: 'متوسط التقييم: الأحدث $average خلال يومين',
+      one: 'متوسط التقييم: الأحدث $average خلال يوم واحد',
+      zero: 'متوسط التقييم: الأحدث $average خلال $days يوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get analyticsRatingNote => 'كل نقطة هي متوسط التقييم المحفوظ عند تجميع ذلك اليوم. الأيام السابقة لأول تقييم لا تُرسم.';
+
+  @override
+  String get analyticsCatalogHeading => 'حجم الكتالوج';
+
+  @override
+  String analyticsCatalogAsOf(int day, int month) {
+    return 'حتى $day/$month (UTC). هذه إجماليات سجّلها التجميع اليومي، وليست تغيّرات يومية.';
+  }
+
+  @override
+  String analyticsRangeDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days يوم',
+      many: '$days يومًا',
+      few: '$days أيام',
+      two: 'يومان',
+      one: 'يوم',
+      zero: '$days يوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get analyticsNewFollowers => 'متابعون جدد';
+
+  @override
+  String get analyticsLikesReceived => 'الإعجابات المستلمة';
+
+  @override
+  String get analyticsCommentsReceived => 'التعليقات المستلمة';
+
+  @override
+  String get analyticsStoryViews => 'مشاهدات الستوري';
+
+  @override
+  String get analyticsNewRatings => 'تقييمات جديدة';
+
+  @override
+  String get analyticsAverageRating => 'متوسط التقييم';
+
+  @override
+  String get analyticsActiveProducts => 'المنتجات النشطة';
+
+  @override
+  String get analyticsPublishedPosts => 'المنشورات المنشورة';
+
+  @override
+  String get analyticsPublishedReels => 'الريلز المنشورة';
 }

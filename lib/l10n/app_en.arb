@@ -1359,5 +1359,368 @@
   "consoleStoryTimeLeftLess": "Less than 1m left",
   "@consoleStoryTimeLeftLess": {
     "description": "Time left of a story: under one minute."
+  },
+  "commonRefresh": "Refresh",
+  "@commonRefresh": {
+    "description": "Generic refresh button / tooltip."
+  },
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "Generic cancel button of a dialog."
+  },
+  "moderationQueueTitle": "Moderation queue",
+  "@moderationQueueTitle": {
+    "description": "Staff: title of the moderation queue screen."
+  },
+  "moderationQueueEmpty": "The queue is clear.\nNothing is waiting for review.",
+  "@moderationQueueEmpty": {
+    "description": "Staff: empty state of the moderation queue."
+  },
+  "moderationNotAllowed": "Your account is not allowed to review content. If it should be, ask an admin to add it to the Moderator group.",
+  "@moderationNotAllowed": {
+    "description": "Staff: shown when the API answers 403 for a moderation call."
+  },
+  "moderationQueueLoadFailed": "Could not load the moderation queue.",
+  "@moderationQueueLoadFailed": {
+    "description": "Staff: generic load failure of the moderation queue."
+  },
+  "moderationSummaryPending": "{count} pending",
+  "@moderationSummaryPending": {
+    "description": "Staff: queue summary line. count is the number of pending items.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moderationSummaryPendingFast": "{count} pending \u00b7 {fast} fast path",
+  "@moderationSummaryPendingFast": {
+    "description": "Staff: queue summary line when some items are fast path.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "fast": {
+        "type": "int"
+      }
+    }
+  },
+  "moderationNoPreview": "No preview available",
+  "@moderationNoPreview": {
+    "description": "Staff: placeholder when a queue item has no preview text."
+  },
+  "moderationPriorityFast": "Fast path",
+  "@moderationPriorityFast": {
+    "description": "Staff: priority badge of a fast path item."
+  },
+  "moderationPriorityNormal": "Normal",
+  "@moderationPriorityNormal": {
+    "description": "Staff: priority badge of a normal item."
+  },
+  "moderationAgeUnderMinute": "<1 min",
+  "@moderationAgeUnderMinute": {
+    "description": "Staff: waiting time shorter than one minute."
+  },
+  "moderationAgeMinutes": "{minutes} min",
+  "@moderationAgeMinutes": {
+    "description": "Staff: waiting time in minutes.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "moderationAgeHours": "{hours} h",
+  "@moderationAgeHours": {
+    "description": "Staff: waiting time in whole hours.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "moderationAgeHoursMinutes": "{hours} h {minutes} min",
+  "@moderationAgeHoursMinutes": {
+    "description": "Staff: waiting time in hours and minutes.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "moderationAgeDays": "{days} d",
+  "@moderationAgeDays": {
+    "description": "Staff: waiting time in whole days.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "moderationAgeDaysHours": "{days} d {hours} h",
+  "@moderationAgeDaysHours": {
+    "description": "Staff: waiting time in days and hours.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "moderationAgeOverdue": "{age} \u00b7 overdue",
+  "@moderationAgeOverdue": {
+    "description": "Staff: waiting time chip text when the SLA is breached. age is the already formatted waiting time.",
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "moderationContentTypePost": "Post",
+  "@moderationContentTypePost": {
+    "description": "Staff: content type label."
+  },
+  "moderationContentTypeReel": "Reel",
+  "@moderationContentTypeReel": {
+    "description": "Staff: content type label."
+  },
+  "moderationContentTypeStory": "Story",
+  "@moderationContentTypeStory": {
+    "description": "Staff: content type label."
+  },
+  "moderationContentTypeUnknown": "Unknown",
+  "@moderationContentTypeUnknown": {
+    "description": "Staff: content type label when the backend sent none."
+  },
+  "moderationReviewTitle": "Review content",
+  "@moderationReviewTitle": {
+    "description": "Staff: title of the review screen."
+  },
+  "moderationPreview": "Preview",
+  "@moderationPreview": {
+    "description": "Staff: caption above the preview text on the review screen."
+  },
+  "moderationDetailType": "Type",
+  "@moderationDetailType": {
+    "description": "Staff: review details row label."
+  },
+  "moderationDetailSubmittedBy": "Submitted by",
+  "@moderationDetailSubmittedBy": {
+    "description": "Staff: review details row label."
+  },
+  "moderationDetailPriority": "Priority",
+  "@moderationDetailPriority": {
+    "description": "Staff: review details row label."
+  },
+  "moderationDetailWaiting": "Waiting",
+  "@moderationDetailWaiting": {
+    "description": "Staff: review details row label."
+  },
+  "moderationDetailQueueItem": "Queue item",
+  "@moderationDetailQueueItem": {
+    "description": "Staff: review details row label."
+  },
+  "moderationWaitingNote": "Waiting time is as of the last queue refresh.",
+  "@moderationWaitingNote": {
+    "description": "Staff: note under the review details."
+  },
+  "moderationReject": "Reject",
+  "@moderationReject": {
+    "description": "Staff: reject button and confirm button."
+  },
+  "moderationApprove": "Approve",
+  "@moderationApprove": {
+    "description": "Staff: approve button."
+  },
+  "moderationItemApproved": "Item approved",
+  "@moderationItemApproved": {
+    "description": "Staff: snackbar after approving."
+  },
+  "moderationItemRejected": "Item rejected",
+  "@moderationItemRejected": {
+    "description": "Staff: snackbar after rejecting."
+  },
+  "moderationApproveFailed": "Could not approve this item. Please try again.",
+  "@moderationApproveFailed": {
+    "description": "Staff: fallback error when approving fails."
+  },
+  "moderationRejectFailed": "Could not reject this item. Please try again.",
+  "@moderationRejectFailed": {
+    "description": "Staff: fallback error when rejecting fails."
+  },
+  "moderationAlreadyHandled": "This item was already handled by someone else, or no longer exists. It has been removed from your queue.",
+  "@moderationAlreadyHandled": {
+    "description": "Staff: snackbar when the item is no longer pending."
+  },
+  "moderationRejectTitle": "Reject content",
+  "@moderationRejectTitle": {
+    "description": "Staff: title of the reject dialog."
+  },
+  "moderationRejectNote": "The business will see this reason.",
+  "@moderationRejectNote": {
+    "description": "Staff: note in the reject dialog. The rejection reason is always visible to the business."
+  },
+  "moderationRejectReasonLabel": "Reason (required)",
+  "@moderationRejectReasonLabel": {
+    "description": "Staff: label of the reason field in the reject dialog."
+  },
+  "moderationRejectReasonRequired": "A reason is required.",
+  "@moderationRejectReasonRequired": {
+    "description": "Staff: validation text under the reason field."
+  },
+  "analyticsLoadFailed": "Could not load your analytics.",
+  "@analyticsLoadFailed": {
+    "description": "Business: analytics load failure."
+  },
+  "analyticsEmpty": "{days, plural, one{No activity has been recorded for the last day yet.} other{No activity has been recorded for the last {days} days yet.}}",
+  "@analyticsEmpty": {
+    "description": "Business: analytics empty state. days is the exact range (it picks the plural form).",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsDaysWithData": "Days with data: {withData} of {days}",
+  "@analyticsDaysWithData": {
+    "description": "Business: how many days of the range have a recorded row.",
+    "placeholders": {
+      "withData": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsUtcNote": "Days are counted in UTC. Days without a recorded row are not drawn as zero.",
+  "@analyticsUtcNote": {
+    "description": "Business: note under the analytics totals."
+  },
+  "analyticsChartFollowersTitle": "New followers by day",
+  "@analyticsChartFollowersTitle": {
+    "description": "Business: chart title."
+  },
+  "analyticsChartFollowersSemantics": "{days, plural, one{New followers: {total} total over 1 day} other{New followers: {total} total over {days} days}}",
+  "@analyticsChartFollowersSemantics": {
+    "description": "Business: screen reader summary of the followers chart. days picks the plural form.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsChartLikesTitle": "Likes received by day",
+  "@analyticsChartLikesTitle": {
+    "description": "Business: chart title."
+  },
+  "analyticsChartLikesSemantics": "{days, plural, one{Likes received: {total} total over 1 day} other{Likes received: {total} total over {days} days}}",
+  "@analyticsChartLikesSemantics": {
+    "description": "Business: screen reader summary of the likes chart. days picks the plural form.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsRatingsHeading": "Ratings",
+  "@analyticsRatingsHeading": {
+    "description": "Business: section heading."
+  },
+  "analyticsRatingEmpty": "No rating has been recorded yet, so there is no rating trend to draw.",
+  "@analyticsRatingEmpty": {
+    "description": "Business: shown when there is no rating in the range."
+  },
+  "analyticsChartRatingTitle": "Average rating by day",
+  "@analyticsChartRatingTitle": {
+    "description": "Business: chart title."
+  },
+  "analyticsChartRatingSemantics": "{days, plural, one{Average rating: latest {average} over 1 day} other{Average rating: latest {average} over {days} days}}",
+  "@analyticsChartRatingSemantics": {
+    "description": "Business: screen reader summary of the rating chart. days picks the plural form; average is the formatted latest average.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "average": {
+        "type": "String"
+      }
+    }
+  },
+  "analyticsRatingNote": "Each point is the average rating stored when that day was rolled up. Days before the first rating are not drawn.",
+  "@analyticsRatingNote": {
+    "description": "Business: note under the rating chart."
+  },
+  "analyticsCatalogHeading": "Catalog size",
+  "@analyticsCatalogHeading": {
+    "description": "Business: section heading."
+  },
+  "analyticsCatalogAsOf": "As of {day}/{month} (UTC). These are totals recorded by the daily rollup, not daily changes.",
+  "@analyticsCatalogAsOf": {
+    "description": "Business: note above the catalog size cards.",
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsRangeDays": "{days, plural, one{{days} day} other{{days} days}}",
+  "@analyticsRangeDays": {
+    "description": "Business: label of a range segment (7 / 14 / 30 days).",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsNewFollowers": "New followers",
+  "@analyticsNewFollowers": {
+    "description": "Business: analytics card label."
+  },
+  "analyticsLikesReceived": "Likes received",
+  "@analyticsLikesReceived": {
+    "description": "Business: analytics card label."
+  },
+  "analyticsCommentsReceived": "Comments received",
+  "@analyticsCommentsReceived": {
+    "description": "Business: analytics card label."
+  },
+  "analyticsStoryViews": "Story views",
+  "@analyticsStoryViews": {
+    "description": "Business: analytics card label."
+  },
+  "analyticsNewRatings": "New ratings",
+  "@analyticsNewRatings": {
+    "description": "Business: analytics card label."
+  },
+  "analyticsAverageRating": "Average rating",
+  "@analyticsAverageRating": {
+    "description": "Business: analytics card label."
+  },
+  "analyticsActiveProducts": "Active products",
+  "@analyticsActiveProducts": {
+    "description": "Business: analytics card label."
+  },
+  "analyticsPublishedPosts": "Published posts",
+  "@analyticsPublishedPosts": {
+    "description": "Business: analytics card label."
+  },
+  "analyticsPublishedReels": "Published reels",
+  "@analyticsPublishedReels": {
+    "description": "Business: analytics card label."
   }
 }

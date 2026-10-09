@@ -4,10 +4,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/queue_item_entity.dart';
 import 'moderation_provider.dart';
 import 'moderation_widgets.dart';
@@ -77,6 +79,7 @@ class _ModerationReviewScreenState
     // after an async gap.
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
+    final l10n = context.l10n;
     setState(() => _approving = true);
 
     try {
@@ -87,7 +90,9 @@ class _ModerationReviewScreenState
       }
       if (_isNoLongerPending(error)) {
         // The notifier already dropped the item from the queue.
-        messenger.showSnackBar(const SnackBar(content: Text(_alreadyHandled)));
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.moderationAlreadyHandled)),
+        );
         navigator.pop(false);
         return;
       }
@@ -97,7 +102,8 @@ class _ModerationReviewScreenState
           content: Text(
             _actionErrorMessage(
               error,
-              fallback: 'Could not approve this item. Please try again.',
+              fallback: l10n.moderationApproveFailed,
+              l10n: l10n,
             ),
           ),
         ),
@@ -108,13 +114,16 @@ class _ModerationReviewScreenState
     if (!mounted) {
       return;
     }
-    messenger.showSnackBar(const SnackBar(content: Text('Item approved')));
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.moderationItemApproved)),
+    );
     navigator.pop(true);
   }
 
   Future<void> _reject() async {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
+    final l10n = context.l10n;
 
     final outcome = await showDialog<_RejectOutcome>(
       context: context,
@@ -128,10 +137,14 @@ class _ModerationReviewScreenState
     }
     switch (outcome) {
       case _RejectOutcome.rejected:
-        messenger.showSnackBar(const SnackBar(content: Text('Item rejected')));
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.moderationItemRejected)),
+        );
         navigator.pop(true);
       case _RejectOutcome.alreadyHandled:
-        messenger.showSnackBar(const SnackBar(content: Text(_alreadyHandled)));
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.moderationAlreadyHandled)),
+        );
         navigator.pop(false);
     }
   }
@@ -147,12 +160,13 @@ class _ModerationReviewScreenState
     final item = widget.item;
     final theme = Theme.of(context);
     final colors = context.appColors;
+    final l10n = context.l10n;
     final previewText = item.previewText;
     final hasPreviewText = previewText != null && previewText.isNotEmpty;
     final submitter = item.submitterBusinessName;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Review content')),
+      appBar: AppBar(title: Text(l10n.moderationReviewTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -171,14 +185,14 @@ class _ModerationReviewScreenState
             const SizedBox(height: 16),
           ],
           Text(
-            'Preview',
+            l10n.moderationPreview,
             style: theme.textTheme.labelLarge?.copyWith(
               color: colors.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            hasPreviewText ? previewText : 'No preview available',
+            hasPreviewText ? previewText : l10n.moderationNoPreview,
             key: const ValueKey('review-preview-text'),
             style: theme.textTheme.bodyLarge?.copyWith(
               color: hasPreviewText ? colors.textPrimary : colors.textSecondary,
@@ -199,26 +213,32 @@ class _ModerationReviewScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _DetailRow(
-                    label: 'Type',
-                    child: Text(contentTypeLabel(item.contentType)),
+                    label: l10n.moderationDetailType,
+                    child: Text(contentTypeLabel(item.contentType, l10n: l10n)),
                   ),
                   if (submitter != null)
-                    _DetailRow(label: 'Submitted by', child: Text(submitter)),
+                    _DetailRow(
+                      label: l10n.moderationDetailSubmittedBy,
+                      child: Text(submitter),
+                    ),
                   _DetailRow(
-                    label: 'Priority',
+                    label: l10n.moderationDetailPriority,
                     child: PriorityBadge(priority: item.priority),
                   ),
                   _DetailRow(
-                    label: 'Waiting',
+                    label: l10n.moderationDetailWaiting,
                     child: QueueAgeChip(
                       priority: item.priority,
                       age: item.ageDuration,
                     ),
                   ),
-                  _DetailRow(label: 'Queue item', child: Text('#${item.id}')),
+                  _DetailRow(
+                    label: l10n.moderationDetailQueueItem,
+                    child: Text('#${item.id}'),
+                  ),
                   const SizedBox(height: 4),
                   Text(
-                    'Waiting time is as of the last queue refresh.',
+                    l10n.moderationWaitingNote,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colors.textSecondary,
                     ),
@@ -242,14 +262,14 @@ class _ModerationReviewScreenState
                     foregroundColor: colors.dangerText,
                     side: BorderSide(color: colors.dangerText),
                   ),
-                  child: const Text('Reject'),
+                  child: Text(l10n.moderationReject),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: AppButton(
                   key: const ValueKey('review-approve-button'),
-                  label: 'Approve',
+                  label: l10n.moderationApprove,
                   isLoading: _approving,
                   onPressed: _approve,
                 ),
@@ -294,11 +314,6 @@ class _DetailRow extends StatelessWidget {
 /// item behind (a plain Cancel returns `null` instead).
 enum _RejectOutcome { rejected, alreadyHandled }
 
-/// Shown when the backend says the item is not pending anymore.
-const String _alreadyHandled =
-    'This item was already handled by someone else, or no longer exists. '
-    'It has been removed from your queue.';
-
 /// 409 = already decided, 404 = the row no longer exists (see
 /// `ModerationRepository`'s docstring - neither has a dedicated
 /// `ApiFailure` subtype, so the status code is read from the response).
@@ -317,11 +332,13 @@ bool _isNoLongerPending(Object error) {
 /// uses `is_moderator`/`is_staff`, but the API needs the
 /// `can_moderate_content` permission, which comes from Group membership
 /// (see the P-040 gap note in PROJECT_PROGRESS.md).
-String _actionErrorMessage(Object error, {required String fallback}) {
+String _actionErrorMessage(
+  Object error, {
+  required String fallback,
+  required AppLocalizations l10n,
+}) {
   return switch (error) {
-    DioException(error: AuthFailure()) =>
-      'Your account is not allowed to review content. If it should be, '
-          'ask an admin to add it to the Moderator group.',
+    DioException(error: AuthFailure()) => l10n.moderationNotAllowed,
     DioException(error: ValidationFailure(:final fields, :final message)) =>
       fields['reason']?.join(' ') ?? message,
     DioException(error: final ApiFailure failure) => failure.message,
@@ -377,6 +394,7 @@ class _RejectReasonDialogState extends ConsumerState<_RejectReasonDialog> {
       return;
     }
     final navigator = Navigator.of(context);
+    final l10n = context.l10n;
     setState(() {
       _submitting = true;
       _error = null;
@@ -398,7 +416,8 @@ class _RejectReasonDialogState extends ConsumerState<_RejectReasonDialog> {
         _submitting = false;
         _error = _actionErrorMessage(
           error,
-          fallback: 'Could not reject this item. Please try again.',
+          fallback: l10n.moderationRejectFailed,
+          l10n: l10n,
         );
       });
       return;
@@ -414,16 +433,17 @@ class _RejectReasonDialogState extends ConsumerState<_RejectReasonDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = context.appColors;
+    final l10n = context.l10n;
     final showRequired = _touched && !_hasReason;
 
     return AlertDialog(
-      title: const Text('Reject content'),
+      title: Text(l10n.moderationRejectTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'The business will see this reason.',
+            l10n.moderationRejectNote,
             style: theme.textTheme.bodySmall?.copyWith(
               color: colors.textSecondary,
             ),
@@ -431,7 +451,7 @@ class _RejectReasonDialogState extends ConsumerState<_RejectReasonDialog> {
           const SizedBox(height: 12),
           AppTextField(
             key: const ValueKey('reject-reason-field'),
-            label: 'Reason (required)',
+            label: l10n.moderationRejectReasonLabel,
             controller: _controller,
             keyboardType: TextInputType.multiline,
             maxLines: 3,
@@ -439,7 +459,7 @@ class _RejectReasonDialogState extends ConsumerState<_RejectReasonDialog> {
           if (showRequired) ...[
             const SizedBox(height: 8),
             Text(
-              'A reason is required.',
+              l10n.moderationRejectReasonRequired,
               key: const ValueKey('reject-reason-required'),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colors.dangerText,
@@ -462,11 +482,11 @@ class _RejectReasonDialogState extends ConsumerState<_RejectReasonDialog> {
         TextButton(
           key: const ValueKey('reject-cancel-button'),
           onPressed: _submitting ? null : () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.commonCancel),
         ),
         AppButton(
           key: const ValueKey('reject-confirm-button'),
-          label: 'Reject',
+          label: l10n.moderationReject,
           variant: AppButtonVariant.danger,
           isLoading: _submitting,
           onPressed: _hasReason ? _submit : null,

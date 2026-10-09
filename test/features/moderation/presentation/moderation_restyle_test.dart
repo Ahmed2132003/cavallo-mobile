@@ -14,9 +14,9 @@ import 'package:social_commerce_app/l10n/app_localizations.dart';
 /// Arabic (RTL). The behaviour tests (SLA colours, ordering, retry, 403,
 /// refresh) stay in the P-040 files, which are unchanged.
 ///
-/// The moderation strings are still English on purpose: the P-040 tests pump
-/// a bare MaterialApp without localization delegates, so localizing this
-/// feature is STEP 8 (together with updating those harnesses). RTL is still
+/// The moderation strings are localized (STEP 8A). English finders are used
+/// in the English tests; the Arabic tests read their expected text from the
+/// generated Arabic localizations (this file stays ASCII). RTL is still
 /// testable here: the test passes the Global localization delegates, which is what makes MaterialApp use RTL for Arabic.
 
 class _FixedQueue extends ModerationQueueNotifier {
@@ -249,7 +249,15 @@ void main() {
       size: const Size(320, 1200),
     );
 
-    expect(find.text('3 d 5 h \u00B7 overdue'), findsOneWidget);
+    final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+    expect(
+      find.text(
+        ar.moderationAgeOverdue(
+          formatQueueAge(const Duration(days: 3, hours: 5), l10n: ar),
+        ),
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 }
