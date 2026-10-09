@@ -13,7 +13,7 @@ import '../data/message_repository.dart';
 import '../domain/conversation.dart';
 import '../domain/shared_content.dart';
 
-/// Part P-077 STEP 4 â€” the conversations offered as share targets.
+/// Part P-077 STEP 4 — the conversations offered as share targets.
 ///
 /// Reuses `ConversationRepository.listConversations()` (P-074), first
 /// page only (the backend currently answers a plain array, so there is
@@ -26,10 +26,10 @@ final shareTargetConversationsProvider =
       return page.results;
     });
 
-/// Part P-077 STEP 4 â€” the two-option sheet behind every Share icon
+/// Part P-077 STEP 4 — the two-option sheet behind every Share icon
 /// (Post / Reel / Product):
 ///
-/// - "Share viaâ€¦" -> [onNativeShare], the caller's EXISTING share flow,
+/// - "Share via…" -> [onNativeShare], the caller's EXISTING share flow,
 ///   unchanged (for Post/Reel: share tracking + native share sheet).
 /// - "Share to conversation" -> a conversation picker; picking a row
 ///   POSTs the shared reference via

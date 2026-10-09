@@ -1,0 +1,31 @@
+00:00 +0: loading D:/Cavallo/social_commerce_app/test/l10n/arb_encoding_test.dart
+00:00 +0: D:/Cavallo/social_commerce_app/test/l10n/arb_encoding_test.dart: every Arabic ARB value contains real Arabic letters
+00:00 +1: D:/Cavallo/social_commerce_app/test/l10n/arb_encoding_test.dart: no garbled text anywhere in lib/ or test/ sources
+00:00 +2: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: (setUpAll)
+00:00 +2: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: each file declares its own @@locale
+00:00 +3: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: both files contain exactly the same message keys
+00:00 +4: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: no message is empty
+00:00 +5: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: keys are semantic camelCase, not button1 / text2
+00:00 +6: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: every Arabic plural message defines zero/one/two/few/many/other
+00:00 +7: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: every English plural message defines at least "other"
+00:00 +8: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: a key that is plural in English is plural in Arabic (and back)
+00:00 +9: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: placeholders declared in the template are used in both languages
+00:00 +10: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: (tearDownAll)
+00:01 +10: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) (setUpAll)
+00:01 +10: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) minutes
+00:01 +11: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) hours
+00:01 +12: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) days
+00:01 +13: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) digits are Western (0-9), never Arabic-Indic
+00:01 +14: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) (tearDownAll)
+00:01 +14: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: English plural forms (setUpAll)
+00:01 +14: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: English plural forms minutes / hours / days
+00:01 +15: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: English plural forms (tearDownAll)
+00:01 +15: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: supported locales exactly Arabic and English, Arabic first
+00:01 +16: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:01 +17: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:01 +18: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:01 +19: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:01 +20: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:01 +21: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:02 +22: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp English is left-to-right and shows the English title
+00:02 +23: All tests passed!

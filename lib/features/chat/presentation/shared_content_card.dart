@@ -12,7 +12,7 @@ import '../../content/presentation/post_card.dart';
 import '../../content/presentation/reel_card.dart';
 import '../domain/shared_content.dart';
 
-/// Part P-077 STEP 3 â€” renders the platform content a chat message
+/// Part P-077 STEP 3 — renders the platform content a chat message
 /// shares (Post / Reel / Product) as a tappable card.
 ///
 /// ### Reuse, zero modification elsewhere
