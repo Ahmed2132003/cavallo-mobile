@@ -10,6 +10,7 @@ import '../features/auth/presentation/session_provider.dart';
 import '../features/auth/presentation/splash_screen.dart';
 import '../features/business_console/presentation/analytics_screen.dart';
 import '../features/business_console/presentation/business_console_shell.dart';
+import '../features/business_console/presentation/console_dashboard.dart';
 import '../features/business_profile/presentation/business_onboarding_screen.dart';
 import '../features/business_profile/presentation/business_profile_edit_screen.dart';
 import '../features/business_profile/presentation/business_profile_provider.dart';
@@ -658,6 +659,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: RouteNames.productList,
                 builder:
                     (context, state) => ProductListScreen(
+                      header: const ConsoleDashboardCards(),
                       onCreateNew:
                           () => context.pushNamed(RouteNames.productForm),
                       onEditProduct:

@@ -1132,5 +1132,232 @@
   "notifPrefsSystemFooter": "Important system announcements are always delivered.",
   "@notifPrefsSystemFooter": {
     "description": "Footer under the switches: system announcements cannot be turned off."
+  },
+  "consoleNavProducts": "Products",
+  "@consoleNavProducts": {
+    "description": "Business console tab / dashboard card: products."
+  },
+  "consoleNavContent": "Posts/Reels",
+  "@consoleNavContent": {
+    "description": "Business console tab / dashboard card: posts and reels."
+  },
+  "consoleNavStories": "Stories",
+  "@consoleNavStories": {
+    "description": "Business console tab and screen title: stories."
+  },
+  "consoleNavAnalytics": "Analytics",
+  "@consoleNavAnalytics": {
+    "description": "Business console tab: analytics."
+  },
+  "consoleDashStories": "Active stories",
+  "@consoleDashStories": {
+    "description": "Dashboard card label: stories that are published or pending review."
+  },
+  "consoleDashFollowers": "New followers",
+  "@consoleDashFollowers": {
+    "description": "Dashboard card label: new followers in the selected analytics range."
+  },
+  "consoleDashRange": "{days, plural, one{last day} other{last {days} days}}",
+  "@consoleDashRange": {
+    "description": "Dashboard card caption: the analytics range. days is the exact number (it picks the plural form).",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "consoleDashValueUnavailable": "\u2013",
+  "@consoleDashValueUnavailable": {
+    "description": "Dashboard card value shown when that area failed to load."
+  },
+  "consoleProductsTitle": "My Products",
+  "@consoleProductsTitle": {
+    "description": "App bar title of the business product list."
+  },
+  "consoleProductsCreate": "Create New",
+  "@consoleProductsCreate": {
+    "description": "Extended button on the product list."
+  },
+  "consoleProductsEmpty": "No products yet.\nTap \"Create New\" to add your first product.",
+  "@consoleProductsEmpty": {
+    "description": "Empty state of the product list."
+  },
+  "consoleProductsLoadFailed": "Could not load your products.",
+  "@consoleProductsLoadFailed": {
+    "description": "Fallback error of the product list."
+  },
+  "consoleProductsDeleteTitle": "Delete product?",
+  "@consoleProductsDeleteTitle": {
+    "description": "Title of the delete product confirmation dialog."
+  },
+  "consoleProductsDeleteBody": "This will remove \"{name}\" from your products. This cannot be undone.",
+  "@consoleProductsDeleteBody": {
+    "description": "Body of the delete product dialog. name is the product name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "consoleProductsDeleteFailed": "Could not delete this product.",
+  "@consoleProductsDeleteFailed": {
+    "description": "Snackbar when deleting a product fails."
+  },
+  "consoleProductVariants": "{count, plural, one{{count} variant} other{{count} variants}}",
+  "@consoleProductVariants": {
+    "description": "Variant count under a product row. count is the exact number.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "consoleProductInactive": "Inactive",
+  "@consoleProductInactive": {
+    "description": "Status chip of a hidden product."
+  },
+  "consoleEdit": "Edit",
+  "@consoleEdit": {
+    "description": "Tooltip of an edit icon in console rows."
+  },
+  "consoleDelete": "Delete",
+  "@consoleDelete": {
+    "description": "Tooltip and confirm button of a delete action in the console."
+  },
+  "consoleCancel": "Cancel",
+  "@consoleCancel": {
+    "description": "Cancel button of console dialogs."
+  },
+  "consoleContentTitle": "My Content",
+  "@consoleContentTitle": {
+    "description": "App bar title of the business posts and reels list."
+  },
+  "consoleContentNewPost": "New Post",
+  "@consoleContentNewPost": {
+    "description": "Extended button: create a post."
+  },
+  "consoleContentNewReel": "New Reel",
+  "@consoleContentNewReel": {
+    "description": "Extended button: create a reel."
+  },
+  "consoleContentEmpty": "No posts or reels yet.\nTap \"New Post\" or \"New Reel\" to share your first one.",
+  "@consoleContentEmpty": {
+    "description": "Empty state of the posts and reels list."
+  },
+  "consoleContentLoadFailed": "Could not load your content.",
+  "@consoleContentLoadFailed": {
+    "description": "Fallback error of the posts and reels list."
+  },
+  "consoleTypePost": "Post",
+  "@consoleTypePost": {
+    "description": "Type label of a post row."
+  },
+  "consoleTypeReel": "Reel",
+  "@consoleTypeReel": {
+    "description": "Type label of a reel row."
+  },
+  "consoleStatusUnderReview": "Under review",
+  "@consoleStatusUnderReview": {
+    "description": "Moderation chip: waiting for review (Pending)."
+  },
+  "consoleStatusLive": "Live",
+  "@consoleStatusLive": {
+    "description": "Moderation chip: approved and published (Approved)."
+  },
+  "consoleStatusRejectedWithReason": "Rejected: {reason}",
+  "@consoleStatusRejectedWithReason": {
+    "description": "Moderation chip: rejected, always followed by the reason.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "consoleStatusNoReasonGiven": "no reason given",
+  "@consoleStatusNoReasonGiven": {
+    "description": "Fallback shown when a rejected item has no reason."
+  },
+  "consoleStatusProcessing": "Processing video\u2026",
+  "@consoleStatusProcessing": {
+    "description": "Chip of a reel that has not reached moderation yet."
+  },
+  "consoleStatusProcessingFailed": "Video processing failed",
+  "@consoleStatusProcessingFailed": {
+    "description": "Chip of a reel whose processing failed."
+  },
+  "consoleStoriesCreate": "Create Story",
+  "@consoleStoriesCreate": {
+    "description": "Extended button on the stories list."
+  },
+  "consoleStoriesEmpty": "No stories yet.\nTap \"Create Story\" to share your first one.",
+  "@consoleStoriesEmpty": {
+    "description": "Empty state of the stories list."
+  },
+  "consoleStoriesLoadFailed": "Could not load your stories.",
+  "@consoleStoriesLoadFailed": {
+    "description": "Fallback error of the stories list."
+  },
+  "consoleStoryNumber": "Story #{id}",
+  "@consoleStoryNumber": {
+    "description": "Title of a story row. id is the story number.",
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "consoleStoryPublished": "Published",
+  "@consoleStoryPublished": {
+    "description": "Story status chip: published."
+  },
+  "consoleStoryPending": "Pending",
+  "@consoleStoryPending": {
+    "description": "Story status chip: pending review."
+  },
+  "consoleStoryRejected": "Rejected",
+  "@consoleStoryRejected": {
+    "description": "Story status chip: rejected."
+  },
+  "consoleStoryExpired": "Expired",
+  "@consoleStoryExpired": {
+    "description": "Story status chip: expired."
+  },
+  "consoleStoryUnknown": "Unknown",
+  "@consoleStoryUnknown": {
+    "description": "Story status chip: status not recognised."
+  },
+  "consoleStoryReason": "Reason: {reason}",
+  "@consoleStoryReason": {
+    "description": "Rejection reason line under a rejected story.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "consoleStoryTimeLeftHM": "{hours}h {minutes}m left",
+  "@consoleStoryTimeLeftHM": {
+    "description": "Time left of a story: hours and minutes.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "consoleStoryTimeLeftM": "{minutes}m left",
+  "@consoleStoryTimeLeftM": {
+    "description": "Time left of a story: minutes only.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "consoleStoryTimeLeftLess": "Less than 1m left",
+  "@consoleStoryTimeLeftLess": {
+    "description": "Time left of a story: under one minute."
   }
 }

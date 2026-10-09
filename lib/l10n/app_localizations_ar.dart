@@ -899,4 +899,178 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notifPrefsSystemFooter => 'إعلانات النظام المهمة تصلك دائمًا.';
+
+  @override
+  String get consoleNavProducts => 'المنتجات';
+
+  @override
+  String get consoleNavContent => 'المنشورات والريلز';
+
+  @override
+  String get consoleNavStories => 'القصص';
+
+  @override
+  String get consoleNavAnalytics => 'التحليلات';
+
+  @override
+  String get consoleDashStories => 'القصص النشطة';
+
+  @override
+  String get consoleDashFollowers => 'متابعون جدد';
+
+  @override
+  String consoleDashRange(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'آخر $days يوم',
+      many: 'آخر $days يومًا',
+      few: 'آخر $days أيام',
+      two: 'آخر يومين',
+      one: 'آخر يوم',
+      zero: 'آخر $days يوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get consoleDashValueUnavailable => '–';
+
+  @override
+  String get consoleProductsTitle => 'منتجاتي';
+
+  @override
+  String get consoleProductsCreate => 'إنشاء جديد';
+
+  @override
+  String get consoleProductsEmpty => 'لا توجد منتجات بعد.\nاضغط «إنشاء جديد» لإضافة أول منتج لك.';
+
+  @override
+  String get consoleProductsLoadFailed => 'تعذّر تحميل منتجاتك.';
+
+  @override
+  String get consoleProductsDeleteTitle => 'حذف المنتج؟';
+
+  @override
+  String consoleProductsDeleteBody(String name) {
+    return 'سيتم إزالة «$name» من منتجاتك. لا يمكن التراجع عن هذا الإجراء.';
+  }
+
+  @override
+  String get consoleProductsDeleteFailed => 'تعذّر حذف هذا المنتج.';
+
+  @override
+  String consoleProductVariants(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count خيار',
+      many: '$count خيارًا',
+      few: '$count خيارات',
+      two: 'خياران',
+      one: 'خيار واحد',
+      zero: '$count خيار',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get consoleProductInactive => 'غير نشط';
+
+  @override
+  String get consoleEdit => 'تعديل';
+
+  @override
+  String get consoleDelete => 'حذف';
+
+  @override
+  String get consoleCancel => 'إلغاء';
+
+  @override
+  String get consoleContentTitle => 'محتواي';
+
+  @override
+  String get consoleContentNewPost => 'منشور جديد';
+
+  @override
+  String get consoleContentNewReel => 'ريل جديد';
+
+  @override
+  String get consoleContentEmpty => 'لا توجد منشورات أو ريلز بعد.\nاضغط «منشور جديد» أو «ريل جديد» لمشاركة أول محتوى لك.';
+
+  @override
+  String get consoleContentLoadFailed => 'تعذّر تحميل محتواك.';
+
+  @override
+  String get consoleTypePost => 'منشور';
+
+  @override
+  String get consoleTypeReel => 'ريل';
+
+  @override
+  String get consoleStatusUnderReview => 'قيد المراجعة';
+
+  @override
+  String get consoleStatusLive => 'تم النشر';
+
+  @override
+  String consoleStatusRejectedWithReason(String reason) {
+    return 'مرفوض: $reason';
+  }
+
+  @override
+  String get consoleStatusNoReasonGiven => 'لم يُذكر سبب';
+
+  @override
+  String get consoleStatusProcessing => 'جارٍ معالجة الفيديو…';
+
+  @override
+  String get consoleStatusProcessingFailed => 'تعذّرت معالجة الفيديو';
+
+  @override
+  String get consoleStoriesCreate => 'إنشاء قصة';
+
+  @override
+  String get consoleStoriesEmpty => 'لا توجد قصص بعد.\nاضغط «إنشاء قصة» لمشاركة أول قصة لك.';
+
+  @override
+  String get consoleStoriesLoadFailed => 'تعذّر تحميل قصصك.';
+
+  @override
+  String consoleStoryNumber(int id) {
+    return 'قصة رقم $id';
+  }
+
+  @override
+  String get consoleStoryPublished => 'تم النشر';
+
+  @override
+  String get consoleStoryPending => 'قيد الانتظار';
+
+  @override
+  String get consoleStoryRejected => 'مرفوضة';
+
+  @override
+  String get consoleStoryExpired => 'منتهية';
+
+  @override
+  String get consoleStoryUnknown => 'غير معروفة';
+
+  @override
+  String consoleStoryReason(String reason) {
+    return 'السبب: $reason';
+  }
+
+  @override
+  String consoleStoryTimeLeftHM(int hours, int minutes) {
+    return 'متبقّي $hours س $minutes د';
+  }
+
+  @override
+  String consoleStoryTimeLeftM(int minutes) {
+    return 'متبقّي $minutes د';
+  }
+
+  @override
+  String get consoleStoryTimeLeftLess => 'متبقّي أقل من دقيقة';
 }

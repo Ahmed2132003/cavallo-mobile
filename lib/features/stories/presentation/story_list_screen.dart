@@ -3,63 +3,51 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_status_chip.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../routing/route_names.dart';
+import '../../business_console/presentation/console_row.dart';
 import '../domain/own_story_entity.dart';
 import 'own_stories_provider.dart';
 
-/// Part P-083 scope: the Stories tab of the Business Console -- the
-/// signed-in Business account's own Stories (current and recent, all
-/// statuses), backed by `ownStoriesProvider`. Mirrors
-/// `ProductListScreen`'s (Part P-033) `switch (asyncValue)` pattern and
-/// its shared `ErrorStateWidget`/`EmptyStateWidget`/`LoadingIndicator`.
+/// The Business Console "Stories" tab: the signed-in business's own stories
+/// (`ownStoriesProvider`) with an honest status per story.
+/// (The long design notes of P-051/P-083 live in git history.)
 ///
-/// Owns its own `AppBar` (D1: the shell has none) and a "Create Story"
-/// action that opens P-051's creation flow (`RouteNames.storyForm`)
-/// untouched.
+/// Rules preserved exactly: the status shown is
+/// `OwnStory.displayStatus(now)` (a story past `expiresAt` is Expired even if
+/// the server still says published); a rejected story always shows its
+/// reason; the FAB keeps its explicit hero tag (two default-tag FABs inside
+/// the console IndexedStack make Flutter assert on push).
 ///
-/// ### Status chip
-///
-/// Pending / Published / Rejected / Expired (/ Unknown for a wire value
-/// this app version does not know). The backend has no `approved` or
-/// `expired` status: see `own_story_entity.dart` for how the displayed
-/// status is derived. Only a still-live `published` story shows a
-/// remaining-time label. That label is computed at build time and is not
-/// ticking; a pull-to-refresh or any rebuild updates it.
-///
-/// ### Rejection reason
-///
-/// The deck says a rejected item always shows its rejection reason. The
-/// Story backend does not return one today (documented gap), so the
-/// reason line is shown only when `OwnStory.rejectionReason` is non-null
-/// and nothing is invented otherwise.
+/// Part P-115 (STEP 5) restyle, presentation only: shared `ConsoleRow`
+/// anatomy, shared `AppStatusChip` (icon + label, never colour alone),
+/// localized strings. No provider, clock or navigation call changed.
 class StoryListScreen extends ConsumerWidget {
   const StoryListScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final storiesAsync = ref.watch(ownStoriesProvider);
     final now = ref.watch(storyListClockProvider)();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Stories')),
+      appBar: AppBar(title: Text(l10n.consoleNavStories)),
       floatingActionButton: FloatingActionButton.extended(
         key: const Key('story-list-create-button'),
-        // Explicit hero tag: this screen lives in the Business Console's
-        // IndexedStack next to `ProductListScreen`, whose FAB keeps the
-        // default hero tag. Two default-tag FABs alive in the same
-        // subtree make Flutter assert ("multiple heroes share the same
-        // tag") the moment a route is pushed above the shell (e.g.
-        // Create Story). Caught by business_console_integration_test.
         heroTag: 'story-list-create',
         onPressed: () {
           context.pushNamed(RouteNames.storyForm);
         },
         icon: const Icon(Icons.add),
-        label: const Text('Create Story'),
+        label: Text(l10n.consoleStoriesCreate),
       ),
       body: switch (storiesAsync) {
         AsyncData(value: final stories) when stories.isEmpty =>
@@ -75,16 +63,11 @@ class StoryListScreen extends ConsumerWidget {
   }
 }
 
-/// The clock `StoryListScreen` uses to derive "Expired" and the remaining
-/// time. A provider only so tests can pin it; production always gets the
-/// real [DateTime.now].
+/// Clock used to derive "Expired" and the time left. Overridable in tests.
 final storyListClockProvider = Provider<DateTime Function()>(
   (ref) => DateTime.now,
 );
 
-/// Same two failure shapes as `ProductListScreen`: a `DioException` whose
-/// `.error` is the typed [ApiFailure] (production, `ErrorInterceptor`),
-/// or a bare [ApiFailure].
 String _apiFailureMessage(Object error, {required String fallback}) {
   return switch (error) {
     DioException(error: final ApiFailure failure) => failure.message,
@@ -104,20 +87,19 @@ class _LoadErrorView extends ConsumerWidget {
       key: const Key('story-list-error'),
       message: _apiFailureMessage(
         error,
-        fallback: 'Could not load your stories.',
+        fallback: context.l10n.consoleStoriesLoadFailed,
       ),
       onRetry: () => ref.read(ownStoriesProvider.notifier).refresh(),
     );
   }
 }
 
-/// A business that never posted a Story: a valid, expected state. Still
-/// pull-to-refreshable, which is why it lives inside a scrollable.
 class _EmptyView extends ConsumerWidget {
   const _EmptyView();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     return RefreshIndicator(
       onRefresh: () => ref.read(ownStoriesProvider.notifier).refresh(),
       child: LayoutBuilder(
@@ -127,11 +109,9 @@ class _EmptyView extends ConsumerWidget {
               children: [
                 SizedBox(
                   height: constraints.maxHeight,
-                  child: const EmptyStateWidget(
-                    key: Key('story-list-empty'),
-                    message:
-                        'No stories yet.\nTap "Create Story" to share your first '
-                        'one.',
+                  child: EmptyStateWidget(
+                    key: const Key('story-list-empty'),
+                    message: l10n.consoleStoriesEmpty,
                     icon: Icons.auto_stories_outlined,
                   ),
                 ),
@@ -173,105 +153,88 @@ class _StoryListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final colors = context.appColors;
+    final text = Theme.of(context).textTheme;
     final displayStatus = story.displayStatus(now);
     final remaining = story.remaining(now);
     final reason = story.rejectionReason;
+    final isVideo = _isVideoUrl(story.mediaUrl);
 
-    return Card(
+    return ConsoleRow(
       key: Key('story-list-item-${story.id}'),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            _StoryThumbnail(mediaUrl: story.mediaUrl),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Story #${story.id}',
-                    style: theme.textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 6),
-                  _StatusChip(
-                    key: Key('story-status-${story.id}'),
-                    status: displayStatus,
-                  ),
-                  if (remaining != null) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      _formatRemaining(remaining),
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ],
-                  if (displayStatus == OwnStoryDisplayStatus.rejected &&
-                      reason != null) ...[
-                    const SizedBox(height: 6),
-                    Text('Reason: $reason', style: theme.textTheme.bodySmall),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
+      leading: ConsoleThumbnail(
+        url: isVideo ? null : story.mediaUrl,
+        placeholderIcon: Icons.videocam_outlined,
       ),
+      title: l10n.consoleStoryNumber(story.id),
+      meta: [
+        if (remaining != null)
+          Text(
+            _formatRemaining(l10n, remaining),
+            style: text.bodySmall?.copyWith(color: colors.textSecondary),
+          ),
+      ],
+      status: _StoryStatusChip(
+        key: Key('story-status-${story.id}'),
+        status: displayStatus,
+      ),
+      // The rejection reason is always visible to the business.
+      footer:
+          displayStatus == OwnStoryDisplayStatus.rejected && reason != null
+              ? Text(
+                l10n.consoleStoryReason(reason),
+                style: text.bodySmall?.copyWith(color: colors.dangerText),
+              )
+              : null,
     );
   }
 }
 
-String _formatRemaining(Duration remaining) {
+String _formatRemaining(AppLocalizations l10n, Duration remaining) {
   final hours = remaining.inHours;
   final minutes = remaining.inMinutes.remainder(60);
-  if (hours >= 1) return '${hours}h ${minutes}m left';
-  if (minutes >= 1) return '${minutes}m left';
-  return 'Less than 1m left';
+  if (hours >= 1) return l10n.consoleStoryTimeLeftHM(hours, minutes);
+  if (minutes >= 1) return l10n.consoleStoryTimeLeftM(minutes);
+  return l10n.consoleStoryTimeLeftLess;
 }
 
-class _StatusChip extends StatelessWidget {
-  const _StatusChip({super.key, required this.status});
+class _StoryStatusChip extends StatelessWidget {
+  const _StoryStatusChip({super.key, required this.status});
 
   final OwnStoryDisplayStatus status;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final (label, background, foreground) = switch (status) {
+    final l10n = context.l10n;
+    final (String label, IconData icon, AppStatusTone tone) = switch (status) {
       OwnStoryDisplayStatus.published => (
-        'Published',
-        scheme.primaryContainer,
-        scheme.onPrimaryContainer,
+        l10n.consoleStoryPublished,
+        Icons.check_circle_outline,
+        AppStatusTone.success,
       ),
       OwnStoryDisplayStatus.pending => (
-        'Pending',
-        scheme.secondaryContainer,
-        scheme.onSecondaryContainer,
+        l10n.consoleStoryPending,
+        Icons.hourglass_bottom,
+        AppStatusTone.warning,
       ),
       OwnStoryDisplayStatus.rejected => (
-        'Rejected',
-        scheme.errorContainer,
-        scheme.onErrorContainer,
+        l10n.consoleStoryRejected,
+        Icons.cancel_outlined,
+        AppStatusTone.danger,
       ),
       OwnStoryDisplayStatus.expired => (
-        'Expired',
-        scheme.surfaceContainerHighest,
-        scheme.onSurfaceVariant,
+        l10n.consoleStoryExpired,
+        Icons.timer_off_outlined,
+        AppStatusTone.neutral,
       ),
       OwnStoryDisplayStatus.unknown => (
-        'Unknown',
-        scheme.surfaceContainerHighest,
-        scheme.onSurfaceVariant,
+        l10n.consoleStoryUnknown,
+        Icons.help_outline,
+        AppStatusTone.neutral,
       ),
     };
-
-    return Chip(
-      label: Text(label),
-      labelStyle: TextStyle(color: foreground),
-      backgroundColor: background,
-      side: BorderSide.none,
-      visualDensity: VisualDensity.compact,
-    );
+    return AppStatusChip(label: label, icon: icon, tone: tone);
   }
 }
 
@@ -280,48 +243,4 @@ bool _isVideoUrl(String url) {
   return path.endsWith('.mp4') ||
       path.endsWith('.mov') ||
       path.endsWith('.webm');
-}
-
-/// A Story's media: the real network image for photos, a video icon for
-/// videos (the backend generates no video thumbnail).
-class _StoryThumbnail extends StatelessWidget {
-  const _StoryThumbnail({required this.mediaUrl});
-
-  final String mediaUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    const size = 56.0;
-    final placeholderColor =
-        Theme.of(context).colorScheme.surfaceContainerHighest;
-
-    if (_isVideoUrl(mediaUrl)) {
-      return Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: placeholderColor,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: const Icon(Icons.videocam_outlined),
-      );
-    }
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Image.network(
-        mediaUrl,
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        errorBuilder:
-            (context, error, stackTrace) => Container(
-              width: size,
-              height: size,
-              color: placeholderColor,
-              child: const Icon(Icons.broken_image_outlined),
-            ),
-      ),
-    );
-  }
 }

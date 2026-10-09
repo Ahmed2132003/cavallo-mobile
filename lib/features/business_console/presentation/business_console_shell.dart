@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../stories/presentation/story_upload_queue_provider.dart';
 import '../../stories/presentation/story_upload_status_banner.dart';
 
-/// Part P-083 — the Business Console navigational home.
+/// Part P-083 - the Business Console navigational home.
 ///
 /// Wraps the four branches of the `/business-console`
-/// `StatefulShellRoute.indexedStack` (wired in `app_router.dart` by
-/// the routing owner, not here):
+/// `StatefulShellRoute.indexedStack` (wired in `app_router.dart`):
 ///
 /// | index | label        | destination key                    |
 /// |-------|--------------|------------------------------------|
@@ -19,33 +19,19 @@ import '../../stories/presentation/story_upload_status_banner.dart';
 /// | 2     | Stories      | `business-console-nav-stories`     |
 /// | 3     | Analytics    | `business-console-nav-analytics`   |
 ///
-/// Order, labels and keys are the P-083 shared contract — do not
-/// change them without changing every consumer (router, tests).
+/// Order and keys are the P-083 shared contract - do not change them.
+/// The LABELS are localized since P-115 STEP 5 (English text is unchanged).
 ///
-/// ### Decisions
+/// ### Decisions (unchanged since P-083)
 ///
-/// * **No AppBar (D1).** Each branch root screen keeps its own
-///   `AppBar`; a shell-level one would stack two app bars.
-/// * **Upload banner lives here (D3).** `StoryUploadStatusBanner` is
-///   shown above every tab, which is the "root-level shell" that
-///   P-051's FLAGGED SCOPE DECISION 6 deferred to this phase. The
-///   banner widget itself is not modified; this shell only decides
-///   where it sits.
-/// * **Status-bar handling.** Without an AppBar the banner would sit
-///   under the status bar, so while uploads exist it is wrapped in a
-///   top `SafeArea`. The branch content is then told the top inset is
-///   already consumed (`MediaQuery.removePadding(removeTop: true)`),
-///   otherwise each tab's own `AppBar` would add the status-bar
-///   height a second time and leave a gap under the banner. When the
-///   queue is empty nothing is consumed and each tab handles the
-///   status bar itself.
-/// * **Stable tree.** The `Column` always has the same two children in
-///   the same positions and the `MediaQuery.removePadding` wrapper is
-///   always present (only `removeTop` changes), so the banner
-///   appearing or disappearing never remounts [navigationShell] and
-///   never discards the state of the tabs.
-/// * **No access control here.** Who may reach `/business-console` is
-///   enforced by the router's `redirect`, not by this widget.
+/// * No AppBar here: each branch root keeps its own AppBar.
+/// * The story upload banner lives here, above every tab. While uploads
+///   exist it is wrapped in a top SafeArea and the branch content is told the
+///   top inset is already consumed.
+/// * Stable tree: the Column always has the same two children and the
+///   MediaQuery.removePadding wrapper is always present, so the banner
+///   appearing never remounts [navigationShell] or discards tab state.
+/// * No access control here: the router's redirect owns that.
 class BusinessConsoleShell extends ConsumerWidget {
   const BusinessConsoleShell({required this.navigationShell, super.key});
 
@@ -53,9 +39,7 @@ class BusinessConsoleShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // `select` so the shell only rebuilds when the banner needs to
-    // appear/disappear, not on every attempt/status change of a task
-    // (the banner widget watches the full queue itself).
+    final l10n = context.l10n;
     final hasUploads = ref.watch(
       storyUploadQueueProvider.select((tasks) => tasks.isNotEmpty),
     );
@@ -92,30 +76,30 @@ class BusinessConsoleShell extends ConsumerWidget {
               // branch root, the standard bottom-nav behaviour.
               initialLocation: index == navigationShell.currentIndex,
             ),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            key: Key('business-console-nav-products'),
-            icon: Icon(Icons.inventory_2_outlined),
-            selectedIcon: Icon(Icons.inventory_2),
-            label: 'Products',
+            key: const Key('business-console-nav-products'),
+            icon: const Icon(Icons.inventory_2_outlined),
+            selectedIcon: const Icon(Icons.inventory_2),
+            label: l10n.consoleNavProducts,
           ),
           NavigationDestination(
-            key: Key('business-console-nav-content'),
-            icon: Icon(Icons.dynamic_feed_outlined),
-            selectedIcon: Icon(Icons.dynamic_feed),
-            label: 'Posts/Reels',
+            key: const Key('business-console-nav-content'),
+            icon: const Icon(Icons.dynamic_feed_outlined),
+            selectedIcon: const Icon(Icons.dynamic_feed),
+            label: l10n.consoleNavContent,
           ),
           NavigationDestination(
-            key: Key('business-console-nav-stories'),
-            icon: Icon(Icons.auto_stories_outlined),
-            selectedIcon: Icon(Icons.auto_stories),
-            label: 'Stories',
+            key: const Key('business-console-nav-stories'),
+            icon: const Icon(Icons.auto_stories_outlined),
+            selectedIcon: const Icon(Icons.auto_stories),
+            label: l10n.consoleNavStories,
           ),
           NavigationDestination(
-            key: Key('business-console-nav-analytics'),
-            icon: Icon(Icons.insights_outlined),
-            selectedIcon: Icon(Icons.insights),
-            label: 'Analytics',
+            key: const Key('business-console-nav-analytics'),
+            icon: const Icon(Icons.insights_outlined),
+            selectedIcon: const Icon(Icons.insights),
+            label: l10n.consoleNavAnalytics,
           ),
         ],
       ),

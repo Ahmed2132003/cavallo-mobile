@@ -1558,6 +1558,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Important system announcements are always delivered.'**
   String get notifPrefsSystemFooter;
+
+  /// Business console tab / dashboard card: products.
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get consoleNavProducts;
+
+  /// Business console tab / dashboard card: posts and reels.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts/Reels'**
+  String get consoleNavContent;
+
+  /// Business console tab and screen title: stories.
+  ///
+  /// In en, this message translates to:
+  /// **'Stories'**
+  String get consoleNavStories;
+
+  /// Business console tab: analytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get consoleNavAnalytics;
+
+  /// Dashboard card label: stories that are published or pending review.
+  ///
+  /// In en, this message translates to:
+  /// **'Active stories'**
+  String get consoleDashStories;
+
+  /// Dashboard card label: new followers in the selected analytics range.
+  ///
+  /// In en, this message translates to:
+  /// **'New followers'**
+  String get consoleDashFollowers;
+
+  /// Dashboard card caption: the analytics range. days is the exact number (it picks the plural form).
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{last day} other{last {days} days}}'**
+  String consoleDashRange(int days);
+
+  /// Dashboard card value shown when that area failed to load.
+  ///
+  /// In en, this message translates to:
+  /// **'–'**
+  String get consoleDashValueUnavailable;
+
+  /// App bar title of the business product list.
+  ///
+  /// In en, this message translates to:
+  /// **'My Products'**
+  String get consoleProductsTitle;
+
+  /// Extended button on the product list.
+  ///
+  /// In en, this message translates to:
+  /// **'Create New'**
+  String get consoleProductsCreate;
+
+  /// Empty state of the product list.
+  ///
+  /// In en, this message translates to:
+  /// **'No products yet.\nTap \"Create New\" to add your first product.'**
+  String get consoleProductsEmpty;
+
+  /// Fallback error of the product list.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your products.'**
+  String get consoleProductsLoadFailed;
+
+  /// Title of the delete product confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete product?'**
+  String get consoleProductsDeleteTitle;
+
+  /// Body of the delete product dialog. name is the product name.
+  ///
+  /// In en, this message translates to:
+  /// **'This will remove \"{name}\" from your products. This cannot be undone.'**
+  String consoleProductsDeleteBody(String name);
+
+  /// Snackbar when deleting a product fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete this product.'**
+  String get consoleProductsDeleteFailed;
+
+  /// Variant count under a product row. count is the exact number.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} variant} other{{count} variants}}'**
+  String consoleProductVariants(int count);
+
+  /// Status chip of a hidden product.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get consoleProductInactive;
+
+  /// Tooltip of an edit icon in console rows.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get consoleEdit;
+
+  /// Tooltip and confirm button of a delete action in the console.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get consoleDelete;
+
+  /// Cancel button of console dialogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get consoleCancel;
+
+  /// App bar title of the business posts and reels list.
+  ///
+  /// In en, this message translates to:
+  /// **'My Content'**
+  String get consoleContentTitle;
+
+  /// Extended button: create a post.
+  ///
+  /// In en, this message translates to:
+  /// **'New Post'**
+  String get consoleContentNewPost;
+
+  /// Extended button: create a reel.
+  ///
+  /// In en, this message translates to:
+  /// **'New Reel'**
+  String get consoleContentNewReel;
+
+  /// Empty state of the posts and reels list.
+  ///
+  /// In en, this message translates to:
+  /// **'No posts or reels yet.\nTap \"New Post\" or \"New Reel\" to share your first one.'**
+  String get consoleContentEmpty;
+
+  /// Fallback error of the posts and reels list.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your content.'**
+  String get consoleContentLoadFailed;
+
+  /// Type label of a post row.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get consoleTypePost;
+
+  /// Type label of a reel row.
+  ///
+  /// In en, this message translates to:
+  /// **'Reel'**
+  String get consoleTypeReel;
+
+  /// Moderation chip: waiting for review (Pending).
+  ///
+  /// In en, this message translates to:
+  /// **'Under review'**
+  String get consoleStatusUnderReview;
+
+  /// Moderation chip: approved and published (Approved).
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get consoleStatusLive;
+
+  /// Moderation chip: rejected, always followed by the reason.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected: {reason}'**
+  String consoleStatusRejectedWithReason(String reason);
+
+  /// Fallback shown when a rejected item has no reason.
+  ///
+  /// In en, this message translates to:
+  /// **'no reason given'**
+  String get consoleStatusNoReasonGiven;
+
+  /// Chip of a reel that has not reached moderation yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing video…'**
+  String get consoleStatusProcessing;
+
+  /// Chip of a reel whose processing failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Video processing failed'**
+  String get consoleStatusProcessingFailed;
+
+  /// Extended button on the stories list.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Story'**
+  String get consoleStoriesCreate;
+
+  /// Empty state of the stories list.
+  ///
+  /// In en, this message translates to:
+  /// **'No stories yet.\nTap \"Create Story\" to share your first one.'**
+  String get consoleStoriesEmpty;
+
+  /// Fallback error of the stories list.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your stories.'**
+  String get consoleStoriesLoadFailed;
+
+  /// Title of a story row. id is the story number.
+  ///
+  /// In en, this message translates to:
+  /// **'Story #{id}'**
+  String consoleStoryNumber(int id);
+
+  /// Story status chip: published.
+  ///
+  /// In en, this message translates to:
+  /// **'Published'**
+  String get consoleStoryPublished;
+
+  /// Story status chip: pending review.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get consoleStoryPending;
+
+  /// Story status chip: rejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get consoleStoryRejected;
+
+  /// Story status chip: expired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get consoleStoryExpired;
+
+  /// Story status chip: status not recognised.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get consoleStoryUnknown;
+
+  /// Rejection reason line under a rejected story.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason: {reason}'**
+  String consoleStoryReason(String reason);
+
+  /// Time left of a story: hours and minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m left'**
+  String consoleStoryTimeLeftHM(int hours, int minutes);
+
+  /// Time left of a story: minutes only.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m left'**
+  String consoleStoryTimeLeftM(int minutes);
+
+  /// Time left of a story: under one minute.
+  ///
+  /// In en, this message translates to:
+  /// **'Less than 1m left'**
+  String get consoleStoryTimeLeftLess;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

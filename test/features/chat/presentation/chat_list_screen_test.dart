@@ -144,7 +144,11 @@ Future<void> _pumpScreen(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [conversationRepositoryProvider.overrideWithValue(repository)],
-      child: const MaterialApp(home: ChatListScreen()),
+      child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: ChatListScreen(),
+      ),
     ),
   );
 }

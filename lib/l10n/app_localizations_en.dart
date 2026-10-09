@@ -867,4 +867,170 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifPrefsSystemFooter => 'Important system announcements are always delivered.';
+
+  @override
+  String get consoleNavProducts => 'Products';
+
+  @override
+  String get consoleNavContent => 'Posts/Reels';
+
+  @override
+  String get consoleNavStories => 'Stories';
+
+  @override
+  String get consoleNavAnalytics => 'Analytics';
+
+  @override
+  String get consoleDashStories => 'Active stories';
+
+  @override
+  String get consoleDashFollowers => 'New followers';
+
+  @override
+  String consoleDashRange(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'last $days days',
+      one: 'last day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get consoleDashValueUnavailable => '–';
+
+  @override
+  String get consoleProductsTitle => 'My Products';
+
+  @override
+  String get consoleProductsCreate => 'Create New';
+
+  @override
+  String get consoleProductsEmpty => 'No products yet.\nTap \"Create New\" to add your first product.';
+
+  @override
+  String get consoleProductsLoadFailed => 'Could not load your products.';
+
+  @override
+  String get consoleProductsDeleteTitle => 'Delete product?';
+
+  @override
+  String consoleProductsDeleteBody(String name) {
+    return 'This will remove \"$name\" from your products. This cannot be undone.';
+  }
+
+  @override
+  String get consoleProductsDeleteFailed => 'Could not delete this product.';
+
+  @override
+  String consoleProductVariants(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count variants',
+      one: '$count variant',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get consoleProductInactive => 'Inactive';
+
+  @override
+  String get consoleEdit => 'Edit';
+
+  @override
+  String get consoleDelete => 'Delete';
+
+  @override
+  String get consoleCancel => 'Cancel';
+
+  @override
+  String get consoleContentTitle => 'My Content';
+
+  @override
+  String get consoleContentNewPost => 'New Post';
+
+  @override
+  String get consoleContentNewReel => 'New Reel';
+
+  @override
+  String get consoleContentEmpty => 'No posts or reels yet.\nTap \"New Post\" or \"New Reel\" to share your first one.';
+
+  @override
+  String get consoleContentLoadFailed => 'Could not load your content.';
+
+  @override
+  String get consoleTypePost => 'Post';
+
+  @override
+  String get consoleTypeReel => 'Reel';
+
+  @override
+  String get consoleStatusUnderReview => 'Under review';
+
+  @override
+  String get consoleStatusLive => 'Live';
+
+  @override
+  String consoleStatusRejectedWithReason(String reason) {
+    return 'Rejected: $reason';
+  }
+
+  @override
+  String get consoleStatusNoReasonGiven => 'no reason given';
+
+  @override
+  String get consoleStatusProcessing => 'Processing video…';
+
+  @override
+  String get consoleStatusProcessingFailed => 'Video processing failed';
+
+  @override
+  String get consoleStoriesCreate => 'Create Story';
+
+  @override
+  String get consoleStoriesEmpty => 'No stories yet.\nTap \"Create Story\" to share your first one.';
+
+  @override
+  String get consoleStoriesLoadFailed => 'Could not load your stories.';
+
+  @override
+  String consoleStoryNumber(int id) {
+    return 'Story #$id';
+  }
+
+  @override
+  String get consoleStoryPublished => 'Published';
+
+  @override
+  String get consoleStoryPending => 'Pending';
+
+  @override
+  String get consoleStoryRejected => 'Rejected';
+
+  @override
+  String get consoleStoryExpired => 'Expired';
+
+  @override
+  String get consoleStoryUnknown => 'Unknown';
+
+  @override
+  String consoleStoryReason(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
+  String consoleStoryTimeLeftHM(int hours, int minutes) {
+    return '${hours}h ${minutes}m left';
+  }
+
+  @override
+  String consoleStoryTimeLeftM(int minutes) {
+    return '${minutes}m left';
+  }
+
+  @override
+  String get consoleStoryTimeLeftLess => 'Less than 1m left';
 }

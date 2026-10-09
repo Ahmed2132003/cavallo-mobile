@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_failure.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
@@ -152,7 +153,8 @@ class AnalyticsScreen extends ConsumerWidget {
             'Likes received: ${totals.likesReceived} total over $days days',
         rows: rows,
         valueOf: (row) => row.totalLikesReceived,
-        color: Theme.of(context).colorScheme.tertiary,
+        color: context.appColors.warningText,
+        dashArray: const [8, 4],
       ),
       const SizedBox(height: 24),
       const _SectionHeading('Ratings'),
@@ -177,7 +179,8 @@ class AnalyticsScreen extends ConsumerWidget {
           valueOf: (row) => row.averageRatingSnapshot,
           fixedMaxY: 5,
           yInterval: 1,
-          color: Theme.of(context).colorScheme.secondary,
+          color: context.appColors.successText,
+          dashArray: const [2, 4],
         ),
         const SizedBox(height: 4),
         Text(
@@ -406,7 +409,7 @@ class _TotalCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 20, color: theme.colorScheme.primary),
+            Icon(icon, size: 20, color: context.appColors.brandText),
             const SizedBox(height: 8),
             Text(value, style: theme.textTheme.headlineSmall),
             const SizedBox(height: 2),
