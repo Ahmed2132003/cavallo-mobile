@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_context.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/social_interaction_repository_impl.dart';
 import '../domain/report_reason.dart';
 import 'social_error_message.dart';
@@ -19,12 +21,13 @@ Future<void> showReportDialog(
   );
 }
 
-String _reasonLabel(ReportReason reason) => switch (reason) {
-  ReportReason.spam => 'Spam',
-  ReportReason.inappropriate => 'Inappropriate content',
-  ReportReason.misleading => 'Misleading',
-  ReportReason.other => 'Other',
-};
+String _reasonLabel(AppLocalizations l10n, ReportReason reason) =>
+    switch (reason) {
+      ReportReason.spam => l10n.socialReasonSpam,
+      ReportReason.inappropriate => l10n.socialReasonInappropriate,
+      ReportReason.misleading => l10n.socialReasonMisleading,
+      ReportReason.other => l10n.socialReasonOther,
+    };
 
 class ReportDialog extends ConsumerStatefulWidget {
   const ReportDialog({
@@ -63,6 +66,7 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
 
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
 
     try {
       await ref
@@ -74,9 +78,7 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
             details: _detailsController.text.trim(),
           );
       if (mounted) navigator.pop();
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Thanks, your report was submitted.')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l10n.socialReportThanks)));
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -92,13 +94,13 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
     final error = _error;
 
     return AlertDialog(
-      title: const Text('Report'),
+      title: Text(context.l10n.socialReport),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Why are you reporting this?'),
+            Text(context.l10n.socialReportWhy),
             const SizedBox(height: 8),
             for (final reason in ReportReason.values)
               ListTile(
@@ -108,14 +110,14 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
                   _reason == reason
                       ? Icons.radio_button_checked
                       : Icons.radio_button_unchecked,
-                  color: _reason == reason
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurfaceVariant,
+                  color:
+                      _reason == reason
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurfaceVariant,
                 ),
-                title: Text(_reasonLabel(reason)),
-                onTap: _submitting
-                    ? null
-                    : () => setState(() => _reason = reason),
+                title: Text(_reasonLabel(context.l10n, reason)),
+                onTap:
+                    _submitting ? null : () => setState(() => _reason = reason),
               ),
             const SizedBox(height: 8),
             TextField(
@@ -123,9 +125,9 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
               enabled: !_submitting,
               minLines: 2,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Details (optional)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.socialReportDetails,
+                border: const OutlineInputBorder(),
               ),
             ),
             if (error != null)
@@ -142,17 +144,18 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
       actions: [
         TextButton(
           onPressed: _submitting ? null : () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.commonCancel),
         ),
         FilledButton(
           onPressed: (_reason == null || _submitting) ? null : _submit,
-          child: _submitting
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Text('Submit'),
+          child:
+              _submitting
+                  ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                  : Text(context.l10n.socialReportSubmit),
         ),
       ],
     );

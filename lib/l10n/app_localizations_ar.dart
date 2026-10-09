@@ -1351,4 +1351,199 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get analyticsPublishedReels => 'الريلز المنشورة';
+
+  @override
+  String get bizOnboardTitle => 'أكمل ملف نشاطك التجاري';
+
+  @override
+  String get bizFieldName => 'اسم النشاط التجاري';
+
+  @override
+  String get bizFieldPhone => 'رقم الهاتف (اختياري)';
+
+  @override
+  String get bizFieldPhoneInvalid => 'أدخل رقم هاتف صالحًا للدولة المحددة.';
+
+  @override
+  String get bizFieldDescription => 'الوصف (اختياري)';
+
+  @override
+  String get bizOnboardSubmit => 'إكمال الملف';
+
+  @override
+  String get bizProfileTitle => 'ملف النشاط التجاري';
+
+  @override
+  String get bizProfileBackHome => 'العودة إلى الرئيسية';
+
+  @override
+  String get bizProfileIncomplete => 'لم تكمل ملف نشاطك التجاري بعد.';
+
+  @override
+  String get bizProfileNoChanges => 'لا توجد تغييرات للحفظ.';
+
+  @override
+  String get bizProfileUpdated => 'تم تحديث ملف النشاط التجاري.';
+
+  @override
+  String get bizProfileSave => 'حفظ التغييرات';
+
+  @override
+  String get commonRemove => 'إزالة';
+
+  @override
+  String get contentPostNotFound => 'المنشور غير موجود.\nربما تمت إزالته.';
+
+  @override
+  String get contentReelNotFound => 'الريل غير موجود.\nربما تمت إزالته.';
+
+  @override
+  String get contentReelPlaybackSoon => 'تشغيل الفيديو — قريبًا';
+
+  @override
+  String get contentFormImageLabel => 'صورة (اختياري)';
+
+  @override
+  String get contentFormVideoLabel => 'فيديو';
+
+  @override
+  String get contentFormChooseImage => 'اختيار صورة';
+
+  @override
+  String get contentFormChangeImage => 'تغيير الصورة';
+
+  @override
+  String get contentFormChooseVideo => 'اختيار فيديو';
+
+  @override
+  String get contentFormChangeVideo => 'تغيير الفيديو';
+
+  @override
+  String get contentFormCaption => 'التعليق';
+
+  @override
+  String get postFormTitle => 'منشور جديد';
+
+  @override
+  String get postFormReviewNote => 'ستتم مراجعة منشورك قبل أن يظهر للعملاء.';
+
+  @override
+  String get postFormSubmit => 'نشر';
+
+  @override
+  String get reelFormTitle => 'ريل جديد';
+
+  @override
+  String get reelFormReviewNote => 'تتم معالجة الفيديو أولًا ثم مراجعته قبل أن يظهر للعملاء. ستجد حالته في قائمة المحتوى الخاصة بك.';
+
+  @override
+  String get reelFormSubmit => 'نشر الريل';
+
+  @override
+  String get productFormImageLabel => 'صورة المنتج (اختياري)';
+
+  @override
+  String get productFormVariantName => 'اسم الخيار (مثل: المقاس)';
+
+  @override
+  String get productFormVariantValue => 'القيمة (مثل: كبير)';
+
+  @override
+  String get productFormRemoveVariant => 'إزالة الخيار';
+
+  @override
+  String get productFormAddVariant => 'إضافة خيار';
+
+  @override
+  String get productFormName => 'الاسم';
+
+  @override
+  String get productFormDescription => 'الوصف';
+
+  @override
+  String get productFormPrice => 'السعر';
+
+  @override
+  String get productFormCurrency => 'العملة';
+
+  @override
+  String get productFormActive => 'نشط (ظاهر للعملاء)';
+
+  @override
+  String get productFormCategoryRequired => 'الفئة مطلوبة.';
+
+  @override
+  String get productFormCurrencyRequired => 'العملة مطلوبة.';
+
+  @override
+  String get socialMoreOptions => 'المزيد من الخيارات';
+
+  @override
+  String get socialReport => 'إبلاغ';
+
+  @override
+  String get socialReportThanks => 'شكرًا لك، تم إرسال بلاغك.';
+
+  @override
+  String get socialReportWhy => 'ما سبب الإبلاغ عن هذا المحتوى؟';
+
+  @override
+  String get socialReportDetails => 'تفاصيل (اختياري)';
+
+  @override
+  String get socialReportSubmit => 'إرسال';
+
+  @override
+  String get socialReasonSpam => 'محتوى مزعج';
+
+  @override
+  String get socialReasonInappropriate => 'محتوى غير لائق';
+
+  @override
+  String get socialReasonMisleading => 'مضلِّل';
+
+  @override
+  String get socialReasonOther => 'أخرى';
+
+  @override
+  String get storyUploadStarted => 'بدأ رفع القصة.';
+
+  @override
+  String get storyNoMediaSelected => 'لم يتم اختيار صورة أو فيديو بعد.';
+
+  @override
+  String get storyAddMediaFirst => 'أضف صورة أو فيديو أولًا.';
+
+  @override
+  String get storyAddPhoto => 'إضافة صورة';
+
+  @override
+  String get storyAddVideo => 'إضافة فيديو';
+
+  @override
+  String get storyPostButton => 'نشر القصة';
+
+  @override
+  String get storyUploadDiscard => 'تجاهل';
+
+  @override
+  String storyUploadUploading(int attempt) {
+    return 'جارٍ رفع القصة... (المحاولة $attempt من 5)';
+  }
+
+  @override
+  String storyUploadRetrying(int attempt) {
+    return 'انقطع الاتصال — تتم إعادة محاولة رفع القصة... (المحاولة $attempt من 5)';
+  }
+
+  @override
+  String get storyUploadFailed => 'فشل رفع القصة.';
+
+  @override
+  String storyUploadFailedWithReason(String reason) {
+    return 'فشل رفع القصة: $reason';
+  }
+
+  @override
+  String get pushBannerView => 'عرض';
 }

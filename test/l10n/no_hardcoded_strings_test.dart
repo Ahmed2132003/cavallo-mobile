@@ -37,29 +37,21 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Files that are allowed to keep literals, each with the reason.
 const Map<String, String> _allowlist = <String, String>{
-  // (none yet)
+  // Developer-only widget gallery (Part P-006). Nothing in lib/ imports it:
+  // only its own widget test builds it, so it is never shown to a user and
+  // its labels (component names such as 'AppButton') are not product text.
+  'lib/core/widgets/widget_gallery_demo.dart':
+      'debug-only gallery, not reachable from the app',
 };
 
 /// Files that still contain literals and are being migrated. TEMPORARY.
+/// STEP 8B left only the four chat files: the chat thread restyle (STEP 3)
+/// rewrites them, so they are localized together with it.
 const Set<String> _pendingMigration = <String>{
-  'lib/core/widgets/widget_gallery_demo.dart',
-  'lib/features/business_profile/presentation/business_onboarding_screen.dart',
-  'lib/features/business_profile/presentation/business_profile_edit_screen.dart',
-  'lib/features/business_profile/presentation/business_profile_screen.dart',
   'lib/features/chat/presentation/chat_thread_screen.dart',
   'lib/features/chat/presentation/message_bubble_widget.dart',
   'lib/features/chat/presentation/share_to_conversation_sheet.dart',
   'lib/features/chat/presentation/shared_content_card.dart',
-  'lib/features/content/presentation/post_detail_screen.dart',
-  'lib/features/content/presentation/post_form_screen.dart',
-  'lib/features/content/presentation/reel_detail_screen.dart',
-  'lib/features/content/presentation/reel_form_screen.dart',
-  'lib/features/notifications/presentation/push_notification_handler.dart',
-  'lib/features/products/presentation/product_form_screen.dart',
-  'lib/features/social/presentation/content_overflow_menu.dart',
-  'lib/features/social/presentation/report_dialog.dart',
-  'lib/features/stories/presentation/story_creation_screen.dart',
-  'lib/features/stories/presentation/story_upload_status_banner.dart',
 };
 
 class HardcodedLiteral {

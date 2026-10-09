@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
@@ -232,7 +233,7 @@ class _ReelFormScreenState extends ConsumerState<ReelFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Video'),
+        Text(context.l10n.contentFormVideoLabel),
         const SizedBox(height: 8),
         preview,
         const SizedBox(height: 8),
@@ -242,13 +243,17 @@ class _ReelFormScreenState extends ConsumerState<ReelFormScreen> {
               key: const Key('reelForm_pickVideoButton'),
               onPressed: _isSubmitting ? null : _pickVideo,
               icon: const Icon(Icons.video_library_outlined),
-              label: Text(_videoFile == null ? 'Choose video' : 'Change video'),
+              label: Text(
+                _videoFile == null
+                    ? context.l10n.contentFormChooseVideo
+                    : context.l10n.contentFormChangeVideo,
+              ),
             ),
             if (_videoFile != null)
               TextButton(
                 key: const Key('reelForm_removeVideoButton'),
                 onPressed: _isSubmitting ? null : _removeVideo,
-                child: const Text('Remove'),
+                child: Text(context.l10n.commonRemove),
               ),
           ],
         ),
@@ -267,7 +272,7 @@ class _ReelFormScreenState extends ConsumerState<ReelFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New reel')),
+      appBar: AppBar(title: Text(context.l10n.reelFormTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -278,7 +283,7 @@ class _ReelFormScreenState extends ConsumerState<ReelFormScreen> {
               children: [
                 AppTextField(
                   key: const Key('reelForm_captionField'),
-                  label: 'Caption',
+                  label: context.l10n.contentFormCaption,
                   controller: _captionController,
                   maxLines: 4,
                   validator: (value) {
@@ -293,9 +298,7 @@ class _ReelFormScreenState extends ConsumerState<ReelFormScreen> {
                 _buildVideoPicker(context),
                 const SizedBox(height: 8),
                 Text(
-                  'Your video is processed first, then reviewed before it '
-                  "becomes visible to customers. You'll see its status on "
-                  'your content list.',
+                  context.l10n.reelFormReviewNote,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -304,13 +307,15 @@ class _ReelFormScreenState extends ConsumerState<ReelFormScreen> {
                   const SizedBox(height: 16),
                   Text(
                     _generalError!,
-                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 24),
                 AppButton(
                   key: const Key('reelForm_submitButton'),
-                  label: 'Post reel',
+                  label: context.l10n.reelFormSubmit,
                   isLoading: _isSubmitting,
                   onPressed: _submit,
                 ),

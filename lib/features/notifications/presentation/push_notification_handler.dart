@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/locale_provider.dart';
 import '../../../core/push/fcm_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/notification_repository_impl.dart';
 import 'notification_list_provider.dart';
 import 'notification_navigator.dart';
@@ -68,6 +70,11 @@ final pushNotificationHandlerProvider = Provider<void>((ref) {
     if (messenger == null) return;
 
     final link = PushDeepLink.fromData(message.data);
+    // This handler sits above MaterialApp (no BuildContext), so the active
+    // language is read from the same provider the Accept-Language header uses.
+    final l10n = lookupAppLocalizations(
+      Locale(ref.read(activeLanguageCodeGetterProvider)()),
+    );
     void open() {
       messenger.hideCurrentSnackBar();
       if (link != null) unawaited(openLink(link));
@@ -102,7 +109,7 @@ final pushNotificationHandlerProvider = Provider<void>((ref) {
           action:
               link == null
                   ? null
-                  : SnackBarAction(label: 'View', onPressed: open),
+                  : SnackBarAction(label: l10n.pushBannerView, onPressed: open),
         ),
       );
   }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
@@ -184,7 +185,7 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Image (optional)'),
+        Text(context.l10n.contentFormImageLabel),
         const SizedBox(height: 8),
         preview,
         const SizedBox(height: 8),
@@ -194,13 +195,17 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
               key: const Key('postForm_pickImageButton'),
               onPressed: _isSubmitting ? null : _pickImage,
               icon: const Icon(Icons.photo_library_outlined),
-              label: Text(_imageFile == null ? 'Choose image' : 'Change image'),
+              label: Text(
+                _imageFile == null
+                    ? context.l10n.contentFormChooseImage
+                    : context.l10n.contentFormChangeImage,
+              ),
             ),
             if (_imageFile != null)
               TextButton(
                 key: const Key('postForm_removeImageButton'),
                 onPressed: _isSubmitting ? null : _removeImage,
-                child: const Text('Remove'),
+                child: Text(context.l10n.commonRemove),
               ),
           ],
         ),
@@ -219,7 +224,7 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New post')),
+      appBar: AppBar(title: Text(context.l10n.postFormTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -230,7 +235,7 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
               children: [
                 AppTextField(
                   key: const Key('postForm_captionField'),
-                  label: 'Caption',
+                  label: context.l10n.contentFormCaption,
                   controller: _captionController,
                   maxLines: 4,
                   validator: (value) {
@@ -245,8 +250,7 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
                 _buildImagePicker(context),
                 const SizedBox(height: 8),
                 Text(
-                  'Your post will be reviewed before it becomes visible to '
-                  'customers.',
+                  context.l10n.postFormReviewNote,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -255,13 +259,15 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
                   const SizedBox(height: 16),
                   Text(
                     _generalError!,
-                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 24),
                 AppButton(
                   key: const Key('postForm_submitButton'),
-                  label: 'Post',
+                  label: context.l10n.postFormSubmit,
                   isLoading: _isSubmitting,
                   onPressed: _submit,
                 ),

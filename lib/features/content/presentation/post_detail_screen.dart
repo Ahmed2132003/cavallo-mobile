@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
@@ -53,7 +54,7 @@ class PostDetailScreen extends ConsumerWidget {
     final id = int.tryParse(postId);
     if (id == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Post')),
+        appBar: AppBar(title: Text(context.l10n.consoleTypePost)),
         body: const SafeArea(child: _NotFoundView()),
       );
     }
@@ -63,15 +64,19 @@ class PostDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Post'),
-        actions: loadedPost == null
-            ? null
-            : [ContentOverflowMenu(contentType: 'post', objectId: loadedPost.id)],
+        title: Text(context.l10n.consoleTypePost),
+        actions:
+            loadedPost == null
+                ? null
+                : [
+                  ContentOverflowMenu(
+                    contentType: 'post',
+                    objectId: loadedPost.id,
+                  ),
+                ],
       ),
       body: switch (postAsync) {
-        AsyncData(value: final PublicPost post) => _PostDetailView(
-          post: post,
-        ),
+        AsyncData(value: final PublicPost post) => _PostDetailView(post: post),
         AsyncData(value: null) => const _NotFoundView(),
         AsyncError(:final error) => _LoadErrorView(error: error, id: id),
         _ => const LoadingIndicator(),
@@ -87,8 +92,8 @@ class _NotFoundView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const EmptyStateWidget(
-      message: 'Post not found.\nIt may have been removed.',
+    return EmptyStateWidget(
+      message: context.l10n.contentPostNotFound,
       icon: Icons.article_outlined,
     );
   }
@@ -210,15 +215,17 @@ class _PostDetailImage extends StatelessWidget {
 
     return AspectRatio(
       aspectRatio: 1,
-      child: (url == null || url.isEmpty)
-          ? placeholder(Icons.image_outlined)
-          : Image.network(
-              url,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              errorBuilder: (context, error, stackTrace) =>
-                  placeholder(Icons.broken_image_outlined),
-            ),
+      child:
+          (url == null || url.isEmpty)
+              ? placeholder(Icons.image_outlined)
+              : Image.network(
+                url,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                errorBuilder:
+                    (context, error, stackTrace) =>
+                        placeholder(Icons.broken_image_outlined),
+              ),
     );
   }
 }

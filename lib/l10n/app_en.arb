@@ -1722,5 +1722,272 @@
   "analyticsPublishedReels": "Published reels",
   "@analyticsPublishedReels": {
     "description": "Business: analytics card label."
+  },
+  "bizOnboardTitle": "Complete your business profile",
+  "@bizOnboardTitle": {
+    "description": "Business onboarding: app bar title."
+  },
+  "bizFieldName": "Business name",
+  "@bizFieldName": {
+    "description": "Business forms: business name field label."
+  },
+  "bizFieldPhone": "Phone number (optional)",
+  "@bizFieldPhone": {
+    "description": "Business forms: phone field label."
+  },
+  "bizFieldPhoneInvalid": "Enter a valid phone number for the selected country.",
+  "@bizFieldPhoneInvalid": {
+    "description": "Business forms: phone field validation message."
+  },
+  "bizFieldDescription": "Description (optional)",
+  "@bizFieldDescription": {
+    "description": "Business forms: description field label."
+  },
+  "bizOnboardSubmit": "Complete profile",
+  "@bizOnboardSubmit": {
+    "description": "Business onboarding: submit button."
+  },
+  "bizProfileTitle": "Business profile",
+  "@bizProfileTitle": {
+    "description": "Business profile edit: app bar title."
+  },
+  "bizProfileBackHome": "Back to home",
+  "@bizProfileBackHome": {
+    "description": "Business profile edit: back-to-home tooltip."
+  },
+  "bizProfileIncomplete": "You have not completed your business profile yet.",
+  "@bizProfileIncomplete": {
+    "description": "Business profile edit: shown when no profile exists."
+  },
+  "bizProfileNoChanges": "No changes to save.",
+  "@bizProfileNoChanges": {
+    "description": "Business profile edit: snackbar when nothing changed."
+  },
+  "bizProfileUpdated": "Business profile updated.",
+  "@bizProfileUpdated": {
+    "description": "Business profile edit: snackbar after saving."
+  },
+  "bizProfileSave": "Save changes",
+  "@bizProfileSave": {
+    "description": "Business profile edit: save button."
+  },
+  "commonRemove": "Remove",
+  "@commonRemove": {
+    "description": "Shared: remove button (image, video)."
+  },
+  "contentPostNotFound": "Post not found.\nIt may have been removed.",
+  "@contentPostNotFound": {
+    "description": "Post detail: empty state when the post does not exist."
+  },
+  "contentReelNotFound": "Reel not found.\nIt may have been removed.",
+  "@contentReelNotFound": {
+    "description": "Reel detail: empty state when the reel does not exist."
+  },
+  "contentReelPlaybackSoon": "Video playback \u2014 Coming soon",
+  "@contentReelPlaybackSoon": {
+    "description": "Reel detail: snackbar of the playback placeholder button."
+  },
+  "contentFormImageLabel": "Image (optional)",
+  "@contentFormImageLabel": {
+    "description": "Post form: image section label."
+  },
+  "contentFormVideoLabel": "Video",
+  "@contentFormVideoLabel": {
+    "description": "Reel form: video section label."
+  },
+  "contentFormChooseImage": "Choose image",
+  "@contentFormChooseImage": {
+    "description": "Post and product forms: pick-image button."
+  },
+  "contentFormChangeImage": "Change image",
+  "@contentFormChangeImage": {
+    "description": "Post and product forms: pick-image button once an image is chosen."
+  },
+  "contentFormChooseVideo": "Choose video",
+  "@contentFormChooseVideo": {
+    "description": "Reel form: pick-video button."
+  },
+  "contentFormChangeVideo": "Change video",
+  "@contentFormChangeVideo": {
+    "description": "Reel form: pick-video button once a video is chosen."
+  },
+  "contentFormCaption": "Caption",
+  "@contentFormCaption": {
+    "description": "Post and reel forms: caption field label."
+  },
+  "postFormTitle": "New post",
+  "@postFormTitle": {
+    "description": "Post form: app bar title."
+  },
+  "postFormReviewNote": "Your post will be reviewed before it becomes visible to customers.",
+  "@postFormReviewNote": {
+    "description": "Post form: moderation note under the form."
+  },
+  "postFormSubmit": "Post",
+  "@postFormSubmit": {
+    "description": "Post form: submit button."
+  },
+  "reelFormTitle": "New reel",
+  "@reelFormTitle": {
+    "description": "Reel form: app bar title."
+  },
+  "reelFormReviewNote": "Your video is processed first, then reviewed before it becomes visible to customers. You'll see its status on your content list.",
+  "@reelFormReviewNote": {
+    "description": "Reel form: processing and moderation note under the form."
+  },
+  "reelFormSubmit": "Post reel",
+  "@reelFormSubmit": {
+    "description": "Reel form: submit button."
+  },
+  "productFormImageLabel": "Product image (optional)",
+  "@productFormImageLabel": {
+    "description": "Product form: image section label."
+  },
+  "productFormVariantName": "Variant name (e.g. Size)",
+  "@productFormVariantName": {
+    "description": "Product form: variant name field label."
+  },
+  "productFormVariantValue": "Value (e.g. Large)",
+  "@productFormVariantValue": {
+    "description": "Product form: variant value field label."
+  },
+  "productFormRemoveVariant": "Remove variant",
+  "@productFormRemoveVariant": {
+    "description": "Product form: remove-variant tooltip."
+  },
+  "productFormAddVariant": "Add variant",
+  "@productFormAddVariant": {
+    "description": "Product form: add-variant button."
+  },
+  "productFormName": "Name",
+  "@productFormName": {
+    "description": "Product form: name field label."
+  },
+  "productFormDescription": "Description",
+  "@productFormDescription": {
+    "description": "Product form: description field label."
+  },
+  "productFormPrice": "Price",
+  "@productFormPrice": {
+    "description": "Product form: price field label."
+  },
+  "productFormCurrency": "Currency",
+  "@productFormCurrency": {
+    "description": "Product form: currency dropdown label."
+  },
+  "productFormActive": "Active (visible to customers)",
+  "@productFormActive": {
+    "description": "Product form: active switch title."
+  },
+  "productFormCategoryRequired": "Category is required.",
+  "@productFormCategoryRequired": {
+    "description": "Product form: category validation message."
+  },
+  "productFormCurrencyRequired": "Currency is required.",
+  "@productFormCurrencyRequired": {
+    "description": "Product form: currency validation message."
+  },
+  "socialMoreOptions": "More options",
+  "@socialMoreOptions": {
+    "description": "Content overflow menu: tooltip."
+  },
+  "socialReport": "Report",
+  "@socialReport": {
+    "description": "Report: menu item and dialog title."
+  },
+  "socialReportThanks": "Thanks, your report was submitted.",
+  "@socialReportThanks": {
+    "description": "Report: snackbar after submitting."
+  },
+  "socialReportWhy": "Why are you reporting this?",
+  "@socialReportWhy": {
+    "description": "Report dialog: question above the reasons."
+  },
+  "socialReportDetails": "Details (optional)",
+  "@socialReportDetails": {
+    "description": "Report dialog: details field label."
+  },
+  "socialReportSubmit": "Submit",
+  "@socialReportSubmit": {
+    "description": "Report dialog: submit button."
+  },
+  "socialReasonSpam": "Spam",
+  "@socialReasonSpam": {
+    "description": "Report reason: spam."
+  },
+  "socialReasonInappropriate": "Inappropriate content",
+  "@socialReasonInappropriate": {
+    "description": "Report reason: inappropriate content."
+  },
+  "socialReasonMisleading": "Misleading",
+  "@socialReasonMisleading": {
+    "description": "Report reason: misleading."
+  },
+  "socialReasonOther": "Other",
+  "@socialReasonOther": {
+    "description": "Report reason: other."
+  },
+  "storyUploadStarted": "Story upload started.",
+  "@storyUploadStarted": {
+    "description": "Story creation: snackbar after the upload is queued."
+  },
+  "storyNoMediaSelected": "No photo or video selected yet.",
+  "@storyNoMediaSelected": {
+    "description": "Story creation: placeholder before a file is picked."
+  },
+  "storyAddMediaFirst": "Add a photo or video first.",
+  "@storyAddMediaFirst": {
+    "description": "Story creation: error when submitting without a file."
+  },
+  "storyAddPhoto": "Add Photo",
+  "@storyAddPhoto": {
+    "description": "Story creation: pick-photo button."
+  },
+  "storyAddVideo": "Add Video",
+  "@storyAddVideo": {
+    "description": "Story creation: pick-video button."
+  },
+  "storyPostButton": "Post Story",
+  "@storyPostButton": {
+    "description": "Story creation: submit button."
+  },
+  "storyUploadDiscard": "Discard",
+  "@storyUploadDiscard": {
+    "description": "Story upload banner: discard-failed-upload tooltip."
+  },
+  "storyUploadUploading": "Uploading story... (attempt {attempt} of 5)",
+  "@storyUploadUploading": {
+    "description": "Story upload banner: uploading status. attempt is the current attempt number.",
+    "placeholders": {
+      "attempt": {
+        "type": "int"
+      }
+    }
+  },
+  "storyUploadRetrying": "Connection lost \u2014 retrying story upload... (attempt {attempt} of 5)",
+  "@storyUploadRetrying": {
+    "description": "Story upload banner: retrying status. attempt is the current attempt number.",
+    "placeholders": {
+      "attempt": {
+        "type": "int"
+      }
+    }
+  },
+  "storyUploadFailed": "Story upload failed.",
+  "@storyUploadFailed": {
+    "description": "Story upload banner: failed status without a reason."
+  },
+  "storyUploadFailedWithReason": "Story upload failed: {reason}",
+  "@storyUploadFailedWithReason": {
+    "description": "Story upload banner: failed status with the reason returned by the server.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "pushBannerView": "View",
+  "@pushBannerView": {
+    "description": "Push notification banner: action button that opens the linked screen."
   }
 }

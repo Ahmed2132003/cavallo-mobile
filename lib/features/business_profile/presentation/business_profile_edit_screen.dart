@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
@@ -130,13 +131,13 @@ class _BusinessProfileEditScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Business profile'),
+        title: Text(context.l10n.bizProfileTitle),
         // See this screen's docstring, point 7 — always goes to /home,
         // regardless of whether this route has a back-stack entry to
         // pop to.
         leading: IconButton(
           icon: const Icon(Icons.home),
-          tooltip: 'Back to home',
+          tooltip: context.l10n.bizProfileBackHome,
           onPressed: () => context.goNamed(RouteNames.home),
         ),
       ),
@@ -196,9 +197,12 @@ class _ErrorView extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             AppButton(
-              label: 'Retry',
-              onPressed: () =>
-                  ref.read(businessProfileProvider.notifier).refreshProfile(),
+              label: context.l10n.commonRetry,
+              onPressed:
+                  () =>
+                      ref
+                          .read(businessProfileProvider.notifier)
+                          .refreshProfile(),
             ),
           ],
         ),
@@ -212,11 +216,11 @@ class _NoProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: Text(
-          'You have not completed your business profile yet.',
+          context.l10n.bizProfileIncomplete,
           textAlign: TextAlign.center,
         ),
       ),
@@ -322,12 +326,10 @@ class _BusinessProfileEditFormState
     final description = _descriptionController.text.trim();
 
     // --- Change detection (see this screen's docstring, points 2-3) ---
-    final changedBusinessName = businessName == original.businessName
-        ? null
-        : businessName;
-    final changedBusinessType = _businessType == original.businessType
-        ? null
-        : _businessType;
+    final changedBusinessName =
+        businessName == original.businessName ? null : businessName;
+    final changedBusinessType =
+        _businessType == original.businessType ? null : _businessType;
     final changedCountry = country == original.country ? null : country;
     final changedCity = city == original.city ? null : city;
 
@@ -365,11 +367,10 @@ class _BusinessProfileEditFormState
     // rebuilt (and this State disposed) by the re-seed that follows a
     // successful save, so `context` must not be read afterwards.
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
 
     if (!hasChanges) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('No changes to save.')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l10n.bizProfileNoChanges)));
       return;
     }
 
@@ -388,9 +389,7 @@ class _BusinessProfileEditFormState
             // categoryId deliberately left at its `Patchable.unset()`
             // default — see this screen's docstring, point 1.
           );
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Business profile updated.')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l10n.bizProfileUpdated)));
     } on ApiFailure catch (failure) {
       if (!mounted) return;
       setState(() {
@@ -442,7 +441,7 @@ class _BusinessProfileEditFormState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               AppTextField(
-                label: 'Business name',
+                label: context.l10n.bizFieldName,
                 controller: _businessNameController,
                 validator: (value) {
                   if (_businessNameError != null) return _businessNameError;
@@ -453,17 +452,17 @@ class _BusinessProfileEditFormState
                 },
               ),
               const SizedBox(height: 20),
-              const Text('Business type'),
+              Text(context.l10n.profileInfoType),
               const SizedBox(height: 8),
               SegmentedButton<BusinessType>(
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: BusinessType.trader,
-                    label: Text('Trader'),
+                    label: Text(context.l10n.businessTypeTrader),
                   ),
                   ButtonSegment(
                     value: BusinessType.factory,
-                    label: Text('Factory'),
+                    label: Text(context.l10n.businessTypeFactory),
                   ),
                 ],
                 selected: {_businessType},
@@ -483,7 +482,7 @@ class _BusinessProfileEditFormState
               ],
               const SizedBox(height: 16),
               AppTextField(
-                label: 'Country',
+                label: context.l10n.searchFilterCountry,
                 controller: _countryController,
                 validator: (value) {
                   if (_countryError != null) return _countryError;
@@ -495,7 +494,7 @@ class _BusinessProfileEditFormState
               ),
               const SizedBox(height: 16),
               AppTextField(
-                label: 'City',
+                label: context.l10n.searchFilterCity,
                 controller: _cityController,
                 validator: (value) {
                   if (_cityError != null) return _cityError;
@@ -526,19 +525,16 @@ class _BusinessProfileEditFormState
               IntlPhoneField(
                 key: const ValueKey('business_profile_edit_phone_field'),
                 initialValue: widget.profile.phoneNumber,
-                initialCountryCode: widget.profile.phoneNumber == null
-                    ? 'EG'
-                    : null,
-                decoration: const InputDecoration(
-                  labelText: 'Phone number (optional)',
-                  border: OutlineInputBorder(),
+                initialCountryCode:
+                    widget.profile.phoneNumber == null ? 'EG' : null,
+                decoration: InputDecoration(
+                  labelText: context.l10n.bizFieldPhone,
+                  border: const OutlineInputBorder(),
                 ),
-                invalidNumberMessage:
-                    'Enter a valid phone number for the selected country.',
+                invalidNumberMessage: context.l10n.bizFieldPhoneInvalid,
                 onChanged: (phone) {
-                  _phoneNumber = phone.number.isEmpty
-                      ? null
-                      : phone.completeNumber;
+                  _phoneNumber =
+                      phone.number.isEmpty ? null : phone.completeNumber;
                 },
               ),
               if (_phoneNumberError != null) ...[
@@ -553,7 +549,7 @@ class _BusinessProfileEditFormState
               ],
               const SizedBox(height: 16),
               AppTextField(
-                label: 'Description (optional)',
+                label: context.l10n.bizFieldDescription,
                 controller: _descriptionController,
                 maxLines: 4,
                 validator: (_) => _descriptionError,
@@ -567,7 +563,7 @@ class _BusinessProfileEditFormState
               ],
               const SizedBox(height: 24),
               AppButton(
-                label: 'Save changes',
+                label: context.l10n.bizProfileSave,
                 isLoading: _isSubmitting,
                 onPressed: _submit,
               ),

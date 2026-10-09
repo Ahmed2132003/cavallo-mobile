@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import 'report_dialog.dart';
 
 enum _ContentMenuAction { report }
@@ -20,7 +21,7 @@ class ContentOverflowMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<_ContentMenuAction>(
-      tooltip: 'More options',
+      tooltip: context.l10n.socialMoreOptions,
       icon: Icon(
         Icons.more_vert,
         color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -35,12 +36,13 @@ class ContentOverflowMenu extends StatelessWidget {
             );
         }
       },
-      itemBuilder: (_) => const [
-        PopupMenuItem<_ContentMenuAction>(
-          value: _ContentMenuAction.report,
-          child: Text('Report'),
-        ),
-      ],
+      itemBuilder:
+          (_) => [
+            PopupMenuItem<_ContentMenuAction>(
+              value: _ContentMenuAction.report,
+              child: Text(context.l10n.socialReport),
+            ),
+          ],
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
@@ -57,7 +58,7 @@ class ReelDetailScreen extends ConsumerWidget {
     final id = int.tryParse(reelId);
     if (id == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Reel')),
+        appBar: AppBar(title: Text(context.l10n.consoleTypeReel)),
         body: const SafeArea(child: _NotFoundView()),
       );
     }
@@ -67,15 +68,19 @@ class ReelDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reel'),
-        actions: loadedReel == null
-            ? null
-            : [ContentOverflowMenu(contentType: 'reel', objectId: loadedReel.id)],
+        title: Text(context.l10n.consoleTypeReel),
+        actions:
+            loadedReel == null
+                ? null
+                : [
+                  ContentOverflowMenu(
+                    contentType: 'reel',
+                    objectId: loadedReel.id,
+                  ),
+                ],
       ),
       body: switch (reelAsync) {
-        AsyncData(value: final PublicReel reel) => _ReelDetailView(
-          reel: reel,
-        ),
+        AsyncData(value: final PublicReel reel) => _ReelDetailView(reel: reel),
         AsyncData(value: null) => const _NotFoundView(),
         AsyncError(:final error) => _LoadErrorView(error: error, id: id),
         _ => const LoadingIndicator(),
@@ -91,8 +96,8 @@ class _NotFoundView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const EmptyStateWidget(
-      message: 'Reel not found.\nIt may have been removed.',
+    return EmptyStateWidget(
+      message: context.l10n.contentReelNotFound,
       icon: Icons.movie_outlined,
     );
   }
@@ -238,11 +243,12 @@ class _ReelDetailMedia extends StatelessWidget {
           (url == null || url.isEmpty)
               ? placeholder(Icons.movie_outlined)
               : Image.network(
-                  url,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      placeholder(Icons.broken_image_outlined),
-                ),
+                url,
+                fit: BoxFit.cover,
+                errorBuilder:
+                    (context, error, stackTrace) =>
+                        placeholder(Icons.broken_image_outlined),
+              ),
           const _PlayStubButton(),
         ],
       ),
@@ -263,7 +269,7 @@ class _PlayStubButton extends StatelessWidget {
         customBorder: const CircleBorder(),
         onTap: () {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Video playback — Coming soon')),
+            SnackBar(content: Text(context.l10n.contentReelPlaybackSoon)),
           );
         },
         child: Container(

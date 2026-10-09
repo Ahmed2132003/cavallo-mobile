@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
@@ -134,10 +135,8 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     final variantRepository = ref.read(productVariantRepositoryProvider);
     final originalVariants =
         widget.existingProduct?.variants ?? const <ProductVariant>[];
-    final originalIds = originalVariants
-        .map((v) => v.id)
-        .whereType<int>()
-        .toSet();
+    final originalIds =
+        originalVariants.map((v) => v.id).whereType<int>().toSet();
     final currentIds = _variantRows.map((r) => r.id).whereType<int>().toSet();
 
     for (final removedId in originalIds.difference(currentIds)) {
@@ -207,8 +206,9 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
       final hasValue = row.valueController.text.trim().isNotEmpty;
       if (hasName != hasValue) {
         setState(
-          () => _generalError =
-              'Each variant needs both a name and a value, or remove it.',
+          () =>
+              _generalError =
+                  'Each variant needs both a name and a value, or remove it.',
         );
         return;
       }
@@ -323,12 +323,13 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
           width: previewSize,
           height: previewSize,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => Container(
-            width: previewSize,
-            height: previewSize,
-            color: theme.colorScheme.surfaceContainerHighest,
-            child: const Icon(Icons.broken_image_outlined),
-          ),
+          errorBuilder:
+              (context, error, stackTrace) => Container(
+                width: previewSize,
+                height: previewSize,
+                color: theme.colorScheme.surfaceContainerHighest,
+                child: const Icon(Icons.broken_image_outlined),
+              ),
         ),
       );
     } else {
@@ -346,14 +347,18 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Product image (optional)'),
+        Text(context.l10n.productFormImageLabel),
         const SizedBox(height: 8),
         preview,
         const SizedBox(height: 8),
         TextButton.icon(
           onPressed: _isSubmitting ? null : _pickImage,
           icon: const Icon(Icons.photo_library_outlined),
-          label: Text(_imageFile == null ? 'Choose image' : 'Change image'),
+          label: Text(
+            _imageFile == null
+                ? context.l10n.contentFormChooseImage
+                : context.l10n.contentFormChangeImage,
+          ),
         ),
         if (_imageError != null)
           Padding(
@@ -376,7 +381,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
           Expanded(
             child: AppTextField(
               key: Key('productForm_variantName_$index'),
-              label: 'Variant name (e.g. Size)',
+              label: context.l10n.productFormVariantName,
               controller: row.nameController,
             ),
           ),
@@ -384,14 +389,14 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
           Expanded(
             child: AppTextField(
               key: Key('productForm_variantValue_$index'),
-              label: 'Value (e.g. Large)',
+              label: context.l10n.productFormVariantValue,
               controller: row.valueController,
             ),
           ),
           IconButton(
             key: Key('productForm_removeVariant_$index'),
             icon: const Icon(Icons.remove_circle_outline),
-            tooltip: 'Remove variant',
+            tooltip: context.l10n.productFormRemoveVariant,
             onPressed: _isSubmitting ? null : () => _removeVariantRow(index),
           ),
         ],
@@ -404,30 +409,32 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
       AsyncData(:final value) => DropdownButtonFormField<int>(
         key: const Key('productForm_categoryDropdown'),
         value: _categoryId,
-        decoration: const InputDecoration(
-          labelText: 'Category',
-          border: OutlineInputBorder(),
+        decoration: InputDecoration(
+          labelText: context.l10n.searchFilterCategory,
+          border: const OutlineInputBorder(),
         ),
         items: [
           for (final entry in _flattenCategories(value))
             DropdownMenuItem(
               value: entry.$1.id,
-              child: Text('${'—' * entry.$2}${entry.$2 > 0 ? ' ' : ''}${entry.$1.name}'),
+              child: Text(
+                '${'—' * entry.$2}${entry.$2 > 0 ? ' ' : ''}${entry.$1.name}',
+              ),
             ),
         ],
         onChanged: (id) => setState(() => _categoryId = id),
         validator: (id) {
           if (_categoryError != null) return _categoryError;
-          if (id == null) return 'Category is required.';
+          if (id == null) return context.l10n.productFormCategoryRequired;
           return null;
         },
       ),
       AsyncError() => Row(
         children: [
-          const Expanded(child: Text('Could not load categories.')),
+          Expanded(child: Text(context.l10n.searchFilterCategoriesFailed)),
           TextButton(
             onPressed: () => ref.invalidate(categoryTreeProvider),
-            child: const Text('Retry'),
+            child: Text(context.l10n.commonRetry),
           ),
         ],
       ),
@@ -456,7 +463,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
               children: [
                 AppTextField(
                   key: const Key('productForm_nameField'),
-                  label: 'Name',
+                  label: context.l10n.productFormName,
                   controller: _nameController,
                   validator: (value) {
                     if (_nameError != null) return _nameError;
@@ -469,7 +476,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                 const SizedBox(height: 16),
                 AppTextField(
                   key: const Key('productForm_descriptionField'),
-                  label: 'Description',
+                  label: context.l10n.productFormDescription,
                   controller: _descriptionController,
                   maxLines: 4,
                   validator: (value) {
@@ -483,7 +490,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                 const SizedBox(height: 16),
                 AppTextField(
                   key: const Key('productForm_priceField'),
-                  label: 'Price',
+                  label: context.l10n.productFormPrice,
                   controller: _priceController,
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
@@ -502,9 +509,9 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                 DropdownButtonFormField<Currency>(
                   key: const Key('productForm_currencyDropdown'),
                   value: _currency,
-                  decoration: const InputDecoration(
-                    labelText: 'Currency',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: context.l10n.productFormCurrency,
+                    border: const OutlineInputBorder(),
                   ),
                   items: [
                     for (final currency in Currency.values)
@@ -513,11 +520,11 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                         child: Text(currency.toWire()),
                       ),
                   ],
-                  onChanged: (currency) =>
-                      setState(() => _currency = currency),
+                  onChanged: (currency) => setState(() => _currency = currency),
                   validator: (currency) {
                     if (_currencyError != null) return _currencyError;
-                    if (currency == null) return 'Currency is required.';
+                    if (currency == null)
+                      return context.l10n.productFormCurrencyRequired;
                     return null;
                   },
                 ),
@@ -527,14 +534,17 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                 SwitchListTile(
                   key: const Key('productForm_activeSwitch'),
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Active (visible to customers)'),
+                  title: Text(context.l10n.productFormActive),
                   value: _isActive,
                   onChanged: (value) => setState(() => _isActive = value),
                 ),
                 const SizedBox(height: 16),
                 _buildImagePicker(context),
                 const SizedBox(height: 24),
-                Text('Variants', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  context.l10n.productVariantsTitle,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 8),
                 for (var i = 0; i < _variantRows.length; i++)
                   _buildVariantRow(i, _variantRows[i]),
@@ -542,13 +552,15 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                   key: const Key('productForm_addVariantButton'),
                   onPressed: _isSubmitting ? null : _addVariantRow,
                   icon: const Icon(Icons.add),
-                  label: const Text('Add variant'),
+                  label: Text(context.l10n.productFormAddVariant),
                 ),
                 if (_generalError != null) ...[
                   const SizedBox(height: 16),
                   Text(
                     _generalError!,
-                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 24),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/widgets/app_button.dart';
 import 'story_upload_queue_provider.dart';
 import 'story_upload_status_banner.dart';
@@ -93,7 +94,7 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
   void _submit() {
     final mediaFile = _mediaFile;
     if (mediaFile == null) {
-      setState(() => _mediaError = 'Add a photo or video first.');
+      setState(() => _mediaError = context.l10n.storyAddMediaFirst);
       return;
     }
 
@@ -105,9 +106,9 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
       _mediaError = null;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Story upload started.')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(context.l10n.storyUploadStarted)));
   }
 
   Widget _buildMediaPreview(ThemeData theme) {
@@ -121,7 +122,7 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
           border: Border.all(color: theme.dividerColor),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Text('No photo or video selected yet.'),
+        child: Text(context.l10n.storyNoMediaSelected),
       );
     }
 
@@ -167,7 +168,7 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Story')),
+      appBar: AppBar(title: Text(context.l10n.consoleStoriesCreate)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -189,7 +190,7 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
                       key: const Key('storyCreation_pickImageButton'),
                       onPressed: _pickImage,
                       icon: const Icon(Icons.photo_library_outlined),
-                      label: const Text('Add Photo'),
+                      label: Text(context.l10n.storyAddPhoto),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -198,7 +199,7 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
                       key: const Key('storyCreation_pickVideoButton'),
                       onPressed: _pickVideo,
                       icon: const Icon(Icons.videocam_outlined),
-                      label: const Text('Add Video'),
+                      label: Text(context.l10n.storyAddVideo),
                     ),
                   ),
                 ],
@@ -213,7 +214,7 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
               const SizedBox(height: 24),
               AppButton(
                 key: const Key('storyCreation_submitButton'),
-                label: 'Post Story',
+                label: context.l10n.storyPostButton,
                 onPressed: _submit,
               ),
             ],

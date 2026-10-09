@@ -1291,4 +1291,199 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analyticsPublishedReels => 'Published reels';
+
+  @override
+  String get bizOnboardTitle => 'Complete your business profile';
+
+  @override
+  String get bizFieldName => 'Business name';
+
+  @override
+  String get bizFieldPhone => 'Phone number (optional)';
+
+  @override
+  String get bizFieldPhoneInvalid => 'Enter a valid phone number for the selected country.';
+
+  @override
+  String get bizFieldDescription => 'Description (optional)';
+
+  @override
+  String get bizOnboardSubmit => 'Complete profile';
+
+  @override
+  String get bizProfileTitle => 'Business profile';
+
+  @override
+  String get bizProfileBackHome => 'Back to home';
+
+  @override
+  String get bizProfileIncomplete => 'You have not completed your business profile yet.';
+
+  @override
+  String get bizProfileNoChanges => 'No changes to save.';
+
+  @override
+  String get bizProfileUpdated => 'Business profile updated.';
+
+  @override
+  String get bizProfileSave => 'Save changes';
+
+  @override
+  String get commonRemove => 'Remove';
+
+  @override
+  String get contentPostNotFound => 'Post not found.\nIt may have been removed.';
+
+  @override
+  String get contentReelNotFound => 'Reel not found.\nIt may have been removed.';
+
+  @override
+  String get contentReelPlaybackSoon => 'Video playback — Coming soon';
+
+  @override
+  String get contentFormImageLabel => 'Image (optional)';
+
+  @override
+  String get contentFormVideoLabel => 'Video';
+
+  @override
+  String get contentFormChooseImage => 'Choose image';
+
+  @override
+  String get contentFormChangeImage => 'Change image';
+
+  @override
+  String get contentFormChooseVideo => 'Choose video';
+
+  @override
+  String get contentFormChangeVideo => 'Change video';
+
+  @override
+  String get contentFormCaption => 'Caption';
+
+  @override
+  String get postFormTitle => 'New post';
+
+  @override
+  String get postFormReviewNote => 'Your post will be reviewed before it becomes visible to customers.';
+
+  @override
+  String get postFormSubmit => 'Post';
+
+  @override
+  String get reelFormTitle => 'New reel';
+
+  @override
+  String get reelFormReviewNote => 'Your video is processed first, then reviewed before it becomes visible to customers. You\'ll see its status on your content list.';
+
+  @override
+  String get reelFormSubmit => 'Post reel';
+
+  @override
+  String get productFormImageLabel => 'Product image (optional)';
+
+  @override
+  String get productFormVariantName => 'Variant name (e.g. Size)';
+
+  @override
+  String get productFormVariantValue => 'Value (e.g. Large)';
+
+  @override
+  String get productFormRemoveVariant => 'Remove variant';
+
+  @override
+  String get productFormAddVariant => 'Add variant';
+
+  @override
+  String get productFormName => 'Name';
+
+  @override
+  String get productFormDescription => 'Description';
+
+  @override
+  String get productFormPrice => 'Price';
+
+  @override
+  String get productFormCurrency => 'Currency';
+
+  @override
+  String get productFormActive => 'Active (visible to customers)';
+
+  @override
+  String get productFormCategoryRequired => 'Category is required.';
+
+  @override
+  String get productFormCurrencyRequired => 'Currency is required.';
+
+  @override
+  String get socialMoreOptions => 'More options';
+
+  @override
+  String get socialReport => 'Report';
+
+  @override
+  String get socialReportThanks => 'Thanks, your report was submitted.';
+
+  @override
+  String get socialReportWhy => 'Why are you reporting this?';
+
+  @override
+  String get socialReportDetails => 'Details (optional)';
+
+  @override
+  String get socialReportSubmit => 'Submit';
+
+  @override
+  String get socialReasonSpam => 'Spam';
+
+  @override
+  String get socialReasonInappropriate => 'Inappropriate content';
+
+  @override
+  String get socialReasonMisleading => 'Misleading';
+
+  @override
+  String get socialReasonOther => 'Other';
+
+  @override
+  String get storyUploadStarted => 'Story upload started.';
+
+  @override
+  String get storyNoMediaSelected => 'No photo or video selected yet.';
+
+  @override
+  String get storyAddMediaFirst => 'Add a photo or video first.';
+
+  @override
+  String get storyAddPhoto => 'Add Photo';
+
+  @override
+  String get storyAddVideo => 'Add Video';
+
+  @override
+  String get storyPostButton => 'Post Story';
+
+  @override
+  String get storyUploadDiscard => 'Discard';
+
+  @override
+  String storyUploadUploading(int attempt) {
+    return 'Uploading story... (attempt $attempt of 5)';
+  }
+
+  @override
+  String storyUploadRetrying(int attempt) {
+    return 'Connection lost — retrying story upload... (attempt $attempt of 5)';
+  }
+
+  @override
+  String get storyUploadFailed => 'Story upload failed.';
+
+  @override
+  String storyUploadFailedWithReason(String reason) {
+    return 'Story upload failed: $reason';
+  }
+
+  @override
+  String get pushBannerView => 'View';
 }

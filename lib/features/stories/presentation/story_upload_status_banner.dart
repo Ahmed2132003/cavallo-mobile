@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_context.dart';
+import '../../../l10n/app_localizations.dart';
 import 'story_upload_queue_provider.dart';
 
 /// Part P-051 STEP 5 scope: `lib/features/stories/presentation/
@@ -47,9 +49,7 @@ class StoryUploadStatusBanner extends ConsumerWidget {
     return Column(
       key: const Key('storyUploadStatusBanner'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (final task in tasks) _StoryUploadTaskRow(task: task),
-      ],
+      children: [for (final task in tasks) _StoryUploadTaskRow(task: task)],
     );
   }
 }
@@ -59,15 +59,13 @@ class _StoryUploadTaskRow extends ConsumerWidget {
 
   final UploadTask task;
 
-  String get _statusLabel => switch (task.status) {
-    UploadTaskStatus.uploading =>
-      'Uploading story... (attempt ${task.attempt} of 5)',
-    UploadTaskStatus.retrying =>
-      'Connection lost — retrying story upload... '
-          '(attempt ${task.attempt} of 5)',
-    UploadTaskStatus.failed => task.errorMessage == null
-        ? 'Story upload failed.'
-        : 'Story upload failed: ${task.errorMessage}',
+  String _statusLabel(AppLocalizations l10n) => switch (task.status) {
+    UploadTaskStatus.uploading => l10n.storyUploadUploading(task.attempt),
+    UploadTaskStatus.retrying => l10n.storyUploadRetrying(task.attempt),
+    UploadTaskStatus.failed =>
+      task.errorMessage == null
+          ? l10n.storyUploadFailed
+          : l10n.storyUploadFailedWithReason(task.errorMessage!),
   };
 
   IconData get _statusIcon => switch (task.status) {
@@ -79,6 +77,7 @@ class _StoryUploadTaskRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(storyUploadQueueProvider.notifier);
+    final l10n = context.l10n;
     final isFailed = task.status == UploadTaskStatus.failed;
     final theme = Theme.of(context);
 
@@ -87,21 +86,19 @@ class _StoryUploadTaskRow extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: isFailed
-            ? theme.colorScheme.errorContainer
-            : theme.colorScheme.surfaceContainerHighest,
+        color:
+            isFailed
+                ? theme.colorScheme.errorContainer
+                : theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          Icon(
-            _statusIcon,
-            color: isFailed ? theme.colorScheme.error : null,
-          ),
+          Icon(_statusIcon, color: isFailed ? theme.colorScheme.error : null),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              _statusLabel,
+              _statusLabel(l10n),
               key: Key('storyUploadStatusBanner_label_${task.id}'),
             ),
           ),
@@ -109,18 +106,18 @@ class _StoryUploadTaskRow extends ConsumerWidget {
             TextButton(
               key: Key('storyUploadStatusBanner_retry_${task.id}'),
               onPressed: () => notifier.retryFailedTask(task.id),
-              child: const Text('Retry'),
+              child: Text(l10n.commonRetry),
             ),
             IconButton(
               key: Key('storyUploadStatusBanner_discard_${task.id}'),
-              tooltip: 'Discard',
+              tooltip: l10n.storyUploadDiscard,
               icon: const Icon(Icons.close),
               onPressed: () => notifier.discard(task.id),
             ),
           ] else
             IconButton(
               key: Key('storyUploadStatusBanner_cancel_${task.id}'),
-              tooltip: 'Cancel',
+              tooltip: l10n.commonCancel,
               icon: const Icon(Icons.close),
               onPressed: () => notifier.cancel(task.id),
             ),

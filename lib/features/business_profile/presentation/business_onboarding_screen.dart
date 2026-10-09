@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
@@ -199,9 +200,7 @@ class _BusinessOnboardingScreenState
             businessType: _businessType,
             country: _countryController.text.trim(),
             city: _cityController.text.trim(),
-            description: trimmedDescription.isEmpty
-                ? null
-                : trimmedDescription,
+            description: trimmedDescription.isEmpty ? null : trimmedDescription,
             phoneNumber: _phoneNumber,
           );
       if (!mounted) return;
@@ -250,7 +249,7 @@ class _BusinessOnboardingScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Complete your business profile')),
+      appBar: AppBar(title: Text(context.l10n.bizOnboardTitle)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -262,7 +261,7 @@ class _BusinessOnboardingScreenState
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   AppTextField(
-                    label: 'Business name',
+                    label: context.l10n.bizFieldName,
                     controller: _businessNameController,
                     validator: (value) {
                       if (_businessNameError != null) {
@@ -275,17 +274,17 @@ class _BusinessOnboardingScreenState
                     },
                   ),
                   const SizedBox(height: 20),
-                  const Text('Business type'),
+                  Text(context.l10n.profileInfoType),
                   const SizedBox(height: 8),
                   SegmentedButton<BusinessType>(
-                    segments: const [
+                    segments: [
                       ButtonSegment(
                         value: BusinessType.trader,
-                        label: Text('Trader'),
+                        label: Text(context.l10n.businessTypeTrader),
                       ),
                       ButtonSegment(
                         value: BusinessType.factory,
-                        label: Text('Factory'),
+                        label: Text(context.l10n.businessTypeFactory),
                       ),
                     ],
                     selected: {_businessType},
@@ -305,7 +304,7 @@ class _BusinessOnboardingScreenState
                   ],
                   const SizedBox(height: 16),
                   AppTextField(
-                    label: 'Country',
+                    label: context.l10n.searchFilterCountry,
                     controller: _countryController,
                     validator: (value) {
                       if (_countryError != null) return _countryError;
@@ -317,7 +316,7 @@ class _BusinessOnboardingScreenState
                   ),
                   const SizedBox(height: 16),
                   AppTextField(
-                    label: 'City',
+                    label: context.l10n.searchFilterCity,
                     controller: _cityController,
                     validator: (value) {
                       if (_cityError != null) return _cityError;
@@ -329,18 +328,15 @@ class _BusinessOnboardingScreenState
                   ),
                   const SizedBox(height: 16),
                   IntlPhoneField(
-                    decoration: const InputDecoration(
-                      labelText: 'Phone number (optional)',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.bizFieldPhone,
+                      border: const OutlineInputBorder(),
                     ),
                     initialCountryCode: 'EG',
-                    invalidNumberMessage:
-                        'Enter a valid phone number for the selected '
-                        'country.',
+                    invalidNumberMessage: context.l10n.bizFieldPhoneInvalid,
                     onChanged: (phone) {
-                      _phoneNumber = phone.number.isEmpty
-                          ? null
-                          : phone.completeNumber;
+                      _phoneNumber =
+                          phone.number.isEmpty ? null : phone.completeNumber;
                     },
                   ),
                   if (_phoneNumberError != null) ...[
@@ -355,7 +351,7 @@ class _BusinessOnboardingScreenState
                   ],
                   const SizedBox(height: 16),
                   AppTextField(
-                    label: 'Description (optional)',
+                    label: context.l10n.bizFieldDescription,
                     controller: _descriptionController,
                     maxLines: 4,
                     validator: (_) => _descriptionError,
@@ -371,7 +367,7 @@ class _BusinessOnboardingScreenState
                   ],
                   const SizedBox(height: 24),
                   AppButton(
-                    label: 'Complete profile',
+                    label: context.l10n.bizOnboardSubmit,
                     isLoading: _isSubmitting,
                     onPressed: _submit,
                   ),

@@ -2230,6 +2230,384 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Published reels'**
   String get analyticsPublishedReels;
+
+  /// Business onboarding: app bar title.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete your business profile'**
+  String get bizOnboardTitle;
+
+  /// Business forms: business name field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Business name'**
+  String get bizFieldName;
+
+  /// Business forms: phone field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number (optional)'**
+  String get bizFieldPhone;
+
+  /// Business forms: phone field validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid phone number for the selected country.'**
+  String get bizFieldPhoneInvalid;
+
+  /// Business forms: description field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get bizFieldDescription;
+
+  /// Business onboarding: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete profile'**
+  String get bizOnboardSubmit;
+
+  /// Business profile edit: app bar title.
+  ///
+  /// In en, this message translates to:
+  /// **'Business profile'**
+  String get bizProfileTitle;
+
+  /// Business profile edit: back-to-home tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to home'**
+  String get bizProfileBackHome;
+
+  /// Business profile edit: shown when no profile exists.
+  ///
+  /// In en, this message translates to:
+  /// **'You have not completed your business profile yet.'**
+  String get bizProfileIncomplete;
+
+  /// Business profile edit: snackbar when nothing changed.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes to save.'**
+  String get bizProfileNoChanges;
+
+  /// Business profile edit: snackbar after saving.
+  ///
+  /// In en, this message translates to:
+  /// **'Business profile updated.'**
+  String get bizProfileUpdated;
+
+  /// Business profile edit: save button.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get bizProfileSave;
+
+  /// Shared: remove button (image, video).
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get commonRemove;
+
+  /// Post detail: empty state when the post does not exist.
+  ///
+  /// In en, this message translates to:
+  /// **'Post not found.\nIt may have been removed.'**
+  String get contentPostNotFound;
+
+  /// Reel detail: empty state when the reel does not exist.
+  ///
+  /// In en, this message translates to:
+  /// **'Reel not found.\nIt may have been removed.'**
+  String get contentReelNotFound;
+
+  /// Reel detail: snackbar of the playback placeholder button.
+  ///
+  /// In en, this message translates to:
+  /// **'Video playback — Coming soon'**
+  String get contentReelPlaybackSoon;
+
+  /// Post form: image section label.
+  ///
+  /// In en, this message translates to:
+  /// **'Image (optional)'**
+  String get contentFormImageLabel;
+
+  /// Reel form: video section label.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get contentFormVideoLabel;
+
+  /// Post and product forms: pick-image button.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose image'**
+  String get contentFormChooseImage;
+
+  /// Post and product forms: pick-image button once an image is chosen.
+  ///
+  /// In en, this message translates to:
+  /// **'Change image'**
+  String get contentFormChangeImage;
+
+  /// Reel form: pick-video button.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose video'**
+  String get contentFormChooseVideo;
+
+  /// Reel form: pick-video button once a video is chosen.
+  ///
+  /// In en, this message translates to:
+  /// **'Change video'**
+  String get contentFormChangeVideo;
+
+  /// Post and reel forms: caption field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Caption'**
+  String get contentFormCaption;
+
+  /// Post form: app bar title.
+  ///
+  /// In en, this message translates to:
+  /// **'New post'**
+  String get postFormTitle;
+
+  /// Post form: moderation note under the form.
+  ///
+  /// In en, this message translates to:
+  /// **'Your post will be reviewed before it becomes visible to customers.'**
+  String get postFormReviewNote;
+
+  /// Post form: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get postFormSubmit;
+
+  /// Reel form: app bar title.
+  ///
+  /// In en, this message translates to:
+  /// **'New reel'**
+  String get reelFormTitle;
+
+  /// Reel form: processing and moderation note under the form.
+  ///
+  /// In en, this message translates to:
+  /// **'Your video is processed first, then reviewed before it becomes visible to customers. You\'ll see its status on your content list.'**
+  String get reelFormReviewNote;
+
+  /// Reel form: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Post reel'**
+  String get reelFormSubmit;
+
+  /// Product form: image section label.
+  ///
+  /// In en, this message translates to:
+  /// **'Product image (optional)'**
+  String get productFormImageLabel;
+
+  /// Product form: variant name field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant name (e.g. Size)'**
+  String get productFormVariantName;
+
+  /// Product form: variant value field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Value (e.g. Large)'**
+  String get productFormVariantValue;
+
+  /// Product form: remove-variant tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove variant'**
+  String get productFormRemoveVariant;
+
+  /// Product form: add-variant button.
+  ///
+  /// In en, this message translates to:
+  /// **'Add variant'**
+  String get productFormAddVariant;
+
+  /// Product form: name field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get productFormName;
+
+  /// Product form: description field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get productFormDescription;
+
+  /// Product form: price field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get productFormPrice;
+
+  /// Product form: currency dropdown label.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get productFormCurrency;
+
+  /// Product form: active switch title.
+  ///
+  /// In en, this message translates to:
+  /// **'Active (visible to customers)'**
+  String get productFormActive;
+
+  /// Product form: category validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Category is required.'**
+  String get productFormCategoryRequired;
+
+  /// Product form: currency validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency is required.'**
+  String get productFormCurrencyRequired;
+
+  /// Content overflow menu: tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'More options'**
+  String get socialMoreOptions;
+
+  /// Report: menu item and dialog title.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get socialReport;
+
+  /// Report: snackbar after submitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks, your report was submitted.'**
+  String get socialReportThanks;
+
+  /// Report dialog: question above the reasons.
+  ///
+  /// In en, this message translates to:
+  /// **'Why are you reporting this?'**
+  String get socialReportWhy;
+
+  /// Report dialog: details field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Details (optional)'**
+  String get socialReportDetails;
+
+  /// Report dialog: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get socialReportSubmit;
+
+  /// Report reason: spam.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam'**
+  String get socialReasonSpam;
+
+  /// Report reason: inappropriate content.
+  ///
+  /// In en, this message translates to:
+  /// **'Inappropriate content'**
+  String get socialReasonInappropriate;
+
+  /// Report reason: misleading.
+  ///
+  /// In en, this message translates to:
+  /// **'Misleading'**
+  String get socialReasonMisleading;
+
+  /// Report reason: other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get socialReasonOther;
+
+  /// Story creation: snackbar after the upload is queued.
+  ///
+  /// In en, this message translates to:
+  /// **'Story upload started.'**
+  String get storyUploadStarted;
+
+  /// Story creation: placeholder before a file is picked.
+  ///
+  /// In en, this message translates to:
+  /// **'No photo or video selected yet.'**
+  String get storyNoMediaSelected;
+
+  /// Story creation: error when submitting without a file.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a photo or video first.'**
+  String get storyAddMediaFirst;
+
+  /// Story creation: pick-photo button.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Photo'**
+  String get storyAddPhoto;
+
+  /// Story creation: pick-video button.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Video'**
+  String get storyAddVideo;
+
+  /// Story creation: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Post Story'**
+  String get storyPostButton;
+
+  /// Story upload banner: discard-failed-upload tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get storyUploadDiscard;
+
+  /// Story upload banner: uploading status. attempt is the current attempt number.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading story... (attempt {attempt} of 5)'**
+  String storyUploadUploading(int attempt);
+
+  /// Story upload banner: retrying status. attempt is the current attempt number.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection lost — retrying story upload... (attempt {attempt} of 5)'**
+  String storyUploadRetrying(int attempt);
+
+  /// Story upload banner: failed status without a reason.
+  ///
+  /// In en, this message translates to:
+  /// **'Story upload failed.'**
+  String get storyUploadFailed;
+
+  /// Story upload banner: failed status with the reason returned by the server.
+  ///
+  /// In en, this message translates to:
+  /// **'Story upload failed: {reason}'**
+  String storyUploadFailedWithReason(String reason);
+
+  /// Push notification banner: action button that opens the linked screen.
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get pushBannerView;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
