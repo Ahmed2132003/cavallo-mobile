@@ -55,11 +55,7 @@ class AnalyticsRangeNotifier extends Notifier<int> {
   /// programming error and throws [ArgumentError].
   void select(int days) {
     if (!supportedDays.contains(days)) {
-      throw ArgumentError.value(
-        days,
-        'days',
-        'must be one of $supportedDays.',
-      );
+      throw ArgumentError.value(days, 'days', 'must be one of $supportedDays.');
     }
     state = days;
   }

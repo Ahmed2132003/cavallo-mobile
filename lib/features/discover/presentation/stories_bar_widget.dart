@@ -141,10 +141,7 @@ class _OwnStoryTile extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: colors.brand,
-                        border: Border.all(
-                          color: colors.background,
-                          width: 2,
-                        ),
+                        border: Border.all(color: colors.background, width: 2),
                       ),
                       child: Icon(Icons.add, size: 16, color: colors.onBrand),
                     ),
@@ -157,9 +154,9 @@ class _OwnStoryTile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colors.textPrimary,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelSmall?.copyWith(color: colors.textPrimary),
               ),
             ],
           ),

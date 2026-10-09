@@ -26,9 +26,7 @@ enum ModerationStatus {
       case 'rejected':
         return ModerationStatus.rejected;
       default:
-        throw FormatException(
-          'Unknown moderation status from backend: $value',
-        );
+        throw FormatException('Unknown moderation status from backend: $value');
     }
   }
 }

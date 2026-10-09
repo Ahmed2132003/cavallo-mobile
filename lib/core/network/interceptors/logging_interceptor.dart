@@ -12,10 +12,7 @@ class LoggingInterceptor extends Interceptor {
   bool get _enabled => AppConfig.environment == AppEnvironment.dev;
 
   @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (_enabled) {
       // ignore: avoid_print
       print('[HTTP] --> ${options.method} ${options.uri}');
@@ -43,10 +40,7 @@ class LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     if (_enabled) {
       // ignore: avoid_print
       print(

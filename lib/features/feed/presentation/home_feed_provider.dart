@@ -104,7 +104,7 @@ class HomeFeedNotifier extends AsyncNotifier<FeedState> {
   /// there is no more data or a load is already in flight.
   Future<void> loadMore() async {
     final current = state.value;
-    
+
     if (current == null ||
         current.nextCursor == null ||
         current.isLoadingMore) {

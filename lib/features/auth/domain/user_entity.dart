@@ -94,8 +94,7 @@ class User {
           other.isStaff == isStaff);
 
   @override
-  int get hashCode =>
-      Object.hash(id, email, accountType, isModerator, isStaff);
+  int get hashCode => Object.hash(id, email, accountType, isModerator, isStaff);
 
   @override
   String toString() =>

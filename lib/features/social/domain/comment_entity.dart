@@ -77,15 +77,8 @@ class CommentEntity {
           other.createdAt == createdAt);
 
   @override
-  int get hashCode => Object.hash(
-    id,
-    userId,
-    contentType,
-    objectId,
-    text,
-    isHidden,
-    createdAt,
-  );
+  int get hashCode =>
+      Object.hash(id, userId, contentType, objectId, text, isHidden, createdAt);
 
   @override
   String toString() =>

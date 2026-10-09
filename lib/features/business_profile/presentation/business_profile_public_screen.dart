@@ -366,9 +366,7 @@ class _ProfileHeader extends ConsumerWidget {
               Flexible(
                 child: Text(
                   l10n.profileLocation(profile.city, profile.country),
-                  style: text.bodyMedium?.copyWith(
-                    color: colors.textSecondary,
-                  ),
+                  style: text.bodyMedium?.copyWith(color: colors.textSecondary),
                 ),
               ),
             ],
@@ -411,8 +409,7 @@ class _ProfileAvatar extends ConsumerWidget {
 
     final bool hasStories = stories != null && stories.isNotEmpty;
     final bool hasUnviewed =
-        stories != null &&
-        stories.any((story) => !viewed.contains(story.id));
+        stories != null && stories.any((story) => !viewed.contains(story.id));
 
     final AppAvatarRing ring =
         !hasStories
@@ -586,9 +583,8 @@ class _GridSkeleton extends StatelessWidget {
           childAspectRatio: childAspectRatio,
           children: List<Widget>.generate(
             6,
-            (int index) => const SizedBox.expand(
-              child: AppShimmerBox(borderRadius: 0),
-            ),
+            (int index) =>
+                const SizedBox.expand(child: AppShimmerBox(borderRadius: 0)),
           ),
         ),
       ),

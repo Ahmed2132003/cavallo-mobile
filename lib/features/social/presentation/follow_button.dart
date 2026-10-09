@@ -110,9 +110,10 @@ class _FollowButtonState extends ConsumerState<FollowButton> {
               : CrossAxisAlignment.stretch,
       children: [
         AppButton(
-          label: state.isFollowing
-              ? l10n.followButtonFollowing
-              : l10n.followButtonFollow,
+          label:
+              state.isFollowing
+                  ? l10n.followButtonFollowing
+                  : l10n.followButtonFollow,
           variant:
               state.isFollowing
                   ? AppButtonVariant.neutral
@@ -122,7 +123,10 @@ class _FollowButtonState extends ConsumerState<FollowButton> {
         if (widget.showCount) ...[
           const SizedBox(height: 6),
           Text(
-            l10n.followersCountLine(count, AppFormatters(l10n).compactCount(count)),
+            l10n.followersCountLine(
+              count,
+              AppFormatters(l10n).compactCount(count),
+            ),
             style: Theme.of(context).textTheme.labelMedium,
           ),
         ],

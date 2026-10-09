@@ -97,9 +97,8 @@ class SearchFilters {
       categoryId: clearCategoryId ? null : (categoryId ?? this.categoryId),
       country: clearCountry ? null : (country ?? this.country),
       city: clearCity ? null : (city ?? this.city),
-      businessType: clearBusinessType
-          ? null
-          : (businessType ?? this.businessType),
+      businessType:
+          clearBusinessType ? null : (businessType ?? this.businessType),
       minRating: clearMinRating ? null : (minRating ?? this.minRating),
       featuredOnly: featuredOnly ?? this.featuredOnly,
       minPrice: clearMinPrice ? null : (minPrice ?? this.minPrice),

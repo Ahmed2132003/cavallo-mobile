@@ -69,5 +69,6 @@ final businessStoriesProvider = FutureProvider.autoDispose
 ///
 /// `StoryViewerScreen` adds a story's id to this set as it comes into
 /// view -- see that screen's own doc (a later step) for exactly when.
-final viewedStoriesProvider = StateProvider.autoDispose
-    .family<Set<int>, int>((ref, businessId) => <int>{});
+final viewedStoriesProvider = StateProvider.autoDispose.family<Set<int>, int>(
+  (ref, businessId) => <int>{},
+);

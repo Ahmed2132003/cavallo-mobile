@@ -19,9 +19,8 @@ import '../domain/shared_content.dart';
 /// the picker is opened and never shows a stale conversation list.
 final shareTargetConversationsProvider =
     FutureProvider.autoDispose<List<Conversation>>((ref) async {
-      final page = await ref
-          .watch(conversationRepositoryProvider)
-          .listConversations();
+      final page =
+          await ref.watch(conversationRepositoryProvider).listConversations();
       return page.results;
     });
 
@@ -78,13 +77,14 @@ Future<void> showShareOptionsSheet(
                     context: context,
                     isScrollControlled: true,
                     showDragHandle: true,
-                    builder: (_) => _ConversationPickerSheet(
-                      contentType: contentType,
-                      objectId: objectId,
-                      router: router,
-                      messenger: messenger,
-                      onSent: onSharedToConversation,
-                    ),
+                    builder:
+                        (_) => _ConversationPickerSheet(
+                          contentType: contentType,
+                          objectId: objectId,
+                          router: router,
+                          messenger: messenger,
+                          onSent: onSharedToConversation,
+                        ),
                   ),
                 );
               },
@@ -195,48 +195,49 @@ class _ConversationPickerSheetState
               AsyncData(:final value) =>
                 value.isEmpty
                     ? const Center(
-                        key: ValueKey('sharePicker_empty'),
-                        child: Padding(
-                          padding: EdgeInsets.all(24),
-                          child: Text(
-                            'No conversations yet.\n'
-                            'Start one from the Messages tab first.',
-                            textAlign: TextAlign.center,
-                          ),
+                      key: ValueKey('sharePicker_empty'),
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Text(
+                          'No conversations yet.\n'
+                          'Start one from the Messages tab first.',
+                          textAlign: TextAlign.center,
                         ),
-                      )
+                      ),
+                    )
                     : ListView.separated(
-                        itemCount: value.length,
-                        separatorBuilder: (_, _) => const Divider(height: 1),
-                        itemBuilder: (context, index) {
-                          final conversation = value[index];
-                          final name =
-                              conversation.otherParticipant?.displayName ??
-                              'Unknown';
-                          return ListTile(
-                            key: ValueKey(
-                              'sharePicker_conversation_${conversation.id}',
+                      itemCount: value.length,
+                      separatorBuilder: (_, _) => const Divider(height: 1),
+                      itemBuilder: (context, index) {
+                        final conversation = value[index];
+                        final name =
+                            conversation.otherParticipant?.displayName ??
+                            'Unknown';
+                        return ListTile(
+                          key: ValueKey(
+                            'sharePicker_conversation_${conversation.id}',
+                          ),
+                          enabled: _sendingId == null,
+                          onTap: () => _send(conversation),
+                          leading: CircleAvatar(
+                            child: Text(
+                              name.isNotEmpty ? name[0].toUpperCase() : '?',
                             ),
-                            enabled: _sendingId == null,
-                            onTap: () => _send(conversation),
-                            leading: CircleAvatar(
-                              child: Text(
-                                name.isNotEmpty ? name[0].toUpperCase() : '?',
-                              ),
-                            ),
-                            title: Text(name),
-                            trailing: _sendingId == conversation.id
-                                ? const SizedBox(
+                          ),
+                          title: Text(name),
+                          trailing:
+                              _sendingId == conversation.id
+                                  ? const SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : null,
-                          );
-                        },
-                      ),
+                                  : null,
+                        );
+                      },
+                    ),
               AsyncError() => Center(
                 key: const ValueKey('sharePicker_error'),
                 child: Column(
@@ -245,8 +246,9 @@ class _ConversationPickerSheetState
                     const Text('Could not load your conversations.'),
                     const SizedBox(height: 12),
                     ElevatedButton(
-                      onPressed: () =>
-                          ref.invalidate(shareTargetConversationsProvider),
+                      onPressed:
+                          () =>
+                              ref.invalidate(shareTargetConversationsProvider),
                       child: const Text('Retry'),
                     ),
                   ],

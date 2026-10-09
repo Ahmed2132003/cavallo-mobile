@@ -140,26 +140,25 @@ class SearchRepositoryImpl implements SearchRepository {
     final data = response.data!;
     final rawItems = data['items'] as List<dynamic>;
 
-    final items = rawItems.map((raw) {
-      final json = raw as Map<String, dynamic>;
-      final resultType = json['result_type'] as String;
-      return switch (resultType) {
-        'business' => BusinessSearchResult(
-          _businessToEntity(BusinessProfileResponseDto.fromJson(json)),
-        ),
-        'product' => ProductSearchResult(
-          ProductResponseDto.fromJson(json).toEntity(),
-        ),
-        _ => throw FormatException(
-          'Unknown search result_type: "$resultType"',
-        ),
-      };
-    }).toList();
+    final items =
+        rawItems.map((raw) {
+          final json = raw as Map<String, dynamic>;
+          final resultType = json['result_type'] as String;
+          return switch (resultType) {
+            'business' => BusinessSearchResult(
+              _businessToEntity(BusinessProfileResponseDto.fromJson(json)),
+            ),
+            'product' => ProductSearchResult(
+              ProductResponseDto.fromJson(json).toEntity(),
+            ),
+            _ =>
+              throw FormatException(
+                'Unknown search result_type: "$resultType"',
+              ),
+          };
+        }).toList();
 
-    return SearchPage(
-      items: items,
-      nextCursor: data['next_cursor'] as String?,
-    );
+    return SearchPage(items: items, nextCursor: data['next_cursor'] as String?);
   }
 }
 

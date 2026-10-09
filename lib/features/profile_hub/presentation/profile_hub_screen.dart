@@ -46,9 +46,7 @@ final hubBusinessProfileProvider = Provider.autoDispose<BusinessProfile?>((
 /// only pending items). No new request and no polling is added: the count is
 /// whatever that provider holds, and it is 0 while loading or on error.
 final hubModerationPendingCountProvider = Provider.autoDispose<int>((Ref ref) {
-  final AsyncValue<List<QueueItem>> queue = ref.watch(
-    moderationQueueProvider,
-  );
+  final AsyncValue<List<QueueItem>> queue = ref.watch(moderationQueueProvider);
   return switch (queue) {
     AsyncData(:final value) => value.length,
     _ => 0,
@@ -260,10 +258,7 @@ class ProfileHubScreen extends ConsumerWidget {
           if (settingsRows.isNotEmpty)
             SettingsGroup(title: l10n.hubSettingsGroup, children: settingsRows),
           if (businessRows.isNotEmpty)
-            SettingsGroup(
-              title: l10n.hubBusinessTools,
-              children: businessRows,
-            ),
+            SettingsGroup(title: l10n.hubBusinessTools, children: businessRows),
           if (moderationRows.isNotEmpty)
             SettingsGroup(title: l10n.hubModeration, children: moderationRows),
           SettingsGroup(

@@ -48,16 +48,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get errorNetwork => 'No connection. Check your internet and try again.';
+  String get errorNetwork =>
+      'No connection. Check your internet and try again.';
 
   @override
-  String get errorSecureConnection => 'A secure connection to the server could not be established.';
+  String get errorSecureConnection =>
+      'A secure connection to the server could not be established.';
 
   @override
-  String get errorServer => 'Something went wrong on our end. Please try again later.';
+  String get errorServer =>
+      'Something went wrong on our end. Please try again later.';
 
   @override
-  String get errorAuthentication => 'We could not verify your identity. Please sign in again.';
+  String get errorAuthentication =>
+      'We could not verify your identity. Please sign in again.';
 
   @override
   String get errorNotAuthorized => 'You are not allowed to do that.';
@@ -72,16 +76,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorBadRequest => 'That request could not be completed.';
 
   @override
-  String get errorValidation => 'Some of the information you entered could not be accepted. Please check it and try again.';
+  String get errorValidation =>
+      'Some of the information you entered could not be accepted. Please check it and try again.';
 
   @override
-  String get errorThrottled => 'Too many attempts in a short time. Please wait a moment and try again.';
+  String get errorThrottled =>
+      'Too many attempts in a short time. Please wait a moment and try again.';
 
   @override
-  String get errorConflict => 'This item has already changed. Refresh and try again.';
+  String get errorConflict =>
+      'This item has already changed. Refresh and try again.';
 
   @override
-  String get errorServiceUnavailable => 'This service is not available right now. Please try again later.';
+  String get errorServiceUnavailable =>
+      'This service is not available right now. Please try again later.';
 
   @override
   String get errorCancelled => 'The request was cancelled.';
@@ -106,24 +114,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String monthName(String month) {
-    String _temp0 = intl.Intl.selectLogic(
-      month,
-      {
-        'january': 'January',
-        'february': 'February',
-        'march': 'March',
-        'april': 'April',
-        'may': 'May',
-        'june': 'June',
-        'july': 'July',
-        'august': 'August',
-        'september': 'September',
-        'october': 'October',
-        'november': 'November',
-        'december': 'December',
-        'other': '$month',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(month, {
+      'january': 'January',
+      'february': 'February',
+      'march': 'March',
+      'april': 'April',
+      'may': 'May',
+      'june': 'June',
+      'july': 'July',
+      'august': 'August',
+      'september': 'September',
+      'october': 'October',
+      'november': 'November',
+      'december': 'December',
+      'other': '$month',
+    });
     return '$_temp0';
   }
 
@@ -139,16 +144,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String currencyLabel(String currency) {
-    String _temp0 = intl.Intl.selectLogic(
-      currency,
-      {
-        'egp': 'EGP',
-        'sar': 'SAR',
-        'aed': 'AED',
-        'jod': 'JOD',
-        'other': '$currency',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(currency, {
+      'egp': 'EGP',
+      'sar': 'SAR',
+      'aed': 'AED',
+      'jod': 'JOD',
+      'other': '$currency',
+    });
     return '$_temp0';
   }
 
@@ -212,16 +214,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authInvalidCredentials => 'Invalid email or password.';
 
   @override
-  String get authAutoLoginFailed => 'Account created, but automatic sign-in failed. Please log in.';
+  String get authAutoLoginFailed =>
+      'Account created, but automatic sign-in failed. Please log in.';
 
   @override
-  String get authFieldErrorEmail => 'This email address cannot be used. Please check it or try another one.';
+  String get authFieldErrorEmail =>
+      'This email address cannot be used. Please check it or try another one.';
 
   @override
-  String get authFieldErrorPassword => 'This password cannot be used. Please choose a different one.';
+  String get authFieldErrorPassword =>
+      'This password cannot be used. Please choose a different one.';
 
   @override
-  String get authFieldErrorPasswordConfirm => 'The passwords you entered do not match.';
+  String get authFieldErrorPasswordConfirm =>
+      'The passwords you entered do not match.';
 
   @override
   String get authFieldErrorAccountType => 'Please choose a valid account type.';
@@ -239,7 +245,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get routeErrorTitle => 'Page not found';
 
   @override
-  String get routeErrorMessage => 'The page you are looking for does not exist or has moved.';
+  String get routeErrorMessage =>
+      'The page you are looking for does not exist or has moved.';
 
   @override
   String get routeErrorGoHome => 'Back to home';
@@ -344,7 +351,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hubLogOutConfirmTitle => 'Log out?';
 
   @override
-  String get hubLogOutConfirmMessage => 'You will need to sign in again to use your account.';
+  String get hubLogOutConfirmMessage =>
+      'You will need to sign in again to use your account.';
 
   @override
   String get hubCancel => 'Cancel';
@@ -359,13 +367,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get savedTabProducts => 'Products';
 
   @override
-  String get savedEmptyPosts => 'No saved posts yet. Tap the bookmark on a post to keep it here.';
+  String get savedEmptyPosts =>
+      'No saved posts yet. Tap the bookmark on a post to keep it here.';
 
   @override
-  String get savedEmptyReels => 'No saved reels yet. Tap the bookmark on a reel to keep it here.';
+  String get savedEmptyReels =>
+      'No saved reels yet. Tap the bookmark on a reel to keep it here.';
 
   @override
-  String get savedEmptyProducts => 'No saved products yet. Tap the bookmark on a product to keep it here.';
+  String get savedEmptyProducts =>
+      'No saved products yet. Tap the bookmark on a product to keep it here.';
 
   @override
   String get savedUnsave => 'Remove from saved';
@@ -377,7 +388,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get savedNoPreviewText => 'Saved item';
 
   @override
-  String get savedUnsaveFailed => 'Couldn\'t remove it from saved. Please try again.';
+  String get savedUnsaveFailed =>
+      'Couldn\'t remove it from saved. Please try again.';
 
   @override
   String get savedLoadMoreFailed => 'Couldn\'t load more saved items.';
@@ -494,7 +506,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get feedEmptyMessage => 'Your feed is empty right now.\nFollow some businesses, or check back soon.';
+  String get feedEmptyMessage =>
+      'Your feed is empty right now.\nFollow some businesses, or check back soon.';
 
   @override
   String get feedLoadFailed => 'Could not load your feed.';
@@ -547,19 +560,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileMessageButton => 'Message';
 
   @override
-  String get profileMessageStarted => 'Conversation started. Open it from Messages.';
+  String get profileMessageStarted =>
+      'Conversation started. Open it from Messages.';
 
   @override
-  String get profileMessageFailed => 'Could not start the conversation. Please try again.';
+  String get profileMessageFailed =>
+      'Could not start the conversation. Please try again.';
 
   @override
-  String get profileNotFound => 'Business not found.\nIt may have been removed.';
+  String get profileNotFound =>
+      'Business not found.\nIt may have been removed.';
 
   @override
   String get profileLoadFailed => 'Could not load this business profile.';
 
   @override
-  String get profileNoDescription => 'This business hasn\'t added a description yet.';
+  String get profileNoDescription =>
+      'This business hasn\'t added a description yet.';
 
   @override
   String profileLocation(String city, String country) {
@@ -585,10 +602,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileReelsLoadFailed => 'Could not load this business\'s reels.';
 
   @override
-  String get profileProductsEmpty => 'This business hasn\'t added any products yet.';
+  String get profileProductsEmpty =>
+      'This business hasn\'t added any products yet.';
 
   @override
-  String get profileProductsLoadFailed => 'Could not load this business\'s products.';
+  String get profileProductsLoadFailed =>
+      'Could not load this business\'s products.';
 
   @override
   String get profileInfoType => 'Business type';
@@ -620,10 +639,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get searchIdlePrompt => 'Search for traders, factories, and products.\nType a keyword or set a filter to get started.';
+  String get searchIdlePrompt =>
+      'Search for traders, factories, and products.\nType a keyword or set a filter to get started.';
 
   @override
-  String get searchNoResults => 'No results found. Try a different search or adjust your filters.';
+  String get searchNoResults =>
+      'No results found. Try a different search or adjust your filters.';
 
   @override
   String get searchLoadFailed => 'Could not load search results.';
@@ -632,7 +653,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchResultsLoadingLabel => 'Loading results';
 
   @override
-  String get discoverEmpty => 'Nothing to discover yet.\nCheck back soon for new businesses.';
+  String get discoverEmpty =>
+      'Nothing to discover yet.\nCheck back soon for new businesses.';
 
   @override
   String get discoverLoadFailed => 'Could not load Discover right now.';
@@ -693,16 +715,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get productPriceNote => 'Approximate price, negotiable directly with the business. Message the business to confirm.';
+  String get productPriceNote =>
+      'Approximate price, negotiable directly with the business. Message the business to confirm.';
 
   @override
-  String get productNotFoundMessage => 'Product not found.\nIt may have been removed.';
+  String get productNotFoundMessage =>
+      'Product not found.\nIt may have been removed.';
 
   @override
   String get productLoadFailed => 'Could not load this product.';
 
   @override
-  String get productNoDescription => 'This business hasn\'t added a description yet.';
+  String get productNoDescription =>
+      'This business hasn\'t added a description yet.';
 
   @override
   String get productVariantsTitle => 'Variants';
@@ -851,22 +876,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifPrefModerationTitle => 'Content review';
 
   @override
-  String get notifPrefModerationSubtitle => 'When your content is approved or rejected.';
+  String get notifPrefModerationSubtitle =>
+      'When your content is approved or rejected.';
 
   @override
   String get notifPrefSocialTitle => 'Social activity';
 
   @override
-  String get notifPrefSocialSubtitle => 'New followers, comments, likes, shares and ratings.';
+  String get notifPrefSocialSubtitle =>
+      'New followers, comments, likes, shares and ratings.';
 
   @override
-  String get notifPrefsSaveFailed => 'Could not save your preference. Please try again.';
+  String get notifPrefsSaveFailed =>
+      'Could not save your preference. Please try again.';
 
   @override
-  String get notifPrefsLoadFailed => 'Could not load your notification settings.';
+  String get notifPrefsLoadFailed =>
+      'Could not load your notification settings.';
 
   @override
-  String get notifPrefsSystemFooter => 'Important system announcements are always delivered.';
+  String get notifPrefsSystemFooter =>
+      'Important system announcements are always delivered.';
 
   @override
   String get consoleNavProducts => 'Products';
@@ -907,7 +937,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consoleProductsCreate => 'Create New';
 
   @override
-  String get consoleProductsEmpty => 'No products yet.\nTap \"Create New\" to add your first product.';
+  String get consoleProductsEmpty =>
+      'No products yet.\nTap \"Create New\" to add your first product.';
 
   @override
   String get consoleProductsLoadFailed => 'Could not load your products.';
@@ -956,7 +987,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consoleContentNewReel => 'New Reel';
 
   @override
-  String get consoleContentEmpty => 'No posts or reels yet.\nTap \"New Post\" or \"New Reel\" to share your first one.';
+  String get consoleContentEmpty =>
+      'No posts or reels yet.\nTap \"New Post\" or \"New Reel\" to share your first one.';
 
   @override
   String get consoleContentLoadFailed => 'Could not load your content.';
@@ -991,7 +1023,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consoleStoriesCreate => 'Create Story';
 
   @override
-  String get consoleStoriesEmpty => 'No stories yet.\nTap \"Create Story\" to share your first one.';
+  String get consoleStoriesEmpty =>
+      'No stories yet.\nTap \"Create Story\" to share your first one.';
 
   @override
   String get consoleStoriesLoadFailed => 'Could not load your stories.';
@@ -1044,13 +1077,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moderationQueueTitle => 'Moderation queue';
 
   @override
-  String get moderationQueueEmpty => 'The queue is clear.\nNothing is waiting for review.';
+  String get moderationQueueEmpty =>
+      'The queue is clear.\nNothing is waiting for review.';
 
   @override
-  String get moderationNotAllowed => 'Your account is not allowed to review content. If it should be, ask an admin to add it to the Moderator group.';
+  String get moderationNotAllowed =>
+      'Your account is not allowed to review content. If it should be, ask an admin to add it to the Moderator group.';
 
   @override
-  String get moderationQueueLoadFailed => 'Could not load the moderation queue.';
+  String get moderationQueueLoadFailed =>
+      'Could not load the moderation queue.';
 
   @override
   String moderationSummaryPending(int count) {
@@ -1138,7 +1174,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moderationDetailQueueItem => 'Queue item';
 
   @override
-  String get moderationWaitingNote => 'Waiting time is as of the last queue refresh.';
+  String get moderationWaitingNote =>
+      'Waiting time is as of the last queue refresh.';
 
   @override
   String get moderationReject => 'Reject';
@@ -1153,13 +1190,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moderationItemRejected => 'Item rejected';
 
   @override
-  String get moderationApproveFailed => 'Could not approve this item. Please try again.';
+  String get moderationApproveFailed =>
+      'Could not approve this item. Please try again.';
 
   @override
-  String get moderationRejectFailed => 'Could not reject this item. Please try again.';
+  String get moderationRejectFailed =>
+      'Could not reject this item. Please try again.';
 
   @override
-  String get moderationAlreadyHandled => 'This item was already handled by someone else, or no longer exists. It has been removed from your queue.';
+  String get moderationAlreadyHandled =>
+      'This item was already handled by someone else, or no longer exists. It has been removed from your queue.';
 
   @override
   String get moderationRejectTitle => 'Reject content';
@@ -1193,7 +1233,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get analyticsUtcNote => 'Days are counted in UTC. Days without a recorded row are not drawn as zero.';
+  String get analyticsUtcNote =>
+      'Days are counted in UTC. Days without a recorded row are not drawn as zero.';
 
   @override
   String get analyticsChartFollowersTitle => 'New followers by day';
@@ -1227,7 +1268,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analyticsRatingsHeading => 'Ratings';
 
   @override
-  String get analyticsRatingEmpty => 'No rating has been recorded yet, so there is no rating trend to draw.';
+  String get analyticsRatingEmpty =>
+      'No rating has been recorded yet, so there is no rating trend to draw.';
 
   @override
   String get analyticsChartRatingTitle => 'Average rating by day';
@@ -1244,7 +1286,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get analyticsRatingNote => 'Each point is the average rating stored when that day was rolled up. Days before the first rating are not drawn.';
+  String get analyticsRatingNote =>
+      'Each point is the average rating stored when that day was rolled up. Days before the first rating are not drawn.';
 
   @override
   String get analyticsCatalogHeading => 'Catalog size';
@@ -1302,7 +1345,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bizFieldPhone => 'Phone number (optional)';
 
   @override
-  String get bizFieldPhoneInvalid => 'Enter a valid phone number for the selected country.';
+  String get bizFieldPhoneInvalid =>
+      'Enter a valid phone number for the selected country.';
 
   @override
   String get bizFieldDescription => 'Description (optional)';
@@ -1317,7 +1361,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bizProfileBackHome => 'Back to home';
 
   @override
-  String get bizProfileIncomplete => 'You have not completed your business profile yet.';
+  String get bizProfileIncomplete =>
+      'You have not completed your business profile yet.';
 
   @override
   String get bizProfileNoChanges => 'No changes to save.';
@@ -1332,10 +1377,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonRemove => 'Remove';
 
   @override
-  String get contentPostNotFound => 'Post not found.\nIt may have been removed.';
+  String get contentPostNotFound =>
+      'Post not found.\nIt may have been removed.';
 
   @override
-  String get contentReelNotFound => 'Reel not found.\nIt may have been removed.';
+  String get contentReelNotFound =>
+      'Reel not found.\nIt may have been removed.';
 
   @override
   String get contentReelPlaybackSoon => 'Video playback — Coming soon';
@@ -1365,7 +1412,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get postFormTitle => 'New post';
 
   @override
-  String get postFormReviewNote => 'Your post will be reviewed before it becomes visible to customers.';
+  String get postFormReviewNote =>
+      'Your post will be reviewed before it becomes visible to customers.';
 
   @override
   String get postFormSubmit => 'Post';
@@ -1374,7 +1422,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reelFormTitle => 'New reel';
 
   @override
-  String get reelFormReviewNote => 'Your video is processed first, then reviewed before it becomes visible to customers. You\'ll see its status on your content list.';
+  String get reelFormReviewNote =>
+      'Your video is processed first, then reviewed before it becomes visible to customers. You\'ll see its status on your content list.';
 
   @override
   String get reelFormSubmit => 'Post reel';
@@ -1486,4 +1535,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pushBannerView => 'View';
+
+  @override
+  String get validationBusinessNameRequired => 'Business name is required.';
+
+  @override
+  String get validationCountryRequired => 'Country is required.';
+
+  @override
+  String get validationCityRequired => 'City is required.';
+
+  @override
+  String get businessProfileLoadError =>
+      'Could not load your business profile.';
+
+  @override
+  String get postLoadError => 'Could not load this post.';
+
+  @override
+  String get reelLoadError => 'Could not load this reel.';
+
+  @override
+  String get commonGenericError => 'Something went wrong. Please try again.';
+
+  @override
+  String get validationCaptionRequired => 'Caption is required.';
+
+  @override
+  String get reelVideoRequired => 'A video is required.';
+
+  @override
+  String get productFormEditTitle => 'Edit product';
+
+  @override
+  String get productFormCreate => 'Create product';
+
+  @override
+  String get productFormSaveChanges => 'Save changes';
+
+  @override
+  String get validationProductNameRequired => 'Name is required.';
+
+  @override
+  String get validationDescriptionRequired => 'Description is required.';
+
+  @override
+  String get validationPriceRequired => 'Price is required.';
+
+  @override
+  String get validationPriceInvalid => 'Enter a valid price (e.g. 199.99).';
 }

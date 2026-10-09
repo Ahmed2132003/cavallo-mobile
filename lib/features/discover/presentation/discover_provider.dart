@@ -44,9 +44,8 @@ final activeStoryGroupsProvider =
 class DiscoverFeedNotifier extends AsyncNotifier<FeedState> {
   @override
   Future<FeedState> build() async {
-    final page = await ref
-        .watch(discoverRepositoryProvider)
-        .fetchDiscoverFeed();
+    final page =
+        await ref.watch(discoverRepositoryProvider).fetchDiscoverFeed();
     return FeedState(items: page.items, nextCursor: page.nextCursor);
   }
 
@@ -55,9 +54,8 @@ class DiscoverFeedNotifier extends AsyncNotifier<FeedState> {
   Future<void> refresh() async {
     state = const AsyncValue<FeedState>.loading();
     state = await AsyncValue.guard<FeedState>(() async {
-      final page = await ref
-          .read(discoverRepositoryProvider)
-          .fetchDiscoverFeed();
+      final page =
+          await ref.read(discoverRepositoryProvider).fetchDiscoverFeed();
       return FeedState(items: page.items, nextCursor: page.nextCursor);
     });
   }

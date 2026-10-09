@@ -215,10 +215,11 @@ class _DiscoverTile extends ConsumerWidget {
         tile = GridTileMedia(
           imageUrl: post.imageUrl,
           semanticLabel: l10n.feedPostMediaLabel(businessName),
-          onTap: () => context.pushNamed(
-            RouteNames.postDetail,
-            pathParameters: {RouteNames.idParam: '${post.id}'},
-          ),
+          onTap:
+              () => context.pushNamed(
+                RouteNames.postDetail,
+                pathParameters: {RouteNames.idParam: '${post.id}'},
+              ),
         );
       case ReelFeedItem(:final reel):
         key = ValueKey<String>('discover-reel-${reel.id}');
@@ -227,28 +228,30 @@ class _DiscoverTile extends ConsumerWidget {
           imageUrl: reel.thumbnailUrl,
           badge: GridTileBadge.video,
           semanticLabel: l10n.feedReelMediaLabel(businessName),
-          onTap: () => context.pushNamed(
-            RouteNames.reelDetail,
-            pathParameters: {RouteNames.idParam: '${reel.id}'},
-          ),
+          onTap:
+              () => context.pushNamed(
+                RouteNames.reelDetail,
+                pathParameters: {RouteNames.idParam: '${reel.id}'},
+              ),
         );
     }
 
     return KeyedSubtree(
       key: key,
-      child: featured
-          ? Stack(
-              fit: StackFit.expand,
-              children: <Widget>[
-                tile,
-                const PositionedDirectional(
-                  bottom: 6,
-                  start: 6,
-                  child: FeaturedBadge(),
-                ),
-              ],
-            )
-          : tile,
+      child:
+          featured
+              ? Stack(
+                fit: StackFit.expand,
+                children: <Widget>[
+                  tile,
+                  const PositionedDirectional(
+                    bottom: 6,
+                    start: 6,
+                    child: FeaturedBadge(),
+                  ),
+                ],
+              )
+              : tile,
     );
   }
 }
@@ -265,8 +268,9 @@ class _DiscoverSkeleton extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: _gridDelegate,
         itemCount: 18,
-        itemBuilder: (BuildContext context, int index) =>
-            const AppShimmerBox(borderRadius: 0),
+        itemBuilder:
+            (BuildContext context, int index) =>
+                const AppShimmerBox(borderRadius: 0),
       ),
     );
   }

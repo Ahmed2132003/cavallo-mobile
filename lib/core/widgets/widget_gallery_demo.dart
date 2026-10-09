@@ -62,20 +62,18 @@ class _WidgetGalleryDemoState extends State<WidgetGalleryDemo> {
             const SizedBox(height: 16),
             OutlinedButton(
               onPressed: () => setState(() => _showError = !_showError),
-              child: Text(
-                _showError ? 'Show empty state' : 'Show error state',
-              ),
+              child: Text(_showError ? 'Show empty state' : 'Show error state'),
             ),
             const SizedBox(height: 16),
             _showError
                 ? ErrorStateWidget(
-                    message: 'Something went wrong.',
-                    onRetry: () {},
-                  )
+                  message: 'Something went wrong.',
+                  onRetry: () {},
+                )
                 : const EmptyStateWidget(
-                    message: 'Nothing here yet.',
-                    icon: Icons.inbox_outlined,
-                  ),
+                  message: 'Nothing here yet.',
+                  icon: Icons.inbox_outlined,
+                ),
             const SizedBox(height: 16),
             const SizedBox(height: 80, child: LoadingIndicator()),
           ],

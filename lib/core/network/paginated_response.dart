@@ -31,9 +31,10 @@ class PaginatedResponse<T> {
   ) {
     final rawResults = json['results'] as List<dynamic>;
     return PaginatedResponse<T>(
-      results: rawResults
-          .map((e) => itemFromJson(e as Map<String, dynamic>))
-          .toList(),
+      results:
+          rawResults
+              .map((e) => itemFromJson(e as Map<String, dynamic>))
+              .toList(),
       next: json['next'] as String?,
       previous: json['previous'] as String?,
     );

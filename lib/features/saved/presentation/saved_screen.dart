@@ -101,7 +101,8 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
       ),
       AsyncError(:final error) => ErrorStateWidget(
         message: localizedApiError(l10n, error),
-        onRetry: () => unawaited(ref.read(savedListProvider.notifier).refresh()),
+        onRetry:
+            () => unawaited(ref.read(savedListProvider.notifier).refresh()),
       ),
       _ => const LoadingIndicator(),
     };
@@ -223,8 +224,8 @@ class _SavedTab extends ConsumerWidget {
         child: ListView.separated(
           physics: const AlwaysScrollableScrollPhysics(),
           itemCount: items.length + (showFooter ? 1 : 0),
-          separatorBuilder: (BuildContext context, int index) =>
-              const Divider(height: 1),
+          separatorBuilder:
+              (BuildContext context, int index) => const Divider(height: 1),
           itemBuilder: (BuildContext context, int index) {
             if (index >= items.length) {
               return _LoadMoreFooter(
@@ -371,7 +372,10 @@ class _SavedThumbnail extends StatelessWidget {
     final Widget placeholder = Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(color: colors.surfaceVariant, borderRadius: radius),
+      decoration: BoxDecoration(
+        color: colors.surfaceVariant,
+        borderRadius: radius,
+      ),
       child: Icon(_icon, color: colors.textSecondary),
     );
 

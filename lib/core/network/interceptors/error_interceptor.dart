@@ -44,14 +44,16 @@ class ErrorInterceptor extends Interceptor {
       case DioExceptionType.connectionError:
       case DioExceptionType.transformTimeout:
         return const NetworkFailure(
-          message: 'Network error. Please check your connection and try '
+          message:
+              'Network error. Please check your connection and try '
               'again.',
           code: ApiErrorCodes.networkError,
         );
 
       case DioExceptionType.badCertificate:
         return const NetworkFailure(
-          message: 'A secure connection to the server could not be '
+          message:
+              'A secure connection to the server could not be '
               'established.',
           code: ApiErrorCodes.badCertificate,
         );
@@ -72,7 +74,8 @@ class ErrorInterceptor extends Interceptor {
         // problem from the caller's point of view.
         if (err.response == null) {
           return const NetworkFailure(
-            message: 'Network error. Please check your connection and '
+            message:
+                'Network error. Please check your connection and '
                 'try again.',
             code: ApiErrorCodes.networkError,
           );
@@ -104,14 +107,17 @@ class ErrorInterceptor extends Interceptor {
 
     if (statusCode != null && statusCode >= 500) {
       return ServerFailure(
-        message: envelope?.message ?? 'Something went wrong on our end. '
-            'Please try again later.',
+        message:
+            envelope?.message ??
+            'Something went wrong on our end. '
+                'Please try again later.',
         code: envelope?.code,
       );
     }
 
     return UnknownFailure(
-      message: envelope?.message ??
+      message:
+          envelope?.message ??
           'An unexpected error occurred (status $statusCode).',
       code: envelope?.code,
     );

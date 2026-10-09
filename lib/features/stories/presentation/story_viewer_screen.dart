@@ -24,6 +24,7 @@ final Color _storyScrim = Colors.black.withValues(alpha: 0.54);
 final Color _storyWhite70 = Colors.white.withValues(alpha: 0.7);
 final Color _storyWhite54 = Colors.white.withValues(alpha: 0.54);
 final Color _storyWhite24 = Colors.white.withValues(alpha: 0.24);
+
 /// Part P-050 scope: the full-screen, tap-to-advance Story viewer behind
 /// `/stories/:id` -- the customer-facing payoff of the story pipeline.
 ///
@@ -198,9 +199,10 @@ class _StoryPlayerState extends ConsumerState<_StoryPlayer>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: _storyDuration)
-      ..addStatusListener(_onAnimationStatus)
-      ..forward();
+    _controller =
+        AnimationController(vsync: this, duration: _storyDuration)
+          ..addStatusListener(_onAnimationStatus)
+          ..forward();
     _recordCurrentView();
   }
 

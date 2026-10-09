@@ -190,10 +190,7 @@ class _ProductSkeleton extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AspectRatio(
-              aspectRatio: 1,
-              child: AppShimmerBox(borderRadius: 0),
-            ),
+            AspectRatio(aspectRatio: 1, child: AppShimmerBox(borderRadius: 0)),
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(16, 16, 16, 24),
               child: Column(
@@ -313,7 +310,9 @@ class _ProductViewState extends ConsumerState<_ProductView> {
       setState(() => _isStartingConversation = false);
       messenger.showSnackBar(
         SnackBar(
-          content: Text(e is ApiFailure ? e.message : l10n.profileMessageFailed),
+          content: Text(
+            e is ApiFailure ? e.message : l10n.profileMessageFailed,
+          ),
         ),
       );
     }

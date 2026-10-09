@@ -33,8 +33,10 @@ class _CommentInputWidgetState extends ConsumerState<CommentInputWidget> {
   final TextEditingController _controller = TextEditingController();
   bool _sending = false;
 
-  ContentInteractionKey get _key =>
-      (contentType: widget.contentType, objectId: widget.objectId);
+  ContentInteractionKey get _key => (
+    contentType: widget.contentType,
+    objectId: widget.objectId,
+  );
 
   @override
   void dispose() {
@@ -111,19 +113,20 @@ class _CommentInputWidgetState extends ConsumerState<CommentInputWidget> {
         SizedBox(
           width: 44,
           height: 44,
-          child: _sending
-              ? const Center(
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+          child:
+              _sending
+                  ? const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                  : IconButton(
+                    icon: DirectionalIcon(Icons.send, color: colors.brandText),
+                    tooltip: l10n.commentsPostTooltip,
+                    onPressed: _submit,
                   ),
-                )
-              : IconButton(
-                  icon: DirectionalIcon(Icons.send, color: colors.brandText),
-                  tooltip: l10n.commentsPostTooltip,
-                  onPressed: _submit,
-                ),
         ),
       ],
     );

@@ -109,11 +109,7 @@ class SocialInteractionRepositoryImpl implements SocialInteractionRepository {
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
       _commentsPath,
-      data: {
-        'content_type': contentType,
-        'object_id': objectId,
-        'text': text,
-      },
+      data: {'content_type': contentType, 'object_id': objectId, 'text': text},
     );
     return CommentResponseDto.fromJson(response.data!).toEntity();
   }
@@ -124,15 +120,16 @@ class SocialInteractionRepositoryImpl implements SocialInteractionRepository {
     required int objectId,
     String? pageUrl,
   }) async {
-    final response = pageUrl != null
-        ? await _dio.get<Map<String, dynamic>>(pageUrl)
-        : await _dio.get<Map<String, dynamic>>(
-            _commentsPath,
-            queryParameters: {
-              'content_type': contentType,
-              'object_id': objectId,
-            },
-          );
+    final response =
+        pageUrl != null
+            ? await _dio.get<Map<String, dynamic>>(pageUrl)
+            : await _dio.get<Map<String, dynamic>>(
+              _commentsPath,
+              queryParameters: {
+                'content_type': contentType,
+                'object_id': objectId,
+              },
+            );
     return PaginatedResponse.fromJson<CommentEntity>(
       response.data!,
       (json) => CommentResponseDto.fromJson(json).toEntity(),
@@ -183,8 +180,6 @@ class SocialInteractionRepositoryImpl implements SocialInteractionRepository {
 /// `Provider`, same pattern as `postPublicRepositoryProvider` /
 /// `productPublicRepositoryProvider`, so Step 3's provider (and
 /// widget tests) can override it.
-final socialInteractionRepositoryProvider =
-    Provider<SocialInteractionRepository>(
-      (ref) =>
-          SocialInteractionRepositoryImpl(dio: ref.watch(dioClientProvider)),
-    );
+final socialInteractionRepositoryProvider = Provider<
+  SocialInteractionRepository
+>((ref) => SocialInteractionRepositoryImpl(dio: ref.watch(dioClientProvider)));

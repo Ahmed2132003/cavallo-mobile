@@ -53,9 +53,7 @@ import '../domain/product_entity.dart';
 class OwnProductsNotifier extends AsyncNotifier<List<Product>> {
   @override
   Future<List<Product>> build() async {
-    final page = await ref
-        .watch(productRepositoryProvider)
-        .fetchOwnProducts();
+    final page = await ref.watch(productRepositoryProvider).fetchOwnProducts();
     return page.results;
   }
 
@@ -158,9 +156,7 @@ class OwnProductsNotifier extends AsyncNotifier<List<Product>> {
   Future<void> refreshProducts() async {
     state = const AsyncValue<List<Product>>.loading();
     state = await AsyncValue.guard<List<Product>>(() async {
-      final page = await ref
-          .read(productRepositoryProvider)
-          .fetchOwnProducts();
+      final page = await ref.read(productRepositoryProvider).fetchOwnProducts();
       return page.results;
     });
   }

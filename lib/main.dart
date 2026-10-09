@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -105,7 +105,8 @@ class _DetachSentryIsolateListener implements Integration<SentryOptions> {
 /// (P-008) and starts the app. Must run AFTER `SentryFlutter.init` when
 /// Sentry is enabled, see the note on [main].
 void _installErrorHooksAndRunApp() {
-  FlutterError.onError = (FlutterErrorDetails details) {    reportError(details.exception, details.stack ?? StackTrace.empty);
+  FlutterError.onError = (FlutterErrorDetails details) {
+    reportError(details.exception, details.stack ?? StackTrace.empty);
   };
 
   PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
@@ -187,8 +188,8 @@ class _SocialCommerceAppState extends ConsumerState<SocialCommerceApp> {
     if (!_bootstrapped) {
       if (session.isLoading) {
         return MaterialApp(
-          onGenerateTitle: (BuildContext context) =>
-              AppLocalizations.of(context).appTitle,
+          onGenerateTitle:
+              (BuildContext context) => AppLocalizations.of(context).appTitle,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           locale: locale,
           localeListResolutionCallback: resolveLocaleList,
@@ -210,8 +211,8 @@ class _SocialCommerceAppState extends ConsumerState<SocialCommerceApp> {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
-      onGenerateTitle: (BuildContext context) =>
-          AppLocalizations.of(context).appTitle,
+      onGenerateTitle:
+          (BuildContext context) => AppLocalizations.of(context).appTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       locale: locale,
       localeListResolutionCallback: resolveLocaleList,

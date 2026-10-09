@@ -31,12 +31,14 @@ class PostResponseDto {
       image: json['image'] as String?,
       status: json['status'] as String,
       rejectionReason: json['rejection_reason'] as String?,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
+      createdAt:
+          json['created_at'] == null
+              ? null
+              : DateTime.parse(json['created_at'] as String),
+      updatedAt:
+          json['updated_at'] == null
+              ? null
+              : DateTime.parse(json['updated_at'] as String),
     );
   }
 

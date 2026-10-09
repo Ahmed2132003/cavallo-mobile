@@ -38,8 +38,10 @@ class CommentListWidget extends ConsumerStatefulWidget {
 }
 
 class _CommentListWidgetState extends ConsumerState<CommentListWidget> {
-  ContentInteractionKey get _key =>
-      (contentType: widget.contentType, objectId: widget.objectId);
+  ContentInteractionKey get _key => (
+    contentType: widget.contentType,
+    objectId: widget.objectId,
+  );
 
   @override
   void initState() {
@@ -119,11 +121,11 @@ class _CommentListWidgetState extends ConsumerState<CommentListWidget> {
           state.isLoadingMore
               ? const _CommentSkeletonRow()
               : Center(
-                  child: TextButton(
-                    onPressed: notifier.loadMore,
-                    child: Text(l10n.commentsLoadMore),
-                  ),
+                child: TextButton(
+                  onPressed: notifier.loadMore,
+                  child: Text(l10n.commentsLoadMore),
                 ),
+              ),
       ],
     );
   }
@@ -148,7 +150,11 @@ class _CommentSkeletonRow extends StatelessWidget {
               children: [
                 AppShimmerBox(width: 110, height: 12, borderRadius: 6),
                 SizedBox(height: 8),
-                AppShimmerBox(width: double.infinity, height: 12, borderRadius: 6),
+                AppShimmerBox(
+                  width: double.infinity,
+                  height: 12,
+                  borderRadius: 6,
+                ),
               ],
             ),
           ),
@@ -213,7 +219,10 @@ class _CommentTile extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Flexible(
-                          child: Text(l10n.commentsPendingReview, style: metaStyle),
+                          child: Text(
+                            l10n.commentsPendingReview,
+                            style: metaStyle,
+                          ),
                         ),
                       ],
                     ),

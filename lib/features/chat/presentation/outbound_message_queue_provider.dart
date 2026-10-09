@@ -288,19 +288,22 @@ class OutboundMessageQueueNotifier extends Notifier<List<OutboundMessage>> {
       // which repository method performs the single send call. Every
       // outcome below is handled identically for text and media.
       final mediaPath = message.mediaPath;
-      final sent = mediaPath == null
-          ? await repository.sendMessage(
-              conversationId: message.conversationId,
-              text: message.text,
-            )
-          : await repository.sendMediaMessage(
-              conversationId: message.conversationId,
-              text: message.text,
-              mediaPath: mediaPath,
-            );
+      final sent =
+          mediaPath == null
+              ? await repository.sendMessage(
+                conversationId: message.conversationId,
+                text: message.text,
+              )
+              : await repository.sendMediaMessage(
+                conversationId: message.conversationId,
+                text: message.text,
+                mediaPath: mediaPath,
+              );
       if (_disposed) return;
       state = state.where((m) => m.id != messageId).toList();
-      _sentController.add(OutboundMessageSent(localId: messageId, message: sent));
+      _sentController.add(
+        OutboundMessageSent(localId: messageId, message: sent),
+      );
     } on ApiFailure catch (e) {
       _handleFailure(messageId, e.message, retryable: e is NetworkFailure);
     } catch (_) {

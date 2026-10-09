@@ -30,10 +30,10 @@ void reportError(Object error, StackTrace stack) {
   }
   try {
     unawaited(
-      Sentry.captureException(error, stackTrace: stack).then<void>(
-        (_) {},
-        onError: (Object _) {},
-      ),
+      Sentry.captureException(
+        error,
+        stackTrace: stack,
+      ).then<void>((_) {}, onError: (Object _) {}),
     );
   } catch (_) {
     // Intentionally swallowed: reporting must never throw.

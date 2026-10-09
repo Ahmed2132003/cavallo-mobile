@@ -144,14 +144,13 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
                   ChoiceChip(
                     label: Text(l10n.businessTypeTrader),
                     selected: _businessType == 'trader',
-                    onSelected: (_) =>
-                        setState(() => _businessType = 'trader'),
+                    onSelected: (_) => setState(() => _businessType = 'trader'),
                   ),
                   ChoiceChip(
                     label: Text(l10n.businessTypeFactory),
                     selected: _businessType == 'factory',
-                    onSelected: (_) =>
-                        setState(() => _businessType = 'factory'),
+                    onSelected:
+                        (_) => setState(() => _businessType = 'factory'),
                   ),
                 ],
               ),
@@ -191,16 +190,17 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
                     child: AppButton(
                       label: l10n.searchFilterClear,
                       variant: AppButtonVariant.outlined,
-                      onPressed: () =>
-                          Navigator.of(context).pop(const SearchFilters()),
+                      onPressed:
+                          () =>
+                              Navigator.of(context).pop(const SearchFilters()),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppButton(
                       label: l10n.searchFilterApply,
-                      onPressed: () =>
-                          Navigator.of(context).pop(_buildFilters()),
+                      onPressed:
+                          () => Navigator.of(context).pop(_buildFilters()),
                     ),
                   ),
                 ],

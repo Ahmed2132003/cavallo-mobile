@@ -54,7 +54,11 @@ class CreateSheet extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
-          option(RouteNames.postForm, Icons.image_outlined, l10n.createSheetPost),
+          option(
+            RouteNames.postForm,
+            Icons.image_outlined,
+            l10n.createSheetPost,
+          ),
           option(
             RouteNames.reelForm,
             Icons.play_circle_outline,

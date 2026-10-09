@@ -139,7 +139,9 @@ class SavedListNotifier extends AsyncNotifier<SavedListState> {
   /// is set and the error is rethrown to the caller.
   Future<void> loadMore() async {
     final current = state.value;
-    if (current == null || current.nextCursor == null || current.isLoadingMore) {
+    if (current == null ||
+        current.nextCursor == null ||
+        current.isLoadingMore) {
       return;
     }
 

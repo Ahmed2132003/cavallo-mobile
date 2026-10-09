@@ -18,9 +18,10 @@ class CategoryNodeDto {
       id: json['id'] as int,
       name: json['name'] as String,
       slug: json['slug'] as String,
-      children: rawChildren
-          .map((e) => CategoryNodeDto.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      children:
+          rawChildren
+              .map((e) => CategoryNodeDto.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 

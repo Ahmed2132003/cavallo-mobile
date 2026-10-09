@@ -157,9 +157,10 @@ class AppFormatters {
   String price(String amount, String currencyCode) {
     final String code = currencyCode.trim();
     final String lower = code.toLowerCase();
-    final String currency = _knownCurrencies.contains(lower)
-        ? _l10n.currencyLabel(lower)
-        : code.toUpperCase();
+    final String currency =
+        _knownCurrencies.contains(lower)
+            ? _l10n.currencyLabel(lower)
+            : code.toUpperCase();
     return _l10n.priceDisplay(_groupAmount(amount), currency);
   }
 

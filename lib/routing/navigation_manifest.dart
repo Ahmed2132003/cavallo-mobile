@@ -466,7 +466,10 @@ const List<NavDestination> kNavigationManifest = [
     allowedFor: _staffOnly,
     entries: {
       NavAudience.staff: [
-        NavEntry(NavEntryKind.inContextLink, 'Item row in the moderation queue'),
+        NavEntry(
+          NavEntryKind.inContextLink,
+          'Item row in the moderation queue',
+        ),
       ],
     },
   ),
@@ -485,7 +488,8 @@ const List<NavDestination> kNavigationManifest = [
     routeName: RouteNames.login,
     allowedFor: {},
     entries: {},
-    authFlowReason: 'Signed-out entry. Signed-in users are redirected to /home.',
+    authFlowReason:
+        'Signed-out entry. Signed-in users are redirected to /home.',
   ),
   NavDestination(
     id: RouteNames.register,

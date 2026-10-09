@@ -24,8 +24,7 @@ class ProductVariantDto {
   final String name;
   final String value;
 
-  ProductVariant toEntity() =>
-      ProductVariant(id: id, name: name, value: value);
+  ProductVariant toEntity() => ProductVariant(id: id, name: name, value: value);
 }
 
 /// The write body for Part P-032B's variant create/update endpoints

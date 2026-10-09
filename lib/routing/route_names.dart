@@ -306,6 +306,7 @@ class RouteNames {
   /// screen in STEP 3.
   static const String profile = 'profile';
   static const String profilePath = '/profile';
+
   /// Path-parameter key shared by [businessProfilePath], [productDetailPath],
   /// [chatThreadPath], [postDetailPath], [reelDetailPath] and
   /// [storyViewerPath].

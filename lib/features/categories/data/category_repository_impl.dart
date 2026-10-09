@@ -77,7 +77,8 @@ class CategoryRepositoryImpl implements CategoryRepository {
     if (cached == null) return null;
 
     final cachedAtRaw = cached['cachedAt'] as String?;
-    final cachedAt = cachedAtRaw == null ? null : DateTime.tryParse(cachedAtRaw);
+    final cachedAt =
+        cachedAtRaw == null ? null : DateTime.tryParse(cachedAtRaw);
     if (cachedAt == null) return null;
 
     if (DateTime.now().difference(cachedAt) >= _cacheTtl) {
@@ -97,7 +98,9 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
   List<CategoryNode> _parseTree(List<dynamic> rawTree) {
     return rawTree
-        .map((e) => CategoryNodeDto.fromJson(e as Map<String, dynamic>).toEntity())
+        .map(
+          (e) => CategoryNodeDto.fromJson(e as Map<String, dynamic>).toEntity(),
+        )
         .toList();
   }
 }

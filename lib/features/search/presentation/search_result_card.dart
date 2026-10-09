@@ -45,7 +45,11 @@ import '../../products/presentation/product_price_framing.dart';
 import '../domain/search_result_entity.dart';
 
 class SearchResultCard extends StatelessWidget {
-  const SearchResultCard({super.key, required this.result, required this.onTap});
+  const SearchResultCard({
+    super.key,
+    required this.result,
+    required this.onTap,
+  });
 
   final SearchResult result;
   final VoidCallback onTap;
@@ -115,18 +119,19 @@ class _BusinessResultRow extends StatelessWidget {
     final l10n = context.l10n;
     final AppFormatters formatters = AppFormatters(l10n);
 
-    final String typeLabel = business.businessType == BusinessType.trader
-        ? l10n.businessTypeTrader
-        : l10n.businessTypeFactory;
+    final String typeLabel =
+        business.businessType == BusinessType.trader
+            ? l10n.businessTypeTrader
+            : l10n.businessTypeFactory;
     final String locationLabel;
     if (business.city.isNotEmpty && business.country.isNotEmpty) {
       locationLabel = l10n.profileLocation(business.city, business.country);
     } else {
-      locationLabel = business.city.isNotEmpty ? business.city : business.country;
+      locationLabel =
+          business.city.isNotEmpty ? business.city : business.country;
     }
-    final String subtitle = locationLabel.isEmpty
-        ? typeLabel
-        : '$typeLabel \u2022 $locationLabel';
+    final String subtitle =
+        locationLabel.isEmpty ? typeLabel : '$typeLabel \u2022 $locationLabel';
     final int followers = business.followerCount;
 
     return _ResultRowFrame(

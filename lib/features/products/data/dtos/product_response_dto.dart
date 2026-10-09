@@ -43,15 +43,18 @@ class ProductResponseDto {
       currency: json['currency'] as String,
       image: json['image'] as String?,
       isActive: json['is_active'] as bool,
-      variants: rawVariants
-          .map((e) => ProductVariantDto.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
+      variants:
+          rawVariants
+              .map((e) => ProductVariantDto.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      createdAt:
+          json['created_at'] == null
+              ? null
+              : DateTime.parse(json['created_at'] as String),
+      updatedAt:
+          json['updated_at'] == null
+              ? null
+              : DateTime.parse(json['updated_at'] as String),
       // Part P-110: the owning business's Featured state, resolved by
       // the backend through the business join.
       isFeatured: (json['is_featured'] as bool?) ?? false,

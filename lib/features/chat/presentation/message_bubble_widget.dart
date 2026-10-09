@@ -68,11 +68,12 @@ class MessageBubbleWidget extends StatelessWidget {
     return _BubbleShell(
       text: message.text,
       isMine: isMine,
-      media: mediaType == null
-          ? null
-          : _MediaPreview(type: mediaType, networkUrl: message.mediaUrl),
-      footerBuilder: (textColor) =>
-          _deliveredFooter(message, isMine, textColor),
+      media:
+          mediaType == null
+              ? null
+              : _MediaPreview(type: mediaType, networkUrl: message.mediaUrl),
+      footerBuilder:
+          (textColor) => _deliveredFooter(message, isMine, textColor),
     );
   }
 }
@@ -116,9 +117,8 @@ class _SharedContentBubble extends StatelessWidget {
     final cardWidth = math.min(MediaQuery.of(context).size.width * 0.75, 300.0);
 
     return Column(
-      crossAxisAlignment: isMine
-          ? CrossAxisAlignment.end
-          : CrossAxisAlignment.start,
+      crossAxisAlignment:
+          isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
@@ -131,8 +131,8 @@ class _SharedContentBubble extends StatelessWidget {
         _BubbleShell(
           text: message.text,
           isMine: isMine,
-          footerBuilder: (textColor) =>
-              _deliveredFooter(message, isMine, textColor),
+          footerBuilder:
+              (textColor) => _deliveredFooter(message, isMine, textColor),
         ),
       ],
     );
@@ -173,9 +173,10 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
       isFailed: isFailed,
       onTap: isFailed ? onRetry : null,
       tapKey: isFailed ? ValueKey('outbound_retry_${outbound.id}') : null,
-      media: mediaType == null
-          ? null
-          : _MediaPreview(type: mediaType, localPath: outbound.mediaPath),
+      media:
+          mediaType == null
+              ? null
+              : _MediaPreview(type: mediaType, localPath: outbound.mediaPath),
       footerBuilder: (textColor) {
         if (isFailed) {
           return Column(
@@ -297,16 +298,18 @@ class _BubbleShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bubbleColor = isFailed
-        ? theme.colorScheme.errorContainer
-        : isMine
-        ? theme.colorScheme.primary
-        : theme.colorScheme.surfaceContainerHighest;
-    final textColor = isFailed
-        ? theme.colorScheme.onErrorContainer
-        : isMine
-        ? theme.colorScheme.onPrimary
-        : theme.colorScheme.onSurface;
+    final bubbleColor =
+        isFailed
+            ? theme.colorScheme.errorContainer
+            : isMine
+            ? theme.colorScheme.primary
+            : theme.colorScheme.surfaceContainerHighest;
+    final textColor =
+        isFailed
+            ? theme.colorScheme.onErrorContainer
+            : isMine
+            ? theme.colorScheme.onPrimary
+            : theme.colorScheme.onSurface;
 
     final bubble = Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -339,14 +342,15 @@ class _BubbleShell extends StatelessWidget {
 
     return Align(
       alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
-      child: onTap == null
-          ? bubble
-          : GestureDetector(
-              key: tapKey,
-              behavior: HitTestBehavior.opaque,
-              onTap: onTap,
-              child: bubble,
-            ),
+      child:
+          onTap == null
+              ? bubble
+              : GestureDetector(
+                key: tapKey,
+                behavior: HitTestBehavior.opaque,
+                onTap: onTap,
+                child: bubble,
+              ),
     );
   }
 }
@@ -394,15 +398,17 @@ class _MediaPreview extends StatelessWidget {
       content = Image.file(
         File(path),
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) =>
-            placeholder(Icons.broken_image_outlined),
+        errorBuilder:
+            (context, error, stackTrace) =>
+                placeholder(Icons.broken_image_outlined),
       );
     } else if (url != null && url.isNotEmpty) {
       content = Image.network(
         url,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) =>
-            placeholder(Icons.broken_image_outlined),
+        errorBuilder:
+            (context, error, stackTrace) =>
+                placeholder(Icons.broken_image_outlined),
       );
     } else {
       content = placeholder(Icons.image_outlined);

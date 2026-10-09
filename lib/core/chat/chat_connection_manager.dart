@@ -59,10 +59,8 @@ ChatSocket _defaultChatSocketFactory(Uri uri) =>
 /// fresh [ChatConnectionManager.connect] to a different conversation).
 /// Production default is a real [Timer]; tests inject a fake that lets
 /// them fire the callback manually instead of waiting real seconds.
-typedef ReconnectScheduler = Timer Function(
-  Duration delay,
-  void Function() callback,
-);
+typedef ReconnectScheduler =
+    Timer Function(Duration delay, void Function() callback);
 
 Timer _defaultReconnectScheduler(Duration delay, void Function() callback) =>
     Timer(delay, callback);
@@ -70,16 +68,13 @@ Timer _defaultReconnectScheduler(Duration delay, void Function() callback) =>
 /// STEP 3: schedules a repeating callback every [period] (the heartbeat
 /// timer), matching [Timer.periodic]'s own signature so the production
 /// default can just be [Timer.periodic] itself.
-typedef PeriodicTimerFactory = Timer Function(
-  Duration period,
-  void Function(Timer timer) callback,
-);
+typedef PeriodicTimerFactory =
+    Timer Function(Duration period, void Function(Timer timer) callback);
 
 Timer _defaultPeriodicTimerFactory(
   Duration period,
   void Function(Timer) callback,
-) =>
-    Timer.periodic(period, callback);
+) => Timer.periodic(period, callback);
 
 /// Part P-073 — the global-singleton WebSocket connection manager for
 /// chat (`lib/core/chat/`, per Architecture Section 13 — see this part's
@@ -135,12 +130,12 @@ class ChatConnectionManager {
     ReconnectScheduler reconnectScheduler = _defaultReconnectScheduler,
     PeriodicTimerFactory periodicTimerFactory = _defaultPeriodicTimerFactory,
     Duration heartbeatInterval = const Duration(seconds: 30),
-  })  : _getAccessToken = getAccessToken,
-        _getApiBaseUrl = getApiBaseUrl,
-        _socketFactory = socketFactory,
-        _reconnectScheduler = reconnectScheduler,
-        _periodicTimerFactory = periodicTimerFactory,
-        _heartbeatInterval = heartbeatInterval;
+  }) : _getAccessToken = getAccessToken,
+       _getApiBaseUrl = getApiBaseUrl,
+       _socketFactory = socketFactory,
+       _reconnectScheduler = reconnectScheduler,
+       _periodicTimerFactory = periodicTimerFactory,
+       _heartbeatInterval = heartbeatInterval;
 
   final Future<String?> Function() _getAccessToken;
   final String Function() _getApiBaseUrl;
@@ -412,8 +407,10 @@ class ChatConnectionManager {
 
   void _startHeartbeatTimer() {
     _heartbeatTimer?.cancel();
-    _heartbeatTimer =
-        _periodicTimerFactory(_heartbeatInterval, (_) => sendHeartbeat());
+    _heartbeatTimer = _periodicTimerFactory(
+      _heartbeatInterval,
+      (_) => sendHeartbeat(),
+    );
   }
 
   void _stopHeartbeatTimer() {

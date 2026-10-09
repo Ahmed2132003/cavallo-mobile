@@ -161,12 +161,12 @@ sealed class ChatEvent {
         status: status,
         createdAt: createdAt,
         mediaUrl: mediaRaw is String && mediaRaw.isNotEmpty ? mediaRaw : null,
-        mediaType: mediaTypeRaw is String && mediaTypeRaw.isNotEmpty
-            ? mediaTypeRaw
-            : null,
-        sharedContent: sharedContentRaw is Map<String, dynamic>
-            ? sharedContentRaw
-            : null,
+        mediaType:
+            mediaTypeRaw is String && mediaTypeRaw.isNotEmpty
+                ? mediaTypeRaw
+                : null,
+        sharedContent:
+            sharedContentRaw is Map<String, dynamic> ? sharedContentRaw : null,
       );
     }
 

@@ -15,9 +15,7 @@ abstract class StoryPublicRepository {
   /// `PostPublicRepository.fetchBusinessPosts` (Part P-045) —
   /// `StoryViewerScreen`'s sequence (this part, later step) is built
   /// from that first page only.
-  Future<PaginatedResponse<PublicStory>> fetchBusinessStories(
-    int businessId,
-  );
+  Future<PaginatedResponse<PublicStory>> fetchBusinessStories(int businessId);
 
   /// Calls `POST /api/v1/stories/{id}/view/`
   /// (`stories.views.StoryViewRecordView`, Part P-049) — records that

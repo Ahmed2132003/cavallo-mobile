@@ -148,12 +148,14 @@ class Conversation {
 
     return Conversation(
       id: json['id'] as int,
-      otherParticipant: otherParticipantRaw == null
-          ? null
-          : ConversationParticipantSummary.fromJson(otherParticipantRaw),
-      lastMessage: lastMessageRaw == null
-          ? null
-          : LastMessagePreview.fromJson(lastMessageRaw),
+      otherParticipant:
+          otherParticipantRaw == null
+              ? null
+              : ConversationParticipantSummary.fromJson(otherParticipantRaw),
+      lastMessage:
+          lastMessageRaw == null
+              ? null
+              : LastMessagePreview.fromJson(lastMessageRaw),
       unreadCount: json['unread_count'] as int,
       createdAt: DateTime.parse(json['created_at'] as String),
     );

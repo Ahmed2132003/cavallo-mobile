@@ -87,9 +87,10 @@ class SharedContent {
       businessId: businessId is int ? businessId : null,
       businessName: businessName is String ? businessName : null,
       previewText: previewText is String ? previewText : null,
-      previewImageUrl: previewImageUrl is String && previewImageUrl.isNotEmpty
-          ? previewImageUrl
-          : null,
+      previewImageUrl:
+          previewImageUrl is String && previewImageUrl.isNotEmpty
+              ? previewImageUrl
+              : null,
     );
   }
 

@@ -149,16 +149,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               hintText: l10n.searchFieldHint,
               isDense: true,
               prefixIcon: const Icon(Icons.search),
-              suffixIcon: _searchController.text.isEmpty
-                  ? null
-                  : IconButton(
-                      icon: const Icon(Icons.clear),
-                      tooltip: l10n.searchClearTooltip,
-                      onPressed: () {
-                        _searchController.clear();
-                        _onQueryChanged('');
-                      },
-                    ),
+              suffixIcon:
+                  _searchController.text.isEmpty
+                      ? null
+                      : IconButton(
+                        icon: const Icon(Icons.clear),
+                        tooltip: l10n.searchClearTooltip,
+                        onPressed: () {
+                          _searchController.clear();
+                          _onQueryChanged('');
+                        },
+                      ),
             ),
           ),
         ),
@@ -304,16 +305,17 @@ class _SearchListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return SearchResultCard(
       result: result,
-      onTap: () => switch (result) {
-        BusinessSearchResult(:final business) => context.pushNamed(
-          RouteNames.businessProfile,
-          pathParameters: {RouteNames.idParam: business.id.toString()},
-        ),
-        ProductSearchResult(:final product) => context.pushNamed(
-          RouteNames.productDetail,
-          pathParameters: {RouteNames.idParam: product.id.toString()},
-        ),
-      },
+      onTap:
+          () => switch (result) {
+            BusinessSearchResult(:final business) => context.pushNamed(
+              RouteNames.businessProfile,
+              pathParameters: {RouteNames.idParam: business.id.toString()},
+            ),
+            ProductSearchResult(:final product) => context.pushNamed(
+              RouteNames.productDetail,
+              pathParameters: {RouteNames.idParam: product.id.toString()},
+            ),
+          },
     );
   }
 }

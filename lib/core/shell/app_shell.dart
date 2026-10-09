@@ -118,8 +118,7 @@ class AppShell extends ConsumerWidget {
                         initialLocation: branch == navigationShell.currentIndex,
                       ),
                   onCreate:
-                      onCreateTap ??
-                      () => unawaited(showCreateSheet(context)),
+                      onCreateTap ?? () => unawaited(showCreateSheet(context)),
                   badgeCounts: counts,
                 ),
       ),

@@ -372,25 +372,28 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
   Future<void> _showAttachSheet() async {
     final choice = await showModalBottomSheet<ChatMediaType>(
       context: context,
-      builder: (sheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              key: const Key('chatAttach_photo'),
-              leading: const Icon(Icons.photo_outlined),
-              title: const Text('Photo'),
-              onTap: () => Navigator.of(sheetContext).pop(ChatMediaType.image),
+      builder:
+          (sheetContext) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  key: const Key('chatAttach_photo'),
+                  leading: const Icon(Icons.photo_outlined),
+                  title: const Text('Photo'),
+                  onTap:
+                      () => Navigator.of(sheetContext).pop(ChatMediaType.image),
+                ),
+                ListTile(
+                  key: const Key('chatAttach_video'),
+                  leading: const Icon(Icons.videocam_outlined),
+                  title: const Text('Video'),
+                  onTap:
+                      () => Navigator.of(sheetContext).pop(ChatMediaType.video),
+                ),
+              ],
             ),
-            ListTile(
-              key: const Key('chatAttach_video'),
-              leading: const Icon(Icons.videocam_outlined),
-              title: const Text('Video'),
-              onTap: () => Navigator.of(sheetContext).pop(ChatMediaType.video),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
     if (choice == null || !mounted) return;
     await _pickAndEnqueueMedia(choice);
@@ -402,13 +405,14 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
   /// messages. Whatever is typed in the composer is sent as the caption.
   Future<void> _pickAndEnqueueMedia(ChatMediaType type) async {
     final picker = ImagePicker();
-    final XFile? picked = type == ChatMediaType.image
-        ? await picker.pickImage(
-            source: ImageSource.gallery,
-            imageQuality: 85,
-            maxWidth: 1920,
-          )
-        : await picker.pickVideo(source: ImageSource.gallery);
+    final XFile? picked =
+        type == ChatMediaType.image
+            ? await picker.pickImage(
+              source: ImageSource.gallery,
+              imageQuality: 85,
+              maxWidth: 1920,
+            )
+            : await picker.pickVideo(source: ImageSource.gallery);
     if (picked == null || !mounted) return;
 
     final size = await File(picked.path).length();
@@ -418,7 +422,9 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
       final label = type == ChatMediaType.image ? 'Photo' : 'Video';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$label is too large (max ${limit ~/ (1024 * 1024)} MB).'),
+          content: Text(
+            '$label is too large (max ${limit ~/ (1024 * 1024)} MB).',
+          ),
         ),
       );
       return;
@@ -468,8 +474,9 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
   Widget build(BuildContext context) {
     final displayName =
         widget.conversation.otherParticipant?.displayName ?? 'Chat';
-    final sortedMessages = _messagesById.values.toList()
-      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final sortedMessages =
+        _messagesById.values.toList()
+          ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     final pending =
         ref
             .watch(outboundMessageQueueProvider)
@@ -517,10 +524,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
           children: [
             Text(_historyError!.message, textAlign: TextAlign.center),
             const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: _loadHistory,
-              child: const Text('Retry'),
-            ),
+            ElevatedButton(onPressed: _loadHistory, child: const Text('Retry')),
           ],
         ),
       );
@@ -578,10 +582,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
               ),
             ),
             const SizedBox(width: 8),
-            IconButton(
-              icon: const Icon(Icons.send),
-              onPressed: _sendMessage,
-            ),
+            IconButton(icon: const Icon(Icons.send), onPressed: _sendMessage),
           ],
         ),
       ),

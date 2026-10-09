@@ -36,12 +36,14 @@ class StoryPublicResponseDto {
       media: json['media'] as String,
       publishedAt: DateTime.parse(json['published_at'] as String),
       expiresAt: DateTime.parse(json['expires_at'] as String),
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
+      createdAt:
+          json['created_at'] == null
+              ? null
+              : DateTime.parse(json['created_at'] as String),
+      updatedAt:
+          json['updated_at'] == null
+              ? null
+              : DateTime.parse(json['updated_at'] as String),
     );
   }
 

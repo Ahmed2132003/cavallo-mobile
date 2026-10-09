@@ -1,4 +1,4 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/social_interaction_repository_impl.dart';
 import '../domain/social_interaction_state.dart';
@@ -56,15 +56,16 @@ class ContentInteractionNotifier extends Notifier<SocialInteractionState> {
 
     final repo = ref.read(socialInteractionRepositoryProvider);
     try {
-      final serverLiked = wasLiked
-          ? await repo.unlikeContent(
-              contentType: key.contentType,
-              objectId: key.objectId,
-            )
-          : await repo.likeContent(
-              contentType: key.contentType,
-              objectId: key.objectId,
-            );
+      final serverLiked =
+          wasLiked
+              ? await repo.unlikeContent(
+                contentType: key.contentType,
+                objectId: key.objectId,
+              )
+              : await repo.likeContent(
+                contentType: key.contentType,
+                objectId: key.objectId,
+              );
       if (serverLiked != state.isLiked) {
         state = state.copyWith(isLiked: serverLiked);
       }
@@ -81,15 +82,16 @@ class ContentInteractionNotifier extends Notifier<SocialInteractionState> {
 
     final repo = ref.read(socialInteractionRepositoryProvider);
     try {
-      final serverSaved = wasSaved
-          ? await repo.unsaveContent(
-              contentType: key.contentType,
-              objectId: key.objectId,
-            )
-          : await repo.saveContent(
-              contentType: key.contentType,
-              objectId: key.objectId,
-            );
+      final serverSaved =
+          wasSaved
+              ? await repo.unsaveContent(
+                contentType: key.contentType,
+                objectId: key.objectId,
+              )
+              : await repo.saveContent(
+                contentType: key.contentType,
+                objectId: key.objectId,
+              );
       if (serverSaved != state.isSaved) {
         state = state.copyWith(isSaved: serverSaved);
       }
@@ -157,16 +159,16 @@ class BusinessFollowNotifier extends Notifier<SocialInteractionState> {
     final previous = state;
     state = state.copyWith(
       isFollowing: !wasFollowing,
-      followersCount: wasFollowing
-          ? state.followersCount - 1
-          : state.followersCount + 1,
+      followersCount:
+          wasFollowing ? state.followersCount - 1 : state.followersCount + 1,
     );
 
     final repo = ref.read(socialInteractionRepositoryProvider);
     try {
-      final serverFollowing = wasFollowing
-          ? await repo.unfollowBusiness(businessId)
-          : await repo.followBusiness(businessId);
+      final serverFollowing =
+          wasFollowing
+              ? await repo.unfollowBusiness(businessId)
+              : await repo.followBusiness(businessId);
       if (serverFollowing != state.isFollowing) {
         state = state.copyWith(isFollowing: serverFollowing);
       }
@@ -180,8 +182,7 @@ class BusinessFollowNotifier extends Notifier<SocialInteractionState> {
 /// Part BUGFIX-058: `.autoDispose`, same reasoning as
 /// [contentInteractionProvider] above — paired with
 /// `ref.invalidate(businessFollowProvider)` in `SessionNotifier.logout()`.
-final businessFollowProvider = NotifierProvider.autoDispose.family<
-  BusinessFollowNotifier,
-  SocialInteractionState,
-  int
->((businessId) => BusinessFollowNotifier(businessId));
+final businessFollowProvider = NotifierProvider.autoDispose
+    .family<BusinessFollowNotifier, SocialInteractionState, int>(
+      (businessId) => BusinessFollowNotifier(businessId),
+    );

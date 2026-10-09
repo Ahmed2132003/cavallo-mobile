@@ -45,9 +45,8 @@ class PostRepositoryImpl implements PostRepository {
   Future<Post> createPost({required String caption, File? imageFile}) async {
     final fields = <String, dynamic>{'caption': caption};
 
-    final data = imageFile == null
-        ? fields
-        : await _toFormData(fields, imageFile);
+    final data =
+        imageFile == null ? fields : await _toFormData(fields, imageFile);
 
     final response = await _dio.post<Map<String, dynamic>>(
       _postsPath,

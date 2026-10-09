@@ -107,4 +107,8 @@ class CommentListNotifier extends Notifier<CommentListState> {
   }
 }
 
-final commentListProvider = NotifierProvider.family<CommentListNotifier, CommentListState, ContentInteractionKey>((key) => CommentListNotifier(key));
+final commentListProvider = NotifierProvider.family<
+  CommentListNotifier,
+  CommentListState,
+  ContentInteractionKey
+>((key) => CommentListNotifier(key));

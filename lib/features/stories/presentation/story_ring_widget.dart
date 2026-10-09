@@ -95,7 +95,8 @@ class StoryRingWidget extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: hasUnviewed ? colors.textPrimary : colors.textSecondary,
+                  color:
+                      hasUnviewed ? colors.textPrimary : colors.textSecondary,
                 ),
               ),
             ],

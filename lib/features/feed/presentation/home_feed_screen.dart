@@ -316,8 +316,7 @@ class _HomeStoriesTray extends ConsumerWidget {
     final bool isBusiness = ref.watch(
       sessionProvider.select(
         (AsyncValue<User?> session) => switch (session) {
-          AsyncData(:final value) =>
-            value?.accountType == AccountType.business,
+          AsyncData(:final value) => value?.accountType == AccountType.business,
           _ => false,
         },
       ),

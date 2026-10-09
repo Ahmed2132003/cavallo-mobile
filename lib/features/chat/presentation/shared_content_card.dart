@@ -130,9 +130,10 @@ class _PreviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final previewText = shared.previewText;
-    final title = (previewText != null && previewText.isNotEmpty)
-        ? previewText
-        : _typeLabel(shared.type);
+    final title =
+        (previewText != null && previewText.isNotEmpty)
+            ? previewText
+            : _typeLabel(shared.type);
     final businessName = shared.businessName;
 
     return Card(
@@ -221,8 +222,9 @@ class _PreviewThumbnail extends StatelessWidget {
     return Image.network(
       imageUrl,
       fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) =>
-          placeholder(Icons.broken_image_outlined),
+      errorBuilder:
+          (context, error, stackTrace) =>
+              placeholder(Icons.broken_image_outlined),
     );
   }
 }

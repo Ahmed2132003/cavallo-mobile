@@ -92,11 +92,13 @@ class ConversationRepository {
         // pagination handling (harmlessly) just never finds a `next`
         // cursor to follow.
         return PaginatedResponse<Conversation>(
-          results: data
-              .map(
-                (json) => Conversation.fromJson(json as Map<String, dynamic>),
-              )
-              .toList(),
+          results:
+              data
+                  .map(
+                    (json) =>
+                        Conversation.fromJson(json as Map<String, dynamic>),
+                  )
+                  .toList(),
           next: null,
           previous: null,
         );
@@ -216,8 +218,6 @@ class ConversationRepository {
 /// A `Provider`, not a singleton — same pattern as `dioClientProvider`
 /// and `chatConnectionManagerProvider`, so this is trivially overridable
 /// in tests with a fake/mock `Dio`.
-final conversationRepositoryProvider = Provider<ConversationRepository>((
-  ref,
-) {
+final conversationRepositoryProvider = Provider<ConversationRepository>((ref) {
   return ConversationRepository(ref.watch(dioClientProvider));
 });

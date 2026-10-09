@@ -50,8 +50,9 @@ Future<void> showCommentsSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (BuildContext sheetContext) =>
-        CommentsSheet(contentType: contentType, objectId: objectId),
+    builder:
+        (BuildContext sheetContext) =>
+            CommentsSheet(contentType: contentType, objectId: objectId),
   );
 }
 

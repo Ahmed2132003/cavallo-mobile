@@ -1989,5 +1989,21 @@
   "pushBannerView": "View",
   "@pushBannerView": {
     "description": "Push notification banner: action button that opens the linked screen."
-  }
+  },
+  "validationBusinessNameRequired": "Business name is required.",
+  "validationCountryRequired": "Country is required.",
+  "validationCityRequired": "City is required.",
+  "businessProfileLoadError": "Could not load your business profile.",
+  "postLoadError": "Could not load this post.",
+  "reelLoadError": "Could not load this reel.",
+  "commonGenericError": "Something went wrong. Please try again.",
+  "validationCaptionRequired": "Caption is required.",
+  "reelVideoRequired": "A video is required.",
+  "productFormEditTitle": "Edit product",
+  "productFormCreate": "Create product",
+  "productFormSaveChanges": "Save changes",
+  "validationProductNameRequired": "Name is required.",
+  "validationDescriptionRequired": "Description is required.",
+  "validationPriceRequired": "Price is required.",
+  "validationPriceInvalid": "Enter a valid price (e.g. 199.99)."
 }

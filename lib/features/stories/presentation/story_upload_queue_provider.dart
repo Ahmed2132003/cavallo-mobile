@@ -214,14 +214,16 @@ class StoryUploadQueueNotifier extends Notifier<List<UploadTask>> {
     // flight — re-check before touching state.
     if (_findTask(taskId) == null) return;
 
-    final message = e.error is ApiFailure
-        ? (e.error as ApiFailure).message
-        : 'Upload failed.';
+    final message =
+        e.error is ApiFailure
+            ? (e.error as ApiFailure).message
+            : 'Upload failed.';
 
     if (!_isRetryable(e)) {
       _updateTask(
         taskId,
-        (t) => t.copyWith(status: UploadTaskStatus.failed, errorMessage: message),
+        (t) =>
+            t.copyWith(status: UploadTaskStatus.failed, errorMessage: message),
       );
       return;
     }
@@ -229,7 +231,8 @@ class StoryUploadQueueNotifier extends Notifier<List<UploadTask>> {
     if (task.attempt >= _maxAttempts) {
       _updateTask(
         taskId,
-        (t) => t.copyWith(status: UploadTaskStatus.failed, errorMessage: message),
+        (t) =>
+            t.copyWith(status: UploadTaskStatus.failed, errorMessage: message),
       );
       return;
     }
@@ -242,7 +245,10 @@ class StoryUploadQueueNotifier extends Notifier<List<UploadTask>> {
       if (stillPending == null) return; // Cancelled during the wait.
       _updateTask(
         taskId,
-        (t) => t.copyWith(attempt: t.attempt + 1, status: UploadTaskStatus.uploading),
+        (t) => t.copyWith(
+          attempt: t.attempt + 1,
+          status: UploadTaskStatus.uploading,
+        ),
       );
       unawaited(_attempt(taskId));
     });

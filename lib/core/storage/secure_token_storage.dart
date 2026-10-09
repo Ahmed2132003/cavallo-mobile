@@ -54,9 +54,7 @@ class SecureTokenStorage {
   SecureTokenStorage({FlutterSecureStorage? storage})
     : _storage =
           storage ??
-          const FlutterSecureStorage(
-            aOptions: AndroidOptions.defaultOptions,
-          );
+          const FlutterSecureStorage(aOptions: AndroidOptions.defaultOptions);
 
   final FlutterSecureStorage _storage;
 

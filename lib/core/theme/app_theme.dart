@@ -85,16 +85,18 @@ abstract final class AppTheme {
         indicatorColor: _clear,
         iconTheme: WidgetStateProperty.resolveWith<IconThemeData>(
           (Set<WidgetState> states) => IconThemeData(
-            color: states.contains(WidgetState.selected)
-                ? c.brand
-                : c.textSecondary,
+            color:
+                states.contains(WidgetState.selected)
+                    ? c.brand
+                    : c.textSecondary,
           ),
         ),
         labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>(
           (Set<WidgetState> states) => (text.labelSmall ?? base).copyWith(
-            color: states.contains(WidgetState.selected)
-                ? c.textPrimary
-                : c.textSecondary,
+            color:
+                states.contains(WidgetState.selected)
+                    ? c.textPrimary
+                    : c.textSecondary,
           ),
         ),
       ),
@@ -121,7 +123,9 @@ abstract final class AppTheme {
         disabledBorder: inputBorder(BorderSide.none),
         focusedBorder: inputBorder(BorderSide(color: c.brand, width: 1.5)),
         errorBorder: inputBorder(BorderSide(color: c.danger)),
-        focusedErrorBorder: inputBorder(BorderSide(color: c.danger, width: 1.5)),
+        focusedErrorBorder: inputBorder(
+          BorderSide(color: c.danger, width: 1.5),
+        ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
@@ -166,9 +170,10 @@ abstract final class AppTheme {
         shape: const StadiumBorder(),
         labelStyle: WidgetStateTextStyle.resolveWith(
           (Set<WidgetState> states) => (text.labelLarge ?? base).copyWith(
-            color: states.contains(WidgetState.selected)
-                ? c.onBrand
-                : c.textPrimary,
+            color:
+                states.contains(WidgetState.selected)
+                    ? c.onBrand
+                    : c.textPrimary,
           ),
         ),
       ),
@@ -202,8 +207,9 @@ abstract final class AppTheme {
         labelColor: c.textPrimary,
         unselectedLabelColor: c.textSecondary,
         labelStyle: text.titleSmall,
-        unselectedLabelStyle:
-            (text.titleSmall ?? base).copyWith(fontWeight: FontWeight.w500),
+        unselectedLabelStyle: (text.titleSmall ?? base).copyWith(
+          fontWeight: FontWeight.w500,
+        ),
         indicator: UnderlineTabIndicator(
           borderSide: BorderSide(color: c.brand, width: 2),
         ),

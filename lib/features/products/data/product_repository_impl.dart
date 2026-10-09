@@ -94,9 +94,8 @@ class ProductRepositoryImpl implements ProductRepository {
       'is_active': isActive,
     };
 
-    final data = imageFile == null
-        ? fields
-        : await _toFormData(fields, imageFile);
+    final data =
+        imageFile == null ? fields : await _toFormData(fields, imageFile);
 
     final response = await _dio.post<Map<String, dynamic>>(
       _productsPath,
@@ -126,9 +125,8 @@ class ProductRepositoryImpl implements ProductRepository {
       if (isActive != null) 'is_active': isActive,
     };
 
-    final data = imageFile == null
-        ? fields
-        : await _toFormData(fields, imageFile);
+    final data =
+        imageFile == null ? fields : await _toFormData(fields, imageFile);
 
     final response = await _dio.patch<Map<String, dynamic>>(
       _detailPath(productId),

@@ -62,7 +62,8 @@ import 'app_localizations_en.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,17 +84,18 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
-    Locale('en')
+    Locale('en'),
   ];
 
   /// Application title shown in the OS task switcher.
@@ -2608,9 +2611,106 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View'**
   String get pushBannerView;
+
+  /// No description provided for @validationBusinessNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Business name is required.'**
+  String get validationBusinessNameRequired;
+
+  /// No description provided for @validationCountryRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Country is required.'**
+  String get validationCountryRequired;
+
+  /// No description provided for @validationCityRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'City is required.'**
+  String get validationCityRequired;
+
+  /// No description provided for @businessProfileLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your business profile.'**
+  String get businessProfileLoadError;
+
+  /// No description provided for @postLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this post.'**
+  String get postLoadError;
+
+  /// No description provided for @reelLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this reel.'**
+  String get reelLoadError;
+
+  /// No description provided for @commonGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get commonGenericError;
+
+  /// No description provided for @validationCaptionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Caption is required.'**
+  String get validationCaptionRequired;
+
+  /// No description provided for @reelVideoRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A video is required.'**
+  String get reelVideoRequired;
+
+  /// No description provided for @productFormEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit product'**
+  String get productFormEditTitle;
+
+  /// No description provided for @productFormCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create product'**
+  String get productFormCreate;
+
+  /// No description provided for @productFormSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get productFormSaveChanges;
+
+  /// No description provided for @validationProductNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required.'**
+  String get validationProductNameRequired;
+
+  /// No description provided for @validationDescriptionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Description is required.'**
+  String get validationDescriptionRequired;
+
+  /// No description provided for @validationPriceRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Price is required.'**
+  String get validationPriceRequired;
+
+  /// No description provided for @validationPriceInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid price (e.g. 199.99).'**
+  String get validationPriceInvalid;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -2619,25 +2719,26 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['ar', 'en'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['ar', 'en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'ar': return AppLocalizationsAr();
-    case 'en': return AppLocalizationsEn();
+    case 'ar':
+      return AppLocalizationsAr();
+    case 'en':
+      return AppLocalizationsEn();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

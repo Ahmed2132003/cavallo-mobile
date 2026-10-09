@@ -306,8 +306,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: RouteNames.splashPath,
     debugLogDiagnostics: true,
     refreshListenable: refreshListenable,
-    errorBuilder: (BuildContext context, GoRouterState state) =>
-        const RouteErrorScreen(),
+    errorBuilder:
+        (BuildContext context, GoRouterState state) => const RouteErrorScreen(),
     redirect: (BuildContext context, GoRouterState state) {
       // Snapshot read — NOT ref.watch. See the provider-level doc above
       // for why watching here would silently reintroduce the exact bug

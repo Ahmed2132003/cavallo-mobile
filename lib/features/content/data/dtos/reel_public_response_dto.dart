@@ -46,12 +46,14 @@ class ReelPublicResponseDto {
       sharesCount: (json['shares_count'] as int?) ?? 0,
       isLiked: (json['is_liked'] as bool?) ?? false,
       isSaved: (json['is_saved'] as bool?) ?? false,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
+      createdAt:
+          json['created_at'] == null
+              ? null
+              : DateTime.parse(json['created_at'] as String),
+      updatedAt:
+          json['updated_at'] == null
+              ? null
+              : DateTime.parse(json['updated_at'] as String),
       // Part P-110: the owning business's Featured state (backend join).
       isFeatured: (json['is_featured'] as bool?) ?? false,
     );

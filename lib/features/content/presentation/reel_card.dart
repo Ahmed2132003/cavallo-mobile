@@ -111,9 +111,7 @@ class ReelCard extends StatelessWidget {
                           reel.caption,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: text.bodyMedium?.copyWith(
-                            color: _reelOnMedia,
-                          ),
+                          style: text.bodyMedium?.copyWith(color: _reelOnMedia),
                         ),
                       ),
                   ],

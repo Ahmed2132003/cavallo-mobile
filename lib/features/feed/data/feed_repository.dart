@@ -56,21 +56,23 @@ class FeedRepositoryImpl implements FeedRepository {
     final data = response.data!;
     final rawItems = data['items'] as List<dynamic>;
 
-    final items = rawItems.map((raw) {
-      final json = raw as Map<String, dynamic>;
-      final contentType = json['content_type'] as String;
-      return switch (contentType) {
-        'post' => PostFeedItem(
-          PostPublicResponseDto.fromJson(json).toEntity(),
-        ),
-        'reel' => ReelFeedItem(
-          ReelPublicResponseDto.fromJson(json).toEntity(),
-        ),
-        _ => throw FormatException(
-          'Unknown feed content_type: "$contentType"',
-        ),
-      };
-    }).toList();
+    final items =
+        rawItems.map((raw) {
+          final json = raw as Map<String, dynamic>;
+          final contentType = json['content_type'] as String;
+          return switch (contentType) {
+            'post' => PostFeedItem(
+              PostPublicResponseDto.fromJson(json).toEntity(),
+            ),
+            'reel' => ReelFeedItem(
+              ReelPublicResponseDto.fromJson(json).toEntity(),
+            ),
+            _ =>
+              throw FormatException(
+                'Unknown feed content_type: "$contentType"',
+              ),
+          };
+        }).toList();
 
     return FeedPage(items: items, nextCursor: data['next_cursor'] as String?);
   }
