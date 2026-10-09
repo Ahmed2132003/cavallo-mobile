@@ -5,20 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_failure.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../domain/queue_item_entity.dart';
 import 'moderation_provider.dart';
 import 'moderation_widgets.dart';
 
-/// Part P-040 scope: the moderator's item review screen — a larger view
+/// Part P-040 scope: the moderator's item review screen - a larger view
 /// of one queue item with an Approve action and a Reject action that
 /// requires a written reason.
 ///
 /// ### How the screen is given its item, and how it leaves
 ///
 /// The [QueueItem] is passed in (the queue screen already holds the full
-/// object), not looked up by id — the same "no lookup, the caller has it"
+/// object), not looked up by id - the same "no lookup, the caller has it"
 /// reasoning as `ProductFormScreen.existingProduct`. What the screen shows
 /// is therefore the snapshot from the last queue load, which is also why
 /// the age is captioned as such.
@@ -27,27 +28,33 @@ import 'moderation_widgets.dart';
 /// dependency: it leaves with a plain `Navigator.pop`, so it can be tested
 /// inside a bare `MaterialApp` and the router (a later step) only decides
 /// how it is reached. The pop result says what happened:
-///   * `true`  — this moderator approved or rejected the item.
-///   * `false` — the item turned out to be no longer pending (already
+///   * `true`  - this moderator approved or rejected the item.
+///   * `false` - the item turned out to be no longer pending (already
 ///     decided by another moderator, or deleted), so it was dropped from
 ///     the queue and there is nothing left to review.
-///   * `null`  — the moderator backed out without deciding.
+///   * `null`  - the moderator backed out without deciding.
 ///
 /// ### Approve and Reject
 ///
 /// Both call `ModerationQueueNotifier`, which talks to the backend first
-/// and removes the item from the queue only after a confirmed success —
+/// and removes the item from the queue only after a confirmed success -
 /// so a failure here never makes an item disappear. Approve has no
 /// confirmation dialog on purpose: it is the fast path for a moderator
 /// clearing many items, and the outcome is confirmed by a snackbar.
 ///
 /// Reject opens a dialog ([_RejectReasonDialog]) whose confirm button
-/// stays disabled until a non-blank reason is typed — the same rule the
+/// stays disabled until a non-blank reason is typed - the same rule the
 /// backend enforces (`reason` must not be blank), applied up front so the
 /// moderator gets instant feedback instead of a round trip to learn it.
 /// The reject request itself runs INSIDE the dialog, so a failure (network
 /// drop, 403) is shown next to the reason field and the typed reason is
 /// still there to resend, instead of being lost with a closed dialog.
+///
+/// Part P-115 (STEP 7B) restyle, presentation only: the details card is the
+/// same hairline token surface as the queue rows, Reject is the destructive
+/// action in the danger colour (its dialog is the confirmation, and the
+/// confirm button is the shared danger button), paddings are directional.
+/// No provider call, text, key, pop result or rule changed.
 class ModerationReviewScreen extends ConsumerStatefulWidget {
   const ModerationReviewScreen({super.key, required this.item});
 
@@ -73,9 +80,7 @@ class _ModerationReviewScreenState
     setState(() => _approving = true);
 
     try {
-      await ref
-          .read(moderationQueueProvider.notifier)
-          .approve(widget.item.id);
+      await ref.read(moderationQueueProvider.notifier).approve(widget.item.id);
     } catch (error) {
       if (!mounted) {
         return;
@@ -141,6 +146,7 @@ class _ModerationReviewScreenState
 
     final item = widget.item;
     final theme = Theme.of(context);
+    final colors = context.appColors;
     final previewText = item.previewText;
     final hasPreviewText = previewText != null && previewText.isNotEmpty;
     final submitter = item.submitterBusinessName;
@@ -164,18 +170,29 @@ class _ModerationReviewScreenState
             ),
             const SizedBox(height: 16),
           ],
-          Text('Preview', style: theme.textTheme.labelLarge),
+          Text(
+            'Preview',
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: colors.textSecondary,
+            ),
+          ),
           const SizedBox(height: 4),
           Text(
             hasPreviewText ? previewText : 'No preview available',
             key: const ValueKey('review-preview-text'),
             style: theme.textTheme.bodyLarge?.copyWith(
+              color: hasPreviewText ? colors.textPrimary : colors.textSecondary,
               fontStyle: hasPreviewText ? null : FontStyle.italic,
             ),
           ),
           const SizedBox(height: 16),
-          Card(
-            margin: EdgeInsets.zero,
+          Material(
+            key: const ValueKey('review-details-card'),
+            color: colors.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: colors.outline),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -202,7 +219,9 @@ class _ModerationReviewScreenState
                   const SizedBox(height: 4),
                   Text(
                     'Waiting time is as of the last queue refresh.',
-                    style: theme.textTheme.bodySmall,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -212,7 +231,7 @@ class _ModerationReviewScreenState
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+          padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 12),
           child: Row(
             children: [
               Expanded(
@@ -220,7 +239,8 @@ class _ModerationReviewScreenState
                   key: const ValueKey('review-reject-button'),
                   onPressed: _approving ? null : _reject,
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: theme.colorScheme.error,
+                    foregroundColor: colors.dangerText,
+                    side: BorderSide(color: colors.dangerText),
                   ),
                   child: const Text('Reject'),
                 ),
@@ -256,7 +276,12 @@ class _DetailRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 110,
-            child: Text(label, style: Theme.of(context).textTheme.bodySmall),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: context.appColors.textSecondary,
+              ),
+            ),
           ),
           Flexible(child: child),
         ],
@@ -275,7 +300,7 @@ const String _alreadyHandled =
     'It has been removed from your queue.';
 
 /// 409 = already decided, 404 = the row no longer exists (see
-/// `ModerationRepository`'s docstring — neither has a dedicated
+/// `ModerationRepository`'s docstring - neither has a dedicated
 /// `ApiFailure` subtype, so the status code is read from the response).
 /// Same rule `ModerationQueueNotifier` uses to drop the item from the
 /// queue.
@@ -306,7 +331,7 @@ String _actionErrorMessage(Object error, {required String fallback}) {
 
 /// The reject dialog: a required reason field plus a confirm button that
 /// stays disabled until the reason has real content. It owns its text
-/// controller and runs the reject request itself — see
+/// controller and runs the reject request itself - see
 /// [ModerationReviewScreen]'s docstring for why.
 class _RejectReasonDialog extends ConsumerStatefulWidget {
   const _RejectReasonDialog({required this.item});
@@ -388,6 +413,7 @@ class _RejectReasonDialogState extends ConsumerState<_RejectReasonDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = context.appColors;
     final showRequired = _touched && !_hasReason;
 
     return AlertDialog(
@@ -398,7 +424,9 @@ class _RejectReasonDialogState extends ConsumerState<_RejectReasonDialog> {
         children: [
           Text(
             'The business will see this reason.',
-            style: theme.textTheme.bodySmall,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.textSecondary,
+            ),
           ),
           const SizedBox(height: 12),
           AppTextField(
@@ -414,7 +442,7 @@ class _RejectReasonDialogState extends ConsumerState<_RejectReasonDialog> {
               'A reason is required.',
               key: const ValueKey('reject-reason-required'),
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.error,
+                color: colors.dangerText,
               ),
             ),
           ],
@@ -424,7 +452,7 @@ class _RejectReasonDialogState extends ConsumerState<_RejectReasonDialog> {
               _error!,
               key: const ValueKey('reject-error'),
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.error,
+                color: colors.dangerText,
               ),
             ),
           ],
@@ -439,6 +467,7 @@ class _RejectReasonDialogState extends ConsumerState<_RejectReasonDialog> {
         AppButton(
           key: const ValueKey('reject-confirm-button'),
           label: 'Reject',
+          variant: AppButtonVariant.danger,
           isLoading: _submitting,
           onPressed: _hasReason ? _submit : null,
         ),

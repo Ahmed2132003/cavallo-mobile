@@ -16,6 +16,10 @@ enum AppButtonVariant {
 
   /// Hairline outline, no fill: a secondary action such as "Message".
   outlined,
+
+  /// Filled with the danger colour: a destructive action such as "Reject"
+  /// (Part P-115 STEP 7B).
+  danger,
 }
 
 /// The one button of the app (Part P-006, extended by P-114 STEP 3).
@@ -51,10 +55,11 @@ class AppButton extends StatelessWidget {
               width: 18,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color:
-                    variant == AppButtonVariant.filled
-                        ? colors.brandText
-                        : colors.textPrimary,
+                color: switch (variant) {
+                  AppButtonVariant.filled => colors.brandText,
+                  AppButtonVariant.danger => colors.onDanger,
+                  _ => colors.textPrimary,
+                },
               ),
             )
             : Text(label);
@@ -68,6 +73,15 @@ class AppButton extends StatelessWidget {
           style: FilledButton.styleFrom(
             backgroundColor: colors.surfaceVariant,
             foregroundColor: colors.textPrimary,
+          ),
+          child: child,
+        );
+      case AppButtonVariant.danger:
+        return FilledButton(
+          onPressed: handler,
+          style: FilledButton.styleFrom(
+            backgroundColor: colors.danger,
+            foregroundColor: colors.onDanger,
           ),
           child: child,
         );

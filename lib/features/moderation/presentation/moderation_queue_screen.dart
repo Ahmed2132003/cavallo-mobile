@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_failure.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
@@ -11,25 +12,30 @@ import 'moderation_provider.dart';
 import 'moderation_widgets.dart';
 
 /// Part P-040 scope: the moderator's queue list. A dense, scannable list
-/// rather than a decorative one — a moderator clearing many items quickly
+/// rather than a decorative one - a moderator clearing many items quickly
 /// benefits more from information density than from polish (per the
 /// part's own design note).
 ///
 /// Each row shows: a preview thumbnail, the preview text, the content
 /// type (and submitting business when the backend knows it), a priority
 /// badge (`fast_path` visually distinct) and an age chip that escalates
-/// green → amber → red against the same per-priority SLA the backend's
+/// green -> amber -> red against the same per-priority SLA the backend's
 /// P-039 job tracks (see `ModerationSla`). Order comes from
 /// `moderationQueueProvider` (fast_path first, then oldest first).
 ///
 /// Navigation is injected ([onOpenItem]) rather than hard-wired to
-/// `GoRouter`, exactly like `ProductListScreen.onEditProduct` — the
+/// `GoRouter`, exactly like `ProductListScreen.onEditProduct` - the
 /// router (a later step) supplies the real navigation, and this screen
 /// stays testable with a plain `MaterialApp`.
 ///
 /// State handling: while a refresh is in flight the previous list stays
 /// on screen (the notifier refreshes through `invalidateSelf`), so
 /// pull-to-refresh never blanks the queue.
+///
+/// Part P-115 (STEP 7A) restyle, presentation only: rows use the same
+/// hairline surface as the Business Console rows, colours come from the
+/// AppColors tokens, paddings are directional, and the row chevron mirrors
+/// in RTL. No provider, text, key or callback changed.
 class ModerationQueueScreen extends ConsumerWidget {
   const ModerationQueueScreen({super.key, required this.onOpenItem});
 
@@ -48,8 +54,8 @@ class ModerationQueueScreen extends ConsumerWidget {
           IconButton(
             tooltip: 'Refresh',
             icon: const Icon(Icons.refresh),
-            onPressed: () =>
-                ref.read(moderationQueueProvider.notifier).refresh(),
+            onPressed:
+                () => ref.read(moderationQueueProvider.notifier).refresh(),
           ),
         ],
       ),
@@ -63,7 +69,7 @@ class ModerationQueueScreen extends ConsumerWidget {
     List<QueueItem>? items,
   ) {
     // A failure wins over any stale list, so a moderator is never
-    // looking at data that a failed refresh could not confirm — but only
+    // looking at data that a failed refresh could not confirm - but only
     // once the retry has finished; while it runs, fall through to the
     // loading indicator so pressing Retry visibly does something.
     if (queueAsync.hasError && !queueAsync.isLoading) {
@@ -89,7 +95,7 @@ class ModerationQueueScreen extends ConsumerWidget {
 /// dedicated message because it has a specific, actionable cause in this
 /// project: the app gates the route on the `is_moderator`/`is_staff`
 /// flags, but the API requires the `can_moderate_content` permission,
-/// which comes from Group membership — an account with the flag but not
+/// which comes from Group membership - an account with the flag but not
 /// the Group lands here (see the P-040 gap note in PROJECT_PROGRESS.md).
 String _loadErrorMessage(Object? error) {
   return switch (error) {
@@ -114,13 +120,13 @@ class _QueueListView extends ConsumerWidget {
         _SummaryBar(items: items),
         Expanded(
           child: RefreshIndicator(
-            onRefresh: () =>
-                ref.read(moderationQueueProvider.notifier).refresh(),
+            onRefresh:
+                () => ref.read(moderationQueueProvider.notifier).refresh(),
             child: ListView.separated(
               // Always scrollable so pull-to-refresh works even when the
               // list is shorter than the screen.
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+              padding: const EdgeInsetsDirectional.fromSTEB(12, 4, 12, 12),
               itemCount: items.length,
               separatorBuilder: (context, index) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
@@ -143,18 +149,22 @@ class _SummaryBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fastPathCount = items.where((item) => item.isFastPath).length;
-    final text = fastPathCount == 0
-        ? '${items.length} pending'
-        : '${items.length} pending · $fastPathCount fast path';
+    final text =
+        fastPathCount == 0
+            ? '${items.length} pending'
+            : '${items.length} pending \u00B7 $fastPathCount fast path';
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 8),
       child: Align(
         alignment: AlignmentDirectional.centerStart,
         child: Text(
           text,
           key: const ValueKey('queue-summary'),
-          style: Theme.of(context).textTheme.titleSmall,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+            color: context.appColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -169,16 +179,24 @@ class _QueueRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final textTheme = Theme.of(context).textTheme;
     final previewText = item.previewText;
+    final hasPreview = previewText != null && previewText.isNotEmpty;
+    final String shownText = hasPreview ? previewText : 'No preview available';
     final submitter = item.submitterBusinessName;
-    final typeLine = submitter == null
-        ? contentTypeLabel(item.contentType)
-        : '${contentTypeLabel(item.contentType)} · $submitter';
+    final typeLine =
+        submitter == null
+            ? contentTypeLabel(item.contentType)
+            : '${contentTypeLabel(item.contentType)} \u00B7 $submitter';
 
-    return Card(
+    return Material(
       key: ValueKey('queue-row-${item.id}'),
-      margin: EdgeInsets.zero,
+      color: colors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: colors.outline),
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
@@ -194,19 +212,25 @@ class _QueueRow extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      previewText == null || previewText.isEmpty
-                          ? 'No preview available'
-                          : previewText,
+                      shownText,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: textTheme.bodyMedium?.copyWith(
-                        fontStyle: previewText == null || previewText.isEmpty
-                            ? FontStyle.italic
-                            : null,
+                        color:
+                            hasPreview
+                                ? colors.textPrimary
+                                : colors.textSecondary,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: hasPreview ? null : FontStyle.italic,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(typeLine, style: textTheme.bodySmall),
+                    Text(
+                      typeLine,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colors.textSecondary,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -222,7 +246,8 @@ class _QueueRow extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right),
+              // Icons.chevron_right has matchTextDirection, so it mirrors in RTL.
+              Icon(Icons.chevron_right, color: colors.textSecondary),
             ],
           ),
         ),
