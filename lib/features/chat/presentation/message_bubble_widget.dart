@@ -3,27 +3,28 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/l10n_context.dart';
 import '../domain/message.dart';
 import '../domain/message_status.dart';
 import '../domain/shared_content.dart';
 import 'outbound_message_queue_provider.dart';
 import 'shared_content_card.dart';
 
-/// Part P-074 STEP 3 — renders a single message bubble inside the
+/// Part P-074 STEP 3 â€” renders a single message bubble inside the
 /// message thread screen (kept as `chat_thread_screen.dart`'s
-/// `ChatThreadScreen`, not renamed — see that file's own doc comment
+/// `ChatThreadScreen`, not renamed â€” see that file's own doc comment
 /// for why no new screen file/class was created for P-007's existing
 /// placeholders).
 ///
 /// [isMine] is supplied by the caller, not computed here: in a 1:1
 /// conversation, `message.senderId != conversation.otherParticipant.id`
 /// is enough to know "this is my own message" without this app ever
-/// needing to know its own signed-in user id — see
+/// needing to know its own signed-in user id â€” see
 /// `chat_thread_screen.dart`'s own doc comment for why that's a
 /// deliberate design choice, not an oversight.
 ///
 /// Part P-075 STEP 3: this file now also holds
-/// [OutboundMessageBubbleWidget] — the bubble for a message that is
+/// [OutboundMessageBubbleWidget] â€” the bubble for a message that is
 /// still in the local outbound queue (sending / retrying / failed).
 /// Both widgets share one private layout ([_BubbleShell]) so a pending
 /// bubble looks like a real one. [MessageBubbleWidget]'s own API is
@@ -31,7 +32,7 @@ import 'shared_content_card.dart';
 ///
 /// Part P-076: both bubbles can now show media above the text. An image
 /// renders as a thumbnail; a video renders as a neutral placeholder with
-/// a play icon (same visual language as `ReelCard`'s play overlay — the
+/// a play icon (same visual language as `ReelCard`'s play overlay â€” the
 /// backend produces no thumbnail for chat video and this project has no
 /// video-playback package, so there is no inline playback). A
 /// media-only message simply shows no text.
@@ -96,7 +97,7 @@ Widget _deliveredFooter(Message message, bool isMine, Color textColor) {
   );
 }
 
-/// Part P-077 STEP 3 — a delivered message that shares Post / Reel /
+/// Part P-077 STEP 3 â€” a delivered message that shares Post / Reel /
 /// Product content: the card on top, then a normal text bubble (text,
 /// if any, plus the footer) aligned to the same side.
 class _SharedContentBubble extends StatelessWidget {
@@ -139,14 +140,14 @@ class _SharedContentBubble extends StatelessWidget {
   }
 }
 
-/// Part P-075 STEP 3 — the bubble for a locally-queued outbound message
+/// Part P-075 STEP 3 â€” the bubble for a locally-queued outbound message
 /// ([OutboundMessage]). Always rendered as the sender's own bubble.
 ///
 /// - [OutboundMessageStatus.sending]: clock icon.
-/// - [OutboundMessageStatus.retrying]: clock icon + "Retrying…".
+/// - [OutboundMessageStatus.retrying]: clock icon + "Retryingâ€¦".
 /// - [OutboundMessageStatus.failed]: error-colored bubble with
-///   "Failed to send · Tap to retry"; tapping ANYWHERE on the bubble
-///   calls [onRetry], and the small × calls [onDiscard].
+///   "Failed to send Â· Tap to retry"; tapping ANYWHERE on the bubble
+///   calls [onRetry], and the small Ã— calls [onDiscard].
 ///
 /// Part P-076: a queued media message shows its local file as the
 /// thumbnail (video: placeholder + play icon) with the same three states.
@@ -190,7 +191,7 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
                   const SizedBox(width: 4),
                   Flexible(
                     child: Text(
-                      'Failed to send · Tap to retry',
+                      context.l10n.chatBubbleFailedTapRetry,
                       style: TextStyle(
                         color: textColor,
                         fontSize: 11,
@@ -241,7 +242,7 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
             if (isRetrying) ...[
               const SizedBox(width: 4),
               Text(
-                'Retrying…',
+                context.l10n.chatBubbleRetrying,
                 style: TextStyle(
                   color: textColor.withValues(alpha: 0.7),
                   fontSize: 11,
@@ -355,7 +356,7 @@ class _BubbleShell extends StatelessWidget {
   }
 }
 
-/// Part P-076 — the image thumbnail / video placeholder shown inside a
+/// Part P-076 â€” the image thumbnail / video placeholder shown inside a
 /// bubble. Exactly one of [networkUrl] (a delivered message) or
 /// [localPath] (a still-queued message) is normally set.
 ///
@@ -365,7 +366,7 @@ class _BubbleShell extends StatelessWidget {
 /// - video: a neutral placeholder plus a play icon (the `ReelCard`
 ///   overlay look). No thumbnail exists for chat video and there is no
 ///   video-playback package in this project, so it is not playable
-///   inline — flagged limitation, not silently omitted.
+///   inline â€” flagged limitation, not silently omitted.
 ///
 /// The root carries `ValueKey('chatMedia_image')` / `'chatMedia_video'`
 /// so widget tests can find it.
@@ -425,7 +426,7 @@ class _MediaPreview extends StatelessWidget {
   }
 }
 
-/// Same look as `ReelCard`'s private `_PlayIconOverlay` — deliberately
+/// Same look as `ReelCard`'s private `_PlayIconOverlay` â€” deliberately
 /// duplicated (that widget is private to `reel_card.dart`, and this
 /// project's own convention for such small visuals is duplication over
 /// cross-feature coupling; see that file's own comment).
@@ -450,7 +451,7 @@ class _PlayIconOverlay extends StatelessWidget {
 /// Sent -> single check. Delivered -> double check. Read -> double
 /// check, tinted with the theme's own tertiary color rather than a
 /// hardcoded blue (this file has no knowledge of the app's palette).
-/// [MessageStatus.unknown] falls back to a single check — same
+/// [MessageStatus.unknown] falls back to a single check â€” same
 /// never-block-rendering-on-an-unrecognized-value rationale as
 /// `MessageStatus.unknown` itself.
 class _StatusIcon extends StatelessWidget {

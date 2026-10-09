@@ -2704,6 +2704,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter a valid price (e.g. 199.99).'**
   String get validationPriceInvalid;
+
+  /// Chat thread app bar title when the other participant is unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get chatThreadFallbackTitle;
+
+  /// Chat thread subtitle: this device's live connection is up.
+  ///
+  /// In en, this message translates to:
+  /// **'Online'**
+  String get chatConnectionOnline;
+
+  /// Chat thread subtitle: connecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting…'**
+  String get chatConnectionConnecting;
+
+  /// Chat thread subtitle: connection lost, retrying.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting…'**
+  String get chatConnectionReconnecting;
+
+  /// Chat thread subtitle: no live connection.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get chatConnectionOffline;
+
+  /// Chat thread subtitle while the other person is typing.
+  ///
+  /// In en, this message translates to:
+  /// **'typing…'**
+  String get chatThreadTyping;
+
+  /// Empty chat thread message.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet — say hi!'**
+  String get chatThreadEmpty;
+
+  /// Hint text of the chat message input.
+  ///
+  /// In en, this message translates to:
+  /// **'Message…'**
+  String get chatComposerHint;
+
+  /// Attach sheet option: pick a photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get chatAttachPhoto;
+
+  /// Attach sheet option: pick a video.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get chatAttachVideo;
+
+  /// Snackbar when the chosen photo exceeds the size cap.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo is too large (max {maxMb} MB).'**
+  String chatPhotoTooLarge(int maxMb);
+
+  /// Snackbar when the chosen video exceeds the size cap.
+  ///
+  /// In en, this message translates to:
+  /// **'Video is too large (max {maxMb} MB).'**
+  String chatVideoTooLarge(int maxMb);
+
+  /// Outgoing bubble footer while the queue retries.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrying…'**
+  String get chatBubbleRetrying;
+
+  /// Outgoing bubble footer when sending failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send · Tap to retry'**
+  String get chatBubbleFailedTapRetry;
+
+  /// Share options sheet: system share sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Share via…'**
+  String get chatShareVia;
+
+  /// Share options sheet entry and picker title.
+  ///
+  /// In en, this message translates to:
+  /// **'Share to conversation'**
+  String get chatShareToConversation;
+
+  /// Share picker empty state.
+  ///
+  /// In en, this message translates to:
+  /// **'No conversations yet.\nStart one from the Messages tab first.'**
+  String get chatSharePickerEmpty;
+
+  /// Share picker load error.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your conversations.'**
+  String get chatSharePickerLoadError;
+
+  /// Snackbar when sharing to a conversation fails unexpectedly.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not share. Please try again.'**
+  String get chatShareFailed;
+
+  /// Label on a shared-content preview card.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get sharedContentTypePost;
+
+  /// Label on a shared-content preview card.
+  ///
+  /// In en, this message translates to:
+  /// **'Reel'**
+  String get sharedContentTypeReel;
+
+  /// Label on a shared-content preview card.
+  ///
+  /// In en, this message translates to:
+  /// **'Product'**
+  String get sharedContentTypeProduct;
+
+  /// Shared content was removed after sharing.
+  ///
+  /// In en, this message translates to:
+  /// **'This content is no longer available'**
+  String get sharedContentUnavailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

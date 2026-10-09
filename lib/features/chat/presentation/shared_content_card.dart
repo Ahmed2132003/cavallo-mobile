@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/l10n_context.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../routing/route_names.dart';
 import '../../content/domain/public_post_entity.dart';
 import '../../content/domain/public_reel_entity.dart';
@@ -10,7 +12,7 @@ import '../../content/presentation/post_card.dart';
 import '../../content/presentation/reel_card.dart';
 import '../domain/shared_content.dart';
 
-/// Part P-077 STEP 3 — renders the platform content a chat message
+/// Part P-077 STEP 3 â€” renders the platform content a chat message
 /// shares (Post / Reel / Product) as a tappable card.
 ///
 /// ### Reuse, zero modification elsewhere
@@ -93,14 +95,14 @@ class SharedContentCard extends ConsumerWidget {
   }
 }
 
-String _typeLabel(SharedContentType type) {
+String _typeLabel(AppLocalizations l10n, SharedContentType type) {
   switch (type) {
     case SharedContentType.post:
-      return 'Post';
+      return l10n.sharedContentTypePost;
     case SharedContentType.reel:
-      return 'Reel';
+      return l10n.sharedContentTypeReel;
     case SharedContentType.product:
-      return 'Product';
+      return l10n.sharedContentTypeProduct;
   }
 }
 
@@ -133,7 +135,7 @@ class _PreviewCard extends StatelessWidget {
     final title =
         (previewText != null && previewText.isNotEmpty)
             ? previewText
-            : _typeLabel(shared.type);
+            : _typeLabel(context.l10n, shared.type);
     final businessName = shared.businessName;
 
     return Card(
@@ -168,7 +170,7 @@ class _PreviewCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          _typeLabel(shared.type),
+                          _typeLabel(context.l10n, shared.type),
                           style: theme.textTheme.labelSmall,
                         ),
                       ],
@@ -254,7 +256,7 @@ class _UnavailableCard extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                'This content is no longer available',
+                context.l10n.sharedContentUnavailable,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

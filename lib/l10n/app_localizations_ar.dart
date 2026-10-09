@@ -1594,4 +1594,77 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get validationPriceInvalid => 'أدخل سعرًا صحيحًا (مثال: 199.99).';
+
+  @override
+  String get chatThreadFallbackTitle => 'محادثة';
+
+  @override
+  String get chatConnectionOnline => 'متصل';
+
+  @override
+  String get chatConnectionConnecting => 'جارٍ الاتصال…';
+
+  @override
+  String get chatConnectionReconnecting => 'جارٍ إعادة الاتصال…';
+
+  @override
+  String get chatConnectionOffline => 'غير متصل';
+
+  @override
+  String get chatThreadTyping => 'يكتب…';
+
+  @override
+  String get chatThreadEmpty => 'لا توجد رسائل بعد — ابدأ بالتحية!';
+
+  @override
+  String get chatComposerHint => 'اكتب رسالة…';
+
+  @override
+  String get chatAttachPhoto => 'صورة';
+
+  @override
+  String get chatAttachVideo => 'فيديو';
+
+  @override
+  String chatPhotoTooLarge(int maxMb) {
+    return 'الصورة كبيرة جدًا (الحد الأقصى $maxMb ميغابايت).';
+  }
+
+  @override
+  String chatVideoTooLarge(int maxMb) {
+    return 'الفيديو كبير جدًا (الحد الأقصى $maxMb ميغابايت).';
+  }
+
+  @override
+  String get chatBubbleRetrying => 'جارٍ إعادة المحاولة…';
+
+  @override
+  String get chatBubbleFailedTapRetry => 'تعذّر الإرسال · اضغط لإعادة المحاولة';
+
+  @override
+  String get chatShareVia => 'مشاركة عبر…';
+
+  @override
+  String get chatShareToConversation => 'المشاركة في محادثة';
+
+  @override
+  String get chatSharePickerEmpty => 'لا توجد محادثات بعد.\nابدأ محادثة من تبويب الرسائل أولًا.';
+
+  @override
+  String get chatSharePickerLoadError => 'تعذّر تحميل محادثاتك.';
+
+  @override
+  String get chatShareFailed => 'تعذّرت المشاركة. حاول مرة أخرى.';
+
+  @override
+  String get sharedContentTypePost => 'منشور';
+
+  @override
+  String get sharedContentTypeReel => 'ريل';
+
+  @override
+  String get sharedContentTypeProduct => 'منتج';
+
+  @override
+  String get sharedContentUnavailable => 'هذا المحتوى لم يعد متاحًا';
 }

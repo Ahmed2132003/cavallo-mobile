@@ -1,0 +1,116 @@
+00:00 +0: loading D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart
+00:00 +0: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: listConversations parses a page of conversations, including a null last_message
+00:00 +1: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: listConversations falls back to MessageStatus.unknown for an unrecognized status string rather than throwing
+00:00 +2: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: listConversations defensive fallback: a null other_participant does not crash the parse
+00:00 +3: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: listConversations fetches the next page via the opaque cursor URL verbatim
+00:00 +4: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: listConversations a 403 surfaces as AuthFailure, not a raw DioException
+00:00 +5: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: listConversations a 500 surfaces as ServerFailure
+00:00 +6: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: startConversation returns only the id from the plain ConversationSerializer shape
+00:00 +7: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: startConversation returns the id of an existing conversation too (200, not just 201)
+00:00 +8: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: startConversation a 400 (e.g. self-conversation) surfaces as ValidationFailure
+00:00 +9: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: fetchMessageHistory parses a paginated page of messages without reversing it
+00:00 +10: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: fetchMessageHistory fetches the next page via the opaque cursor URL verbatim
+00:00 +11: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: fetchMessageHistory a 404 for an unknown conversation surfaces as UnknownFailure
+00:00 +12: D:/Cavallo/social_commerce_app/test/features/chat/data/conversation_repository_test.dart: fetchMessageHistory a 403 for a non-participant surfaces as AuthFailure
+00:01 +13: D:/Cavallo/social_commerce_app/test/features/chat/data/message_media_repository_test.dart: sendMediaMessage POSTs multipart with the media file and caption, parses media
+00:01 +14: D:/Cavallo/social_commerce_app/test/features/chat/data/message_media_repository_test.dart: sendMediaMessage a media-only message sends NO text field
+00:01 +15: D:/Cavallo/social_commerce_app/test/features/chat/data/message_media_repository_test.dart: parsing media fields Message.fromJson parses a video message
+00:01 +16: D:/Cavallo/social_commerce_app/test/features/chat/data/message_media_repository_test.dart: parsing media fields Message.fromJson: text-only message has no media
+00:01 +17: D:/Cavallo/social_commerce_app/test/features/chat/data/message_media_repository_test.dart: parsing media fields Message.fromJson still parses a legacy payload with no media keys
+00:01 +18: D:/Cavallo/social_commerce_app/test/features/chat/data/message_media_repository_test.dart: parsing media fields copyWithStatus keeps the media fields
+00:01 +19: D:/Cavallo/social_commerce_app/test/features/chat/data/message_media_repository_test.dart: parsing media fields ChatEvent.fromJson: a media chat_message frame carries media
+00:01 +20: D:/Cavallo/social_commerce_app/test/features/chat/data/message_media_repository_test.dart: parsing media fields ChatEvent.fromJson: a text-only frame has null media
+00:01 +21: D:/Cavallo/social_commerce_app/test/features/chat/data/message_media_repository_test.dart: parsing media fields LastMessagePreview.previewText: text wins, else Photo/Video label
+00:02 +22: D:/Cavallo/social_commerce_app/test/features/chat/data/message_repository_test.dart: sendMessage POSTs {text} and parses the persisted Message, status "sent"
+00:02 +23: D:/Cavallo/social_commerce_app/test/features/chat/data/message_repository_test.dart: sendMessage a 403 (not a participant) surfaces as AuthFailure
+00:02 +24: D:/Cavallo/social_commerce_app/test/features/chat/data/message_repository_test.dart: sendMessage a 404 for an unknown conversation surfaces as UnknownFailure
+00:02 +25: D:/Cavallo/social_commerce_app/test/features/chat/data/message_repository_test.dart: fetchMessagesSince parses a plain JSON array (not a paginated envelope)
+00:02 +26: D:/Cavallo/social_commerce_app/test/features/chat/data/message_repository_test.dart: fetchMessagesSince an empty result set parses to an empty list, not an error
+00:02 +27: D:/Cavallo/social_commerce_app/test/features/chat/data/message_repository_test.dart: fetchMessagesSince a 400 (missing/non-integer since, surfaced by the backend) maps to ValidationFailure
+00:03 +28: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: SharedContentType fromRaw maps the three whitelisted strings, else null
+00:03 +29: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: sendSharedContentMessage POSTs JSON with type + id and NO text when text is empty
+00:03 +30: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: sendSharedContentMessage includes text alongside the shared reference when given
+00:03 +31: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: parsing shared_content Message.fromJson parses an available shared post with preview
+00:03 +32: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: parsing shared_content Message.fromJson parses an UNAVAILABLE shared reel (all null)
+00:03 +33: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: parsing shared_content Message.fromJson: explicit null and missing key both mean none
+00:03 +34: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: parsing shared_content an unknown content_type is treated as nothing shared
+00:03 +35: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: parsing shared_content copyWithStatus keeps sharedContent
+00:03 +36: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: parsing shared_content ChatEvent.fromJson: a shared frame carries the raw map
+00:03 +37: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: parsing shared_content ChatEvent.fromJson: a text-only frame has null sharedContent
+00:03 +38: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: parsing shared_content LastMessagePreview.previewText: text wins, else shared label
+00:03 +39: D:/Cavallo/social_commerce_app/test/features/chat/data/shared_content_data_test.dart: parsing shared_content LastMessagePreview: legacy payload without the key still parses
+00:04 +40: D:/Cavallo/social_commerce_app/test/features/chat/data/start_conversation_with_business_test.dart: POSTs business_id, then returns the matching real Conversation
+00:05 +41: D:/Cavallo/social_commerce_app/test/features/chat/data/start_conversation_with_business_test.dart: returns null when the started conversation is not in the list
+00:05 +42: D:/Cavallo/social_commerce_app/test/features/chat/data/start_conversation_with_business_test.dart: a 400 surfaces as ValidationFailure and the list is never fetched
+00:06 +43: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_list_screen_test.dart: ChatListScreen — loading shows a loading indicator before the first page resolves
+00:09 +44: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_list_screen_test.dart: ChatListScreen — loading shows a loading indicator before the first page resolves
+00:09 +45: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_list_screen_test.dart: ChatListScreen — loading shows a loading indicator before the first page resolves
+00:09 +46: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_list_screen_test.dart: ChatListScreen — loading shows a loading indicator before the first page resolves
+00:09 +47: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_list_screen_test.dart: ChatListScreen — loading shows a loading indicator before the first page resolves
+00:10 +48: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:10 +49: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:11 +50: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:11 +51: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:11 +52: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:11 +53: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:11 +54: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:11 +55: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:11 +56: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:11 +57: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:11 +58: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:12 +59: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:12 +60: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:12 +61: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:12 +62: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:12 +63: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:12 +64: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:12 +65: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:12 +66: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:12 +67: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:12 +68: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: optimistic send: pending bubble shows immediately, field clears, then becomes the confirmed message (no duplicate)
+00:13 +69: D:/Cavallo/social_commerce_app/test/features/chat/presentation/media_message_bubble_widget_test.dart: image message with a caption renders the image and the caption
+00:13 +70: D:/Cavallo/social_commerce_app/test/features/chat/presentation/media_message_bubble_widget_test.dart: image message with a caption renders the image and the caption
+00:13 +71: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: network failures: retries automatically, ends in "Failed to send · Tap to retry" after 5 attempts, then tap-to-retry succeeds
+00:13 +72: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: network failures: retries automatically, ends in "Failed to send · Tap to retry" after 5 attempts, then tap-to-retry succeeds
+00:13 +73: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: network failures: retries automatically, ends in "Failed to send · Tap to retry" after 5 attempts, then tap-to-retry succeeds
+00:13 +74: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:13 +75: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:13 +76: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:14 +77: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:14 +78: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:14 +79: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:14 +80: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:15 +81: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:15 +82: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:15 +83: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:15 +84: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:15 +85: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:15 +86: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:15 +87: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: sending: shows the text and a clock, no retry affordance
+00:15 +88: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_queue_provider_test.dart: unexpected non-ApiFailure exception — failed immediately with a generic message, never silently lost
+00:15 +89: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: retrying: shows the clock and "Retrying…"
+00:15 +90: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: retrying: shows the clock and "Retrying…"
+00:15 +91: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_queue_provider_test.dart: retryFailedMessage is a no-op for a message that is not failed
+00:15 +92: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_queue_provider_test.dart: retryFailedMessage is a no-op for a message that is not failed
+00:15 +93: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: failed: tapping the bubble calls onRetry only
+00:15 +94: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: failed: tapping the bubble calls onRetry only
+00:15 +95: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: failed: tapping the bubble calls onRetry only
+00:15 +96: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: failed: tapping the bubble calls onRetry only
+00:16 +97: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_queue_provider_test.dart: disposing the container while a retry is pending cancels it — no extra send, no crash
+00:16 +98: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: failed: tapping the × calls onDiscard and NOT onRetry
+00:16 +99: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: MessageBubbleWidget (regression): own sent message still shows a single tick and no clock
+00:16 +100: D:/Cavallo/social_commerce_app/test/features/chat/presentation/shared_content_bubble_widget_test.dart: shared Post renders the reused PostCard, the business name and the text
+00:18 +101: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: the sheet offers both options; "Share via" runs the native flow
+00:18 +102: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: the sheet offers both options; "Share via" runs the native flow
+00:18 +103: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: the sheet offers both options; "Share via" runs the native flow
+00:18 +104: D:/Cavallo/social_commerce_app/test/features/chat/presentation/shared_content_bubble_widget_test.dart: shared Post a failed fetch falls back to a tappable preview card
+00:18 +105: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:18 +106: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:19 +107: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:19 +108: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:19 +109: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:19 +110: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:19 +111: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: a failed send keeps the picker open and navigates nowhere
+00:19 +112: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: no conversations shows the empty state
+00:19 +113: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: ContentActionRow: the Share icon opens the options; sharing to a conversation sends the post and tracks the share
+00:20 +114: All tests passed!

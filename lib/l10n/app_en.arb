@@ -2005,5 +2005,107 @@
   "validationProductNameRequired": "Name is required.",
   "validationDescriptionRequired": "Description is required.",
   "validationPriceRequired": "Price is required.",
-  "validationPriceInvalid": "Enter a valid price (e.g. 199.99)."
+  "validationPriceInvalid": "Enter a valid price (e.g. 199.99).",
+  "chatThreadFallbackTitle": "Chat",
+  "@chatThreadFallbackTitle": {
+    "description": "Chat thread app bar title when the other participant is unknown."
+  },
+  "chatConnectionOnline": "Online",
+  "@chatConnectionOnline": {
+    "description": "Chat thread subtitle: this device's live connection is up."
+  },
+  "chatConnectionConnecting": "Connecting\u2026",
+  "@chatConnectionConnecting": {
+    "description": "Chat thread subtitle: connecting."
+  },
+  "chatConnectionReconnecting": "Reconnecting\u2026",
+  "@chatConnectionReconnecting": {
+    "description": "Chat thread subtitle: connection lost, retrying."
+  },
+  "chatConnectionOffline": "Offline",
+  "@chatConnectionOffline": {
+    "description": "Chat thread subtitle: no live connection."
+  },
+  "chatThreadTyping": "typing\u2026",
+  "@chatThreadTyping": {
+    "description": "Chat thread subtitle while the other person is typing."
+  },
+  "chatThreadEmpty": "No messages yet \u2014 say hi!",
+  "@chatThreadEmpty": {
+    "description": "Empty chat thread message."
+  },
+  "chatComposerHint": "Message\u2026",
+  "@chatComposerHint": {
+    "description": "Hint text of the chat message input."
+  },
+  "chatAttachPhoto": "Photo",
+  "@chatAttachPhoto": {
+    "description": "Attach sheet option: pick a photo."
+  },
+  "chatAttachVideo": "Video",
+  "@chatAttachVideo": {
+    "description": "Attach sheet option: pick a video."
+  },
+  "chatPhotoTooLarge": "Photo is too large (max {maxMb} MB).",
+  "@chatPhotoTooLarge": {
+    "description": "Snackbar when the chosen photo exceeds the size cap.",
+    "placeholders": {
+      "maxMb": {
+        "type": "int"
+      }
+    }
+  },
+  "chatVideoTooLarge": "Video is too large (max {maxMb} MB).",
+  "@chatVideoTooLarge": {
+    "description": "Snackbar when the chosen video exceeds the size cap.",
+    "placeholders": {
+      "maxMb": {
+        "type": "int"
+      }
+    }
+  },
+  "chatBubbleRetrying": "Retrying\u2026",
+  "@chatBubbleRetrying": {
+    "description": "Outgoing bubble footer while the queue retries."
+  },
+  "chatBubbleFailedTapRetry": "Failed to send \u00b7 Tap to retry",
+  "@chatBubbleFailedTapRetry": {
+    "description": "Outgoing bubble footer when sending failed."
+  },
+  "chatShareVia": "Share via\u2026",
+  "@chatShareVia": {
+    "description": "Share options sheet: system share sheet."
+  },
+  "chatShareToConversation": "Share to conversation",
+  "@chatShareToConversation": {
+    "description": "Share options sheet entry and picker title."
+  },
+  "chatSharePickerEmpty": "No conversations yet.\nStart one from the Messages tab first.",
+  "@chatSharePickerEmpty": {
+    "description": "Share picker empty state."
+  },
+  "chatSharePickerLoadError": "Could not load your conversations.",
+  "@chatSharePickerLoadError": {
+    "description": "Share picker load error."
+  },
+  "chatShareFailed": "Could not share. Please try again.",
+  "@chatShareFailed": {
+    "description": "Snackbar when sharing to a conversation fails unexpectedly."
+  },
+  "sharedContentTypePost": "Post",
+  "@sharedContentTypePost": {
+    "description": "Label on a shared-content preview card."
+  },
+  "sharedContentTypeReel": "Reel",
+  "@sharedContentTypeReel": {
+    "description": "Label on a shared-content preview card."
+  },
+  "sharedContentTypeProduct": "Product",
+  "@sharedContentTypeProduct": {
+    "description": "Label on a shared-content preview card."
+  },
+  "sharedContentUnavailable": "This content is no longer available",
+  "@sharedContentUnavailable": {
+    "description": "Shared content was removed after sharing."
+  }
 }

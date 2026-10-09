@@ -1,0 +1,58 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20261009163036
+Username: DESKTOP-N2TD0ON\HP
+RunAs User: DESKTOP-N2TD0ON\HP
+Configuration Name: 
+Machine: DESKTOP-N2TD0ON (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File .\p115_step9b_fix.ps1
+Process ID: 11796
+PSVersion: 5.1.26100.9444
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9444
+BuildVersion: 10.0.26100.9444
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+PLAN OK (8->7 files, 23 replacements)
+ARB keys already present: 16 | to add: 0
+PRE-CHECKS OK
+gen-l10n OK
+OK: lib\features\business_profile\presentation\business_onboarding_screen.dart
+OK: lib\features\business_profile\presentation\business_profile_edit_screen.dart
+OK: lib\features\content\presentation\post_detail_screen.dart
+OK: lib\features\content\presentation\reel_detail_screen.dart
+OK: lib\features\content\presentation\post_form_screen.dart
+OK: lib\features\content\presentation\reel_form_screen.dart
+flutter : 1 issue found. (ran in 3.7s)
+At D:\Cavallo\social_commerce_app\p115_step9b_fix.ps1:164 char:23
++     $a = Run-Native { flutter analyze --no-pub $rel }
++                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (1 issue found. (ran in 3.7s):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+OK: lib\features\products\presentation\product_form_screen.dart
+--- leftover literals (should be none) ---
+00:52 +400: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower count
+00:52 +401: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower count
+00:52 +402: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower count
+00:52 +403: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower count
+00:52 +404: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower count
+00:52 +405: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower count
+00:52 +406: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower count
+00:52 +407: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower count
+00:52 +408: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower count
+00:53 +409: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: tapping Follow shows Following and the higher count immediately, before any response
+00:53 +410: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: a failed Follow reverts the label and the count and shows an error
+00:53 +411: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: tapping Following unfollows and lowers the count
+00:53 +412: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: a second tap while a request is in flight is ignored
+00:53 +413: All tests passed!
+Replacements applied this run: 23
+flutter test exit code: 0
+Reverted files: 0
+Backup: C:\Users\HP\AppData\Local\Temp\p115_step9b_fix_20261009_163036
+**********************
+Windows PowerShell transcript end
+End time: 20261009163220
+**********************

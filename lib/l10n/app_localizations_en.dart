@@ -1534,4 +1534,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get validationPriceInvalid => 'Enter a valid price (e.g. 199.99).';
+
+  @override
+  String get chatThreadFallbackTitle => 'Chat';
+
+  @override
+  String get chatConnectionOnline => 'Online';
+
+  @override
+  String get chatConnectionConnecting => 'Connecting…';
+
+  @override
+  String get chatConnectionReconnecting => 'Reconnecting…';
+
+  @override
+  String get chatConnectionOffline => 'Offline';
+
+  @override
+  String get chatThreadTyping => 'typing…';
+
+  @override
+  String get chatThreadEmpty => 'No messages yet — say hi!';
+
+  @override
+  String get chatComposerHint => 'Message…';
+
+  @override
+  String get chatAttachPhoto => 'Photo';
+
+  @override
+  String get chatAttachVideo => 'Video';
+
+  @override
+  String chatPhotoTooLarge(int maxMb) {
+    return 'Photo is too large (max $maxMb MB).';
+  }
+
+  @override
+  String chatVideoTooLarge(int maxMb) {
+    return 'Video is too large (max $maxMb MB).';
+  }
+
+  @override
+  String get chatBubbleRetrying => 'Retrying…';
+
+  @override
+  String get chatBubbleFailedTapRetry => 'Failed to send · Tap to retry';
+
+  @override
+  String get chatShareVia => 'Share via…';
+
+  @override
+  String get chatShareToConversation => 'Share to conversation';
+
+  @override
+  String get chatSharePickerEmpty => 'No conversations yet.\nStart one from the Messages tab first.';
+
+  @override
+  String get chatSharePickerLoadError => 'Could not load your conversations.';
+
+  @override
+  String get chatShareFailed => 'Could not share. Please try again.';
+
+  @override
+  String get sharedContentTypePost => 'Post';
+
+  @override
+  String get sharedContentTypeReel => 'Reel';
+
+  @override
+  String get sharedContentTypeProduct => 'Product';
+
+  @override
+  String get sharedContentUnavailable => 'This content is no longer available';
 }

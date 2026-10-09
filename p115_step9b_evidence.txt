@@ -221,3 +221,69 @@ remote: Resolving deltas: 100% (107/107), completed with 100 local objects.
 To https://github.com/Ahmed2132003/cavallo-mobile.git
    86b1211..b4fd7d1  part-111 -> part-111
 PS D:\Cavallo\social_commerce_app> cls
+PS D:\Cavallo\social_commerce_app> git status -sb
+## part-111...origin/part-111
+ M p115_step9b_evidence.txt
+?? p115_step9b_fix.ps1
+PS D:\Cavallo\social_commerce_app> powershell -ExecutionPolicy Bypass -File .\p115_step9b_fix.ps1
+unt
+00:52 +404: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower co
+unt
+00:52 +405: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower co
+unt
+00:52 +406: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower co
+unt
+00:52 +407: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower co
+unt
+00:52 +408: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: starts as Follow with the real follower co
+unt
+00:53 +409: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: tapping Follow shows Following and the hig
+her count immediately, before any response
+00:53 +410: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: a failed Follow reverts the label and the
+count and shows an error
+00:53 +411: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: tapping Following unfollows and lowers the
+ count
+00:53 +412: D:/Cavallo/social_commerce_app/test/features/social/follow_button_test.dart: a second tap while a request is in flight
+is ignored
+00:53 +413: All tests passed!
+
+
+Replacements applied this run: 23
+flutter test exit code: 0
+Reverted files: 0
+Backup: C:\Users\HP\AppData\Local\Temp\p115_step9b_fix_20261009_163036
+PS D:\Cavallo\social_commerce_app> git add -u
+
+PS D:\Cavallo\social_commerce_app> git add p115_step9b_fix.ps1
+
+PS D:\Cavallo\social_commerce_app> git status -sb
+
+PS D:\Cavallo\social_commerce_app> git commit -m "P-115 Step 9B fix: apply 23 l10n replacements in 7 files (script alias bug)"
+
+PS D:\Cavallo\social_commerce_app> git push
+
+PS D:\Cavallo\social_commerce_app> cls
+PS D:\Cavallo\social_commerce_app> $out = Join-Path $env:TEMP 'step9c_bundle.txt'
+PS D:\Cavallo\social_commerce_app> if (Test-Path $out) { Remove-Item $out }
+PS D:\Cavallo\social_commerce_app> $files = @(
+  'lib\core\network\api_failure.dart',
+  'lib\core\network\interceptors\error_interceptor.dart',
+  'lib\features\social\presentation\social_error_message.dart',
+  'lib\features\chat\presentation\chat_thread_screen.dart',
+  'lib\features\chat\presentation\shared_content_card.dart',
+  'lib\features\chat\presentation\share_to_conversation_sheet.dart',
+  'lib\features\chat\presentation\message_bubble_widget.dart',
+  'lib\features\chat\domain\conversation.dart',
+  'lib\core\widgets\featured_badge.dart',
+  'test\l10n\no_hardcoded_strings_test.dart'
+)
+PS D:\Cavallo\social_commerce_app> foreach ($f in $files) {
+  "`n===== FILE: $f =====" | Out-File -Append -Encoding utf8 $out
+  if (Test-Path $f) { Get-Content $f -Raw | Out-File -Append -Encoding utf8 $out }
+  else { "MISSING" | Out-File -Append -Encoding utf8 $out }
+}
+PS D:\Cavallo\social_commerce_app> "`n===== GREP: remaining literals in chat + featured_badge =====" | Out-File -Append -Encoding utf8 $out
+PS D:\Cavallo\social_commerce_app> git grep -n -E "'[A-Z][A-Za-z .,…!?']{2,}'" -- "lib/features/chat" "lib/core/widgets/featured_badge.dart" | Out-File -Append -Encoding utf8 $out
+PS D:\Cavallo\social_commerce_app> Write-Host "Done: $out"
+Done: C:\Users\HP\AppData\Local\Temp\step9c_bundle.txt
+PS D:\Cavallo\social_commerce_app> explorer.exe /select,$out

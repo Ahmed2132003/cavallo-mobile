@@ -7,8 +7,10 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../core/chat/chat_connection_manager.dart';
 import '../../../core/chat/chat_event.dart';
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../data/conversation_repository.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/message_repository.dart';
 import '../domain/conversation.dart';
 import '../domain/message.dart';
@@ -17,14 +19,14 @@ import '../domain/shared_content.dart';
 import 'message_bubble_widget.dart';
 import 'outbound_message_queue_provider.dart';
 
-/// Part P-074 STEP 3 — the Message Thread screen (`/chat/:id`), replacing
+/// Part P-074 STEP 3 â€” the Message Thread screen (`/chat/:id`), replacing
 /// P-007's placeholder IN PLACE (same file; class renamed only in its
-/// constructor signature — see this class's own note below on why
+/// constructor signature â€” see this class's own note below on why
 /// `chatId` became `conversation`).
 ///
 /// ### Why this takes a full [Conversation], not just an id
 /// Determining "is this message mine or theirs" needs
-/// `conversation.otherParticipant.id` (STEP 2) — in a 1:1 conversation,
+/// `conversation.otherParticipant.id` (STEP 2) â€” in a 1:1 conversation,
 /// `message.senderId != otherParticipant.id` is sufficient and means
 /// this screen never needs to know its own signed-in user id at all.
 /// That requires the full [Conversation], not just its id, so
@@ -32,13 +34,13 @@ import 'outbound_message_queue_provider.dart';
 /// `extra:` (the same convention `app_router.dart` already uses for
 /// `QueueItem`/`Product`/`businessName`). `app_router.dart`'s `redirect`
 /// now guarantees `extra` is a [Conversation] before this screen is ever
-/// built — see that file's own STEP 3 diff — mirroring
+/// built â€” see that file's own STEP 3 diff â€” mirroring
 /// `moderationReview`'s existing `QueueItem` guard exactly.
 ///
-/// ### Fetch strategy — documented, per this part's execution prompt
+/// ### Fetch strategy â€” documented, per this part's execution prompt
 /// - **Opening this screen** (this `State`'s `initState`, i.e. every
 ///   time the user navigates into a conversation): [ConversationRepository.fetchMessageHistory]
-///   — a full, current snapshot from the server. No "resume" logic is
+///   â€” a full, current snapshot from the server. No "resume" logic is
 ///   needed here because a fresh screen instance always fetches fresh.
 /// - **A WebSocket reconnect while this screen stays open**
 ///   ([ChatConnectionState] transitioning back to `connected` from
@@ -46,27 +48,27 @@ import 'outbound_message_queue_provider.dart';
 ///   using the highest message id already loaded, to fill exactly the
 ///   gap the disconnect may have caused without re-fetching everything.
 ///
-/// ### mark_delivered / mark_read — MVP choices, per this part's own
+/// ### mark_delivered / mark_read â€” MVP choices, per this part's own
 /// execution prompt ("document your choice")
 /// - **delivered**: sent for every one of the OTHER participant's
 ///   messages not already `delivered`/`read`, the moment they're
 ///   fetched (history, fetch-since) or received (`MessageReceived`).
-/// - **read**: uses the simpler of the two offered approximations —
+/// - **read**: uses the simpler of the two offered approximations â€”
 ///   everything currently loaded from the other participant, not
 ///   already `read`, is marked read whenever this screen is mounted AND
 ///   the app is in the foreground (tracked via [WidgetsBindingObserver],
 ///   not a real per-bubble `VisibilityDetector`).
 ///
-/// ### Presence — flagged gap, not fabricated
+/// ### Presence â€” flagged gap, not fabricated
 /// The verified `chat_event.dart` contract (P-073) has exactly three
 /// server-push event shapes, none of which carries the OTHER
 /// participant's online/offline state, and `ConversationParticipantSummary`
 /// (STEP 2) carries no presence field either. The small label under the
 /// app bar title below therefore shows THIS DEVICE'S OWN socket
 /// connection state (`ChatConnectionState`), not real per-user presence
-/// — see that label's own inline comment.
+/// â€” see that label's own inline comment.
 ///
-/// ### Sending — Part P-075 STEP 3 (optimistic UI + outbound queue)
+/// ### Sending â€” Part P-075 STEP 3 (optimistic UI + outbound queue)
 /// Pressing send no longer awaits the REST call here. The text is
 /// handed to [OutboundMessageQueueNotifier.enqueueMessage] and the
 /// field is cleared immediately; the message shows up right away as a
@@ -79,7 +81,7 @@ import 'outbound_message_queue_provider.dart';
 /// The queue provider is NOT autoDispose (P-051's same choice), so a
 /// message still retrying when the user leaves this screen keeps
 /// retrying; on re-entry its pending bubble reappears from the queue.
-/// If it succeeds while no thread screen is open, nothing is lost — the
+/// If it succeeds while no thread screen is open, nothing is lost â€” the
 /// next open's history fetch includes it.
 ///
 /// Only pending bubbles for THIS conversation are shown. If history
@@ -114,11 +116,11 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
   /// (see this class's BUGFIX note above).
   late final ChatConnectionManager _chatManager;
 
-  /// Keyed by message id — makes upsert/dedupe O(1) and cheaply absorbs
+  /// Keyed by message id â€” makes upsert/dedupe O(1) and cheaply absorbs
   /// a `MessageReceived` echo of a message this device itself just sent
   /// via REST (flagged: `chat_event.dart`'s own doc comment only
   /// confirms self-exclusion for `typing_indicator` specifically, not
-  /// `chat_message` — this dedupe is a defensive choice, not an assumed
+  /// `chat_message` â€” this dedupe is a defensive choice, not an assumed
   /// guarantee either way).
   final Map<int, Message> _messagesById = {};
 
@@ -160,11 +162,11 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     _eventSubscription?.cancel();
     _connectionSubscription?.cancel();
     _sentSubscription?.cancel();
-    // Uses the cached [_chatManager], NOT `ref.read` — `ref` is unsafe
+    // Uses the cached [_chatManager], NOT `ref.read` â€” `ref` is unsafe
     // to use during dispose (see this class's BUGFIX note).
     _chatManager.sendTyping(false);
     // A deliberate close, per this part's execution prompt ("On leaving
-    // the screen, call disconnect()"). Fire-and-forget is correct here —
+    // the screen, call disconnect()"). Fire-and-forget is correct here â€”
     // this widget is already unmounting.
     unawaited(_chatManager.disconnect());
     _textController.dispose();
@@ -207,7 +209,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
           .read(conversationRepositoryProvider)
           .fetchMessageHistory(_conversationId);
       if (!mounted) return;
-      // Wire order is newest-first — reversed here into oldest-to-newest
+      // Wire order is newest-first â€” reversed here into oldest-to-newest
       // (the on-screen order), exactly as `fetchMessageHistory`'s own
       // doc comment says is this layer's job, not the data layer's.
       for (final message in page.results.reversed) {
@@ -247,7 +249,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
       _scrollToBottomSoon();
     } on ApiFailure catch (_) {
       // Best-effort: a fresh screen open, or the next reconnect, will
-      // retry. Not surfaced as an error banner — from the user's
+      // retry. Not surfaced as an error banner â€” from the user's
       // perspective the connection is back up.
     }
   }
@@ -306,7 +308,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
         _typingTimeoutTimer?.cancel();
         setState(() => _otherIsTyping = event.isTyping);
         if (event.isTyping) {
-          // Safety net if the paired "false" frame never arrives —
+          // Safety net if the paired "false" frame never arrives â€”
           // comfortably longer than _onTextChanged's own 2s debounce.
           _typingTimeoutTimer = Timer(const Duration(seconds: 5), () {
             if (mounted) setState(() => _otherIsTyping = false);
@@ -315,7 +317,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     }
   }
 
-  /// Part P-075 STEP 3 — a queued message reached the server. The queue
+  /// Part P-075 STEP 3 â€” a queued message reached the server. The queue
   /// has already removed its local pending bubble; this puts the real,
   /// server-confirmed [Message] into the thread. Ignores messages that
   /// belong to a different conversation (the queue is app-wide).
@@ -342,7 +344,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     );
   }
 
-  /// Part P-075 STEP 3 — optimistic send: hands the text to the
+  /// Part P-075 STEP 3 â€” optimistic send: hands the text to the
   /// outbound queue and clears the field immediately. The queue owns
   /// the real REST call, retries and the failed state.
   void _sendMessage() {
@@ -359,7 +361,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     _scrollToBottomSoon();
   }
 
-  /// Part P-076 — client-side size caps. MUST stay in sync with the
+  /// Part P-076 â€” client-side size caps. MUST stay in sync with the
   /// backend's `CHAT_IMAGE_MAX_BYTES` / `CHAT_VIDEO_MAX_BYTES`
   /// (`chat/serializers.py`): 5 MB image / 25 MB video. The backend is
   /// still the final authority (`validate_upload()`); this pre-check only
@@ -367,7 +369,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
   static const _maxImageBytes = 5 * 1024 * 1024;
   static const _maxVideoBytes = 25 * 1024 * 1024;
 
-  /// Part P-076 — the attach button: a small sheet to choose Photo or
+  /// Part P-076 â€” the attach button: a small sheet to choose Photo or
   /// Video, then [_pickAndEnqueueMedia].
   Future<void> _showAttachSheet() async {
     final choice = await showModalBottomSheet<ChatMediaType>(
@@ -380,14 +382,14 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
                 ListTile(
                   key: const Key('chatAttach_photo'),
                   leading: const Icon(Icons.photo_outlined),
-                  title: const Text('Photo'),
+                  title: Text(sheetContext.l10n.chatAttachPhoto),
                   onTap:
                       () => Navigator.of(sheetContext).pop(ChatMediaType.image),
                 ),
                 ListTile(
                   key: const Key('chatAttach_video'),
                   leading: const Icon(Icons.videocam_outlined),
-                  title: const Text('Video'),
+                  title: Text(sheetContext.l10n.chatAttachVideo),
                   onTap:
                       () => Navigator.of(sheetContext).pop(ChatMediaType.video),
                 ),
@@ -399,7 +401,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     await _pickAndEnqueueMedia(choice);
   }
 
-  /// Part P-076 — picks a file (same `image_picker` calls as
+  /// Part P-076 â€” picks a file (same `image_picker` calls as
   /// `story_creation_screen.dart`), rejects an over-cap file with a
   /// SnackBar, and otherwise hands it to the SAME outbound queue as text
   /// messages. Whatever is typed in the composer is sent as the caption.
@@ -419,11 +421,14 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     if (!mounted) return;
     final limit = type == ChatMediaType.image ? _maxImageBytes : _maxVideoBytes;
     if (size > limit) {
-      final label = type == ChatMediaType.image ? 'Photo' : 'Video';
+      final l10n = context.l10n;
+      final maxMb = limit ~/ (1024 * 1024);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '$label is too large (max ${limit ~/ (1024 * 1024)} MB).',
+            type == ChatMediaType.image
+                ? l10n.chatPhotoTooLarge(maxMb)
+                : l10n.chatVideoTooLarge(maxMb),
           ),
         ),
       );
@@ -457,23 +462,25 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     });
   }
 
-  String _connectionLabel() {
+  String _connectionLabel(AppLocalizations l10n) {
     switch (_connectionState) {
       case ChatConnectionState.connected:
-        return 'Online';
+        return l10n.chatConnectionOnline;
       case ChatConnectionState.connecting:
-        return 'Connecting…';
+        return l10n.chatConnectionConnecting;
       case ChatConnectionState.reconnecting:
-        return 'Reconnecting…';
+        return l10n.chatConnectionReconnecting;
       case ChatConnectionState.disconnected:
-        return 'Offline';
+        return l10n.chatConnectionOffline;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final displayName =
-        widget.conversation.otherParticipant?.displayName ?? 'Chat';
+        widget.conversation.otherParticipant?.displayName ??
+        l10n.chatThreadFallbackTitle;
     final sortedMessages =
         _messagesById.values.toList()
           ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
@@ -491,11 +498,11 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
           preferredSize: const Size.fromHeight(20),
           child: Padding(
             padding: const EdgeInsets.only(bottom: 4),
-            // See this class's own top doc comment ("Presence — flagged
+            // See this class's own top doc comment ("Presence â€” flagged
             // gap, not fabricated"): this is OUR OWN socket state, not
             // the other participant's real presence.
             child: Text(
-              _otherIsTyping ? 'typing…' : _connectionLabel(),
+              _otherIsTyping ? l10n.chatThreadTyping : _connectionLabel(l10n),
               style: const TextStyle(fontSize: 12),
             ),
           ),
@@ -524,13 +531,16 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
           children: [
             Text(_historyError!.message, textAlign: TextAlign.center),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: _loadHistory, child: const Text('Retry')),
+            ElevatedButton(
+              onPressed: _loadHistory,
+              child: Text(context.l10n.commonRetry),
+            ),
           ],
         ),
       );
     }
     if (messages.isEmpty && pending.isEmpty) {
-      return const Center(child: Text('No messages yet — say hi!'));
+      return Center(child: Text(context.l10n.chatThreadEmpty));
     }
 
     final queue = ref.read(outboundMessageQueueProvider.notifier);
@@ -574,10 +584,10 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
                 onChanged: _onTextChanged,
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _sendMessage(),
-                decoration: const InputDecoration(
-                  hintText: 'Message…',
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                decoration: InputDecoration(
+                  hintText: context.l10n.chatComposerHint,
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                 ),
               ),
             ),

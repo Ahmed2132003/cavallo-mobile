@@ -45,14 +45,9 @@ const Map<String, String> _allowlist = <String, String>{
 };
 
 /// Files that still contain literals and are being migrated. TEMPORARY.
-/// STEP 8B left only the four chat files: the chat thread restyle (STEP 3)
-/// rewrites them, so they are localized together with it.
-const Set<String> _pendingMigration = <String>{
-  'lib/features/chat/presentation/chat_thread_screen.dart',
-  'lib/features/chat/presentation/message_bubble_widget.dart',
-  'lib/features/chat/presentation/share_to_conversation_sheet.dart',
-  'lib/features/chat/presentation/shared_content_card.dart',
-};
+/// Empty since P-115 STEP 9C: the last four chat files were localized.
+/// Keep the set (the tests below use it); add to it only with a written reason.
+const Set<String> _pendingMigration = <String>{};
 
 class HardcodedLiteral {
   const HardcodedLiteral(this.file, this.line, this.kind, this.text);

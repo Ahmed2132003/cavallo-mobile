@@ -1,0 +1,39 @@
+00:00 +0: loading D:/Cavallo/social_commerce_app/test/l10n/arb_encoding_test.dart
+00:00 +0: D:/Cavallo/social_commerce_app/test/l10n/arb_encoding_test.dart: every Arabic ARB value contains real Arabic letters
+00:00 +1: D:/Cavallo/social_commerce_app/test/l10n/arb_encoding_test.dart: no garbled text anywhere in lib/ or test/ sources
+00:01 +1 -1: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: each file declares its own @@locale
+00:01 +1 -1: D:/Cavallo/social_commerce_app/test/l10n/arb_encoding_test.dart: no garbled text anywhere in lib/ or test/ sources [E]
+  Expected: empty
+    Actual: ['lib\\features\\chat\\presentation\\message_bubble_widget.dart']
+  files with garbled text: [lib\features\chat\presentation\message_bubble_widget.dart]
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 474:18  expect
+  test\l10n\arb_encoding_test.dart 83:5               main.<fn>
+  
+00:01 +2 -1: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: both files contain exactly the same message keys
+00:01 +3 -1: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: no message is empty
+00:01 +4 -1: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: keys are semantic camelCase, not button1 / text2
+00:01 +5 -1: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: every Arabic plural message defines zero/one/two/few/many/other
+00:01 +6 -1: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: every English plural message defines at least "other"
+00:01 +7 -1: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: a key that is plural in English is plural in Arabic (and back)
+00:01 +8 -1: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: placeholders declared in the template are used in both languages
+00:01 +9 -1: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: (tearDownAll)
+00:02 +9 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) (setUpAll)
+00:02 +9 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) minutes
+00:02 +10 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) hours
+00:02 +11 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) days
+00:02 +12 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) digits are Western (0-9), never Arabic-Indic
+00:02 +13 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: Arabic plural forms (0, 1, 2, 3, 11, 100) (tearDownAll)
+00:02 +13 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: English plural forms (setUpAll)
+00:02 +13 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: English plural forms minutes / hours / days
+00:02 +14 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: English plural forms (tearDownAll)
+00:02 +14 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: supported locales exactly Arabic and English, Arabic first
+00:02 +15 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:03 +16 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:03 +17 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:03 +18 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:03 +19 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:03 +20 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp Arabic is right-to-left and shows the Arabic title
+00:04 +21 -1: D:/Cavallo/social_commerce_app/test/l10n/localization_pipeline_test.dart: text direction through MaterialApp English is left-to-right and shows the English title
+00:04 +22 -1: Some tests failed.

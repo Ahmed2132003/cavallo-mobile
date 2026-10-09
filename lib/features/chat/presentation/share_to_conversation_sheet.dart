@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/error_messages.dart';
+import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../routing/route_names.dart';
 import '../data/conversation_repository.dart';
@@ -11,7 +13,7 @@ import '../data/message_repository.dart';
 import '../domain/conversation.dart';
 import '../domain/shared_content.dart';
 
-/// Part P-077 STEP 4 — the conversations offered as share targets.
+/// Part P-077 STEP 4 â€” the conversations offered as share targets.
 ///
 /// Reuses `ConversationRepository.listConversations()` (P-074), first
 /// page only (the backend currently answers a plain array, so there is
@@ -24,10 +26,10 @@ final shareTargetConversationsProvider =
       return page.results;
     });
 
-/// Part P-077 STEP 4 — the two-option sheet behind every Share icon
+/// Part P-077 STEP 4 â€” the two-option sheet behind every Share icon
 /// (Post / Reel / Product):
 ///
-/// - "Share via…" -> [onNativeShare], the caller's EXISTING share flow,
+/// - "Share viaâ€¦" -> [onNativeShare], the caller's EXISTING share flow,
 ///   unchanged (for Post/Reel: share tracking + native share sheet).
 /// - "Share to conversation" -> a conversation picker; picking a row
 ///   POSTs the shared reference via
@@ -59,7 +61,7 @@ Future<void> showShareOptionsSheet(
             ListTile(
               key: const ValueKey('shareOption_native'),
               leading: const Icon(Icons.ios_share),
-              title: const Text('Share via…'),
+              title: Text(sheetContext.l10n.chatShareVia),
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 unawaited(onNativeShare());
@@ -68,7 +70,7 @@ Future<void> showShareOptionsSheet(
             ListTile(
               key: const ValueKey('shareOption_conversation'),
               leading: const Icon(Icons.chat_bubble_outline),
-              title: const Text('Share to conversation'),
+              title: Text(sheetContext.l10n.chatShareToConversation),
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 if (!context.mounted) return;
@@ -142,10 +144,11 @@ class _ConversationPickerSheetState
     } catch (e) {
       if (!mounted) return;
       setState(() => _sendingId = null);
+      final l10n = context.l10n;
       messenger.showSnackBar(
         SnackBar(
           content: Text(
-            e is ApiFailure ? e.message : 'Could not share. Please try again.',
+            e is ApiFailure ? localizedApiError(l10n, e) : l10n.chatShareFailed,
           ),
         ),
       );
@@ -185,7 +188,7 @@ class _ConversationPickerSheetState
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Text(
-              'Share to conversation',
+              context.l10n.chatShareToConversation,
               style: theme.textTheme.titleMedium,
             ),
           ),
@@ -194,13 +197,12 @@ class _ConversationPickerSheetState
             child: switch (async) {
               AsyncData(:final value) =>
                 value.isEmpty
-                    ? const Center(
-                      key: ValueKey('sharePicker_empty'),
+                    ? Center(
+                      key: const ValueKey('sharePicker_empty'),
                       child: Padding(
-                        padding: EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(24),
                         child: Text(
-                          'No conversations yet.\n'
-                          'Start one from the Messages tab first.',
+                          context.l10n.chatSharePickerEmpty,
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -212,7 +214,7 @@ class _ConversationPickerSheetState
                         final conversation = value[index];
                         final name =
                             conversation.otherParticipant?.displayName ??
-                            'Unknown';
+                            context.l10n.chatListUnknownUser;
                         return ListTile(
                           key: ValueKey(
                             'sharePicker_conversation_${conversation.id}',
@@ -243,13 +245,13 @@ class _ConversationPickerSheetState
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Could not load your conversations.'),
+                    Text(context.l10n.chatSharePickerLoadError),
                     const SizedBox(height: 12),
                     ElevatedButton(
                       onPressed:
                           () =>
                               ref.invalidate(shareTargetConversationsProvider),
-                      child: const Text('Retry'),
+                      child: Text(context.l10n.commonRetry),
                     ),
                   ],
                 ),
