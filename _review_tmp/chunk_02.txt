@@ -1,0 +1,116 @@
+﻿KEY	FLAG	EN	AR
+storyViewerClose		Close	إغلاق
+storyViewerNotFound		Story not found.	لم يتم العثور على القصة.
+storyViewerEmpty		No stories to show right now.	لا توجد قصص للعرض الآن.
+storyViewerLoadFailed		Could not load stories.	تعذّر تحميل القصص.
+storyViewerDefaultName		Business	نشاط تجاري
+businessUnknownName		Unknown business	نشاط تجاري غير معروف
+captionMore		more	المزيد
+actionLike		Like	إعجاب
+actionComment		Comment	تعليق
+actionShare		Share	مشاركة
+actionSave		Save	حفظ
+feedLikesLine	[PLURAL]	{count, plural, one{{formatted} like} other{{formatted} likes}}	{count, plural, zero{{formatted} إعجاب} one{إعجاب واحد} two{إعجابان} few{{formatted} إعجابات} many{{formatted} إعجابًا} other{{formatted} إعجاب}}
+feedViewAllComments	[PLURAL]	{count, plural, one{View 1 comment} other{View all {formatted} comments}}	{count, plural, zero{عرض كل {formatted} تعليق} one{عرض التعليق} two{عرض التعليقين} few{عرض كل {formatted} تعليقات} many{عرض كل {formatted} تعليقًا} other{عرض كل {formatted} تعليق}}
+feedVerifiedLabel		Verified	موثّق
+feedPostMediaLabel		Post by {name}	منشور من {name}
+feedReelMediaLabel		Reel by {name}	ريل من {name}
+feedEmptyMessage		Your feed is empty right now. Follow some businesses, or check back soon.	خلاصتك فارغة حاليًا. تابع بعض الأنشطة التجارية، أو عد لاحقًا.
+feedLoadFailed		Could not load your feed.	تعذّر تحميل خلاصتك.
+feedLoadingLabel		Loading your feed	جارٍ تحميل خلاصتك
+profileScreenTitle		Business	نشاط تجاري
+profileStatPosts		Posts	المنشورات
+profileStatFollowers		Followers	المتابعون
+profileStatProducts		Products	المنتجات
+profileTabPosts		Posts	المنشورات
+profileTabReels		Reels	الريلز
+profileTabProducts		Products	المنتجات
+profileTabInfo		Info	معلومات
+followButtonFollow		Follow	متابعة
+followButtonFollowing		Following	متابَع
+followersCountLine	[PLURAL]	{count, plural, one{{formatted} follower} other{{formatted} followers}}	{count, plural, zero{{formatted} متابع} one{متابع واحد} two{متابعان} few{{formatted} متابعين} many{{formatted} متابعًا} other{{formatted} متابع}}
+profileMessageButton		Message	مراسلة
+profileMessageStarted		Conversation started. Open it from Messages.	بدأت المحادثة. افتحها من الرسائل.
+profileMessageFailed		Could not start the conversation. Please try again.	تعذّر بدء المحادثة. حاول مرة أخرى.
+profileNotFound		Business not found. It may have been removed.	لم يتم العثور على النشاط التجاري. ربما تمت إزالته.
+profileLoadFailed		Could not load this business profile.	تعذّر تحميل ملف هذا النشاط التجاري.
+profileNoDescription		This business hasn't added a description yet.	لم يضف هذا النشاط التجاري وصفًا بعد.
+profileLocation		{city}, {country}	{city}، {country}
+businessTypeTrader		Trader	تاجر
+businessTypeFactory		Factory	مصنع
+profilePostsEmpty		This business hasn't shared any posts yet.	لم يشارك هذا النشاط التجاري أي منشورات بعد.
+profilePostsLoadFailed		Could not load this business's posts.	تعذّر تحميل منشورات هذا النشاط التجاري.
+profileReelsEmpty		This business hasn't shared any reels yet.	لم يشارك هذا النشاط التجاري أي ريلز بعد.
+profileReelsLoadFailed		Could not load this business's reels.	تعذّر تحميل ريلز هذا النشاط التجاري.
+profileProductsEmpty		This business hasn't added any products yet.	لم يضف هذا النشاط التجاري أي منتجات بعد.
+profileProductsLoadFailed		Could not load this business's products.	تعذّر تحميل منتجات هذا النشاط التجاري.
+profileInfoType		Business type	نوع النشاط
+profileInfoLocation		Location	الموقع
+profileInfoPhone		Phone	الهاتف
+profileGridLoadingLabel		Loading content	جارٍ تحميل المحتوى
+featuredBadgeLabel		Featured	مميّز
+searchFieldHint		Search traders, factories, products...	ابحث عن تجار ومصانع ومنتجات...
+searchClearTooltip		Clear search	مسح البحث
+searchFiltersChip		Filters	الفلاتر
+searchFiltersChipActive		Filters ({count})	الفلاتر ({count})
+searchIdlePrompt		Search for traders, factories, and products. Type a keyword or set a filter to get started.	ابحث عن تجار ومصانع ومنتجات. اكتب كلمة أو اختر فلترًا للبدء.
+searchNoResults		No results found. Try a different search or adjust your filters.	لم يتم العثور على نتائج. جرّب بحثًا مختلفًا أو عدّل الفلاتر.
+searchLoadFailed		Could not load search results.	تعذّر تحميل نتائج البحث.
+searchResultsLoadingLabel		Loading results	جارٍ تحميل النتائج
+discoverEmpty		Nothing to discover yet. Check back soon for new businesses.	لا يوجد ما يمكن اكتشافه بعد. عد قريبًا لترى أنشطة تجارية جديدة.
+discoverLoadFailed		Could not load Discover right now.	تعذّر تحميل صفحة الاستكشاف الآن.
+searchFilterTitle		Filters	الفلاتر
+searchFilterCategory		Category	التصنيف
+searchFilterCategoryAll		All categories	كل التصنيفات
+searchFilterCategoriesFailed		Could not load categories.	تعذّر تحميل التصنيفات.
+searchFilterCountry		Country	الدولة
+searchFilterCity		City	المدينة
+searchFilterBusinessType		Business type	نوع النشاط
+searchFilterAny		Any	الكل
+searchFilterMinRating		Minimum rating	الحد الأدنى للتقييم
+searchFilterMinRatingOption	[PLURAL]	{stars, plural, one{{stars} star & up} other{{stars} stars & up}}	{stars, plural, zero{{stars} نجمة فأكثر} one{نجمة فأكثر} two{نجمتان فأكثر} few{{stars} نجوم فأكثر} many{{stars} نجمة فأكثر} other{{stars} نجمة فأكثر}}
+searchFilterFeaturedOnly		Featured only	المميّز فقط
+searchFilterClear		Clear	مسح
+searchFilterApply		Apply	تطبيق
+productDetailTitle		Product	المنتج
+productPriceHeadline		Starting from {price} {currency}	ابتداءً من {price} {currency}
+productPriceNote		Approximate price, negotiable directly with the business. Message the business to confirm.	السعر تقريبي وقابل للتفاوض مباشرة مع النشاط التجاري. راسل النشاط التجاري للتأكيد.
+productNotFoundMessage		Product not found. It may have been removed.	لم يتم العثور على المنتج. ربما تمت إزالته.
+productLoadFailed		Could not load this product.	تعذّر تحميل هذا المنتج.
+productNoDescription		This business hasn't added a description yet.	لم يضف هذا النشاط التجاري وصفًا بعد.
+productVariantsTitle		Variants	الخيارات
+productMessageBusiness		Message Business	مراسلة النشاط التجاري
+productShareText		Check out {name} on Cavallo	شاهد {name} على كافالو
+productLoadingLabel		Loading product	جارٍ تحميل المنتج
+commentsTitle		Comments	التعليقات
+commentsInputHint		Add a comment...	أضف تعليقًا...
+commentsPostTooltip		Post comment	نشر التعليق
+commentsEmpty		No comments yet. Be the first to comment.	لا توجد تعليقات بعد. كن أول من يعلّق.
+commentsPendingReview		Pending review: hidden from other users	قيد المراجعة: مخفي عن المستخدمين الآخرين
+commentsLoadMore		Load more comments	تحميل المزيد من التعليقات
+commentsAuthorFallback		User #{id}	مستخدم رقم {id}
+commentsLoadingLabel		Loading comments	جارٍ تحميل التعليقات
+chatListTitle		Messages	الرسائل
+chatListEmpty		No conversations yet	لا توجد محادثات بعد
+chatListNoMessages		No messages yet	لا توجد رسائل بعد
+chatListUnknownUser		Unknown	غير معروف
+chatListPreviewPhoto		Photo	صورة
+chatListPreviewVideo		Video	فيديو
+chatListPreviewSharedPost		Shared a post	شارك منشورًا
+chatListPreviewSharedReel		Shared a reel	شارك ريلًا
+chatListPreviewSharedProduct		Shared a product	شارك منتجًا
+chatListLoadingLabel		Loading conversations	جارٍ تحميل المحادثات
+chatListNewChatTest		New chat (test)	محادثة جديدة (تجريبية)
+chatTestDialogTitle		Start test conversation	بدء محادثة تجريبية
+chatTestUserIdLabel		Other account's user id	رقم مستخدم الحساب الآخر
+chatTestUserIdHint		e.g. 7	مثال: 7
+chatTestCancel		Cancel	إلغاء
+chatTestStart		Start	بدء
+chatListUnreadLabel	[PLURAL]	{count, plural, one{{count} unread message} other{{count} unread messages}}	{count, plural, zero{لا رسائل غير مقروءة} one{رسالة واحدة غير مقروءة} two{رسالتان غير مقروءتان} few{{count} رسائل غير مقروءة} many{{count} رسالة غير مقروءة} other{{count} رسالة غير مقروءة}}
+chatTestUserPlaceholder		User #{id}	مستخدم رقم {id}
+notifTitle		Notifications	الإشعارات
+notifSettingsTitle		Notification settings	إعدادات الإشعارات
+notifLoadMoreFailed		Could not load more notifications.	تعذّر تحميل المزيد من الإشعارات.
+notifLoadFailed		Could not load your notifications.	تعذّر تحميل إشعاراتك.
+notifEmpty		No notifications yet.	لا توجد إشعارات بعد
+notifSectionToday		Today	اليوم

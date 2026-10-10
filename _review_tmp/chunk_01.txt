@@ -1,0 +1,116 @@
+﻿KEY	FLAG	EN	AR
+appTitle		Social Commerce Discovery Platform	منصة اكتشاف التجار والمصانع
+relativeJustNow		just now	الآن
+relativeMinutesAgo	[PLURAL]	{count, plural, one{{count} minute ago} other{{count} minutes ago}}	{count, plural, zero{منذ {count} دقيقة} one{منذ دقيقة} two{منذ دقيقتين} few{منذ {count} دقائق} many{منذ {count} دقيقة} other{منذ {count} دقيقة}}
+relativeHoursAgo	[PLURAL]	{count, plural, one{{count} hour ago} other{{count} hours ago}}	{count, plural, zero{منذ {count} ساعة} one{منذ ساعة} two{منذ ساعتين} few{منذ {count} ساعات} many{منذ {count} ساعة} other{منذ {count} ساعة}}
+relativeDaysAgo	[PLURAL]	{count, plural, one{{count} day ago} other{{count} days ago}}	{count, plural, zero{منذ {count} يوم} one{منذ يوم} two{منذ يومين} few{منذ {count} أيام} many{منذ {count} يومًا} other{منذ {count} يوم}}
+errorNetwork		No connection. Check your internet and try again.	لا يوجد اتصال. تحقق من الإنترنت وحاول مرة أخرى.
+errorSecureConnection		A secure connection to the server could not be established.	تعذّر إنشاء اتصال آمن بالخادم.
+errorServer		Something went wrong on our end. Please try again later.	حدث خطأ من جانبنا. حاول مرة أخرى لاحقًا.
+errorAuthentication		We could not verify your identity. Please sign in again.	تعذّر التحقق من هويتك. سجّل الدخول مرة أخرى.
+errorNotAuthorized		You are not allowed to do that.	غير مسموح لك بتنفيذ هذا الإجراء.
+errorPermissionDenied		You do not have permission to do that.	ليست لديك صلاحية لتنفيذ هذا الإجراء.
+errorNotFound		We could not find what you were looking for.	تعذّر العثور على ما تبحث عنه.
+errorBadRequest		That request could not be completed.	تعذّر إتمام الطلب.
+errorValidation		Some of the information you entered could not be accepted. Please check it and try again.	تعذّر قبول بعض البيانات التي أدخلتها. راجعها وحاول مرة أخرى.
+errorThrottled		Too many attempts in a short time. Please wait a moment and try again.	محاولات كثيرة في وقت قصير. انتظر قليلًا ثم حاول مرة أخرى.
+errorConflict		This item has already changed. Refresh and try again.	تغيّرت حالة هذا العنصر بالفعل. حدّث الصفحة وحاول مرة أخرى.
+errorServiceUnavailable		This service is not available right now. Please try again later.	هذه الخدمة غير متاحة حاليًا. حاول مرة أخرى لاحقًا.
+errorCancelled		The request was cancelled.	تم إلغاء الطلب.
+errorUnknown		An unexpected error occurred. Please try again.	حدث خطأ غير متوقع. حاول مرة أخرى.
+compactThousands		{value}K	{value} ألف
+compactMillions		{value}M	{value} مليون
+compactBillions		{value}B	{value} مليار
+monthName		{month, select, january{January} february{February} march{March} april{April} may{May} june{June} july{July} august{August} september{September} october{October} november{November} december{December} other{{month}}}	{month, select, january{يناير} february{فبراير} march{مارس} april{أبريل} may{مايو} june{يونيو} july{يوليو} august{أغسطس} september{سبتمبر} october{أكتوبر} november{نوفمبر} december{ديسمبر} other{{month}}}
+dateFull		{month} {day}, {year}	{day} {month} {year}
+dateAndTime		{date}, {time}	{date}، {time}
+currencyLabel		{currency, select, egp{EGP} sar{SAR} aed{AED} jod{JOD} other{{currency}}}	{currency, select, egp{ج.م} sar{ر.س} aed{د.إ} jod{د.أ} other{{currency}}}
+priceDisplay		{amount} {currency}	{amount} {currency}
+authLoginTitle		Login	تسجيل الدخول
+authRegisterTitle		Register	إنشاء حساب
+authEmailLabel		Email	البريد الإلكتروني
+authPasswordLabel		Password	كلمة المرور
+authConfirmPasswordLabel		Confirm password	تأكيد كلمة المرور
+authAccountTypeLabel		Account type	نوع الحساب
+authAccountTypeCustomer		Customer	عميل
+authAccountTypeBusiness		Business	نشاط تجاري
+authLoginButton		Log in	تسجيل الدخول
+authRegisterButton		Create account	إنشاء الحساب
+authGoToRegister		Don't have an account? Register	ليس لديك حساب؟ أنشئ حسابًا
+authGoToLogin		Already have an account? Log in	لديك حساب بالفعل؟ سجّل الدخول
+authEmailRequired		Email is required.	البريد الإلكتروني مطلوب.
+authEmailInvalid		Enter a valid email address.	أدخل بريدًا إلكترونيًا صالحًا.
+authPasswordRequired		Password is required.	كلمة المرور مطلوبة.
+authConfirmPasswordRequired		Please confirm your password.	يرجى تأكيد كلمة المرور.
+authPasswordsDoNotMatch		Passwords do not match.	كلمتا المرور غير متطابقتين.
+authInvalidCredentials		Invalid email or password.	البريد الإلكتروني أو كلمة المرور غير صحيحة.
+authAutoLoginFailed		Account created, but automatic sign-in failed. Please log in.	تم إنشاء الحساب، لكن تعذّر تسجيل الدخول تلقائيًا. يرجى تسجيل الدخول.
+authFieldErrorEmail		This email address cannot be used. Please check it or try another one.	لا يمكن استخدام هذا البريد الإلكتروني. تحقق منه أو جرّب بريدًا آخر.
+authFieldErrorPassword		This password cannot be used. Please choose a different one.	لا يمكن استخدام كلمة المرور هذه. يرجى اختيار كلمة أخرى.
+authFieldErrorPasswordConfirm		The passwords you entered do not match.	كلمتا المرور اللتان أدخلتهما غير متطابقتين.
+authFieldErrorAccountType		Please choose a valid account type.	يرجى اختيار نوع حساب صالح.
+commonRetry		Retry	إعادة المحاولة
+splashLoading		Loading...	جارٍ التحميل...
+splashGoToLogin		Go to login	الانتقال إلى تسجيل الدخول
+routeErrorTitle		Page not found	الصفحة غير موجودة
+routeErrorMessage		The page you are looking for does not exist or has moved.	الصفحة التي تبحث عنها غير موجودة أو تم نقلها.
+routeErrorGoHome		Back to home	العودة إلى الرئيسية
+navHome		Home	الرئيسية
+navExplore		Explore	استكشاف
+navSaved		Saved	المحفوظات
+navCreate		Create	إنشاء
+navModeration		Moderation	المراجعة
+navChats		Chats	المحادثات
+navProfile		Profile	حسابي
+hubTitle		Profile & Settings	الحساب والإعدادات
+hubAccountTypeCustomer		Customer	عميل
+hubAccountTypeBusiness		Business	نشاط تجاري
+hubAccountTypeStaff		Staff	فريق العمل
+hubSaved		Saved	المحفوظات
+hubNotificationPreferences		Notification preferences	تفضيلات الإشعارات
+hubSettingsGroup		Settings	الإعدادات
+hubAppearance		Appearance	المظهر
+hubAppearanceSystem		System	النظام
+hubAppearanceLight		Light	فاتح
+hubAppearanceDark		Dark	داكن
+hubLanguage		Language	اللغة
+hubBusinessTools		Business tools	أدوات النشاط التجاري
+hubBusinessConsole		Business console	لوحة النشاط التجاري
+hubEditBusinessProfile		Edit business profile	تعديل ملف النشاط
+hubProducts		Products	المنتجات
+hubContent		Content	المحتوى
+hubStories		Stories	القصص
+hubAnalytics		Analytics	التحليلات
+hubFeaturedStatus		Featured status	حالة التمييز
+hubFeaturedNo		Not featured	غير مميّز
+hubModeration		Moderation	المراجعة
+hubModerationQueue		Moderation queue	قائمة المراجعة
+hubAbout		About	عن التطبيق
+hubLogOut		Log out	تسجيل الخروج
+hubLogOutConfirmTitle		Log out?	تسجيل الخروج؟
+hubLogOutConfirmMessage		You will need to sign in again to use your account.	ستحتاج إلى تسجيل الدخول مرة أخرى لاستخدام حسابك.
+hubCancel		Cancel	إلغاء
+savedTabPosts		Posts	المنشورات
+savedTabReels		Reels	الريلز
+savedTabProducts		Products	المنتجات
+savedEmptyPosts		No saved posts yet. Tap the bookmark on a post to keep it here.	لا توجد منشورات محفوظة بعد. اضغط على علامة الحفظ في أي منشور ليظهر هنا.
+savedEmptyReels		No saved reels yet. Tap the bookmark on a reel to keep it here.	لا توجد ريلز محفوظة بعد. اضغط على علامة الحفظ في أي ريل ليظهر هنا.
+savedEmptyProducts		No saved products yet. Tap the bookmark on a product to keep it here.	لا توجد منتجات محفوظة بعد. اضغط على علامة الحفظ في أي منتج ليظهر هنا.
+savedUnsave		Remove from saved	إزالة من المحفوظات
+savedUnavailable		This item is no longer available	هذا العنصر لم يعد متاحًا
+savedNoPreviewText		Saved item	عنصر محفوظ
+savedUnsaveFailed		Couldn't remove it from saved. Please try again.	تعذّرت الإزالة من المحفوظات. حاول مرة أخرى.
+savedLoadMoreFailed		Couldn't load more saved items.	تعذّر تحميل المزيد من المحفوظات.
+createSheetTitle		Create new	إنشاء جديد
+createSheetPost		Post	منشور
+createSheetReel		Reel	ريل
+createSheetStory		Story	ستوري
+createSheetProduct		Product	منتج
+homeWordmark		Cavallo	Cavallo
+homeNotificationsTooltip		Notifications	الإشعارات
+homeChatsTooltip		Chats	المحادثات
+discoverSearchHint		Search businesses, products and posts	ابحث عن أنشطة ومنتجات ومنشورات
+storyYourStory		Your story	قصتك
+storyAddTooltip		Add to your story	أضف إلى قصتك
+storyRingNewLabel		{name}, new story	{name}، قصة جديدة
+storyRingSeenLabel		{name}, story seen	{name}، تمت مشاهدة القصة

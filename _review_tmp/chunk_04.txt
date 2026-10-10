@@ -1,0 +1,114 @@
+﻿KEY	FLAG	EN	AR
+analyticsCatalogAsOf		As of {day}/{month} (UTC). These are totals recorded by the daily rollup, not daily changes.	حتى {day}/{month} (UTC). هذه إجماليات سجّلها التجميع اليومي، وليست تغيّرات يومية.
+analyticsRangeDays	[PLURAL]	{days, plural, one{{days} day} other{{days} days}}	{days, plural, zero{{days} يوم} one{يوم} two{يومان} few{{days} أيام} many{{days} يومًا} other{{days} يوم}}
+analyticsNewFollowers		New followers	متابعون جدد
+analyticsLikesReceived		Likes received	الإعجابات المستلمة
+analyticsCommentsReceived		Comments received	التعليقات المستلمة
+analyticsStoryViews		Story views	مشاهدات الستوري
+analyticsNewRatings		New ratings	تقييمات جديدة
+analyticsAverageRating		Average rating	متوسط التقييم
+analyticsActiveProducts		Active products	المنتجات النشطة
+analyticsPublishedPosts		Published posts	المنشورات المنشورة
+analyticsPublishedReels		Published reels	الريلز المنشورة
+bizOnboardTitle		Complete your business profile	أكمل ملف نشاطك التجاري
+bizFieldName		Business name	اسم النشاط التجاري
+bizFieldPhone		Phone number (optional)	رقم الهاتف (اختياري)
+bizFieldPhoneInvalid		Enter a valid phone number for the selected country.	أدخل رقم هاتف صالحًا للدولة المحددة.
+bizFieldDescription		Description (optional)	الوصف (اختياري)
+bizOnboardSubmit		Complete profile	إكمال الملف
+bizProfileTitle		Business profile	ملف النشاط التجاري
+bizProfileBackHome		Back to home	العودة إلى الرئيسية
+bizProfileIncomplete		You have not completed your business profile yet.	لم تكمل ملف نشاطك التجاري بعد.
+bizProfileNoChanges		No changes to save.	لا توجد تغييرات للحفظ.
+bizProfileUpdated		Business profile updated.	تم تحديث ملف النشاط التجاري.
+bizProfileSave		Save changes	حفظ التغييرات
+commonRemove		Remove	إزالة
+contentPostNotFound		Post not found. It may have been removed.	المنشور غير موجود. ربما تمت إزالته.
+contentReelNotFound		Reel not found. It may have been removed.	الريل غير موجود. ربما تمت إزالته.
+contentReelPlaybackSoon		Video playback — Coming soon	تشغيل الفيديو — قريبًا
+contentFormImageLabel		Image (optional)	صورة (اختياري)
+contentFormVideoLabel		Video	فيديو
+contentFormChooseImage		Choose image	اختيار صورة
+contentFormChangeImage		Change image	تغيير الصورة
+contentFormChooseVideo		Choose video	اختيار فيديو
+contentFormChangeVideo		Change video	تغيير الفيديو
+contentFormCaption		Caption	التعليق
+postFormTitle		New post	منشور جديد
+postFormReviewNote		Your post will be reviewed before it becomes visible to customers.	ستتم مراجعة منشورك قبل أن يظهر للعملاء.
+postFormSubmit		Post	نشر
+reelFormTitle		New reel	ريل جديد
+reelFormReviewNote		Your video is processed first, then reviewed before it becomes visible to customers. You'll see its status on your content list.	تتم معالجة الفيديو أولًا ثم مراجعته قبل أن يظهر للعملاء. ستجد حالته في قائمة المحتوى الخاصة بك.
+reelFormSubmit		Post reel	نشر الريل
+productFormImageLabel		Product image (optional)	صورة المنتج (اختياري)
+productFormVariantName		Variant name (e.g. Size)	اسم الخيار (مثل: المقاس)
+productFormVariantValue		Value (e.g. Large)	القيمة (مثل: كبير)
+productFormRemoveVariant		Remove variant	إزالة الخيار
+productFormAddVariant		Add variant	إضافة خيار
+productFormName		Name	الاسم
+productFormDescription		Description	الوصف
+productFormPrice		Price	السعر
+productFormCurrency		Currency	العملة
+productFormActive		Active (visible to customers)	نشط (ظاهر للعملاء)
+productFormCategoryRequired		Category is required.	الفئة مطلوبة.
+productFormCurrencyRequired		Currency is required.	العملة مطلوبة.
+socialMoreOptions		More options	المزيد من الخيارات
+socialReport		Report	إبلاغ
+socialReportThanks		Thanks, your report was submitted.	شكرًا لك، تم إرسال بلاغك.
+socialReportWhy		Why are you reporting this?	ما سبب الإبلاغ عن هذا المحتوى؟
+socialReportDetails		Details (optional)	تفاصيل (اختياري)
+socialReportSubmit		Submit	إرسال
+socialReasonSpam		Spam	محتوى مزعج
+socialReasonInappropriate		Inappropriate content	محتوى غير لائق
+socialReasonMisleading		Misleading	مضلِّل
+socialReasonOther		Other	أخرى
+storyUploadStarted		Story upload started.	بدأ رفع القصة.
+storyNoMediaSelected		No photo or video selected yet.	لم يتم اختيار صورة أو فيديو بعد.
+storyAddMediaFirst		Add a photo or video first.	أضف صورة أو فيديو أولًا.
+storyAddPhoto		Add Photo	إضافة صورة
+storyAddVideo		Add Video	إضافة فيديو
+storyPostButton		Post Story	نشر القصة
+storyUploadDiscard		Discard	تجاهل
+storyUploadUploading		Uploading story... (attempt {attempt} of 5)	جارٍ رفع القصة... (المحاولة {attempt} من 5)
+storyUploadRetrying		Connection lost — retrying story upload... (attempt {attempt} of 5)	انقطع الاتصال — تتم إعادة محاولة رفع القصة... (المحاولة {attempt} من 5)
+storyUploadFailed		Story upload failed.	فشل رفع القصة.
+storyUploadFailedWithReason		Story upload failed: {reason}	فشل رفع القصة: {reason}
+pushBannerView		View	عرض
+validationBusinessNameRequired		Business name is required.	اسم النشاط التجاري مطلوب.
+validationCountryRequired		Country is required.	الدولة مطلوبة.
+validationCityRequired		City is required.	المدينة مطلوبة.
+businessProfileLoadError		Could not load your business profile.	تعذّر تحميل ملف نشاطك التجاري.
+postLoadError		Could not load this post.	تعذّر تحميل هذا المنشور.
+reelLoadError		Could not load this reel.	تعذّر تحميل هذا الريل.
+commonGenericError		Something went wrong. Please try again.	حدث خطأ ما. يُرجى المحاولة مرة أخرى.
+validationCaptionRequired		Caption is required.	النص التوضيحي مطلوب.
+reelVideoRequired		A video is required.	الفيديو مطلوب.
+productFormEditTitle		Edit product	تعديل المنتج
+productFormCreate		Create product	إنشاء منتج
+productFormSaveChanges		Save changes	حفظ التغييرات
+validationProductNameRequired		Name is required.	الاسم مطلوب.
+validationDescriptionRequired		Description is required.	الوصف مطلوب.
+validationPriceRequired		Price is required.	السعر مطلوب.
+validationPriceInvalid		Enter a valid price (e.g. 199.99).	أدخل سعرًا صحيحًا (مثال: 199.99).
+chatThreadFallbackTitle		Chat	محادثة
+chatConnectionOnline		Online	متصل
+chatConnectionConnecting		Connecting…	جارٍ الاتصال…
+chatConnectionReconnecting		Reconnecting…	جارٍ إعادة الاتصال…
+chatConnectionOffline		Offline	غير متصل
+chatThreadTyping		typing…	يكتب…
+chatThreadEmpty		No messages yet — say hi!	لا توجد رسائل بعد — ابدأ بالتحية!
+chatComposerHint		Message…	اكتب رسالة…
+chatAttachPhoto		Photo	صورة
+chatAttachVideo		Video	فيديو
+chatPhotoTooLarge		Photo is too large (max {maxMb} MB).	الصورة كبيرة جدًا (الحد الأقصى {maxMb} ميغابايت).
+chatVideoTooLarge		Video is too large (max {maxMb} MB).	الفيديو كبير جدًا (الحد الأقصى {maxMb} ميغابايت).
+chatBubbleRetrying		Retrying…	جارٍ إعادة المحاولة…
+chatBubbleFailedTapRetry		Failed to send · Tap to retry	تعذّر الإرسال · اضغط لإعادة المحاولة
+chatShareVia		Share via…	مشاركة عبر…
+chatShareToConversation		Share to conversation	المشاركة في محادثة
+chatSharePickerEmpty		No conversations yet. Start one from the Messages tab first.	لا توجد محادثات بعد. ابدأ محادثة من تبويب الرسائل أولًا.
+chatSharePickerLoadError		Could not load your conversations.	تعذّر تحميل محادثاتك.
+chatShareFailed		Could not share. Please try again.	تعذّرت المشاركة. حاول مرة أخرى.
+sharedContentTypePost		Post	منشور
+sharedContentTypeReel		Reel	ريل
+sharedContentTypeProduct		Product	منتج
+sharedContentUnavailable		This content is no longer available	هذا المحتوى لم يعد متاحًا

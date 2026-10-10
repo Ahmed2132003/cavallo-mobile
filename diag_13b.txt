@@ -1,0 +1,87 @@
+﻿DIAG13B 2026-10-10T06:13:23
+== discover_search_bar_test (Arabic) ==
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:4:import 'package:social_commerce_app/features/discover/presentation/discover_search_bar.dart';
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:5:import 'package:social_commerce_app/l10n/app_localizations.dart';
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:6:import 'package:social_commerce_app/routing/route_names.dart';
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:10:const String _arHint =
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:11:    '\u0627\u0628\u062d\u062b \u0639\u0646 \u0623\u0646\u0634\u0637\u0629 '
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:12:    '\u0648\u0645\u0646\u062a\u062c\u0627\u062a '
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:17:  Locale locale = const Locale('en'),
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:18:}) async {
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:19:  final GoRouter router = GoRouter(
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:25:                Scaffold(appBar: AppBar(title: const DiscoverSearchBar())),
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:26:      ),
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:27:      GoRoute(
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:32:                Scaffold(appBar: AppBar(), body: const Text('stub:search')),
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:33:      ),
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:34:    ],
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:40:      locale: locale,
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:41:      localizationsDelegates: AppLocalizations.localizationsDelegates,
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:42:      supportedLocales: AppLocalizations.supportedLocales,
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:43:    ),
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:44:  );
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:49:  testWidgets('shows the English hint', (tester) async {
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:50:    await _pump(tester);
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:51:
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:52:    expect(find.byKey(DiscoverSearchBar.barKey), findsOneWidget);
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:53:    expect(find.text('Search businesses, products and posts'), findsOneWidget);
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:54:  });
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:55:
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:56:  testWidgets('shows the Arabic hint', (tester) async {
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:57:    await _pump(tester, locale: const Locale('ar'));
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:58:
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:59:    expect(find.text(_arHint), findsOneWidget);
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:60:  });
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:61:
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:62:  testWidgets('tapping the bar opens the search screen', (tester) async {
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:63:    await _pump(tester);
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:64:
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:65:    await tester.tap(find.byKey(DiscoverSearchBar.barKey));
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:66:    await tester.pumpAndSettle();
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:67:
+> D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:68:    expect(find.text('stub:search'), findsOneWidget);
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:69:  });
+  D:\Cavallo\social_commerce_app\test\features\discover\presentation\discover_search_bar_test.dart:70:}
+== key used by the bar ==
+final String hint = context.l10n.discoverSearchHint;
+== golden failure images ==
+D:\Cavallo\social_commerce_app\test\goldens\failures\chat_thread_typing_dark_ar_isolatedDiff.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\chat_thread_typing_dark_ar_maskedDiff.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\chat_thread_typing_dark_ar_masterImage.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\chat_thread_typing_dark_ar_testImage.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\chat_thread_typing_light_ar_isolatedDiff.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\chat_thread_typing_light_ar_maskedDiff.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\chat_thread_typing_light_ar_masterImage.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\chat_thread_typing_light_ar_testImage.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\moderation_queue_dark_ar_isolatedDiff.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\moderation_queue_dark_ar_maskedDiff.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\moderation_queue_dark_ar_masterImage.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\moderation_queue_dark_ar_testImage.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\moderation_queue_light_ar_isolatedDiff.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\moderation_queue_light_ar_maskedDiff.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\moderation_queue_light_ar_masterImage.png
+D:\Cavallo\social_commerce_app\test\goldens\failures\moderation_queue_light_ar_testImage.png
+== BASE (before P-115) = ed2ea65e9f1e99be8cad59b392a1120f09e8c68a ==
+== LOGIC FILES, whitespace-ignored (must be empty) ==
+ lib/core/chat/chat_connection_manager.dart          | 21 +++++++++------------
+ lib/core/chat/chat_event.dart                       |  8 ++++----
+ lib/features/chat/data/conversation_repository.dart | 10 +++++-----
+ lib/features/chat/domain/conversation.dart          |  6 ++++--
+ lib/features/chat/domain/shared_content.dart        |  3 ++-
+ .../outbound_message_queue_provider.dart            |  7 +++++--
+ 6 files changed, 29 insertions(+), 26 deletions(-)
+== LOGIC FILES, raw ==
+ lib/core/chat/chat_connection_manager.dart         | 35 ++++++++++------------
+ lib/core/chat/chat_event.dart                      | 14 ++++-----
+ .../chat/data/conversation_repository.dart         | 18 +++++------
+ lib/features/chat/data/message_repository.dart     |  2 +-
+ lib/features/chat/domain/conversation.dart         | 16 +++++-----
+ lib/features/chat/domain/message.dart              |  2 +-
+ lib/features/chat/domain/message_status.dart       |  2 +-
+ lib/features/chat/domain/shared_content.dart       |  9 +++---
+ .../outbound_message_queue_provider.dart           | 27 +++++++++--------
+ 9 files changed, 64 insertions(+), 61 deletions(-)
+== TEST FILES modified in P-115, whitespace-ignored ==
+ .../chat/presentation/chat_list_screen_test.dart   | 166 +++++++++--
+ .../presentation/notification_restyle_test.dart    | 324 +++++++++++++++++++++
+ 2 files changed, 465 insertions(+), 25 deletions(-)

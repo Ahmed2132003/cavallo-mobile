@@ -1,0 +1,18 @@
+﻿ARABIC GLOSSARY (from P-112, baseline - approval pending)
+Use these terms consistently in every string.
+
+English | Arabic | Usage note
+Home / Explore / Saved / Chats / Profile | الرئيسية / استكشاف / المحفوظات / المحادثات / حسابي | Bottom navigation labels.
+Follow / Following / Followers | متابعة / تتم المتابعة / المتابعون | Gender-neutral wording; button shows متابعة when not following and تتم المتابعة when following.
+Message | مراسلة | Button on business profile; "رسالة" for a single message.
+Like / Comment / Share / Save | إعجاب / تعليق / مشاركة / حفظ | Action row tooltips and counts.
+Story / Reel / Post | قصة / ريل / منشور | Keep "ريل" (commonly used); plural: قصص / ريلز / منشورات.
+Business / Trader / Factory | نشاط تجاري / تاجر / مصنع | Trader and Factory are the two business types.
+Featured | مميز | Badge text; never translate as "إعلان" (that implies a paid ad label elsewhere).
+Verified | موثّق | Verification badge.
+Products / Price / Available / Out of stock | المنتجات / السعر / متاح / غير متاح | Price shown for discovery only; never "اشترِ الآن".
+Report / Block | إبلاغ / حظر | Dialogs and menus.
+Notifications | الإشعارات | Also settings title.
+Pending review / Approved / Rejected | قيد المراجعة / تمت الموافقة / مرفوض | Moderation states shown to businesses.
+Log out | تسجيل الخروج | Settings.
+Dark mode / Light mode / System | الوضع الداكن / الوضع الفاتح / تلقائي | Appearance setting.

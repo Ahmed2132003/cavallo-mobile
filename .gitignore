@@ -18,3 +18,5 @@ android/hs_err_pid*.log
 /flutter_*.log
 /hs_err_pid*.log
 android/.kotlin/
+
+test/goldens/failures/

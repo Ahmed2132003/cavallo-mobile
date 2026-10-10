@@ -1,0 +1,20 @@
+﻿BRANCH: part-111
+
+=== ARB files ===
+lib\l10n\app_ar.arb
+lib\l10n\app_en.arb
+
+=== Key counts (without @metadata) ===
+app_en.arb : 1098 keys, 15 plural messages
+app_ar.arb : 458 keys, 15 plural messages
+
+=== Glossary candidates (P-112) ===
+p115_step9c_fix_l10n.txt
+p115_step9c_l10n.txt
+-- mentions of 'glossary' in md files --
+
+=== ARB parity / plural tests ===
+test\core\l10n\l10n_context_test.dart
+test\l10n\arb_encoding_test.dart
+test\l10n\arb_parity_test.dart
+test\l10n\no_hardcoded_strings_test.dart

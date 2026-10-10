@@ -1,0 +1,116 @@
+﻿KEY	FLAG	EN	AR
+notifSectionThisWeek		This week	هذا الأسبوع
+notifSectionEarlier		Earlier	سابقًا
+notifUnreadLabel		Unread	غير مقروء
+notifLoadingLabel		Loading notifications	جارٍ تحميل الإشعارات
+notifPrefsSectionHeader		Notify me about	أخطرني بشأن
+notifPrefChatTitle		Chat messages	رسائل المحادثات
+notifPrefChatSubtitle		New messages in your conversations.	رسائل جديدة في محادثاتك.
+notifPrefModerationTitle		Content review	مراجعة المحتوى
+notifPrefModerationSubtitle		When your content is approved or rejected.	عند الموافقة على محتواك أو رفضه.
+notifPrefSocialTitle		Social activity	النشاط الاجتماعي
+notifPrefSocialSubtitle		New followers, comments, likes, shares and ratings.	متابعون وتعليقات وإعجابات ومشاركات وتقييمات جديدة.
+notifPrefsSaveFailed		Could not save your preference. Please try again.	تعذّر حفظ تفضيلك. حاول مرة أخرى.
+notifPrefsLoadFailed		Could not load your notification settings.	تعذّر تحميل إعدادات الإشعارات.
+notifPrefsSystemFooter		Important system announcements are always delivered.	إعلانات النظام المهمة تصلك دائمًا.
+consoleNavProducts		Products	المنتجات
+consoleNavContent		Posts/Reels	المنشورات والريلز
+consoleNavStories		Stories	القصص
+consoleNavAnalytics		Analytics	التحليلات
+consoleDashStories		Active stories	القصص النشطة
+consoleDashFollowers		New followers	متابعون جدد
+consoleDashRange	[PLURAL]	{days, plural, one{last day} other{last {days} days}}	{days, plural, zero{آخر {days} يوم} one{آخر يوم} two{آخر يومين} few{آخر {days} أيام} many{آخر {days} يومًا} other{آخر {days} يوم}}
+consoleDashValueUnavailable		–	–
+consoleProductsTitle		My Products	منتجاتي
+consoleProductsCreate		Create New	إنشاء جديد
+consoleProductsEmpty		No products yet. Tap "Create New" to add your first product.	لا توجد منتجات بعد. اضغط «إنشاء جديد» لإضافة أول منتج لك.
+consoleProductsLoadFailed		Could not load your products.	تعذّر تحميل منتجاتك.
+consoleProductsDeleteTitle		Delete product?	حذف المنتج؟
+consoleProductsDeleteBody		This will remove "{name}" from your products. This cannot be undone.	سيتم إزالة «{name}» من منتجاتك. لا يمكن التراجع عن هذا الإجراء.
+consoleProductsDeleteFailed		Could not delete this product.	تعذّر حذف هذا المنتج.
+consoleProductVariants	[PLURAL]	{count, plural, one{{count} variant} other{{count} variants}}	{count, plural, zero{{count} خيار} one{خيار واحد} two{خياران} few{{count} خيارات} many{{count} خيارًا} other{{count} خيار}}
+consoleProductInactive		Inactive	غير نشط
+consoleEdit		Edit	تعديل
+consoleDelete		Delete	حذف
+consoleCancel		Cancel	إلغاء
+consoleContentTitle		My Content	محتواي
+consoleContentNewPost		New Post	منشور جديد
+consoleContentNewReel		New Reel	ريل جديد
+consoleContentEmpty		No posts or reels yet. Tap "New Post" or "New Reel" to share your first one.	لا توجد منشورات أو ريلز بعد. اضغط «منشور جديد» أو «ريل جديد» لمشاركة أول محتوى لك.
+consoleContentLoadFailed		Could not load your content.	تعذّر تحميل محتواك.
+consoleTypePost		Post	منشور
+consoleTypeReel		Reel	ريل
+consoleStatusUnderReview		Under review	قيد المراجعة
+consoleStatusLive		Live	تم النشر
+consoleStatusRejectedWithReason		Rejected: {reason}	مرفوض: {reason}
+consoleStatusNoReasonGiven		no reason given	لم يُذكر سبب
+consoleStatusProcessing		Processing video…	جارٍ معالجة الفيديو…
+consoleStatusProcessingFailed		Video processing failed	تعذّرت معالجة الفيديو
+consoleStoriesCreate		Create Story	إنشاء قصة
+consoleStoriesEmpty		No stories yet. Tap "Create Story" to share your first one.	لا توجد قصص بعد. اضغط «إنشاء قصة» لمشاركة أول قصة لك.
+consoleStoriesLoadFailed		Could not load your stories.	تعذّر تحميل قصصك.
+consoleStoryNumber		Story #{id}	قصة رقم {id}
+consoleStoryPublished		Published	تم النشر
+consoleStoryPending		Pending	قيد الانتظار
+consoleStoryRejected		Rejected	مرفوضة
+consoleStoryExpired		Expired	منتهية
+consoleStoryUnknown		Unknown	غير معروفة
+consoleStoryReason		Reason: {reason}	السبب: {reason}
+consoleStoryTimeLeftHM		{hours}h {minutes}m left	متبقّي {hours} س {minutes} د
+consoleStoryTimeLeftM		{minutes}m left	متبقّي {minutes} د
+consoleStoryTimeLeftLess		Less than 1m left	متبقّي أقل من دقيقة
+commonRefresh		Refresh	تحديث
+commonCancel		Cancel	إلغاء
+moderationQueueTitle		Moderation queue	قائمة المراجعة
+moderationQueueEmpty		The queue is clear. Nothing is waiting for review.	القائمة فارغة. لا يوجد شيء بانتظار المراجعة.
+moderationNotAllowed		Your account is not allowed to review content. If it should be, ask an admin to add it to the Moderator group.	حسابك غير مسموح له بمراجعة المحتوى. إذا كان يجب أن يُسمح له، فاطلب من المسؤول إضافته إلى مجموعة المراجعين.
+moderationQueueLoadFailed		Could not load the moderation queue.	تعذّر تحميل قائمة المراجعة.
+moderationSummaryPending		{count} pending	{count} بانتظار المراجعة
+moderationSummaryPendingFast		{count} pending · {fast} fast path	{count} بانتظار المراجعة · {fast} مسار سريع
+moderationNoPreview		No preview available	لا توجد معاينة
+moderationPriorityFast		Fast path	مسار سريع
+moderationPriorityNormal		Normal	عادي
+moderationAgeUnderMinute		<1 min	أقل من دقيقة
+moderationAgeMinutes		{minutes} min	{minutes} د
+moderationAgeHours		{hours} h	{hours} س
+moderationAgeHoursMinutes		{hours} h {minutes} min	{hours} س {minutes} د
+moderationAgeDays		{days} d	{days} يوم
+moderationAgeDaysHours		{days} d {hours} h	{days} يوم {hours} س
+moderationAgeOverdue		{age} · overdue	{age} · متأخر
+moderationContentTypePost		Post	منشور
+moderationContentTypeReel		Reel	ريل
+moderationContentTypeStory		Story	ستوري
+moderationContentTypeUnknown		Unknown	غير معروف
+moderationReviewTitle		Review content	مراجعة المحتوى
+moderationPreview		Preview	المعاينة
+moderationDetailType		Type	النوع
+moderationDetailSubmittedBy		Submitted by	أرسله
+moderationDetailPriority		Priority	الأولوية
+moderationDetailWaiting		Waiting	مدة الانتظار
+moderationDetailQueueItem		Queue item	عنصر القائمة
+moderationWaitingNote		Waiting time is as of the last queue refresh.	مدة الانتظار محسوبة حتى آخر تحديث للقائمة.
+moderationReject		Reject	رفض
+moderationApprove		Approve	موافقة
+moderationItemApproved		Item approved	تمت الموافقة على العنصر
+moderationItemRejected		Item rejected	تم رفض العنصر
+moderationApproveFailed		Could not approve this item. Please try again.	تعذّرت الموافقة على هذا العنصر. حاول مرة أخرى.
+moderationRejectFailed		Could not reject this item. Please try again.	تعذّر رفض هذا العنصر. حاول مرة أخرى.
+moderationAlreadyHandled		This item was already handled by someone else, or no longer exists. It has been removed from your queue.	تمت معالجة هذا العنصر بواسطة شخص آخر أو لم يعد موجودًا. تمت إزالته من قائمتك.
+moderationRejectTitle		Reject content	رفض المحتوى
+moderationRejectNote		The business will see this reason.	سيرى النشاط التجاري هذا السبب.
+moderationRejectReasonLabel		Reason (required)	السبب (مطلوب)
+moderationRejectReasonRequired		A reason is required.	السبب مطلوب.
+analyticsLoadFailed		Could not load your analytics.	تعذّر تحميل التحليلات.
+analyticsEmpty	[PLURAL]	{days, plural, one{No activity has been recorded for the last day yet.} other{No activity has been recorded for the last {days} days yet.}}	{days, plural, zero{لم يتم تسجيل أي نشاط خلال آخر {days} يوم بعد.} one{لم يتم تسجيل أي نشاط خلال آخر يوم بعد.} two{لم يتم تسجيل أي نشاط خلال آخر يومين بعد.} few{لم يتم تسجيل أي نشاط خلال آخر {days} أيام بعد.} many{لم يتم تسجيل أي نشاط خلال آخر {days} يومًا بعد.} other{لم يتم تسجيل أي نشاط خلال آخر {days} يوم بعد.}}
+analyticsDaysWithData		Days with data: {withData} of {days}	أيام بها بيانات: {withData} من {days}
+analyticsUtcNote		Days are counted in UTC. Days without a recorded row are not drawn as zero.	تُحتسب الأيام بالتوقيت العالمي المنسّق (UTC). الأيام التي لا يوجد لها سجل لا تُرسم على أنها صفر.
+analyticsChartFollowersTitle		New followers by day	المتابعون الجدد حسب اليوم
+analyticsChartFollowersSemantics	[PLURAL]	{days, plural, one{New followers: {total} total over 1 day} other{New followers: {total} total over {days} days}}	{days, plural, zero{المتابعون الجدد: {total} إجمالًا خلال {days} يوم} one{المتابعون الجدد: {total} إجمالًا خلال يوم واحد} two{المتابعون الجدد: {total} إجمالًا خلال يومين} few{المتابعون الجدد: {total} إجمالًا خلال {days} أيام} many{المتابعون الجدد: {total} إجمالًا خلال {days} يومًا} other{المتابعون الجدد: {total} إجمالًا خلال {days} يوم}}
+analyticsChartLikesTitle		Likes received by day	الإعجابات المستلمة حسب اليوم
+analyticsChartLikesSemantics	[PLURAL]	{days, plural, one{Likes received: {total} total over 1 day} other{Likes received: {total} total over {days} days}}	{days, plural, zero{الإعجابات المستلمة: {total} إجمالًا خلال {days} يوم} one{الإعجابات المستلمة: {total} إجمالًا خلال يوم واحد} two{الإعجابات المستلمة: {total} إجمالًا خلال يومين} few{الإعجابات المستلمة: {total} إجمالًا خلال {days} أيام} many{الإعجابات المستلمة: {total} إجمالًا خلال {days} يومًا} other{الإعجابات المستلمة: {total} إجمالًا خلال {days} يوم}}
+analyticsRatingsHeading		Ratings	التقييمات
+analyticsRatingEmpty		No rating has been recorded yet, so there is no rating trend to draw.	لم يتم تسجيل أي تقييم بعد، لذلك لا يوجد اتجاه تقييم لرسمه.
+analyticsChartRatingTitle		Average rating by day	متوسط التقييم حسب اليوم
+analyticsChartRatingSemantics	[PLURAL]	{days, plural, one{Average rating: latest {average} over 1 day} other{Average rating: latest {average} over {days} days}}	{days, plural, zero{متوسط التقييم: الأحدث {average} خلال {days} يوم} one{متوسط التقييم: الأحدث {average} خلال يوم واحد} two{متوسط التقييم: الأحدث {average} خلال يومين} few{متوسط التقييم: الأحدث {average} خلال {days} أيام} many{متوسط التقييم: الأحدث {average} خلال {days} يومًا} other{متوسط التقييم: الأحدث {average} خلال {days} يوم}}
+analyticsRatingNote		Each point is the average rating stored when that day was rolled up. Days before the first rating are not drawn.	كل نقطة هي متوسط التقييم المحفوظ عند تجميع ذلك اليوم. الأيام السابقة لأول تقييم لا تُرسم.
+analyticsCatalogHeading		Catalog size	حجم الكتالوج

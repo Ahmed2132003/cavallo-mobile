@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:social_commerce_app/core/theme/app_theme.dart';
+import 'package:social_commerce_app/l10n/app_localizations.dart';
+
+/// Part P-115 STEP 10A: shared golden harness.
+///
+/// One place that pumps any widget with the real theme (Light/Dark), the real
+/// locale (en/ar), the real AppLocalizations delegates (which also give the
+/// correct Directionality) and provider overrides. Nothing here touches the
+/// network. This file is ASCII only.
+///
+/// Goldens are never regenerated from here; baselines are created in 10C with
+/// `flutter test --update-goldens <file>`.
+
+class GoldenCombo {
+  const GoldenCombo(this.tag, this.locale, {required this.dark});
+
+  final String tag;
+  final Locale locale;
+  final bool dark;
+
+  ThemeData get theme => dark ? AppTheme.dark : AppTheme.light;
+
+  TextDirection get direction =>
+      locale.languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr;
+}
+
+const List<GoldenCombo> kGoldenCombos = <GoldenCombo>[
+  GoldenCombo('light_en', Locale('en'), dark: false),
+  GoldenCombo('light_ar', Locale('ar'), dark: false),
+  GoldenCombo('dark_en', Locale('en'), dark: true),
+  GoldenCombo('dark_ar', Locale('ar'), dark: true),
+];
+
+/// Fixes the logical screen size (pixel ratio 1.0) for the current test.
+void setGoldenSize(WidgetTester tester, Size size) {
+  tester.view.physicalSize = size;
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.reset);
+}
+
+/// A MaterialApp wired like the real app (theme, locale, delegates) inside a
+/// ProviderScope carrying [overrides]. Plain MaterialApp, not a router.
+Widget buildGoldenApp(
+  GoldenCombo combo,
+  Widget home, {
+  List<dynamic> overrides = const <dynamic>[],
+}) {
+  return ProviderScope(
+    overrides: [...overrides],
+    child: MaterialApp(
+      debugShowCheckedModeBanner: false,
+      locale: combo.locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      theme: combo.theme,
+      home: home,
+    ),
+  );
+}
+
+/// Sets the size, pumps [home] for [combo], optionally settles, and asserts
+/// the text direction really is the one the combo expects.
+Future<void> pumpGoldenApp(
+  WidgetTester tester,
+  GoldenCombo combo,
+  Widget home, {
+  List<dynamic> overrides = const <dynamic>[],
+  Size size = const Size(400, 800),
+  bool settle = true,
+}) async {
+  setGoldenSize(tester, size);
+  await tester.pumpWidget(buildGoldenApp(combo, home, overrides: overrides));
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump();
+  }
+  expect(
+    Directionality.of(tester.element(find.byType(Scaffold).first)),
+    combo.direction,
+    reason: 'wrong text direction for ${combo.tag}',
+  );
+}
+
+/// Compares the whole MaterialApp against
+/// `test/goldens/<dir>/<name>_<combo.tag>.png`.
+Future<void> expectGolden(String dir, String name, GoldenCombo combo) {
+  return expectLater(
+    find.byType(MaterialApp),
+    matchesGoldenFile('$dir/${name}_${combo.tag}.png'),
+  );
+}
+
+/// Unmounts the tree so the ProviderScope disposes every provider and no
+/// timer is left pending when the test ends.
+Future<void> unmountGolden(WidgetTester tester) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+}

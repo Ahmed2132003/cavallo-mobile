@@ -1,0 +1,315 @@
+﻿STEP 13 VALIDATION  2026-10-10T05:43:25  branch=part-111
+
+===== flutter gen-l10n  (exit=0) =====
+-- last 8 lines --
+Because l10n.yaml exists, the options defined there will be used instead.
+To use the command line arguments, delete the l10n.yaml file in the Flutter project.
+
+===== flutter analyze  (exit=0) =====
+-- key lines --
+No issues found! (ran in 9.2s)
+-- last 25 lines --
+Analyzing social_commerce_app...                                
+No issues found! (ran in 9.2s)
+
+REACHABILITY TEST FILES FOUND: test\routing\navigation_reachability_test.dart
+
+===== Guard: reachability  (exit=0) =====
+-- key lines --
+00:00 +16: All tests passed!
+-- last 12 lines --
+00:00 +6: locked bottom navigation layout Staff: Home, Explore, Moderation, Chats, Profile
+00:00 +7: locked bottom navigation layout slots are exactly 1..5 for every audience
+00:00 +8: navAudienceForUser plain customer and business
+00:00 +9: navAudienceForUser moderator or staff wins over the account type
+00:00 +10: the checker can fail (meta tests) a consistent manifest and router produce no problems
+00:00 +11: the checker can fail (meta tests) a route removed from the router is reported
+00:00 +12: the checker can fail (meta tests) a route added to the router without the manifest is reported
+00:00 +13: the checker can fail (meta tests) an allowed audience with zero entry points is reported
+00:00 +14: the checker can fail (meta tests) a deep-link-only entry does not count as visible
+00:00 +15: the checker can fail (meta tests) a deep-link-only entry without a reason is malformed
+00:00 +16: (tearDownAll)
+00:00 +16: All tests passed!
+
+===== Guard: ARB parity + encoding  (exit=0) =====
+-- key lines --
+00:00 +10: All tests passed!
+-- last 12 lines --
+00:00 +0: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: each file declares its own @@locale
+00:00 +1: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: both files contain exactly the same message keys
+00:00 +2: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: no message is empty
+00:00 +3: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: keys are semantic camelCase, not button1 / text2
+00:00 +4: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: every Arabic plural message defines zero/one/two/few/many/other
+00:00 +5: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: every English plural message defines at least "other"
+00:00 +6: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: a key that is plural in English is plural in Arabic (and back)
+00:00 +7: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: placeholders declared in the template are used in both languages
+00:00 +8: D:/Cavallo/social_commerce_app/test/l10n/arb_parity_test.dart: (tearDownAll)
+00:00 +8: D:/Cavallo/social_commerce_app/test/l10n/arb_encoding_test.dart: every Arabic ARB value contains real Arabic letters
+00:00 +9: D:/Cavallo/social_commerce_app/test/l10n/arb_encoding_test.dart: no garbled text anywhere in lib/ or test/ sources
+00:00 +10: All tests passed!
+
+===== Guard: no hardcoded strings  (exit=0) =====
+-- key lines --
+00:00 +5: All tests passed!
+-- last 20 lines --
+00:00 +0: loading D:/Cavallo/social_commerce_app/test/l10n/no_hardcoded_strings_test.dart
+00:00 +0: scanner self-test finds literals in the user-facing positions
+00:00 +1: scanner self-test ignores localized text, numbers, comments and other layers
+00:00 +2: repository scan (setUpAll)
+00:00 +2: repository scan no user-facing hardcoded string outside the allowlist
+00:00 +3: repository scan every allowlist entry has a reason and is still needed
+00:00 +4: repository scan every pending-migration file still has literals
+00:00 +5: repository scan (tearDownAll)
+00:00 +5: All tests passed!
+
+===== Goldens  (exit=1) =====
+-- key lines --
+00:00 +0: loading D:/Cavallo/social_commerce_app/test/goldens/p114_goldens_test.dart
+00:00 +0: D:/Cavallo/social_commerce_app/test/goldens/p114_goldens_test.dart: P-114 goldens post card (en_light)
+00:02 +1: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat list (light_en)
+00:02 +2: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat list (light_en)
+00:02 +3: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat list (light_en)
+00:02 +4: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat list (light_en)
+00:03 +5: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat list (light_en)
+00:03 +6: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat list (light_en)
+00:03 +7: D:/Cavallo/social_commerce_app/test/goldens/p114_goldens_test.dart: P-114 goldens product detail header (en_light)
+00:03 +8: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat_thread (light_en)
+00:03 +9: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat_thread (light_en)
+00:04 +10: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat_thread (light_en)
+00:04 +11: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat_thread (light_en)
+00:04 +12: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat_thread (light_en)
+00:04 +13: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:04 +14: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:04 +15: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:04 +16: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:04 +17: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:04 +18: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:04 +19: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:05 +20: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:05 +21: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:05 +22: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:05 +23: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:05 +24: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:05 +25: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:05 +26: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:05 +26: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat_thread_typing (light_ar)
+Golden "p115_chat/chat_thread_typing_light_ar.png": Pixel test failed, 0.27%, 877px diff detected.
+Failure feedback can be found at /D:/Cavallo/social_commerce_app/test/goldens/failures
+#0      LocalFileComparator.compare (package:flutter_test/src/_goldens_io.dart:108:5)
+#1      MatchesGoldenFile.matchAsync.<anonymous closure> (package:flutter_test/src/_matchers_io.dart:124:32)
+#6      main.<anonymous closure>.<anonymous closure> (file:///D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart:305:11)
+00:05 +26 -1: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:05 +26 -1: D:/Cavallo/social_commerce_app/test/goldens/p115_chat_goldens_test.dart: P-115 chat goldens chat_thread_typing (light_ar) [E]
+  Test failed. See exception logs above.
+00:05 +27 -1: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:06 +28 -1: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+00:06 +29 -1: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens notification center (light_en)
+-- last 15 lines --
+<asynchronous suspension>
+#6      main.<anonymous closure>.<anonymous closure> (file:///D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart:251:9)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 3 frames from dart:async and package:stack_trace)
+The exception was caught asynchronously.
+ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+00:08 +48 -4: D:/Cavallo/social_commerce_app/test/goldens/p115_screens_goldens_test.dart: P-115 screens goldens moderation queue row (dark_ar) [E]
+  Test failed. See exception logs above.
+  The test description was: moderation queue row (dark_ar)
+00:08 +48 -4: Some tests failed.
+
+===== Chat tests (existing)  (exit=0) =====
+-- key lines --
+00:00 +7: D:/Cavallo/social_commerce_app/test/core/chat/chat_connection_manager_test.dart: reconnection vs deliberate disconnect an unexpected close moves to reconnecting, schedules attempt 1 at 1s, and a successful retry reconnects and resets the attempt count
+00:00 +8: D:/Cavallo/social_commerce_app/test/core/chat/chat_connection_manager_test.dart: reconnection vs deliberate disconnect repeated unexpected closes back off with increasing delays (1s, then 2s on the next failure)
+ChatConnectionManager: dropped malformed frame ΓÇö Could not JSON-decode incoming frame: FormatException: Unexpected character (at character 1)
+ChatConnectionManager: dropped malformed frame ΓÇö ChatEventParseException: Unrecognized WebSocket event shape ΓÇö matched none of chat_message / status_update / typing_indicator (payload: {unexpected: shape})
+00:11 +113: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: network failures: retries automatically, ends in "Failed to send ┬╖ Tap to retry" after 5 attempts, then tap-to-retry succeeds
+00:11 +114: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: network failures: retries automatically, ends in "Failed to send ┬╖ Tap to retry" after 5 attempts, then tap-to-retry succeeds
+00:11 +115: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: network failures: retries automatically, ends in "Failed to send ┬╖ Tap to retry" after 5 attempts, then tap-to-retry succeeds
+00:11 +116: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: network failures: retries automatically, ends in "Failed to send ┬╖ Tap to retry" after 5 attempts, then tap-to-retry succeeds
+00:11 +117: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: network failures: retries automatically, ends in "Failed to send ┬╖ Tap to retry" after 5 attempts, then tap-to-retry succeeds
+00:11 +118: D:/Cavallo/social_commerce_app/test/features/chat/presentation/chat_thread_screen_outbound_test.dart: network failures: retries automatically, ends in "Failed to send ┬╖ Tap to retry" after 5 attempts, then tap-to-retry succeeds
+00:13 +126: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: failed: shows the failure text and the error reason
+00:13 +127: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: failed: tapping the bubble calls onRetry only
+00:13 +128: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_bubble_widget_test.dart: failed: tapping the ├ù calls onDiscard and NOT onRetry
+00:14 +132: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_queue_provider_test.dart: always fails with a network error ΓÇö failed after exactly 5 attempts, never silently disappears, no sentStream event
+00:14 +133: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_queue_provider_test.dart: non-retryable failures fail immediately (no retry loop) ValidationFailure (400) ΓÇö 1 call only, straight to failed
+00:14 +134: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_queue_provider_test.dart: non-retryable failures fail immediately (no retry loop) AuthFailure (401/403) ΓÇö 1 call only, straight to failed
+00:14 +135: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_queue_provider_test.dart: non-retryable failures fail immediately (no retry loop) ServerFailure (5xx) ΓÇö 1 call only, straight to failed
+00:14 +136: D:/Cavallo/social_commerce_app/test/features/chat/presentation/outbound_message_queue_provider_test.dart: unexpected non-ApiFailure exception ΓÇö failed immediately with a generic message, never silently lost
+00:15 +147: D:/Cavallo/social_commerce_app/test/features/chat/presentation/shared_content_bubble_widget_test.dart: shared Post a failed fetch falls back to a tappable preview card
+00:16 +154: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: a failed send keeps the picker open and navigates nowhere
+00:16 +157: All tests passed!
+-- last 15 lines --
+00:14 +143: D:/Cavallo/social_commerce_app/test/features/chat/presentation/shared_content_bubble_widget_test.dart: shared Post renders the reused PostCard, the business name and the text
+00:15 +144: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: the sheet offers both options; "Share via" runs the native flow
+00:15 +145: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: the sheet offers both options; "Share via" runs the native flow
+00:15 +146: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: the sheet offers both options; "Share via" runs the native flow
+00:15 +147: D:/Cavallo/social_commerce_app/test/features/chat/presentation/shared_content_bubble_widget_test.dart: shared Post a failed fetch falls back to a tappable preview card
+00:15 +148: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:15 +149: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:16 +150: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:16 +151: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:16 +152: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:16 +153: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: picking a conversation sends the reference and opens the thread
+00:16 +154: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: a failed send keeps the picker open and navigates nowhere
+00:16 +155: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: no conversations shows the empty state
+00:16 +156: D:/Cavallo/social_commerce_app/test/features/chat/presentation/share_to_conversation_sheet_test.dart: ContentActionRow: the Share icon opens the options; sharing to a conversation sends the post and tracks the share
+00:16 +157: All tests passed!
+
+===== Notification tests (existing)  (exit=0) =====
+-- key lines --
+00:08 +83: All tests passed!
+-- last 15 lines --
+00:07 +69: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/push_notification_handler_test.dart: a foreground push shows a banner with its title and body
+00:08 +70: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/push_notification_handler_test.dart: a foreground push shows a banner with its title and body
+00:08 +71: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/push_notification_handler_test.dart: a foreground push shows a banner with its title and body
+00:08 +72: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/push_notification_handler_test.dart: a foreground push shows a banner with its title and body
+00:08 +73: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/push_notification_handler_test.dart: a foreground push shows a banner with its title and body
+00:08 +74: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/push_notification_handler_test.dart: a foreground push shows a banner with its title and body
+00:08 +75: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/push_notification_handler_test.dart: a foreground push shows a banner with its title and body
+00:08 +76: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/notification_restyle_test.dart: notification preferences three switches in one group, English light
+00:08 +77: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/push_notification_handler_test.dart: tapping the banner opens the deep link and marks it read
+00:08 +78: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/notification_restyle_test.dart: notification preferences Arabic dark: RTL, localized, and a toggle still saves
+00:08 +79: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/notification_restyle_test.dart: notification preferences Arabic dark: RTL, localized, and a toggle still saves
+00:08 +80: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/notification_restyle_test.dart: notification preferences Arabic dark: RTL, localized, and a toggle still saves
+00:08 +81: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/notification_restyle_test.dart: notification preferences Arabic dark: RTL, localized, and a toggle still saves
+00:08 +82: D:/Cavallo/social_commerce_app/test/features/notifications/presentation/push_notification_handler_test.dart: a message with no title and no body shows no banner
+00:08 +83: All tests passed!
+
+===== flutter test (full)  (exit=1) =====
+-- key lines --
+00:00 +7: D:/Cavallo/social_commerce_app/test/core/chat/chat_connection_manager_test.dart: reconnection vs deliberate disconnect an unexpected close moves to reconnecting, schedules attempt 1 at 1s, and a successful retry reconnects and resets the attempt count
+00:00 +8: D:/Cavallo/social_commerce_app/test/core/chat/chat_connection_manager_test.dart: reconnection vs deliberate disconnect repeated unexpected closes back off with increasing delays (1s, then 2s on the next failure)
+ChatConnectionManager: dropped malformed frame ΓÇö Could not JSON-decode incoming frame: FormatException: Unexpected character (at character 1)
+ChatConnectionManager: dropped malformed frame ΓÇö ChatEventParseException: Unrecognized WebSocket event shape ΓÇö matched none of chat_message / status_update / typing_indicator (payload: {unexpected: shape})
+00:03 +66: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +67: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +68: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +69: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +70: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +71: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +72: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +73: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +74: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +75: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +76: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +77: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +78: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +79: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +80: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +81: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +82: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +83: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +84: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +85: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +86: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +87: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +88: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +89: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +90: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +91: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +92: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +93: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +94: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +95: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +96: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +97: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +98: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:03 +99: D:/Cavallo/social_commerce_app/test/core/integration_test.dart: P-009: AppTheme + AppRouter combined via MaterialApp.router renders together without conflict or exception, and the theme actually reaches the router screens (not just the default Material look)
+00:08 +152: D:/Cavallo/social_commerce_app/test/core/network/error_interceptor_test.dart: unparseable/unexpected body maps to UnknownFailure
+00:09 +165: D:/Cavallo/social_commerce_app/test/core/network/refresh_interceptor_test.dart: no refresh token stored ΓåÆ treated the same as a failed refresh: storage cleared, session invalidated, AuthFailure propagated
+-- last 25 lines --
+The status code of 400 has the following meaning: "Client error - the request contains bad syntax or cannot be fulfilled"
+Read more about status codes at https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+In order to resolve this exception you typically have either to verify and fix your request code or you have to fix the server code.
+03:23 +1563 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: (setUpAll)
+03:23 +1563 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: navigation manifest vs the real router every route named in the manifest exists in the router
+03:23 +1564 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: navigation manifest vs the real router no router route exists outside the manifest
+03:23 +1565 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: navigation manifest vs the real router every allowed audience has a visible entry point to every route
+03:23 +1566 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: navigation manifest vs the real router the manifest itself is well formed
+03:23 +1567 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: locked bottom navigation layout Customer: Home, Explore, Saved, Chats, Profile
+03:23 +1568 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: locked bottom navigation layout Business: Home, Explore, Create (+), Chats, Profile
+03:23 +1569 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: locked bottom navigation layout Staff: Home, Explore, Moderation, Chats, Profile
+03:23 +1570 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: locked bottom navigation layout slots are exactly 1..5 for every audience
+03:23 +1571 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: navAudienceForUser plain customer and business
+03:23 +1572 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: navAudienceForUser moderator or staff wins over the account type
+03:23 +1573 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: the checker can fail (meta tests) a consistent manifest and router produce no problems
+03:23 +1574 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: the checker can fail (meta tests) a route removed from the router is reported
+03:23 +1575 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: the checker can fail (meta tests) a route added to the router without the manifest is reported
+03:23 +1576 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: the checker can fail (meta tests) an allowed audience with zero entry points is reported
+03:23 +1577 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: the checker can fail (meta tests) a deep-link-only entry does not count as visible
+03:23 +1578 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: the checker can fail (meta tests) a deep-link-only entry without a reason is malformed
+03:23 +1579 -5: D:/Cavallo/social_commerce_app/test/routing/navigation_reachability_test.dart: (tearDownAll)
+03:25 +1579 -5: D:/Cavallo/social_commerce_app/test/routing/route_error_screen_test.dart: English: texts, left-to-right, and the button goes home
+03:26 +1580 -5: D:/Cavallo/social_commerce_app/test/routing/route_error_screen_test.dart: Arabic: texts and right-to-left
+03:26 +1581 -5: D:/Cavallo/social_commerce_app/test/widget_test.dart: App boots signed-out and lands on LoginScreen
+03:27 +1582 -5: Some tests failed.
+BASE branch=main commit=87cbcbb773fa77b1ee34e7280f5061b6f2b7369c
+
+===== Chat reliability diff =====
+-- logic files (expected: empty) --
+ lib/core/chat/chat_connection_manager.dart         | 35 ++++++++++------------
+ lib/core/chat/chat_event.dart                      | 14 ++++-----
+ .../chat/data/conversation_repository.dart         | 18 +++++------
+ lib/features/chat/data/message_repository.dart     |  2 +-
+ lib/features/chat/domain/conversation.dart         | 16 +++++-----
+ lib/features/chat/domain/message.dart              |  2 +-
+ lib/features/chat/domain/message_status.dart       |  2 +-
+ lib/features/chat/domain/shared_content.dart       |  9 +++---
+ .../chat/presentation/chat_unread_provider.dart    | 34 +++++++++++++++++++++
+ .../outbound_message_queue_provider.dart           | 27 +++++++++--------
+ 10 files changed, 98 insertions(+), 61 deletions(-)
+-- chat/notification test files modified vs base --
+ .../chat/presentation/chat_list_screen_test.dart   | 182 +++++++++---
+ .../presentation/chat_unread_provider_test.dart    | 114 ++++++++
+ .../presentation/notification_restyle_test.dart    | 324 +++++++++++++++++++++
+ 3 files changed, 587 insertions(+), 33 deletions(-)
+
+===== git status =====
+ M lib/features/chat/presentation/chat_thread_screen.dart
+ M lib/features/chat/presentation/message_bubble_widget.dart
+ M lib/features/products/presentation/product_form_screen.dart
+ M lib/l10n/app_ar.arb
+ M lib/l10n/app_localizations_ar.dart
+?? P115-Step11-Rebuild.ps1
+?? P115-Step11A.ps1
+?? P115-Step11B-fix.ps1
+?? P115-Step11B.ps1
+?? P115-Step11C.ps1
+?? UI_QA_CHECKLIST.md
+?? UI_QA_CHECKLIST.md.bak
+?? _review_tmp/
+?? arabic_glossary.txt
+?? arb_recon.txt
+?? bundle_10B.txt
+?? bundle_10C.txt
+?? bundle_11A.txt
+?? bundle_for_chat.txt
+?? golden_recon.txt
+?? lib/l10n/app_ar.arb.bak
+?? phase23_text.txt
+?? qa_recon.txt
+?? test/features/chat/presentation/chat_thread_restyle_test.dart
+?? test/goldens/failures/
+?? test/goldens/golden_helpers.dart
+?? test/goldens/p115_chat/
+?? test/goldens/p115_chat_goldens_test.dart
+?? test/goldens/p115_screens/
+?? test/goldens/p115_screens_goldens_test.dart
+?? validation_13.txt
+
+===== SUMMARY =====
+gen-l10n               PASS
+analyze                PASS
+guard-reachability     PASS
+guard-arb-parity       PASS
+guard-hardcoded        PASS
+goldens                FAIL (exit=1)
+chat-tests             PASS
+notification-tests     PASS
+full-test              FAIL (exit=1)

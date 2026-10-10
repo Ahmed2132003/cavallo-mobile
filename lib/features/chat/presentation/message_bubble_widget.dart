@@ -4,55 +4,121 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/l10n_context.dart';
+import '../../../core/theme/app_colors.dart';
 import '../domain/message.dart';
 import '../domain/message_status.dart';
 import '../domain/shared_content.dart';
 import 'outbound_message_queue_provider.dart';
 import 'shared_content_card.dart';
 
-/// Part P-074 STEP 3 — renders a single message bubble inside the
-/// message thread screen (kept as `chat_thread_screen.dart`'s
-/// `ChatThreadScreen`, not renamed — see that file's own doc comment
-/// for why no new screen file/class was created for P-007's existing
-/// placeholders).
+/// Chat bubbles.
 ///
-/// [isMine] is supplied by the caller, not computed here: in a 1:1
-/// conversation, `message.senderId != conversation.otherParticipant.id`
-/// is enough to know "this is my own message" without this app ever
-/// needing to know its own signed-in user id — see
-/// `chat_thread_screen.dart`'s own doc comment for why that's a
-/// deliberate design choice, not an oversight.
-///
-/// Part P-075 STEP 3: this file now also holds
-/// [OutboundMessageBubbleWidget] — the bubble for a message that is
-/// still in the local outbound queue (sending / retrying / failed).
-/// Both widgets share one private layout ([_BubbleShell]) so a pending
-/// bubble looks like a real one. [MessageBubbleWidget]'s own API is
-/// unchanged.
-///
-/// Part P-076: both bubbles can now show media above the text. An image
-/// renders as a thumbnail; a video renders as a neutral placeholder with
-/// a play icon (same visual language as `ReelCard`'s play overlay — the
-/// backend produces no thumbnail for chat video and this project has no
-/// video-playback package, so there is no inline playback). A
-/// media-only message simply shows no text.
-///
-/// Part P-077 STEP 3: a delivered message that shares platform content
-/// ([Message.sharedContent]) renders a [SharedContentCard] (PostCard /
-/// ReelCard reused unmodified, or a compact product card) ABOVE a
-/// regular text bubble. That text bubble carries the optional text
-/// ("check this out!") plus the time / delivery-status footer, so the
-/// footer looks exactly like every other bubble's. The backend never
-/// combines shared content with media, so the two layouts never mix.
+/// Part P-115 STEP 3A: restyle only. Own bubbles are brand blue with white
+/// text, received bubbles use surfaceVariant, corners are 20 with the corners
+/// on the sender's side tightened to 4 between consecutive messages from the
+/// same sender (grouping is decided by the caller and passed in as
+/// [MessageBubbleWidget.isFirstInGroup] / [MessageBubbleWidget.isLastInGroup];
+/// it is presentation only). Everything is directional, so the layout mirrors
+/// in Arabic. No send / queue / delivery logic lives here.
+
+const double _bubbleRadius = 20;
+const double _groupedRadius = 4;
+
+BorderRadiusDirectional _radiusFor({
+  required bool isMine,
+  required bool isFirstInGroup,
+  required bool isLastInGroup,
+}) {
+  const Radius big = Radius.circular(_bubbleRadius);
+  final Radius top = Radius.circular(
+    isFirstInGroup ? _bubbleRadius : _groupedRadius,
+  );
+  final Radius bottom = Radius.circular(
+    isLastInGroup ? _bubbleRadius : _groupedRadius,
+  );
+  if (isMine) {
+    return BorderRadiusDirectional.only(
+      topStart: big,
+      bottomStart: big,
+      topEnd: top,
+      bottomEnd: bottom,
+    );
+  }
+  return BorderRadiusDirectional.only(
+    topStart: top,
+    bottomStart: bottom,
+    topEnd: big,
+    bottomEnd: big,
+  );
+}
+
+/// The colours of one bubble, all taken from [AppColors].
+class _Tone {
+  const _Tone({
+    required this.background,
+    required this.text,
+    required this.meta,
+    required this.readTick,
+  });
+
+  final Color background;
+  final Color text;
+  final Color meta;
+  final Color readTick;
+}
+
+_Tone _toneFor(AppColors c, {required bool isMine, bool isFailed = false}) {
+  if (isFailed) {
+    return _Tone(
+      background: c.dangerSubtle,
+      text: c.dangerText,
+      meta: c.dangerText.withValues(alpha: 0.8),
+      readTick: c.dangerText,
+    );
+  }
+  if (isMine) {
+    return _Tone(
+      background: c.brand,
+      text: c.onBrand,
+      meta: c.onBrand.withValues(alpha: 0.75),
+      readTick: c.onBrand,
+    );
+  }
+  return _Tone(
+    background: c.surfaceVariant,
+    text: c.textPrimary,
+    meta: c.textSecondary,
+    readTick: c.brandText,
+  );
+}
+
+/// For a time / tick line that sits on the page, outside any bubble.
+_Tone _toneOnBackground(AppColors c) {
+  return _Tone(
+    background: Colors.transparent,
+    text: c.textPrimary,
+    meta: c.textSecondary,
+    readTick: c.brandText,
+  );
+}
+
 class MessageBubbleWidget extends StatelessWidget {
   const MessageBubbleWidget({
     super.key,
     required this.message,
     required this.isMine,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
   });
 
   final Message message;
   final bool isMine;
+
+  /// First message of a run from the same sender (full top corners).
+  final bool isFirstInGroup;
+
+  /// Last message of a run from the same sender (full bottom corners).
+  final bool isLastInGroup;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +128,8 @@ class MessageBubbleWidget extends StatelessWidget {
         message: message,
         shared: shared,
         isMine: isMine,
+        isFirstInGroup: isFirstInGroup,
+        isLastInGroup: isLastInGroup,
       );
     }
 
@@ -69,53 +137,54 @@ class MessageBubbleWidget extends StatelessWidget {
     return _BubbleShell(
       text: message.text,
       isMine: isMine,
+      isFirstInGroup: isFirstInGroup,
+      isLastInGroup: isLastInGroup,
       media:
           mediaType == null
               ? null
               : _MediaPreview(type: mediaType, networkUrl: message.mediaUrl),
-      footerBuilder:
-          (textColor) => _deliveredFooter(message, isMine, textColor),
+      footerBuilder: (tone) => _deliveredFooter(message, isMine, tone),
     );
   }
 }
 
-/// Time + (for my own messages) the delivery-status icon. Shared by the
-/// regular bubble and the shared-content bubble.
-Widget _deliveredFooter(Message message, bool isMine, Color textColor) {
+Widget _deliveredFooter(Message message, bool isMine, _Tone tone) {
   return Row(
     mainAxisSize: MainAxisSize.min,
     children: [
       Text(
         _formatTime(message.createdAt),
-        style: TextStyle(color: textColor.withValues(alpha: 0.7), fontSize: 11),
+        style: TextStyle(color: tone.meta, fontSize: 11),
       ),
       if (isMine) ...[
         const SizedBox(width: 4),
-        _StatusIcon(status: message.status, color: textColor),
+        _StatusIcon(status: message.status, tone: tone),
       ],
     ],
   );
 }
 
-/// Part P-077 STEP 3 — a delivered message that shares Post / Reel /
-/// Product content: the card on top, then a normal text bubble (text,
-/// if any, plus the footer) aligned to the same side.
 class _SharedContentBubble extends StatelessWidget {
   const _SharedContentBubble({
     required this.message,
     required this.shared,
     required this.isMine,
+    required this.isFirstInGroup,
+    required this.isLastInGroup,
   });
 
   final Message message;
   final SharedContent shared;
   final bool isMine;
+  final bool isFirstInGroup;
+  final bool isLastInGroup;
 
   @override
   Widget build(BuildContext context) {
     // Same 75%-of-screen rule as the text bubble, capped so a card is
     // never absurdly wide on a tablet.
     final cardWidth = math.min(MediaQuery.of(context).size.width * 0.75, 300.0);
+    final bool hasText = message.text.isNotEmpty;
 
     return Column(
       crossAxisAlignment:
@@ -123,45 +192,56 @@ class _SharedContentBubble extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+          padding: EdgeInsetsDirectional.fromSTEB(
+            12,
+            isFirstInGroup ? 6 : 2,
+            12,
+            0,
+          ),
           child: SizedBox(
             width: cardWidth,
             child: SharedContentCard(sharedContent: shared),
           ),
         ),
-        _BubbleShell(
-          text: message.text,
-          isMine: isMine,
-          footerBuilder:
-              (textColor) => _deliveredFooter(message, isMine, textColor),
-        ),
+        if (hasText)
+          _BubbleShell(
+            text: message.text,
+            isMine: isMine,
+            // The text bubble is attached under the card.
+            isFirstInGroup: false,
+            isLastInGroup: isLastInGroup,
+            footerBuilder: (tone) => _deliveredFooter(message, isMine, tone),
+          )
+        else
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 4, 16, 6),
+            child: _deliveredFooter(
+              message,
+              isMine,
+              _toneOnBackground(context.appColors),
+            ),
+          ),
       ],
     );
   }
 }
 
-/// Part P-075 STEP 3 — the bubble for a locally-queued outbound message
-/// ([OutboundMessage]). Always rendered as the sender's own bubble.
-///
-/// - [OutboundMessageStatus.sending]: clock icon.
-/// - [OutboundMessageStatus.retrying]: clock icon + "Retrying…".
-/// - [OutboundMessageStatus.failed]: error-colored bubble with
-///   "Failed to send · Tap to retry"; tapping ANYWHERE on the bubble
-///   calls [onRetry], and the small × calls [onDiscard].
-///
-/// Part P-076: a queued media message shows its local file as the
-/// thumbnail (video: placeholder + play icon) with the same three states.
 class OutboundMessageBubbleWidget extends StatelessWidget {
   const OutboundMessageBubbleWidget({
     super.key,
     required this.outbound,
     required this.onRetry,
     required this.onDiscard,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
   });
 
   final OutboundMessage outbound;
   final VoidCallback onRetry;
   final VoidCallback onDiscard;
+
+  final bool isFirstInGroup;
+  final bool isLastInGroup;
 
   @override
   Widget build(BuildContext context) {
@@ -172,13 +252,15 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
       text: outbound.text,
       isMine: true,
       isFailed: isFailed,
+      isFirstInGroup: isFirstInGroup,
+      isLastInGroup: isLastInGroup,
       onTap: isFailed ? onRetry : null,
       tapKey: isFailed ? ValueKey('outbound_retry_${outbound.id}') : null,
       media:
           mediaType == null
               ? null
               : _MediaPreview(type: mediaType, localPath: outbound.mediaPath),
-      footerBuilder: (textColor) {
+      footerBuilder: (tone) {
         if (isFailed) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -187,13 +269,13 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.error_outline, size: 14, color: textColor),
+                  Icon(Icons.error_outline, size: 14, color: tone.text),
                   const SizedBox(width: 4),
                   Flexible(
                     child: Text(
                       context.l10n.chatBubbleFailedTapRetry,
                       style: TextStyle(
-                        color: textColor,
+                        color: tone.text,
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
@@ -206,7 +288,7 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
                     onTap: onDiscard,
                     child: Padding(
                       padding: const EdgeInsets.all(2),
-                      child: Icon(Icons.close, size: 16, color: textColor),
+                      child: Icon(Icons.close, size: 16, color: tone.text),
                     ),
                   ),
                 ],
@@ -218,10 +300,7 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.end,
-                  style: TextStyle(
-                    color: textColor.withValues(alpha: 0.7),
-                    fontSize: 10,
-                  ),
+                  style: TextStyle(color: tone.meta, fontSize: 10),
                 ),
               ],
             ],
@@ -234,27 +313,17 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
           children: [
             Text(
               _formatTime(outbound.createdAt),
-              style: TextStyle(
-                color: textColor.withValues(alpha: 0.7),
-                fontSize: 11,
-              ),
+              style: TextStyle(color: tone.meta, fontSize: 11),
             ),
             if (isRetrying) ...[
               const SizedBox(width: 4),
               Text(
                 context.l10n.chatBubbleRetrying,
-                style: TextStyle(
-                  color: textColor.withValues(alpha: 0.7),
-                  fontSize: 11,
-                ),
+                style: TextStyle(color: tone.meta, fontSize: 11),
               ),
             ],
             const SizedBox(width: 4),
-            Icon(
-              Icons.schedule,
-              size: 14,
-              color: textColor.withValues(alpha: 0.85),
-            ),
+            Icon(Icons.schedule, size: 14, color: tone.meta),
           ],
         );
       },
@@ -269,14 +338,6 @@ String _formatTime(DateTime dt) {
   return '$hour:$minute';
 }
 
-/// The shared bubble layout (alignment, colors, shape, media, text,
-/// footer). [footerBuilder] receives the resolved text color so each
-/// caller's footer matches the bubble. When [isFailed] the bubble uses
-/// the theme's error container colors; when [onTap] is non-null the
-/// whole bubble is tappable ([tapKey] lets tests find that tap target).
-///
-/// Part P-076: [media], when non-null, is drawn above the text; the text
-/// line is skipped entirely when [text] is empty (a media-only message).
 class _BubbleShell extends StatelessWidget {
   const _BubbleShell({
     required this.text,
@@ -284,47 +345,44 @@ class _BubbleShell extends StatelessWidget {
     required this.footerBuilder,
     this.media,
     this.isFailed = false,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
     this.onTap,
     this.tapKey,
   });
 
   final String text;
   final bool isMine;
-  final Widget Function(Color textColor) footerBuilder;
+  final Widget Function(_Tone tone) footerBuilder;
   final Widget? media;
   final bool isFailed;
+  final bool isFirstInGroup;
+  final bool isLastInGroup;
   final VoidCallback? onTap;
   final Key? tapKey;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final bubbleColor =
-        isFailed
-            ? theme.colorScheme.errorContainer
-            : isMine
-            ? theme.colorScheme.primary
-            : theme.colorScheme.surfaceContainerHighest;
-    final textColor =
-        isFailed
-            ? theme.colorScheme.onErrorContainer
-            : isMine
-            ? theme.colorScheme.onPrimary
-            : theme.colorScheme.onSurface;
+    final AppColors colors = context.appColors;
+    final _Tone tone = _toneFor(colors, isMine: isMine, isFailed: isFailed);
 
     final bubble = Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      margin: EdgeInsetsDirectional.fromSTEB(
+        12,
+        isFirstInGroup ? 6 : 1,
+        12,
+        isLastInGroup ? 6 : 1,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width * 0.75,
       ),
       decoration: BoxDecoration(
-        color: bubbleColor,
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(16),
-          topRight: const Radius.circular(16),
-          bottomLeft: Radius.circular(isMine ? 16 : 4),
-          bottomRight: Radius.circular(isMine ? 4 : 16),
+        color: tone.background,
+        borderRadius: _radiusFor(
+          isMine: isMine,
+          isFirstInGroup: isFirstInGroup,
+          isLastInGroup: isLastInGroup,
         ),
       ),
       child: Column(
@@ -334,15 +392,21 @@ class _BubbleShell extends StatelessWidget {
           if (media != null) media!,
           if (media != null && text.isNotEmpty) const SizedBox(height: 6),
           if (text.isNotEmpty)
-            Text(text, style: TextStyle(color: textColor, fontSize: 15)),
+            Text(
+              text,
+              style: TextStyle(color: tone.text, fontSize: 15, height: 1.35),
+            ),
           const SizedBox(height: 4),
-          footerBuilder(textColor),
+          footerBuilder(tone),
         ],
       ),
     );
 
     return Align(
-      alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
+      alignment:
+          isMine
+              ? AlignmentDirectional.centerEnd
+              : AlignmentDirectional.centerStart,
       child:
           onTap == null
               ? bubble
@@ -356,20 +420,6 @@ class _BubbleShell extends StatelessWidget {
   }
 }
 
-/// Part P-076 — the image thumbnail / video placeholder shown inside a
-/// bubble. Exactly one of [networkUrl] (a delivered message) or
-/// [localPath] (a still-queued message) is normally set.
-///
-/// - image: `Image.file` for a local path, `Image.network` for a URL,
-///   with the same neutral broken-image fallback convention as
-///   `PostCard`/`ReelCard` (never throws on a bad/expired URL).
-/// - video: a neutral placeholder plus a play icon (the `ReelCard`
-///   overlay look). No thumbnail exists for chat video and there is no
-///   video-playback package in this project, so it is not playable
-///   inline — flagged limitation, not silently omitted.
-///
-/// The root carries `ValueKey('chatMedia_image')` / `'chatMedia_video'`
-/// so widget tests can find it.
 class _MediaPreview extends StatelessWidget {
   const _MediaPreview({required this.type, this.networkUrl, this.localPath});
 
@@ -379,12 +429,12 @@ class _MediaPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final AppColors colors = context.appColors;
 
     Widget placeholder(IconData icon) => Container(
-      color: surface,
+      color: colors.surfaceVariant,
       alignment: Alignment.center,
-      child: Icon(icon, size: 40),
+      child: Icon(icon, size: 40, color: colors.textSecondary),
     );
 
     final Widget content;
@@ -419,17 +469,13 @@ class _MediaPreview extends StatelessWidget {
       key: ValueKey('chatMedia_${type.name}'),
       constraints: const BoxConstraints(maxWidth: 200),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         child: AspectRatio(aspectRatio: 4 / 3, child: content),
       ),
     );
   }
 }
 
-/// Same look as `ReelCard`'s private `_PlayIconOverlay` — deliberately
-/// duplicated (that widget is private to `reel_card.dart`, and this
-/// project's own convention for such small visuals is duplication over
-/// cross-feature coupling; see that file's own comment).
 class _PlayIconOverlay extends StatelessWidget {
   const _PlayIconOverlay();
 
@@ -448,36 +494,25 @@ class _PlayIconOverlay extends StatelessWidget {
   }
 }
 
-/// Sent -> single check. Delivered -> double check. Read -> double
-/// check, tinted with the theme's own tertiary color rather than a
-/// hardcoded blue (this file has no knowledge of the app's palette).
-/// [MessageStatus.unknown] falls back to a single check — same
-/// never-block-rendering-on-an-unrecognized-value rationale as
-/// `MessageStatus.unknown` itself.
 class _StatusIcon extends StatelessWidget {
-  const _StatusIcon({required this.status, required this.color});
+  const _StatusIcon({required this.status, required this.tone});
 
   final MessageStatus status;
-  final Color color;
+  final _Tone tone;
 
   @override
   Widget build(BuildContext context) {
+    // Sent = one tick, delivered = two ticks, read = two ticks in the
+    // emphasised colour. The tick COUNT separates sent from the rest; read
+    // is the full-strength tick.
     switch (status) {
       case MessageStatus.read:
-        return Icon(
-          Icons.done_all,
-          size: 14,
-          color: Theme.of(context).colorScheme.tertiary,
-        );
+        return Icon(Icons.done_all, size: 14, color: tone.readTick);
       case MessageStatus.delivered:
-        return Icon(
-          Icons.done_all,
-          size: 14,
-          color: color.withValues(alpha: 0.85),
-        );
+        return Icon(Icons.done_all, size: 14, color: tone.meta);
       case MessageStatus.sent:
       case MessageStatus.unknown:
-        return Icon(Icons.done, size: 14, color: color.withValues(alpha: 0.85));
+        return Icon(Icons.done, size: 14, color: tone.meta);
     }
   }
 }

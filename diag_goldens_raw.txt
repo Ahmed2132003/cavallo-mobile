@@ -1,0 +1,1201 @@
+00:00 +0: loading D:/Cavallo/social_commerce_app/test/goldens/p114_goldens_test.dart
+00:00 +0: D:/Cavallo/social_commerce_app/test/goldens/p114_goldens_test.dart: P-114 goldens post card (en_light)
+Shell: [ERROR:flutter/shell/testing/tester_main.cc(239)] Could not create backing store for software rendering.
+00:09 +1: D:/Cavallo/social_commerce_app/test/goldens/p114_goldens_test.dart: P-114 goldens post card (en_light)
+Shell: ../../../flutter/third_party/dart/runtime/vm/os_thread.cc: 348: error: Could not start thread DartWorker: 22 (The device does not recognize the command.
+Shell: 
+Shell: )
+Shell: version=3.7.2 (stable) (Tue Mar 11 04:27:50 2025 -0700) on "windows_x64"
+Shell: pid=36424, thread=16544, isolate_group=main(000001E0B2E959D0), isolate=(nil)(0000000000000000)
+Shell: os=windows, arch=x64, comp=no, sim=no
+Shell: isolate_instructions=7ff6a17e7fe0, vm_instructions=7ff6a17e8000
+Shell: fp=4aca74b0b8, sp=4aca74b0b8, pc=7ff6a1abeec2
+../../runtime/vm/zone.cc: 96: error: Out of memory.
+version=3.7.2 (stable) (Tue Mar 11 04:27:50 2025 -0700) on "windows_x64"
+pid=34732, thread=10348, isolate_group=main(000001DACC7B9270), isolate=(nil)(0000000000000000)
+os=windows, arch=x64, comp=no, sim=no
+isolate_instructions=1dacba20000, vm_instructions=7ff69af09e00
+fp=769ffda28, sp=769ffda28, pc=7ff69b1b82b2
+  pc 0x00007ff69b1b82b2 fp 0x0000000769ffda28 Dart_DetectNullSafety+0x2a5dc2
+-- End of DumpStackTrace
+=== Crash occurred when compiling dart:core_RegExp_The Dart VM service is listening on ((http|//)[a-zA-Z0-9_/=_\-\.\[\]]+) in optimizing JIT mode in ApplyClassIds pass
+*** BEGIN CFG
+ApplyClassIds
+==== dart:core_RegExp_The Dart VM service is listening on ((http|//)[a-zA-Z0-9_/=_\-\.\[\]]+) (IrregexpFunction)
+B0[graph]:32 {
+      v0 <- Constant(#null) T{Null?}
+      v1 <- Constant(#<optimized out>)
+      v7 <- Constant(#6) T{_Smi}
+      v10 <- Constant(#0) T{_Smi}
+      v11 <- Constant(#-1) T{_Smi}
+      v13 <- Constant(#1) T{_Smi}
+      v15 <- Constant(#2) T{_Smi}
+      v17 <- Constant(#3) T{_Smi}
+      v19 <- Constant(#4) T{_Smi}
+      v21 <- Constant(#5) T{_Smi}
+      v25 <- Constant(#32) T{_Smi}
+      v28 <- Constant(#true) T{bool}
+      v34 <- Constant(#-7) T{_Smi}
+      v36 <- Constant(#7) T{_Smi}
+      v40 <- Constant(#_Uint8List) T{_Uint8List}
+      v41 <- Constant(#127) T{_Smi}
+      v45 <- Constant(#8) T{_Smi}
+      v47 <- Constant(#-3) T{_Smi}
+      v52 <- Constant(#543516756) T{_Smi}
+      v54 <- Constant(#-35) T{_Smi}
+      v56 <- Constant(#35) T{_Smi}
+      v61 <- Constant(#34) T{_Smi}
+      v65 <- Constant(#110) T{_Smi}
+      v67 <- Constant(#33) T{_Smi}
+      v71 <- Constant(#111) T{_Smi}
+      v77 <- Constant(#31) T{_Smi}
+      v81 <- Constant(#103) T{_Smi}
+      v83 <- Constant(#30) T{_Smi}
+      v88 <- Constant(#29) T{_Smi}
+      v92 <- Constant(#105) T{_Smi}
+      v94 <- Constant(#28) T{_Smi}
+      v99 <- Constant(#27) T{_Smi}
+      v103 <- Constant(#101) T{_Smi}
+      v105 <- Constant(#26) T{_Smi}
+      v109 <- Constant(#116) T{_Smi}
+      v111 <- Constant(#25) T{_Smi}
+      v115 <- Constant(#115) T{_Smi}
+      v117 <- Constant(#24) T{_Smi}
+      v122 <- Constant(#23) T{_Smi}
+      v126 <- Constant(#108) T{_Smi}
+      v128 <- Constant(#22) T{_Smi}
+      v133 <- Constant(#21) T{_Smi}
+      v138 <- Constant(#20) T{_Smi}
+      v143 <- Constant(#19) T{_Smi}
+      v148 <- Constant(#18) T{_Smi}
+      v153 <- Constant(#17) T{_Smi}
+      v157 <- Constant(#99) T{_Smi}
+      v159 <- Constant(#16) T{_Smi}
+      v164 <- Constant(#15) T{_Smi}
+      v168 <- Constant(#118) T{_Smi}
+      v170 <- Constant(#14) T{_Smi}
+      v174 <- Constant(#114) T{_Smi}
+      v176 <- Constant(#13) T{_Smi}
+      v181 <- Constant(#12) T{_Smi}
+      v186 <- Constant(#11) T{_Smi}
+      v191 <- Constant(#10) T{_Smi}
+      v195 <- Constant(#77) T{_Smi}
+      v197 <- Constant(#9) T{_Smi}
+      v201 <- Constant(#86) T{_Smi}
+      v218 <- Constant(#97) T{_Smi}
+      v223 <- Constant(#68) T{_Smi}
+      v225 <- Constant(#-37) T{_Smi}
+      v227 <- Constant(#36) T{_Smi}
+      v231 <- Constant(#29800) T{_Smi}
+      v233 <- Constant(#-39) T{_Smi}
+      v235 <- Constant(#39) T{_Smi}
+      v239 <- Constant(#112) T{_Smi}
+      v241 <- Constant(#38) T{_Smi}
+      v246 <- Constant(#-40) T{_Smi}
+      v248 <- Constant(#40) T{_Smi}
+      v252 <- Constant(#122) T{_Smi}
+      v254 <- Constant(#_Uint8List) T{_Uint8List}
+      v263 <- Constant(#41) T{_Smi}
+      v277 <- Constant(#12079) T{_Smi}
+      v279 <- Constant(#-38) T{_Smi}
+      v285 <- Constant(#_Uint8List) T{_Uint8List}
+      v311 <- Constant(#_Uint8List) T{_Uint8List}
+      v327 <- Constant(#TypeArguments: (Hac0c5b3) [Type: int]) T{TypeArguments}
+      v366 <- Constant(#Type: int) T{_Type}
+      v527 <- Constant(#TypeParameter: X0)
+}
+B1[function entry]:34 {
+      v2 <- Parameter(0 @fp[4])
+      v3 <- Parameter(1 @fp[3]) T{_OneByteString}
+      v4 <- Parameter(2 @fp[2]) T{_Smi}
+}
+    v5 <- StaticCall:44( get:length<0> v3, recognized_kind = StringBaseLength) T{_Smi}
+    v6 <- BinarySmiOp:46(-, v4, v5) T{_Smi}
+    v8 <- StaticCall:48( _getRegisters@0150898<0> v7) T{Int32List}
+    v9 <- LoadStaticField:50(_backtrackingStack@0150898, CallsInitializer) T{Int32List}
+    v12 <- BinarySmiOp:52(-, v11, v5) T{_Smi}
+    CheckClass:54(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v367 <- AssertAssignable:54(v12, v366, 'value', instantiator_type_args(v0), function_type_args(v0)) T{_Smi}
+    v368 <- LoadField(v8 T{_Int32List} . TypedDataBase.length {final}) T{_Smi}
+    v369 <- CheckArrayBound:54(v368, v10) T{_Smi}
+    v370 <- UnboxInt32:54(v367) int32
+    StoreIndexed:54([_Int32List] v8 T{_Int32List}, v369, v370, NoStoreBarrier)
+    v14 <- BinarySmiOp:56(-, v11, v5) T{_Smi}
+    CheckClass:58(v8 T{_Int32List} Cids[1: _Int32List@8027147 etc.  cid 132])
+    v371 <- AssertAssignable:58(v14, v366, 'value', instantiator_type_args(v0), function_type_args(v0)) T{_Smi}
+    v372 <- LoadField(v8 T{_Int32List} . TypedDataBase.length {final}) T{_Smi}
+    v373 <- CheckArrayBound:58(v372, v13) T{_Smi}
+    v374 <- UnboxInt32:58(v371) int32
+    StoreIndexed:58([_Int32List] v8 T{_Int32List}, v373, v374, NoStoreBarrier)
+    v16 <- BinarySmiOp:60(-, v11, v5) T{_Smi}
+    CheckClass:62(v8 T{_Int32List} Cids[1: _Int32List@8027147 etc.  cid 132])
+    v375 <- AssertAssignable:62(v16, v366, 'value', instantiator_type_args(v0), function_type_args(v0)) T{_Smi}
+    v376 <- LoadField(v8 T{_Int32List} . TypedDataBase.length {final}) T{_Smi}
+    v377 <- CheckArrayBound:62(v376, v15) T{_Smi}
+    v378 <- UnboxInt32:62(v375) int32
+    StoreIndexed:62([_Int32List] v8 T{_Int32List}, v377, v378, NoStoreBarrier)
+    v18 <- BinarySmiOp:64(-, v11, v5) T{_Smi}
+    CheckClass:66(v8 T{_Int32List} Cids[1: _Int32List@8027147 etc.  cid 132])
+    v379 <- AssertAssignable:66(v18, v366, 'value', instantiator_type_args(v0), function_type_args(v0)) T{_Smi}
+    v380 <- LoadField(v8 T{_Int32List} . TypedDataBase.length {final}) T{_Smi}
+    v381 <- CheckArrayBound:66(v380, v17) T{_Smi}
+    v382 <- UnboxInt32:66(v379) int32
+    StoreIndexed:66([_Int32List] v8 T{_Int32List}, v381, v382, NoStoreBarrier)
+    v20 <- BinarySmiOp:68(-, v11, v5) T{_Smi}
+    CheckClass:70(v8 T{_Int32List} Cids[1: _Int32List@8027147 etc.  cid 132])
+    v383 <- AssertAssignable:70(v20, v366, 'value', instantiator_type_args(v0), function_type_args(v0)) T{_Smi}
+    v384 <- LoadField(v8 T{_Int32List} . TypedDataBase.length {final}) T{_Smi}
+    v385 <- CheckArrayBound:70(v384, v19) T{_Smi}
+    v386 <- UnboxInt32:70(v383) int32
+    StoreIndexed:70([_Int32List] v8 T{_Int32List}, v385, v386, NoStoreBarrier)
+    v22 <- BinarySmiOp:72(-, v11, v5) T{_Smi}
+    CheckClass:74(v8 T{_Int32List} Cids[1: _Int32List@8027147 etc.  cid 132])
+    v387 <- AssertAssignable:74(v22, v366, 'value', instantiator_type_args(v0), function_type_args(v0)) T{_Smi}
+    v388 <- LoadField(v8 T{_Int32List} . TypedDataBase.length {final}) T{_Smi}
+    v389 <- CheckArrayBound:74(v388, v21) T{_Smi}
+    v390 <- UnboxInt32:74(v387) int32
+    StoreIndexed:74([_Int32List] v8 T{_Int32List}, v389, v390, NoStoreBarrier)
+    goto:76 B2
+B2[join]:36 pred(B1)
+    v23 <- BinarySmiOp:126(+, v13, v11) T{_Smi}
+    CheckClass:128(v9 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v391 <- AssertAssignable:128(v10, v366, 'value', instantiator_type_args(v0), function_type_args(v0)) T{_Smi}
+    v392 <- LoadField(v9 T{_Int32List} . TypedDataBase.length {final}) T{_Smi}
+    v393 <- CheckArrayBound:128(v392, v23) T{_Smi}
+    v394 <- UnboxInt32:128(v391) int32
+    StoreIndexed:128([_Int32List] v9 T{_Int32List}, v393, v394, NoStoreBarrier)
+    CheckClass:130(v9 T{_Int32List} Cids[1: _Int32List@8027147 etc.  cid 132])
+    v24 <- StaticCall:130( get:length<0> v9 T{_Int32List}, recognized_kind = TypedListBaseLength) T{_Smi}
+    v26 <- BinarySmiOp:132(-, v24, v25) T{_Smi}
+    CheckSmi:136(v26)
+    CheckSmi:136(v23)
+    v27 <- RelationalOp:136(>, v26, v23) T{bool}
+    Branch if StrictCompare:138(===, v27, v28, with number check) goto (7, 8)
+B7[target]:144
+    goto:146 B10
+B8[target]:148
+    goto:150 B9
+B9[join]:140 pred(B8)
+    v29 <- StaticCall:152( _growBacktrackingStack@0150898<0> ) T{Int32List}
+    goto:154 B10
+B10[join]:142 pred(B7, B9) {
+      v30 <- phi(v9 T{_Int32List}, v29) alive T{Int32List}
+}
+    goto:156 B11
+B11[join]:28 pred(B10, B27) {
+      v31 <- phi(v23, v271) alive T{int}
+      v32 <- phi(v6, v273) alive T{_Smi}
+}
+    goto:202 B12
+B12[join]:200 pred(B11)
+    goto:208 B13
+B13[join]:206 pred(B12, B19) {
+      v33 <- phi(v32, v46) alive T{_Smi}
+}
+    CheckStackOverflow:210(stack=0, loop=1)
+    CheckSmi:212(v33)
+    CheckSmi:212(v34)
+    v35 <- RelationalOp:212(>=, v33 T{_Smi}, v34) T{bool}
+    Branch if StrictCompare:214(===, v35, v28, with number check) goto (14, 15)
+B14[target]:220
+    goto:222 B20
+B15[target]:224
+    goto:226 B16
+B16[join]:216 pred(B15)
+    CheckSmi:228(v33 T{_Smi})
+    v37 <- BinarySmiOp:228(+, v33 T{_Smi}, v36) T{_Smi}
+    v38 <- BinarySmiOp:230(+, v37, v5) T{_Smi}
+    v39 <- LoadCodeUnits(v3, v38) T{_Smi}
+    v42 <- BinarySmiOp:232(&, v39, v41) T{_Smi}
+    v395 <- LoadField(v40 . TypedDataBase.length {final}) T{_Smi}
+    v396 <- CheckArrayBound:234(v395, v42) T{_Smi}
+    v397 <- LoadIndexed:234([_Uint8List] v40, v396) int64
+    CheckSmi:236(v397)
+    CheckSmi:236(v391)
+    v44 <- EqualityCompare:236(v397 == v391) T{bool}
+    Branch if StrictCompare:238(!==, v44, v28, with number check) goto (17, 18)
+B17[target]:244
+    goto:246 B20
+B20[join]:204 pred(B14, B17)
+    CheckSmi:256(v33 T{_Smi})
+    CheckSmi:256(v47)
+    v48 <- RelationalOp:256(>=, v33 T{_Smi}, v47) T{bool}
+    Branch if StrictCompare:258(===, v48, v28, with number check) goto (21, 22)
+B21[target]:264
+    goto:266 B4
+B4[join]:40 pred(B21, B181) {
+      v346 <- phi(v31, v359) alive T{int}
+}
+    CheckStackOverflow:1630(stack=0, loop=1)
+    CheckSmi:1632(v346)
+    v347 <- BinarySmiOp:1632(-, v346 T{_Smi}, v13) T{_Smi}
+    CheckClass:1634(v30 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v398 <- LoadField(v30 T{_Int32List} . TypedDataBase.length {final}) T{_Smi}
+    v399 <- CheckArrayBound:1634(v398, v346 T{_Smi}) T{_Smi}
+    v400 <- LoadIndexed:1634([_Int32List] v30 T{_Int32List}, v399) int32
+    igoto:(v400)
+B213[target]:1636
+    goto:1638 B6
+B6[join indirect]:122 pred(B213)
+    goto:124 B212
+B212[join]:120 pred(B6)
+    goto:1628 B5
+B5[join]:42 pred(B212)
+    DartReturn:118(v0)
+B214[target]:1640
+    goto:1642 B151
+B151[join indirect]:1146 pred(B214)
+    goto:1148 B183
+B183[join]:1144 pred(B151)
+    v361 <- BinarySmiOp:1402(-, v11, v5) T{_Smi}
+    CheckClass:1404(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v431 <- AssertAssignable:1404(v361, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v432 <- LoadField(v8 . TypedDataBase.length {final})
+    v433 <- CheckArrayBound:1404(v432, v19)
+    v434 <- UnboxInt32:1404(v361) int32
+    StoreIndexed:1404([_Int32List] v8, v433, v434, NoStoreBarrier)
+    v362 <- BinarySmiOp:1406(-, v11, v5) T{_Smi}
+    CheckClass:1408(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v435 <- AssertAssignable:1408(v362, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v436 <- LoadField(v8 . TypedDataBase.length {final})
+    v437 <- CheckArrayBound:1408(v436, v21)
+    v438 <- UnboxInt32:1408(v362) int32
+    StoreIndexed:1408([_Int32List] v8, v437, v438, NoStoreBarrier)
+    v363 <- BinarySmiOp:1410(-, v11, v5) T{_Smi}
+    CheckClass:1412(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v439 <- AssertAssignable:1412(v363, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v440 <- LoadField(v8 . TypedDataBase.length {final})
+    v441 <- CheckArrayBound:1412(v440, v15)
+    v442 <- UnboxInt32:1412(v363) int32
+    StoreIndexed:1412([_Int32List] v8, v441, v442, NoStoreBarrier)
+    v364 <- BinarySmiOp:1414(-, v347, v13) T{_Smi}
+    CheckClass:1416(v30 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v443 <- LoadField(v30 . TypedDataBase.length {final})
+    v444 <- CheckArrayBound:1416(v443, v347)
+    v445 <- LoadIndexed:1416([_Int32List] v30, v444) int32
+    goto:1418 B27
+B215[target]:1644
+    goto:1646 B170
+B170[join indirect]:1322 pred(B215)
+    goto:1324 B176
+B176[join]:1320 pred(B170)
+    v354 <- BinarySmiOp:1360(-, v11, v5) T{_Smi}
+    CheckClass:1362(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v446 <- AssertAssignable:1362(v354, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v447 <- LoadField(v8 . TypedDataBase.length {final})
+    v448 <- CheckArrayBound:1362(v447, v17)
+    v449 <- UnboxInt32:1362(v354) int32
+    StoreIndexed:1362([_Int32List] v8, v448, v449, NoStoreBarrier)
+    v355 <- BinarySmiOp:1364(-, v347, v13) T{_Smi}
+    CheckClass:1366(v30 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v450 <- LoadField(v30 . TypedDataBase.length {final})
+    v451 <- CheckArrayBound:1366(v450, v347)
+    v452 <- LoadIndexed:1366([_Int32List] v30, v451) int32
+    goto:1368 B178
+B178[join]:1182 pred(B176)
+    CheckClass:1374(v30 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v453 <- LoadField(v30 . TypedDataBase.length {final})
+    v454 <- CheckArrayBound:1374(v453, v355)
+    v455 <- LoadIndexed:1374([_Int32List] v30, v454) int32
+    CheckSmi:1376(v455)
+    CheckSmi:1376(v452)
+    v358 <- EqualityCompare:1376(v455 == v452) T{bool}
+    Branch if StrictCompare:1378(!==, v358, v28, with number check) goto (179, 180)
+B179[target]:1384
+    goto:1386 B182
+B182[join]:1372 pred(B179)
+    v360 <- BinarySmiOp:1398(+, v452, v11) T{_Smi}
+    goto:1400 B169
+B180[target]:1388
+    goto:1390 B181
+B181[join]:1380 pred(B180)
+    v359 <- BinarySmiOp:1392(-, v355, v13) T{_Smi}
+    CheckClass:1394(v30 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v456 <- LoadField(v30 . TypedDataBase.length {final})
+    v457 <- CheckArrayBound:1394(v456, v355)
+    v458 <- LoadIndexed:1394([_Int32List] v30, v457) int32
+    goto:1396 B4
+B216[target]:1648
+    goto:1650 B205
+B205[join indirect]:1568 pred(B216)
+    goto:1570 B210
+B210[join]:1566 pred(B205)
+    v349 <- BinarySmiOp:1604(-, v11, v5) T{_Smi}
+    CheckClass:1606(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v459 <- AssertAssignable:1606(v349, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v460 <- LoadField(v8 . TypedDataBase.length {final})
+    v461 <- CheckArrayBound:1606(v460, v19)
+    v462 <- UnboxInt32:1606(v349) int32
+    StoreIndexed:1606([_Int32List] v8, v461, v462, NoStoreBarrier)
+    v350 <- BinarySmiOp:1608(-, v11, v5) T{_Smi}
+    CheckClass:1610(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v463 <- AssertAssignable:1610(v350, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v464 <- LoadField(v8 . TypedDataBase.length {final})
+    v465 <- CheckArrayBound:1610(v464, v21)
+    v466 <- UnboxInt32:1610(v350) int32
+    StoreIndexed:1610([_Int32List] v8, v465, v466, NoStoreBarrier)
+    v351 <- BinarySmiOp:1612(-, v11, v5) T{_Smi}
+    CheckClass:1614(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v467 <- AssertAssignable:1614(v351, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v468 <- LoadField(v8 . TypedDataBase.length {final})
+    v469 <- CheckArrayBound:1614(v468, v15)
+    v470 <- UnboxInt32:1614(v351) int32
+    StoreIndexed:1614([_Int32List] v8, v469, v470, NoStoreBarrier)
+    v352 <- BinarySmiOp:1616(-, v347, v13) T{_Smi}
+    CheckClass:1618(v30 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v471 <- LoadField(v30 . TypedDataBase.length {final})
+    v472 <- CheckArrayBound:1618(v471, v347)
+    v473 <- LoadIndexed:1618([_Int32List] v30, v472) int32
+    goto:1620 B211
+B22[target]:268
+    goto:270 B23
+B23[join]:260 pred(B22)
+    CheckSmi:272(v33 T{_Smi})
+    v49 <- BinarySmiOp:272(+, v33 T{_Smi}, v391) T{_Smi}
+    v50 <- BinarySmiOp:274(+, v49, v5) T{_Smi}
+    v51 <- LoadCodeUnits(v3, v50) T{_Smi}
+    CheckSmi:276(v51)
+    CheckSmi:276(v52)
+    v53 <- EqualityCompare:276(v51 == v52) T{bool}
+    Branch if StrictCompare:278(===, v53, v28, with number check) goto (24, 25)
+B24[target]:284
+    goto:286 B29
+B29[join]:160 pred(B24)
+    CheckSmi:300(v33)
+    CheckSmi:300(v54)
+    v55 <- RelationalOp:300(>=, v33, v54) T{bool}
+    Branch if StrictCompare:302(===, v55, v28, with number check) goto (30, 31)
+B30[target]:308
+    goto:310 B27
+B31[target]:312
+    goto:314 B32
+B32[join]:304 pred(B31)
+    v57 <- BinarySmiOp:316(+, v33, v56) T{_Smi}
+    v58 <- BinarySmiOp:318(+, v57, v5) T{_Smi}
+    v59 <- LoadCodeUnits(v3, v58) T{_Smi}
+    CheckSmi:320(v59)
+    CheckSmi:320(v25)
+    v60 <- EqualityCompare:320(v59 == v25) T{bool}
+    Branch if StrictCompare:322(!==, v60, v28, with number check) goto (33, 34)
+B33[target]:328
+    goto:330 B27
+B34[target]:332
+    goto:334 B35
+B35[join]:324 pred(B34)
+    v62 <- BinarySmiOp:336(+, v33, v61) T{_Smi}
+    v63 <- BinarySmiOp:338(+, v62, v5) T{_Smi}
+    v64 <- LoadCodeUnits(v3, v63) T{_Smi}
+    CheckSmi:340(v64)
+    CheckSmi:340(v65)
+    v66 <- EqualityCompare:340(v64 == v65) T{bool}
+    Branch if StrictCompare:342(!==, v66, v28, with number check) goto (36, 37)
+B36[target]:348
+    goto:350 B27
+B37[target]:352
+    goto:354 B38
+B38[join]:344 pred(B37)
+    v68 <- BinarySmiOp:356(+, v33, v67) T{_Smi}
+    v69 <- BinarySmiOp:358(+, v68, v5) T{_Smi}
+    v70 <- LoadCodeUnits(v3, v69) T{_Smi}
+    CheckSmi:360(v70)
+    CheckSmi:360(v71)
+    v72 <- EqualityCompare:360(v70 == v71) T{bool}
+    Branch if StrictCompare:362(!==, v72, v28, with number check) goto (39, 40)
+B39[target]:368
+    goto:370 B27
+B40[target]:372
+    goto:374 B41
+B41[join]:364 pred(B40)
+    v73 <- BinarySmiOp:376(+, v33, v25) T{_Smi}
+    v74 <- BinarySmiOp:378(+, v73, v5) T{_Smi}
+    v75 <- LoadCodeUnits(v3, v74) T{_Smi}
+    CheckSmi:380(v75)
+    CheckSmi:380(v25)
+    v76 <- EqualityCompare:380(v75 == v25) T{bool}
+    Branch if StrictCompare:382(!==, v76, v28, with number check) goto (42, 43)
+B42[target]:388
+    goto:390 B27
+B43[target]:392
+    goto:394 B44
+B44[join]:384 pred(B43)
+    v78 <- BinarySmiOp:396(+, v33, v77) T{_Smi}
+    v79 <- BinarySmiOp:398(+, v78, v5) T{_Smi}
+    v80 <- LoadCodeUnits(v3, v79) T{_Smi}
+    CheckSmi:400(v80)
+    CheckSmi:400(v81)
+    v82 <- EqualityCompare:400(v80 == v81) T{bool}
+    Branch if StrictCompare:402(!==, v82, v28, with number check) goto (45, 46)
+B45[target]:408
+    goto:410 B27
+B46[target]:412
+    goto:414 B47
+B47[join]:404 pred(B46)
+    v84 <- BinarySmiOp:416(+, v33, v83) T{_Smi}
+    v85 <- BinarySmiOp:418(+, v84, v5) T{_Smi}
+    v86 <- LoadCodeUnits(v3, v85) T{_Smi}
+    CheckSmi:420(v86)
+    CheckSmi:420(v65)
+    v87 <- EqualityCompare:420(v86 == v65) T{bool}
+    Branch if StrictCompare:422(!==, v87, v28, with number check) goto (48, 49)
+B48[target]:428
+    goto:430 B27
+B49[target]:432
+    goto:434 B50
+B50[join]:424 pred(B49)
+    v89 <- BinarySmiOp:436(+, v33, v88) T{_Smi}
+    v90 <- BinarySmiOp:438(+, v89, v5) T{_Smi}
+    v91 <- LoadCodeUnits(v3, v90) T{_Smi}
+    CheckSmi:440(v91)
+    CheckSmi:440(v92)
+    v93 <- EqualityCompare:440(v91 == v92) T{bool}
+    Branch if StrictCompare:442(!==, v93, v28, with number check) goto (51, 52)
+B51[target]:448
+    goto:450 B27
+B52[target]:452
+    goto:454 B53
+B53[join]:444 pred(B52)
+    v95 <- BinarySmiOp:456(+, v33, v94) T{_Smi}
+    v96 <- BinarySmiOp:458(+, v95, v5) T{_Smi}
+    v97 <- LoadCodeUnits(v3, v96) T{_Smi}
+    CheckSmi:460(v97)
+    CheckSmi:460(v65)
+    v98 <- EqualityCompare:460(v97 == v65) T{bool}
+    Branch if StrictCompare:462(!==, v98, v28, with number check) goto (54, 55)
+B54[target]:468
+    goto:470 B27
+B55[target]:472
+    goto:474 B56
+B56[join]:464 pred(B55)
+    v100 <- BinarySmiOp:476(+, v33, v99) T{_Smi}
+    v101 <- BinarySmiOp:478(+, v100, v5) T{_Smi}
+    v102 <- LoadCodeUnits(v3, v101) T{_Smi}
+    CheckSmi:480(v102)
+    CheckSmi:480(v103)
+    v104 <- EqualityCompare:480(v102 == v103) T{bool}
+    Branch if StrictCompare:482(!==, v104, v28, with number check) goto (57, 58)
+B57[target]:488
+    goto:490 B27
+B58[target]:492
+    goto:494 B59
+B59[join]:484 pred(B58)
+    v106 <- BinarySmiOp:496(+, v33, v105) T{_Smi}
+    v107 <- BinarySmiOp:498(+, v106, v5) T{_Smi}
+    v108 <- LoadCodeUnits(v3, v107) T{_Smi}
+    CheckSmi:500(v108)
+    CheckSmi:500(v109)
+    v110 <- EqualityCompare:500(v108 == v109) T{bool}
+    Branch if StrictCompare:502(!==, v110, v28, with number check) goto (60, 61)
+B60[target]:508
+    goto:510 B27
+B61[target]:512
+    goto:514 B62
+B62[join]:504 pred(B61)
+    v112 <- BinarySmiOp:516(+, v33, v111) T{_Smi}
+    v113 <- BinarySmiOp:518(+, v112, v5) T{_Smi}
+    v114 <- LoadCodeUnits(v3, v113) T{_Smi}
+    CheckSmi:520(v114)
+    CheckSmi:520(v115)
+    v116 <- EqualityCompare:520(v114 == v115) T{bool}
+    Branch if StrictCompare:522(!==, v116, v28, with number check) goto (63, 64)
+B63[target]:528
+    goto:530 B27
+B64[target]:532
+    goto:534 B65
+B65[join]:524 pred(B64)
+    v118 <- BinarySmiOp:536(+, v33, v117) T{_Smi}
+    v119 <- BinarySmiOp:538(+, v118, v5) T{_Smi}
+    v120 <- LoadCodeUnits(v3, v119) T{_Smi}
+    CheckSmi:540(v120)
+    CheckSmi:540(v92)
+    v121 <- EqualityCompare:540(v120 == v92) T{bool}
+    Branch if StrictCompare:542(!==, v121, v28, with number check) goto (66, 67)
+B66[target]:548
+    goto:550 B27
+B67[target]:552
+    goto:554 B68
+B68[join]:544 pred(B67)
+    v123 <- BinarySmiOp:556(+, v33, v122) T{_Smi}
+    v124 <- BinarySmiOp:558(+, v123, v5) T{_Smi}
+    v125 <- LoadCodeUnits(v3, v124) T{_Smi}
+    CheckSmi:560(v125)
+    CheckSmi:560(v126)
+    v127 <- EqualityCompare:560(v125 == v126) T{bool}
+    Branch if StrictCompare:562(!==, v127, v28, with number check) goto (69, 70)
+B69[target]:568
+    goto:570 B27
+B70[target]:572
+    goto:574 B71
+B71[join]:564 pred(B70)
+    v129 <- BinarySmiOp:576(+, v33, v128) T{_Smi}
+    v130 <- BinarySmiOp:578(+, v129, v5) T{_Smi}
+    v131 <- LoadCodeUnits(v3, v130) T{_Smi}
+    CheckSmi:580(v131)
+    CheckSmi:580(v25)
+    v132 <- EqualityCompare:580(v131 == v25) T{bool}
+    Branch if StrictCompare:582(!==, v132, v28, with number check) goto (72, 73)
+B72[target]:588
+    goto:590 B27
+B73[target]:592
+    goto:594 B74
+B74[join]:584 pred(B73)
+    v134 <- BinarySmiOp:596(+, v33, v133) T{_Smi}
+    v135 <- BinarySmiOp:598(+, v134, v5) T{_Smi}
+    v136 <- LoadCodeUnits(v3, v135) T{_Smi}
+    CheckSmi:600(v136)
+    CheckSmi:600(v115)
+    v137 <- EqualityCompare:600(v136 == v115) T{bool}
+    Branch if StrictCompare:602(!==, v137, v28, with number check) goto (75, 76)
+B75[target]:608
+    goto:610 B27
+B76[target]:612
+    goto:614 B77
+B77[join]:604 pred(B76)
+    v139 <- BinarySmiOp:616(+, v33, v138) T{_Smi}
+    v140 <- BinarySmiOp:618(+, v139, v5) T{_Smi}
+    v141 <- LoadCodeUnits(v3, v140) T{_Smi}
+    CheckSmi:620(v141)
+    CheckSmi:620(v92)
+    v142 <- EqualityCompare:620(v141 == v92) T{bool}
+    Branch if StrictCompare:622(!==, v142, v28, with number check) goto (78, 79)
+B78[target]:628
+    goto:630 B27
+B79[target]:632
+    goto:634 B80
+B80[join]:624 pred(B79)
+    v144 <- BinarySmiOp:636(+, v33, v143) T{_Smi}
+    v145 <- BinarySmiOp:638(+, v144, v5) T{_Smi}
+    v146 <- LoadCodeUnits(v3, v145) T{_Smi}
+    CheckSmi:640(v146)
+    CheckSmi:640(v25)
+    v147 <- EqualityCompare:640(v146 == v25) T{bool}
+    Branch if StrictCompare:642(!==, v147, v28, with number check) goto (81, 82)
+B81[target]:648
+    goto:650 B27
+B82[target]:652
+    goto:654 B83
+B83[join]:644 pred(B82)
+    v149 <- BinarySmiOp:656(+, v33, v148) T{_Smi}
+    v150 <- BinarySmiOp:658(+, v149, v5) T{_Smi}
+    v151 <- LoadCodeUnits(v3, v150) T{_Smi}
+    CheckSmi:660(v151)
+    CheckSmi:660(v103)
+    v152 <- EqualityCompare:660(v151 == v103) T{bool}
+    Branch if StrictCompare:662(!==, v152, v28, with number check) goto (84, 85)
+B84[target]:668
+    goto:670 B27
+B85[target]:672
+    goto:674 B86
+B86[join]:664 pred(B85)
+    v154 <- BinarySmiOp:676(+, v33, v153) T{_Smi}
+    v155 <- BinarySmiOp:678(+, v154, v5) T{_Smi}
+    v156 <- LoadCodeUnits(v3, v155) T{_Smi}
+    CheckSmi:680(v156)
+    CheckSmi:680(v157)
+    v158 <- EqualityCompare:680(v156 == v157) T{bool}
+    Branch if StrictCompare:682(!==, v158, v28, with number check) goto (87, 88)
+B87[target]:688
+    goto:690 B27
+B88[target]:692
+    goto:694 B89
+B89[join]:684 pred(B88)
+    v160 <- BinarySmiOp:696(+, v33, v159) T{_Smi}
+    v161 <- BinarySmiOp:698(+, v160, v5) T{_Smi}
+    v162 <- LoadCodeUnits(v3, v161) T{_Smi}
+    CheckSmi:700(v162)
+    CheckSmi:700(v92)
+    v163 <- EqualityCompare:700(v162 == v92) T{bool}
+    Branch if StrictCompare:702(!==, v163, v28, with number check) goto (90, 91)
+B90[target]:708
+    goto:710 B27
+B91[target]:712
+    goto:714 B92
+B92[join]:704 pred(B91)
+    v165 <- BinarySmiOp:716(+, v33, v164) T{_Smi}
+    v166 <- BinarySmiOp:718(+, v165, v5) T{_Smi}
+    v167 <- LoadCodeUnits(v3, v166) T{_Smi}
+    CheckSmi:720(v167)
+    CheckSmi:720(v168)
+    v169 <- EqualityCompare:720(v167 == v168) T{bool}
+    Branch if StrictCompare:722(!==, v169, v28, with number check) goto (93, 94)
+B93[target]:728
+    goto:730 B27
+B94[target]:732
+    goto:734 B95
+B95[join]:724 pred(B94)
+    v171 <- BinarySmiOp:736(+, v33, v170) T{_Smi}
+    v172 <- BinarySmiOp:738(+, v171, v5) T{_Smi}
+    v173 <- LoadCodeUnits(v3, v172) T{_Smi}
+    CheckSmi:740(v173)
+    CheckSmi:740(v174)
+    v175 <- EqualityCompare:740(v173 == v174) T{bool}
+    Branch if StrictCompare:742(!==, v175, v28, with number check) goto (96, 97)
+B96[target]:748
+    goto:750 B27
+B97[target]:752
+    goto:754 B98
+B98[join]:744 pred(B97)
+    v177 <- BinarySmiOp:756(+, v33, v176) T{_Smi}
+    v178 <- BinarySmiOp:758(+, v177, v5) T{_Smi}
+    v179 <- LoadCodeUnits(v3, v178) T{_Smi}
+    CheckSmi:760(v179)
+    CheckSmi:760(v103)
+    v180 <- EqualityCompare:760(v179 == v103) T{bool}
+    Branch if StrictCompare:762(!==, v180, v28, with number check) goto (99, 100)
+B99[target]:768
+    goto:770 B27
+B100[target]:772
+    goto:774 B101
+B101[join]:764 pred(B100)
+    v182 <- BinarySmiOp:776(+, v33, v181) T{_Smi}
+    v183 <- BinarySmiOp:778(+, v182, v5) T{_Smi}
+    v184 <- LoadCodeUnits(v3, v183) T{_Smi}
+    CheckSmi:780(v184)
+    CheckSmi:780(v115)
+    v185 <- EqualityCompare:780(v184 == v115) T{bool}
+    Branch if StrictCompare:782(!==, v185, v28, with number check) goto (102, 103)
+B102[target]:788
+    goto:790 B27
+B103[target]:792
+    goto:794 B104
+B104[join]:784 pred(B103)
+    v187 <- BinarySmiOp:796(+, v33, v186) T{_Smi}
+    v188 <- BinarySmiOp:798(+, v187, v5) T{_Smi}
+    v189 <- LoadCodeUnits(v3, v188) T{_Smi}
+    CheckSmi:800(v189)
+    CheckSmi:800(v25)
+    v190 <- EqualityCompare:800(v189 == v25) T{bool}
+    Branch if StrictCompare:802(!==, v190, v28, with number check) goto (105, 106)
+B105[target]:808
+    goto:810 B27
+B106[target]:812
+    goto:814 B107
+B107[join]:804 pred(B106)
+    v192 <- BinarySmiOp:816(+, v33, v191) T{_Smi}
+    v193 <- BinarySmiOp:818(+, v192, v5) T{_Smi}
+    v194 <- LoadCodeUnits(v3, v193) T{_Smi}
+    CheckSmi:820(v194)
+    CheckSmi:820(v195)
+    v196 <- EqualityCompare:820(v194 == v195) T{bool}
+    Branch if StrictCompare:822(!==, v196, v28, with number check) goto (108, 109)
+B108[target]:828
+    goto:830 B27
+B109[target]:832
+    goto:834 B110
+B110[join]:824 pred(B109)
+    v198 <- BinarySmiOp:836(+, v33, v197) T{_Smi}
+    v199 <- BinarySmiOp:838(+, v198, v5) T{_Smi}
+    v200 <- LoadCodeUnits(v3, v199) T{_Smi}
+    CheckSmi:840(v200)
+    CheckSmi:840(v201)
+    v202 <- EqualityCompare:840(v200 == v201) T{bool}
+    Branch if StrictCompare:842(!==, v202, v28, with number check) goto (111, 112)
+B111[target]:848
+    goto:850 B27
+B112[target]:852
+    goto:854 B113
+B113[join]:844 pred(B112)
+    v203 <- BinarySmiOp:856(+, v33, v45) T{_Smi}
+    v204 <- BinarySmiOp:858(+, v203, v5) T{_Smi}
+    v205 <- LoadCodeUnits(v3, v204) T{_Smi}
+    CheckSmi:860(v205)
+    CheckSmi:860(v25)
+    v206 <- EqualityCompare:860(v205 == v25) T{bool}
+    Branch if StrictCompare:862(!==, v206, v28, with number check) goto (114, 115)
+B114[target]:868
+    goto:870 B27
+B115[target]:872
+    goto:874 B116
+B116[join]:864 pred(B115)
+    v207 <- BinarySmiOp:876(+, v33, v36) T{_Smi}
+    v208 <- BinarySmiOp:878(+, v207, v5) T{_Smi}
+    v209 <- LoadCodeUnits(v3, v208) T{_Smi}
+    CheckSmi:880(v209)
+    CheckSmi:880(v109)
+    v210 <- EqualityCompare:880(v209 == v109) T{bool}
+    Branch if StrictCompare:882(!==, v210, v28, with number check) goto (117, 118)
+B117[target]:888
+    goto:890 B27
+B118[target]:892
+    goto:894 B119
+B119[join]:884 pred(B118)
+    v211 <- BinarySmiOp:896(+, v33, v7) T{_Smi}
+    v212 <- BinarySmiOp:898(+, v211, v5) T{_Smi}
+    v213 <- LoadCodeUnits(v3, v212) T{_Smi}
+    CheckSmi:900(v213)
+    CheckSmi:900(v174)
+    v214 <- EqualityCompare:900(v213 == v174) T{bool}
+    Branch if StrictCompare:902(!==, v214, v28, with number check) goto (120, 121)
+B120[target]:908
+    goto:910 B27
+B121[target]:912
+    goto:914 B122
+B122[join]:904 pred(B121)
+    v215 <- BinarySmiOp:916(+, v33, v21) T{_Smi}
+    v216 <- BinarySmiOp:918(+, v215, v5) T{_Smi}
+    v217 <- LoadCodeUnits(v3, v216) T{_Smi}
+    CheckSmi:920(v217)
+    CheckSmi:920(v218)
+    v219 <- EqualityCompare:920(v217 == v218) T{bool}
+    Branch if StrictCompare:922(!==, v219, v28, with number check) goto (123, 124)
+B123[target]:928
+    goto:930 B27
+B124[target]:932
+    goto:934 B125
+B125[join]:924 pred(B124)
+    v220 <- BinarySmiOp:936(+, v33, v19) T{_Smi}
+    v221 <- BinarySmiOp:938(+, v220, v5) T{_Smi}
+    v222 <- LoadCodeUnits(v3, v221) T{_Smi}
+    CheckSmi:940(v222)
+    CheckSmi:940(v223)
+    v224 <- EqualityCompare:940(v222 == v223) T{bool}
+    Branch if StrictCompare:942(!==, v224, v28, with number check) goto (126, 127)
+B126[target]:948
+    goto:950 B27
+B127[target]:952
+    goto:954 B128
+B128[join]:944 pred(B127)
+    goto:1000 B129
+B129[join]:998 pred(B128)
+    CheckSmi:1002(v33)
+    CheckSmi:1002(v225)
+    v226 <- RelationalOp:1002(>=, v33, v225) T{bool}
+    Branch if StrictCompare:1004(===, v226, v28, with number check) goto (130, 131)
+B130[target]:1010
+    goto:1012 B27
+B131[target]:1014
+    goto:1016 B132
+B132[join]:1006 pred(B131)
+    v228 <- BinarySmiOp:1018(+, v33, v227) T{_Smi}
+    v229 <- BinarySmiOp:1020(+, v228, v5) T{_Smi}
+    v230 <- LoadCodeUnits(v3, v229) T{_Smi}
+    CheckSmi:1022(v230)
+    CheckSmi:1022(v231)
+    v232 <- EqualityCompare:1022(v230 == v231) T{bool}
+    Branch if StrictCompare:1024(===, v232, v28, with number check) goto (133, 134)
+B133[target]:1030
+    goto:1032 B185
+B185[join]:958 pred(B133)
+    CheckSmi:1424(v33)
+    CheckSmi:1424(v233)
+    v234 <- RelationalOp:1424(>=, v33, v233) T{bool}
+    Branch if StrictCompare:1426(===, v234, v28, with number check) goto (186, 187)
+B186[target]:1432
+    goto:1434 B211
+B187[target]:1436
+    goto:1438 B188
+B188[join]:1428 pred(B187)
+    v236 <- BinarySmiOp:1440(+, v33, v235) T{_Smi}
+    v237 <- BinarySmiOp:1442(+, v236, v5) T{_Smi}
+    v238 <- LoadCodeUnits(v3, v237) T{_Smi}
+    CheckSmi:1444(v238)
+    CheckSmi:1444(v239)
+    v240 <- EqualityCompare:1444(v238 == v239) T{bool}
+    Branch if StrictCompare:1446(!==, v240, v28, with number check) goto (189, 190)
+B189[target]:1452
+    goto:1454 B211
+B190[target]:1456
+    goto:1458 B191
+B191[join]:1448 pred(B190)
+    v242 <- BinarySmiOp:1460(+, v33, v241) T{_Smi}
+    v243 <- BinarySmiOp:1462(+, v242, v5) T{_Smi}
+    v244 <- LoadCodeUnits(v3, v243) T{_Smi}
+    CheckSmi:1464(v244)
+    CheckSmi:1464(v109)
+    v245 <- EqualityCompare:1464(v244 == v109) T{bool}
+    Branch if StrictCompare:1466(!==, v245, v28, with number check) goto (192, 193)
+B192[target]:1472
+    goto:1474 B211
+B193[target]:1476
+    goto:1478 B194
+B194[join]:1468 pred(B193)
+    CheckSmi:1480(v33)
+    CheckSmi:1480(v246)
+    v247 <- RelationalOp:1480(>=, v33, v246) T{bool}
+    Branch if StrictCompare:1482(===, v247, v28, with number check) goto (195, 196)
+B195[target]:1488
+    goto:1490 B211
+B196[target]:1492
+    goto:1494 B197
+B197[join]:1484 pred(B196)
+    v249 <- BinarySmiOp:1496(+, v33, v248) T{_Smi}
+    v250 <- BinarySmiOp:1498(+, v249, v5) T{_Smi}
+    v251 <- LoadCodeUnits(v3, v250) T{_Smi}
+    CheckSmi:1504(v251)
+    CheckSmi:1504(v252)
+    v253 <- RelationalOp:1504(>, v251, v252) T{bool}
+    Branch if StrictCompare:1506(===, v253, v28, with number check) goto (198, 199)
+B198[target]:1512
+    goto:1514 B211
+B199[target]:1516
+    goto:1518 B200
+B200[join]:1508 pred(B199)
+    v255 <- BinarySmiOp:1522(&, v251, v41) T{_Smi}
+    CheckClass:1524(v254 Cids[1: _Uint8List@8027147 etc.  cid 116])
+    v474 <- LoadField(v254 . TypedDataBase.length {final})
+    v475 <- CheckArrayBound:1524(v474, v255)
+    v476 <- LoadIndexed:1524([_Uint8List] v254, v475) int64
+    CheckSmi:1526(v476)
+    CheckSmi:1526(v391)
+    v257 <- EqualityCompare:1526(v476 == v391) T{bool}
+    Branch if StrictCompare:1528(!==, v257, v28, with number check) goto (201, 202)
+B201[target]:1534
+    goto:1536 B204
+B204[join]:1500 pred(B201)
+    CheckSmi:1544(v31)
+    v258 <- BinarySmiOp:1544(+, v31, v13) T{_Smi}
+    InstanceCall:1546( []=<0>, v30, v258, v33 T{_Smi} IC[0: ])
+    v402 <- Redefinition(v30 ^ T{*}) T{Int32List}
+    v259 <- BinarySmiOp:1548(+, v33, v391) T{_Smi}
+    CheckClass:1550(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v477 <- AssertAssignable:1550(v259, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v478 <- LoadField(v8 . TypedDataBase.length {final})
+    v479 <- CheckArrayBound:1550(v478, v391)
+    v480 <- UnboxInt32:1550(v259) int32
+    StoreIndexed:1550([_Int32List] v8, v479, v480, NoStoreBarrier)
+    v260 <- BinarySmiOp:1552(+, v33, v227) T{_Smi}
+    CheckClass:1554(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v481 <- AssertAssignable:1554(v260, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v482 <- LoadField(v8 . TypedDataBase.length {final})
+    v483 <- CheckArrayBound:1554(v482, v15)
+    v484 <- UnboxInt32:1554(v260) int32
+    StoreIndexed:1554([_Int32List] v8, v483, v484, NoStoreBarrier)
+    v261 <- BinarySmiOp:1556(+, v33, v227) T{_Smi}
+    CheckClass:1558(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v485 <- AssertAssignable:1558(v261, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v486 <- LoadField(v8 . TypedDataBase.length {final})
+    v487 <- CheckArrayBound:1558(v486, v19)
+    v488 <- UnboxInt32:1558(v261) int32
+    StoreIndexed:1558([_Int32List] v8, v487, v488, NoStoreBarrier)
+    v262 <- BinarySmiOp:1560(+, v33, v248) T{_Smi}
+    CheckClass:1562(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v489 <- AssertAssignable:1562(v262, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v490 <- LoadField(v8 . TypedDataBase.length {final})
+    v491 <- CheckArrayBound:1562(v490, v21)
+    v492 <- UnboxInt32:1562(v262) int32
+    StoreIndexed:1562([_Int32List] v8, v491, v492, NoStoreBarrier)
+    v264 <- BinarySmiOp:1564(+, v33, v263) T{_Smi}
+    v265 <- BinarySmiOp:1572(+, v258, v13) T{_Smi}
+    InstanceCall:1574( []=<0>, v402, v265, v17 IC[0: ])
+    v266 <- InstanceCall:1576( get:length<0>, v402 IC[0: ]) T{*?}
+    CheckSmi:1578(v266)
+    v267 <- BinarySmiOp:1578(-, v266, v25) T{_Smi}
+    CheckSmi:1582(v267)
+    CheckSmi:1582(v265)
+    v268 <- RelationalOp:1582(>, v267, v265) T{bool}
+    Branch if StrictCompare:1584(===, v268, v28, with number check) goto (206, 207)
+B206[target]:1590
+    goto:1592 B209
+B207[target]:1594
+    goto:1596 B208
+B208[join]:1586 pred(B207)
+    v269 <- StaticCall:1598( _growBacktrackingStack@0150898<0> ) T{Int32List}
+    goto:1600 B209
+B209[join]:1588 pred(B206, B208) {
+      v270 <- phi(v402, v269) alive T{Int32List}
+}
+    goto:1602 B156
+B202[target]:1538
+    goto:1540 B203
+B203[join]:1530 pred(B202)
+    goto:1542 B211
+B211[join]:1422 pred(B186, B189, B192, B195, B198, B203, B210) {
+      v341 <- phi(v31, v31, v31, v31, v31, v31, v352) alive T{int}
+      v342 <- phi(v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v473) alive T{*?}
+}
+    CheckSmi:1622(v342)
+    v343 <- BinarySmiOp:1622(+, v342, v227) T{_Smi}
+    v344 <- BinarySmiOp:1624(+, v343, v5) T{_Smi}
+    v345 <- LoadCodeUnits(v3, v344) T{_Smi}
+    goto:1626 B136
+B134[target]:1034
+    goto:1036 B135
+B135[join]:1026 pred(B134)
+    goto:1038 B136
+B136[join]:960 pred(B135, B211) {
+      v274 <- phi(v31, v341) alive T{int}
+      v275 <- phi(v230, v345) alive T{_Smi}
+      v276 <- phi(v33 T{_Smi}, v342) alive T{*?}
+}
+    CheckSmi:1040(v275)
+    CheckSmi:1040(v277)
+    v278 <- EqualityCompare:1040(v275 == v277) T{bool}
+    Branch if StrictCompare:1042(!==, v278, v28, with number check) goto (137, 138)
+B137[target]:1048
+    goto:1050 B27
+B138[target]:1052
+    goto:1054 B139
+B139[join]:1044 pred(B138)
+    goto:1056 B140
+B140[join]:962 pred(B139)
+    CheckSmi:1058(v276)
+    CheckSmi:1058(v279)
+    v280 <- RelationalOp:1058(>=, v276, v279) T{bool}
+    v406 <- Redefinition(v276 ^ T{*}) T{*}
+    Branch if StrictCompare:1060(===, v280, v28, with number check) goto (141, 142)
+B141[target]:1066
+    goto:1068 B27
+B142[target]:1070
+    goto:1072 B143
+B143[join]:1062 pred(B142)
+    CheckSmi:1074(v406)
+    v281 <- BinarySmiOp:1074(+, v406, v241) T{_Smi}
+    v282 <- BinarySmiOp:1076(+, v281, v5) T{_Smi}
+    v283 <- LoadCodeUnits(v3, v282) T{_Smi}
+    CheckSmi:1082(v283)
+    CheckSmi:1082(v252)
+    v284 <- RelationalOp:1082(>, v283, v252) T{bool}
+    Branch if StrictCompare:1084(===, v284, v28, with number check) goto (144, 145)
+B144[target]:1090
+    goto:1092 B27
+B145[target]:1094
+    goto:1096 B146
+B146[join]:1086 pred(B145)
+    v286 <- BinarySmiOp:1100(&, v283, v41) T{_Smi}
+    CheckClass:1102(v285 Cids[1: _Uint8List@8027147 etc.  cid 116])
+    v493 <- LoadField(v285 . TypedDataBase.length {final})
+    v494 <- CheckArrayBound:1102(v493, v286)
+    v495 <- LoadIndexed:1102([_Uint8List] v285, v494) int64
+    CheckSmi:1104(v495)
+    CheckSmi:1104(v391)
+    v288 <- EqualityCompare:1104(v495 == v391) T{bool}
+    Branch if StrictCompare:1106(!==, v288, v28, with number check) goto (147, 148)
+B147[target]:1112
+    goto:1114 B150
+B150[join]:1078 pred(B147)
+    CheckSmi:1122(v274)
+    v289 <- BinarySmiOp:1122(+, v274, v13) T{_Smi}
+    InstanceCall:1124( []=<0>, v30, v289, v406 IC[0: ])
+    v409 <- Redefinition(v30 ^ T{*}) T{Int32List}
+    CheckSmi:1126(v406)
+    v290 <- BinarySmiOp:1126(+, v406, v391) T{_Smi}
+    CheckClass:1128(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v496 <- AssertAssignable:1128(v290, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v497 <- LoadField(v8 . TypedDataBase.length {final})
+    v498 <- CheckArrayBound:1128(v497, v391)
+    v499 <- UnboxInt32:1128(v290) int32
+    StoreIndexed:1128([_Int32List] v8, v498, v499, NoStoreBarrier)
+    CheckSmi:1130(v406)
+    v291 <- BinarySmiOp:1130(+, v406, v227) T{_Smi}
+    CheckClass:1132(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v500 <- AssertAssignable:1132(v291, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v501 <- LoadField(v8 . TypedDataBase.length {final})
+    v502 <- CheckArrayBound:1132(v501, v15)
+    v503 <- UnboxInt32:1132(v291) int32
+    StoreIndexed:1132([_Int32List] v8, v502, v503, NoStoreBarrier)
+    CheckSmi:1134(v406)
+    v292 <- BinarySmiOp:1134(+, v406, v227) T{_Smi}
+    CheckClass:1136(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v504 <- AssertAssignable:1136(v292, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v505 <- LoadField(v8 . TypedDataBase.length {final})
+    v506 <- CheckArrayBound:1136(v505, v19)
+    v507 <- UnboxInt32:1136(v292) int32
+    StoreIndexed:1136([_Int32List] v8, v506, v507, NoStoreBarrier)
+    CheckSmi:1138(v406)
+    v293 <- BinarySmiOp:1138(+, v406, v241) T{_Smi}
+    CheckClass:1140(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v508 <- AssertAssignable:1140(v293, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v509 <- LoadField(v8 . TypedDataBase.length {final})
+    v510 <- CheckArrayBound:1140(v509, v21)
+    v511 <- UnboxInt32:1140(v293) int32
+    StoreIndexed:1140([_Int32List] v8, v510, v511, NoStoreBarrier)
+    CheckSmi:1142(v406)
+    v294 <- BinarySmiOp:1142(+, v406, v235) T{_Smi}
+    v295 <- BinarySmiOp:1150(+, v289, v13) T{_Smi}
+    InstanceCall:1152( []=<0>, v409, v295, v13 IC[0: ])
+    v296 <- InstanceCall:1154( get:length<0>, v409 IC[0: ]) T{*?}
+    CheckSmi:1156(v296)
+    v297 <- BinarySmiOp:1156(-, v296, v25) T{_Smi}
+    CheckSmi:1160(v297)
+    CheckSmi:1160(v295)
+    v298 <- RelationalOp:1160(>, v297, v295) T{bool}
+    Branch if StrictCompare:1162(===, v298, v28, with number check) goto (152, 153)
+B152[target]:1168
+    goto:1170 B155
+B153[target]:1172
+    goto:1174 B154
+B154[join]:1164 pred(B153)
+    v299 <- StaticCall:1176( _growBacktrackingStack@0150898<0> ) T{Int32List}
+    goto:1178 B155
+B155[join]:1166 pred(B152, B154) {
+      v300 <- phi(v409, v299) alive T{Int32List}
+}
+    goto:1180 B156
+B156[join]:6 pred(B155, B209) {
+      v301 <- phi(v300, v270) alive T{Int32List}
+      v302 <- phi(v295, v265) alive T{*?}
+      v303 <- phi(v294, v264) alive T{*?}
+}
+    CheckSmi:1224(v302)
+    v304 <- BinarySmiOp:1224(+, v302, v13) T{_Smi}
+    InstanceCall:1226( []=<0>, v301, v304, v303 IC[0: ])
+    v414 <- Redefinition(v301 ^ T{*}) T{Int32List}
+    goto:1232 B157
+B157[join]:1230 pred(B156, B167) {
+      v305 <- phi(v303, v315) alive T{*?}
+}
+    CheckStackOverflow:1234(stack=0, loop=1)
+    CheckSmi:1236(v305)
+    CheckSmi:1236(v391)
+    v306 <- RelationalOp:1236(>=, v305, v391) T{bool}
+    v415 <- Redefinition(v305 ^ T{*}) T{*}
+    Branch if StrictCompare:1238(===, v306, v28, with number check) goto (158, 159)
+B158[target]:1244
+    goto:1246 B168
+B159[target]:1248
+    goto:1250 B160
+B160[join]:1240 pred(B159)
+    CheckSmi:1252(v415)
+    v307 <- BinarySmiOp:1252(+, v391, v415) T{_Smi}
+    v308 <- BinarySmiOp:1254(+, v307, v5) T{_Smi}
+    v309 <- LoadCodeUnits(v3, v308) T{_Smi}
+    CheckSmi:1260(v309)
+    CheckSmi:1260(v252)
+    v310 <- RelationalOp:1260(>, v309, v252) T{bool}
+    Branch if StrictCompare:1262(===, v310, v28, with number check) goto (161, 162)
+B161[target]:1268
+    goto:1270 B168
+B162[target]:1272
+    goto:1274 B163
+B163[join]:1264 pred(B162)
+    v312 <- BinarySmiOp:1278(&, v309, v41) T{_Smi}
+    CheckClass:1280(v311 Cids[1: _Uint8List@8027147 etc.  cid 116])
+    v512 <- LoadField(v311 . TypedDataBase.length {final})
+    v513 <- CheckArrayBound:1280(v512, v312)
+    v514 <- LoadIndexed:1280([_Uint8List] v311, v513) int64
+    CheckSmi:1282(v514)
+    CheckSmi:1282(v391)
+    v314 <- EqualityCompare:1282(v514 == v391) T{bool}
+    Branch if StrictCompare:1284(!==, v314, v28, with number check) goto (164, 165)
+B164[target]:1290
+    goto:1292 B167
+B167[join]:1256 pred(B164)
+    CheckSmi:1300(v415)
+    v315 <- BinarySmiOp:1300(+, v415, v13) T{_Smi}
+    goto:1302 B157
+B165[target]:1294
+    goto:1296 B166
+B166[join]:1286 pred(B165)
+    goto:1298 B168
+B168[join]:1228 pred(B158, B161, B166)
+    goto:1306 B169
+B169[join]:1304 pred(B168, B182) {
+      v316 <- phi(v414, v30 T{_Int32List}) alive T{Int32List}
+      v317 <- phi(v304, v355) alive T{*?}
+      v318 <- phi(v415, v360) alive T{*?}
+}
+    CheckSmi:1308(v317)
+    v319 <- BinarySmiOp:1308(+, v317, v13) T{_Smi}
+    InstanceCall:1310( []=<0>, v316, v319, v318 IC[0: ])
+    v418 <- Redefinition(v316 ^ T{*}) T{Int32List}
+    CheckSmi:1312(v318)
+    v320 <- BinarySmiOp:1312(+, v318, v391) T{_Smi}
+    v419 <- Redefinition(v318 ^ T{*}) T{*}
+    CheckClass:1314(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v515 <- AssertAssignable:1314(v320, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v516 <- LoadField(v8 . TypedDataBase.length {final})
+    v517 <- CheckArrayBound:1314(v516, v13)
+    v518 <- UnboxInt32:1314(v320) int32
+    StoreIndexed:1314([_Int32List] v8, v517, v518, NoStoreBarrier)
+    CheckSmi:1316(v419)
+    v321 <- BinarySmiOp:1316(+, v419, v391) T{_Smi}
+    CheckClass:1318(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v519 <- AssertAssignable:1318(v321, v366, 'value', instantiator_type_args(v0), function_type_args(v0))
+    v520 <- LoadField(v8 . TypedDataBase.length {final})
+    v521 <- CheckArrayBound:1318(v520, v17)
+    v522 <- UnboxInt32:1318(v321) int32
+    StoreIndexed:1318([_Int32List] v8, v521, v522, NoStoreBarrier)
+    v322 <- BinarySmiOp:1326(+, v319, v13) T{_Smi}
+    InstanceCall:1328( []=<0>, v418, v322, v15 IC[0: ])
+    v323 <- InstanceCall:1330( get:length<0>, v418 IC[0: ]) T{*?}
+    CheckSmi:1332(v323)
+    v324 <- BinarySmiOp:1332(-, v323, v25) T{_Smi}
+    CheckSmi:1336(v324)
+    CheckSmi:1336(v322)
+    v325 <- RelationalOp:1336(>, v324, v322) T{bool}
+    Branch if StrictCompare:1338(===, v325, v28, with number check) goto (171, 172)
+B171[target]:1344
+    goto:1346 B174
+B172[target]:1348
+    goto:1350 B173
+B173[join]:1340 pred(B172)
+    v326 <- StaticCall:1352( _growBacktrackingStack@0150898<0> )
+    goto:1354 B174
+B174[join]:1342 pred(B171, B173)
+    goto:1356 B175
+B175[join]:0 pred(B174)
+    goto:1358 B3
+B3[join]:38 pred(B175)
+    v328 <- CreateArray:78(v327, v7) T{_List}
+    CheckClass:80(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v523 <- LoadField(v8 . TypedDataBase.length {final})
+    v524 <- CheckArrayBound:80(v523, v391)
+    v525 <- LoadIndexed:80([_Int32List] v8, v524) int32
+    v330 <- BinarySmiOp:82(+, v525, v5) T{_Smi}
+    CheckClass:84(v328 Cids[1: _List@0150898 etc.  cid 90])
+    v526 <- LoadField(v328 . Array.type_arguments {final})
+    v528 <- AssertAssignable:84(v330, v527, 'value', instantiator_type_args(v526), function_type_args(v0))
+    v529 <- LoadField(v328 . Array.length {final})
+    v530 <- CheckArrayBound:84(v529, v391)
+    StoreIndexed:84([_List] v328, v530, v330, NoStoreBarrier)
+    CheckClass:86(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v531 <- LoadField(v8 . TypedDataBase.length {final})
+    v532 <- CheckArrayBound:86(v531, v13)
+    v533 <- LoadIndexed:86([_Int32List] v8, v532) int32
+    v332 <- BinarySmiOp:88(+, v533, v5) T{_Smi}
+    CheckClass:90(v328 Cids[1: _List@0150898 etc.  cid 90])
+    v534 <- LoadField(v328 . Array.type_arguments {final})
+    v535 <- AssertAssignable:90(v332, v527, 'value', instantiator_type_args(v534), function_type_args(v0))
+    v536 <- LoadField(v328 . Array.length {final})
+    v537 <- CheckArrayBound:90(v536, v13)
+    StoreIndexed:90([_List] v328, v537, v332, NoStoreBarrier)
+    CheckClass:92(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v538 <- LoadField(v8 . TypedDataBase.length {final})
+    v539 <- CheckArrayBound:92(v538, v15)
+    v540 <- LoadIndexed:92([_Int32List] v8, v539) int32
+    v334 <- BinarySmiOp:94(+, v540, v5) T{_Smi}
+    CheckClass:96(v328 Cids[1: _List@0150898 etc.  cid 90])
+    v541 <- LoadField(v328 . Array.type_arguments {final})
+    v542 <- AssertAssignable:96(v334, v527, 'value', instantiator_type_args(v541), function_type_args(v0))
+    v543 <- LoadField(v328 . Array.length {final})
+    v544 <- CheckArrayBound:96(v543, v15)
+    StoreIndexed:96([_List] v328, v544, v334, NoStoreBarrier)
+    CheckClass:98(v8 Cids[1: _Int32List@8027147 etc.  cid 132])
+    v545 <- LoadField(v8 . TypedDataBase.length {final})
+    v546 <- CheckArrayBound:98(v545, v17)
+    v547 <- LoadIndexed:98([_Int32List] v8, v546) int32
+    v336 <- BinarySmiOp:100(+, v547, v5) T{_Smi}
+    CheckClass:102(v328 Cids[1: _List@0150898 etc.  cid 90])
+    v548 <- LoadField(v328 . Array.type_arguments {final})
+    v549 <- AssertAssignable:102(v336, v527, 'value', instantiator_type_args(v548), function_type_args(v0))
+    v550 <- LoadField(v328 . Array.length {final})
+    v551 <- CheckArrayBound:102(v550, v17)
+    StoreIndexed:102([_List] v328, v551, v336, NoStoreBarrier)
+    v337 <- InstanceCall:104( []<0>, v8 T{_Int32List}, v19 IC[0: ]) T{*?}
+    v338 <- InstanceCall:106( +<0>, v337, v5 IC[1: _Smi@0150898, _Smi@0150898 cnt:0 trgt:'_IntegerImplementation@0150898.+']) T{*?}
+    InstanceCall:108( []=<0>, v328, v19, v338 IC[0: ])
+    v339 <- InstanceCall:110( []<0>, v8 T{_Int32List}, v21 IC[0: ]) T{*?}
+    v340 <- InstanceCall:112( +<0>, v339, v5 IC[1: _Smi@0150898, _Smi@0150898 cnt:0 trgt:'_IntegerImplementation@0150898.+']) T{*?}
+    InstanceCall:114( []=<0>, v328, v21, v340 IC[0: ])
+    DartReturn:116(v328)
+B148[target]:1116
+    goto:1118 B149
+B149[join]:1108 pred(B148)
+    goto:1120 B27
+B25[target]:288
+    goto:290 B26
+B26[join]:280 pred(B25)
+    goto:292 B27
+B27[join]:162 pred(B26, B30, B33, B36, B39, B42, B45, B48, B51, B54, B57, B60, B63, B66, B69, B72, B75, B78, B81, B84, B87, B90, B93, B96, B99, B102, B105, B108, B111, B114, B117, B120, B123, B126, B130, B137, B141, B144, B149, B183) {
+      v271 <- phi(v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v31, v274, v274, v274, v274, v364) alive T{int}
+      v272 <- phi(v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v33 T{_Smi}, v276, v406, v406, v406, v445) alive T{*?}
+}
+    CheckSmi:294(v272)
+    v273 <- BinarySmiOp:294(+, v272 T{_Smi}, v13) T{_Smi}
+    goto:296 B11
+B18[target]:248
+    goto:250 B19
+B19[join]:240 pred(B18)
+    CheckSmi:252(v33 T{_Smi})
+    v46 <- BinarySmiOp:252(+, v33 T{_Smi}, v45) T{_Smi}
+    goto:254 B13
+*** END CFG

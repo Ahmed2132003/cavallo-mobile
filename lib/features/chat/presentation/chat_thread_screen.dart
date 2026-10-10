@@ -8,6 +8,10 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/chat/chat_connection_manager.dart';
 import '../../../core/chat/chat_event.dart';
 import '../../../core/l10n/l10n_context.dart';
+import '../../../core/l10n/formatters.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_avatar.dart';
+import '../../../core/widgets/app_shimmer_box.dart';
 import '../../../core/network/api_failure.dart';
 import '../data/conversation_repository.dart';
 import '../../../l10n/app_localizations.dart';
@@ -478,6 +482,8 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final AppColors colors = context.appColors;
+    final TextTheme textTheme = Theme.of(context).textTheme;
     final displayName =
         widget.conversation.otherParticipant?.displayName ??
         l10n.chatThreadFallbackTitle;
@@ -493,28 +499,84 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(displayName),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(20),
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            // See this class's own top doc comment ("Presence — flagged
-            // gap, not fabricated"): this is OUR OWN socket state, not
-            // the other participant's real presence.
-            child: Text(
-              _otherIsTyping ? l10n.chatThreadTyping : _connectionLabel(l10n),
-              style: const TextStyle(fontSize: 12),
+        title: Row(
+          children: [
+            AppAvatar(name: displayName, size: 36),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    displayName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.titleSmall?.copyWith(
+                      color: colors.textPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  // See this class's own top doc comment ("Presence — flagged
+                  // gap, not fabricated"): this is OUR OWN socket state, not
+                  // the other participant's real presence. No online dot.
+                  Text(
+                    _otherIsTyping
+                        ? l10n.chatThreadTyping
+                        : _connectionLabel(l10n),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodySmall?.copyWith(
+                      color:
+                          _otherIsTyping
+                              ? colors.brandText
+                              : colors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
       body: Column(
         children: [
           Expanded(child: _buildMessageList(sortedMessages, pending)),
+          if (_otherIsTyping) const _TypingBubble(),
           _buildComposer(),
         ],
       ),
     );
+  }
+
+  /// Flat, ordered rows for the list: a date separator whenever the calendar
+  /// day changes, then the confirmed messages, then this conversation's
+  /// pending outbound messages. Presentation only.
+  List<_ThreadItem> _buildItems(
+    List<Message> messages,
+    List<OutboundMessage> pending,
+  ) {
+    final List<_ThreadItem> items = <_ThreadItem>[];
+    DateTime? currentDay;
+
+    void startDayIfNeeded(DateTime createdAt) {
+      final DateTime local = createdAt.toLocal();
+      final DateTime day = DateTime(local.year, local.month, local.day);
+      if (currentDay != day) {
+        items.add(_DateItem(day));
+        currentDay = day;
+      }
+    }
+
+    for (final Message message in messages) {
+      startDayIfNeeded(message.createdAt);
+      items.add(_MessageItem(message, message.senderId != _otherParticipantId));
+    }
+    for (final OutboundMessage outbound in pending) {
+      startDayIfNeeded(outbound.createdAt);
+      items.add(_OutboundItem(outbound));
+    }
+    return items;
   }
 
   Widget _buildMessageList(
@@ -522,7 +584,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     List<OutboundMessage> pending,
   ) {
     if (_isLoadingHistory) {
-      return const Center(child: CircularProgressIndicator());
+      return const _ThreadSkeleton();
     }
     if (_historyError != null && messages.isEmpty && pending.isEmpty) {
       return Center(
@@ -540,61 +602,254 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
       );
     }
     if (messages.isEmpty && pending.isEmpty) {
-      return Center(child: Text(context.l10n.chatThreadEmpty));
+      return Center(
+        child: Text(
+          context.l10n.chatThreadEmpty,
+          style: TextStyle(color: context.appColors.textSecondary),
+        ),
+      );
     }
 
     final queue = ref.read(outboundMessageQueueProvider.notifier);
+    final List<_ThreadItem> items = _buildItems(messages, pending);
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: messages.length + pending.length,
+      itemCount: items.length,
       itemBuilder: (context, index) {
-        if (index < messages.length) {
-          final message = messages[index];
-          return MessageBubbleWidget(
-            message: message,
-            isMine: message.senderId != _otherParticipantId,
-          );
+        final _ThreadItem item = items[index];
+        switch (item) {
+          case _DateItem():
+            return _DateSeparator(date: item.date);
+          case _MessageItem():
+            return MessageBubbleWidget(
+              message: item.message,
+              isMine: item.isMine,
+              isFirstInGroup: _isGroupStart(items, index),
+              isLastInGroup: _isGroupEnd(items, index),
+            );
+          case _OutboundItem():
+            final outbound = item.outbound;
+            return OutboundMessageBubbleWidget(
+              key: ValueKey('outbound_bubble_${outbound.id}'),
+              outbound: outbound,
+              isFirstInGroup: _isGroupStart(items, index),
+              isLastInGroup: _isGroupEnd(items, index),
+              onRetry: () => queue.retryFailedMessage(outbound.id),
+              onDiscard: () => queue.discardFailedMessage(outbound.id),
+            );
         }
-        final outbound = pending[index - messages.length];
-        return OutboundMessageBubbleWidget(
-          key: ValueKey('outbound_bubble_${outbound.id}'),
-          outbound: outbound,
-          onRetry: () => queue.retryFailedMessage(outbound.id),
-          onDiscard: () => queue.discardFailedMessage(outbound.id),
-        );
       },
     );
   }
 
   Widget _buildComposer() {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Row(
-          children: [
-            IconButton(
-              key: const Key('chatComposer_attachButton'),
-              icon: const Icon(Icons.attach_file),
-              onPressed: _showAttachSheet,
-            ),
-            Expanded(
-              child: TextField(
-                controller: _textController,
-                onChanged: _onTextChanged,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => _sendMessage(),
-                decoration: InputDecoration(
-                  hintText: context.l10n.chatComposerHint,
-                  border: const OutlineInputBorder(),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+    final AppColors colors = context.appColors;
+    final OutlineInputBorder pill = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(24),
+      borderSide: BorderSide.none,
+    );
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colors.outline)),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            children: [
+              IconButton(
+                key: const Key('chatComposer_attachButton'),
+                icon: Icon(Icons.attach_file, color: colors.textSecondary),
+                onPressed: _showAttachSheet,
+              ),
+              Expanded(
+                child: TextField(
+                  controller: _textController,
+                  onChanged: _onTextChanged,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: (_) => _sendMessage(),
+                  decoration: InputDecoration(
+                    hintText: context.l10n.chatComposerHint,
+                    filled: true,
+                    fillColor: colors.surfaceVariant,
+                    isDense: true,
+                    border: pill,
+                    enabledBorder: pill,
+                    focusedBorder: pill,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 8),
-            IconButton(icon: const Icon(Icons.send), onPressed: _sendMessage),
-          ],
+              const SizedBox(width: 8),
+              // Icons.send mirrors in RTL (matchTextDirection).
+              IconButton(
+                icon: const Icon(Icons.send, size: 20),
+                style: IconButton.styleFrom(
+                  backgroundColor: colors.brand,
+                  foregroundColor: colors.onBrand,
+                ),
+                onPressed: _sendMessage,
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Presentation-only helpers (Part P-115 STEP 3B). No send / queue / delivery
+// logic below this line.
+// ---------------------------------------------------------------------------
+
+sealed class _ThreadItem {
+  const _ThreadItem();
+}
+
+final class _DateItem extends _ThreadItem {
+  const _DateItem(this.date);
+
+  final DateTime date;
+}
+
+final class _MessageItem extends _ThreadItem {
+  const _MessageItem(this.message, this.isMine);
+
+  final Message message;
+  final bool isMine;
+}
+
+final class _OutboundItem extends _ThreadItem {
+  const _OutboundItem(this.outbound);
+
+  final OutboundMessage outbound;
+}
+
+/// Who a row belongs to: true = me, false = the other person, null = not a
+/// bubble (a date separator, which also ends a group).
+bool? _mineOf(_ThreadItem item) => switch (item) {
+  _DateItem() => null,
+  _MessageItem(:final isMine) => isMine,
+  _OutboundItem() => true,
+};
+
+bool _isGroupStart(List<_ThreadItem> items, int index) =>
+    index == 0 || _mineOf(items[index - 1]) != _mineOf(items[index]);
+
+bool _isGroupEnd(List<_ThreadItem> items, int index) =>
+    index == items.length - 1 ||
+    _mineOf(items[index + 1]) != _mineOf(items[index]);
+
+class _DateSeparator extends StatelessWidget {
+  const _DateSeparator({required this.date});
+
+  final DateTime date;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors colors = context.appColors;
+    return Center(
+      child: Container(
+        key: const ValueKey('chatThread_dateSeparator'),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        decoration: BoxDecoration(
+          color: colors.surfaceVariant,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          AppFormatters(context.l10n).absoluteDate(date),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colors.textSecondary),
+        ),
+      ),
+    );
+  }
+}
+
+/// "The other person is typing": three STATIC dots in a received-style
+/// bubble. Deliberately not animated (no new animation in this phase, and it
+/// keeps the golden deterministic).
+class _TypingBubble extends StatelessWidget {
+  const _TypingBubble();
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors colors = context.appColors;
+    Widget dot(double alpha) => Container(
+      width: 7,
+      height: 7,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: colors.textSecondary.withValues(alpha: alpha),
+      ),
+    );
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Semantics(
+        label: context.l10n.chatThreadTyping,
+        child: Container(
+          key: const ValueKey('chatThread_typingDots'),
+          margin: const EdgeInsetsDirectional.fromSTEB(12, 2, 12, 6),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: colors.surfaceVariant,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              dot(0.4),
+              const SizedBox(width: 4),
+              dot(0.7),
+              const SizedBox(width: 4),
+              dot(1),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ThreadSkeleton extends StatelessWidget {
+  const _ThreadSkeleton();
+
+  static const int _rows = 6;
+
+  @override
+  Widget build(BuildContext context) {
+    return ExcludeSemantics(
+      child: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: _rows,
+        itemBuilder: (context, index) {
+          final bool mine = index.isOdd;
+          return Padding(
+            padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: 12,
+              vertical: 6,
+            ),
+            child: Align(
+              alignment:
+                  mine
+                      ? AlignmentDirectional.centerEnd
+                      : AlignmentDirectional.centerStart,
+              child: AppShimmerBox(
+                width: index % 3 == 0 ? 220 : 160,
+                height: 40,
+                borderRadius: 20,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

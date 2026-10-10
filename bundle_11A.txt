@@ -1,0 +1,2384 @@
+﻿
+
+##### FILE: lib\routing\route_names.dart #####
+/// Part P-007 scope: centralized route name/path constants for the app's
+/// [GoRouter] table (see `app_router.dart`).
+///
+/// No feature should hardcode a path string or route name directly —
+/// always reference these constants (with `context.goNamed(...)` /
+/// `context.pushNamed(...)`) so a path can change in exactly one place
+/// without hunting through every feature screen.
+///
+/// ### Part P-028C1 addition — [businessOnboarding] / [businessOnboardingPath]
+///
+/// P-028B's own handoff note left these unadded on purpose ("RouteNames
+/// has no businessOnboarding/businessProfileEdit entries yet — P-028C
+/// should add the real, permanent names"). This part (P-028C1) adds the
+/// onboarding entry only — it owns the router-gate half of the original
+/// P-028C scope. The edit-screen route (`businessProfileEdit`) is
+/// deliberately NOT added here — that stays Part P-028C2's job, per the
+/// split of the original P-028C spec into two parts for length reasons.
+///
+/// Path chosen: `/business-onboarding` — kebab-case, consistent with
+/// this file's only other multi-word path ([businessConsolePath],
+/// `/business-console`). P-028B's own test file used a throwaway local
+/// route (`'businessOnboarding'` / `'/onboarding'`) inside its own test
+/// only, explicitly flagged as not the real permanent one — this is the
+/// real one.
+///
+/// ### Part P-028C2 addition — [businessProfileEdit] / [businessProfileEditPath]
+///
+/// The other half of the same handoff note, added now by the part that
+/// actually builds the screen behind it (`BusinessProfileEditScreen`).
+/// Nothing above it changed: P-028C1's two constants, and every
+/// pre-existing P-007 constant, are untouched — this is a purely
+/// additive edit, per this project's "don't redesign a prior part's
+/// work unless the real backend contract forces it" convention.
+///
+/// ### Part P-033 addition — [productList] / [productForm]
+///
+/// This part's own spec: "Wire routes for this list/create/edit flow,
+/// reachable from the business console area (even though the full
+/// Business Console shell itself isn't built until Phase 14 — for now,
+/// reach these screens via a simple route the router exposes)." Both
+/// live under `/business-console/products...` — nested under the
+/// existing [businessConsolePath] segment rather than a new top-level
+/// one, since that's exactly where this part's spec says they belong
+/// once Phase 14 gives them a real navigational home; nesting the path
+/// now means Phase 14 only has to change how they're *reached*, not the
+/// paths themselves.
+///
+/// [productForm] deliberately has NO `:id` path parameter, unlike
+/// [productDetail]/[businessProfile]/[chatThread] — see this class's
+/// own [productFormPath] doc for why.
+///
+/// ### Part P-040 addition — [moderation] / [moderationReview]
+///
+/// The in-app moderator review UI (`lib/features/moderation/`). Both
+/// paths sit under one `/moderation` prefix on purpose: the router's
+/// role gate (`app_router.dart`) protects the whole prefix in one check,
+/// so a future moderation screen added under it is gated automatically.
+/// Neither entry appears in any menu-driven allow-list — gating is done
+/// by the redirect guard itself, not by hiding a link.
+///
+/// ### Part P-083 addition — [storyList] / [businessAnalytics]
+///
+/// The two Business Console destinations that had no route yet. Both
+/// sit under the existing `/business-console` prefix, so the router's
+/// Business-only gate (`app_router.dart`) covers them automatically,
+/// exactly like [productListPath] / [contentListPath]. They are the
+/// roots of branches 2 (Stories) and 3 (Analytics) of the console's
+/// `StatefulShellRoute`. Nothing pre-existing changed: every earlier
+/// constant keeps its name and path.
+class RouteNames {
+  RouteNames._();
+
+  // --- Route names (used with context.goNamed / context.pushNamed) ---
+  static const String splash = 'splash';
+  static const String login = 'login';
+  static const String register = 'register';
+  static const String home = 'home';
+  static const String discover = 'discover';
+  static const String search = 'search';
+  static const String businessProfile = 'businessProfile';
+  static const String productDetail = 'productDetail';
+  static const String chatList = 'chatList';
+  static const String chatThread = 'chatThread';
+  static const String notifications = 'notifications';
+
+  /// Part P-082: the notification preferences screen, opened from the
+  /// notification center's app bar.
+  static const String notificationPreferences = 'notificationPreferences';
+  static const String businessConsole = 'businessConsole';
+
+  /// Part P-028C1: the "complete your business profile" onboarding
+  /// screen (`BusinessOnboardingScreen`, Part P-028B) a Business-type
+  /// user with no `BusinessProfile` yet is routed into by
+  /// `app_router.dart`'s redirect guard.
+  static const String businessOnboarding = 'businessOnboarding';
+
+  /// Part P-028C2: the authenticated Business user's own profile EDIT
+  /// screen (`BusinessProfileEditScreen`) — the entry P-028B's handoff
+  /// note named ("RouteNames has no businessOnboarding/
+  /// businessProfileEdit entries yet") and P-028C1 deliberately left
+  /// unadded, since it owns only the onboarding half of the original
+  /// P-028C scope.
+  ///
+  /// Distinct from [businessProfile], which is the PUBLIC, customer-
+  /// facing "view some business by id" screen (Part P-029) — this one
+  /// takes no id at all: the backend resolves "my own profile" strictly
+  /// from `request.user` (Part P-026's IDOR-safe `/businesses/me/`
+  /// endpoint), so there is deliberately no id to put in the path.
+  static const String businessProfileEdit = 'businessProfileEdit';
+
+  /// Part P-033: the signed-in Business user's own product list
+  /// (`ProductListScreen`), backed by `ownProductsProvider`. Same "no id
+  /// — resolved from `request.user`" reasoning as [businessProfileEdit].
+  static const String productList = 'productList';
+
+  /// Part P-033: the shared create/edit product form (`ProductFormScreen`).
+  /// See [productFormPath]'s own doc for why this takes no `:id`.
+  static const String productForm = 'productForm';
+
+  /// Part P-040: the moderator's pending-content queue
+  /// (`ModerationQueueScreen`). Reachable only by accounts with
+  /// `is_moderator` or `is_staff` — see [moderationPath].
+  static const String moderation = 'moderation';
+
+  /// Part P-040: the single-item review screen
+  /// (`ModerationReviewScreen`). See [moderationReviewPath] for how the
+  /// item is handed to it.
+  static const String moderationReview = 'moderationReview';
+
+  /// Part P-044: the signed-in Business user's own Post/Reel list
+  /// (`ContentListScreen`), backed by `ownContentProvider`. Same "no id
+  /// — resolved from `request.user`" reasoning as [productList].
+  static const String contentList = 'contentList';
+
+  /// Part P-044: the Post creation form (`PostFormScreen`). Create-only
+  /// (no edit mode, unlike [productForm]) — see that screen's own
+  /// docstring for why. Reached from [contentList]'s own "New Post"
+  /// action.
+  static const String postForm = 'postForm';
+
+  /// Part P-044: the Reel creation form (`ReelFormScreen`). Same
+  /// create-only reasoning as [postForm]. Reached from [contentList]'s
+  /// own "New Reel" action.
+  static const String reelForm = 'reelForm';
+
+  /// Part P-051: the Story creation form (`StoryCreationScreen`).
+  /// Create-only, same reasoning as [postForm]/[reelForm]. Distinct
+  /// from [storyViewer] (P-050's PUBLIC, customer-facing "watch this
+  /// business's Stories" screen) — this one is the Business account's
+  /// own upload flow. Not nested under [contentListPath]: Stories has
+  /// its own queue-backed background-retry upload flow
+  /// (`StoryUploadQueueNotifier`), not `ownContentProvider` like
+  /// Posts/Reels, so it gets its own `/business-console/stories/...`
+  /// segment rather than joining [contentListPath]'s.
+  static const String storyForm = 'storyForm';
+
+  /// Part P-045: the public, by-id Post detail screen (`PostDetailScreen`).
+  /// A genuinely new route — P-007's original skeleton never anticipated
+  /// Posts/Reels as top-level routes, so this is an additive routing
+  /// change, not a placeholder replacement like [productDetail]'s route
+  /// was. No gate of its own in `app_router.dart` — an ordinary protected
+  /// route, same as [productDetail].
+  static const String postDetail = 'postDetail';
+
+  /// Part P-045: the public, by-id Reel detail screen (`ReelDetailScreen`).
+  /// Same reasoning as [postDetail].
+  static const String reelDetail = 'reelDetail';
+
+  /// Part P-050: the customer-facing Story viewer (`StoryViewerScreen`)
+  /// for one business's currently-visible Story sequence, reached from
+  /// `StoryRingWidget` (this part). Uses [idParam], same convention as
+  /// [businessProfilePath]/[productDetailPath]/[postDetailPath]/
+  /// [reelDetailPath] — this router always names its path segment `id`
+  /// regardless of what it semantically identifies (here: a business
+  /// id, exactly like [businessProfilePath]). Its natural entry point
+  /// (Phase 10's Discover screen stories bar, P-062) doesn't exist yet
+  /// — reachable for now via direct navigation from wherever
+  /// `StoryRingWidget` is placed, same precedent as [postDetail]/
+  /// [reelDetail] being reachable before Phase 10's Feed existed.
+  static const String storyViewer = 'storyViewer';
+
+  /// Part P-083: the Business Console's own Stories list tab
+  /// (`StoryListScreen`) — the signed-in Business user's own stories.
+  /// Distinct from [storyForm] (the creation form) and [storyViewer]
+  /// (the public, customer-facing viewer).
+  static const String storyList = 'storyList';
+
+  /// Part P-083: the Business Console's Analytics tab. Currently an
+  /// `AnalyticsPlaceholderScreen`; Part P-085 replaces only the builder
+  /// in `app_router.dart`, this route stays as it is.
+  static const String businessAnalytics = 'businessAnalytics';
+
+  // --- Route paths (used inside GoRoute(path: ...)) ---
+  static const String splashPath = '/';
+  static const String loginPath = '/login';
+  static const String registerPath = '/register';
+  static const String homePath = '/home';
+  static const String discoverPath = '/discover';
+  static const String searchPath = '/search';
+  static const String businessProfilePath = '/business/:id';
+  static const String productDetailPath = '/product/:id';
+  static const String chatListPath = '/chat';
+  static const String chatThreadPath = '/chat/:id';
+  static const String notificationsPath = '/notifications';
+  static const String notificationPreferencesPath =
+      '/notifications/preferences';
+  static const String businessConsolePath = '/business-console';
+
+  /// Part P-028C1 — see [businessOnboarding]/this class's docstring.
+  static const String businessOnboardingPath = '/business-onboarding';
+
+  /// Part P-028C2 — see [businessProfileEdit].
+  ///
+  /// Kept on its own top-level segment rather than under
+  /// [businessProfilePath] (`/business/:id`): that route is the public
+  /// by-id screen, and hanging `/business/edit` off it would make
+  /// `edit` indistinguishable from an id path-parameter value to
+  /// `go_router`'s matcher. `/business-profile/edit` is unambiguous and
+  /// still kebab-case, consistent with [businessConsolePath] and
+  /// [businessOnboardingPath].
+  static const String businessProfileEditPath = '/business-profile/edit';
+
+  /// Part P-033 — see [productList].
+  static const String productListPath = '/business-console/products';
+
+  /// Part P-033 — see [productForm].
+  ///
+  /// No `:id` segment: unlike [productDetailPath] (the PUBLIC,
+  /// customer-facing "view this exact product" screen, Part P-034,
+  /// looked up fresh by id), this is "my own product form," reached
+  /// only from [productListPath]'s own screen, which already holds the
+  /// full [Product] object in memory (`ownProductsProvider`) — there is
+  /// nothing to look up. Edit mode is signalled by passing that
+  /// `Product` as `context.pushNamed(...)`'s `extra:` argument instead
+  /// (read back via `GoRouterState.extra` in `app_router.dart`); `extra`
+  /// being absent/null means create mode. See `ProductFormScreen`'s own
+  /// docstring for why this screen takes no `RouteNames` dependency of
+  /// its own at all — the caller (this route's own builder) supplies
+  /// navigation.
+  static const String productFormPath = '/business-console/products/form';
+
+  /// Part P-040 — see [moderation].
+  ///
+  /// Gated in `app_router.dart`'s `redirect` callback: a signed-in user
+  /// whose session has neither `isModerator` nor `isStaff` is sent to
+  /// [homePath] no matter how they got here (`context.go`, a deep link,
+  /// a restored location). The gate covers this path and everything
+  /// under `/moderation/`.
+  static const String moderationPath = '/moderation';
+
+  /// Part P-040 — see [moderationReview].
+  ///
+  /// No `:id` segment, for the same reason as [productFormPath]: the
+  /// queue screen already holds the full queue item, which is handed
+  /// over as `context.pushNamed(..., extra: item)` instead of being
+  /// looked up again. A location reached WITHOUT that `extra` (a deep
+  /// link, an app restore) has nothing to show, so the router's redirect
+  /// sends it back to [moderationPath] rather than building a broken
+  /// screen.
+  static const String moderationReviewPath = '/moderation/review';
+
+  /// Part P-044 — see [contentList]. Nested under [businessConsolePath],
+  /// same convention as [productListPath].
+  static const String contentListPath = '/business-console/content';
+
+  /// Part P-044 — see [postForm]. No `:id` segment — create-only, same
+  /// reasoning as [productFormPath] minus the edit-mode `extra:`
+  /// (`PostFormScreen` takes none).
+  static const String postFormPath = '/business-console/content/post';
+
+  /// Part P-044 — see [reelForm]. Same shape as [postFormPath].
+  static const String reelFormPath = '/business-console/content/reel';
+
+  /// Part P-051 — see [storyForm]. Own segment under [businessConsolePath]
+  /// rather than under [contentListPath] — see [storyForm]'s own doc for
+  /// why.
+  static const String storyFormPath = '/business-console/stories/create';
+
+  /// Part P-045 — see [postDetail]. Uses [idParam], same convention as
+  /// [productDetailPath]/[businessProfilePath]/[chatThreadPath].
+  static const String postDetailPath = '/post/:id';
+
+  /// Part P-045 — see [reelDetail]. Same shape as [postDetailPath].
+  static const String reelDetailPath = '/reel/:id';
+
+  /// Part P-050 — see [storyViewer].
+  static const String storyViewerPath = '/stories/:id';
+
+  /// Part P-083 — see [storyList]. Sibling of [storyFormPath]
+  /// (`/business-console/stories/create`); the two don't collide because
+  /// [storyFormPath] is its own top-level route, not a child of this one.
+  static const String storyListPath = '/business-console/stories';
+
+  /// Part P-083 — see [businessAnalytics].
+  static const String businessAnalyticsPath = '/business-console/analytics';
+
+  /// Part P-113: the Saved screen (Posts / Reels / Products tabs), tab 3 of
+  /// the Customer bottom bar and a Profile hub row for every account type.
+  /// The name and path are added in STEP 1 so the navigation manifest
+  /// compiles; the GoRoute itself is added in P-113 STEP 2.
+  static const String saved = 'saved';
+  static const String savedPath = '/saved';
+
+  /// Part P-113: the Profile & Settings hub, tab 5 for every account type.
+  /// Same staging as [saved]: name and path now, GoRoute in STEP 2, real
+  /// screen in STEP 3.
+  static const String profile = 'profile';
+  static const String profilePath = '/profile';
+
+  /// Path-parameter key shared by [businessProfilePath], [productDetailPath],
+  /// [chatThreadPath], [postDetailPath], [reelDetailPath] and
+  /// [storyViewerPath].
+  static const String idParam = 'id';
+}
+
+
+##### FILE: lib\routing\navigation_manifest.dart #####
+import '../features/auth/domain/user_entity.dart';
+import 'route_names.dart';
+
+/// Part P-113 (STEP 1): the navigation manifest.
+///
+/// ONE const data structure that answers, for every destination of the app
+/// and for every account type, "which VISIBLE entry points open this?".
+/// It is the single source of truth for navigation visibility:
+///
+/// * STEP 2 builds the bottom bar from it ([bottomTabsFor]).
+/// * STEP 3 builds the Profile & Settings hub from its `profileHubRow`
+///   entries, STEP 4 builds the create sheet from its `createSheet` entries.
+/// * `test/routing/navigation_reachability_test.dart` reads it to prove that
+///   no screen is reachable only by accident (no debug menu, no hidden path).
+///
+/// ## What the manifest is NOT
+///
+/// It never grants or removes access. Account-type gating stays in the
+/// router `redirect` callback in `app_router.dart` (untouched by P-113).
+/// `allowedFor` documents who the redirect lets in; the reachability test
+/// then forces every allowed audience to have a visible way to get there.
+///
+/// ## Adding a route later (handoff rule)
+///
+/// A new `GoRoute` with a `name` that is not listed here makes the
+/// reachability test fail. Add a [NavDestination] for it in the same commit.
+///
+/// ## Account types ("audiences")
+///
+/// Staff = `isModerator || isStaff` and wins over the account type, because
+/// the locked P-113 table gives Staff its own bottom bar. See
+/// [navAudienceForUser].
+enum NavAudience { customer, business, staff }
+
+/// How a destination is made visible to the user.
+enum NavEntryKind {
+  /// One of the five bottom-bar slots.
+  bottomTab,
+
+  /// An icon in the Home top bar (bell, chats).
+  topBarAction,
+
+  /// A row in the Profile & Settings hub.
+  profileHubRow,
+
+  /// An item of the Business "+" create sheet.
+  createSheet,
+
+  /// A tap target inside another screen (card, avatar, button, header).
+  inContextLink,
+
+  /// Not visible anywhere on purpose. Needs a documented reason and never
+  /// counts as an entry point for the reachability test.
+  deepLinkOnly,
+}
+
+class NavEntry {
+  const NavEntry(this.kind, this.where, {this.tabSlot, this.reason});
+
+  final NavEntryKind kind;
+
+  /// Human description of the exact place (used in the walk-through).
+  final String where;
+
+  /// 1..5, only for [NavEntryKind.bottomTab].
+  final int? tabSlot;
+
+  /// Required for [NavEntryKind.deepLinkOnly].
+  final String? reason;
+}
+
+class NavDestination {
+  const NavDestination({
+    required this.id,
+    required this.allowedFor,
+    required this.entries,
+    this.routeName,
+    this.authFlowReason,
+  });
+
+  /// Stable identifier. Equals [routeName] for real routes; for things that
+  /// are not routes (create sheet, theme/language selectors, log out) it is
+  /// a short descriptive id and [routeName] is null.
+  final String id;
+
+  /// The `RouteNames.*` route name, or null for non-route destinations.
+  final String? routeName;
+
+  /// Audiences the router lets in. Empty for auth-flow destinations.
+  final Set<NavAudience> allowedFor;
+
+  /// Visible entry points per audience.
+  final Map<NavAudience, List<NavEntry>> entries;
+
+  /// Non-null (with a reason) for destinations that belong to the auth flow
+  /// guarded by the router redirect and are not part of the shell.
+  final String? authFlowReason;
+
+  bool get isAuthFlow => authFlowReason != null;
+}
+
+/// The audience a signed-in user belongs to. Staff wins over account type.
+NavAudience navAudienceForUser(User user) {
+  if (user.isModerator || user.isStaff) {
+    return NavAudience.staff;
+  }
+  return switch (user.accountType) {
+    AccountType.business => NavAudience.business,
+    AccountType.customer => NavAudience.customer,
+  };
+}
+
+/// Destinations that are not routes (no `GoRoute`). Their ids are used by
+/// the shell and hub in later steps.
+const String kNavCreateId = 'create';
+const String kNavAppearanceId = 'appearance';
+const String kNavLanguageId = 'language';
+const String kNavLogoutId = 'logout';
+
+const Set<NavAudience> _everyone = {
+  NavAudience.customer,
+  NavAudience.business,
+  NavAudience.staff,
+};
+const Set<NavAudience> _businessOnly = {NavAudience.business};
+const Set<NavAudience> _staffOnly = {NavAudience.staff};
+
+// --- Reusable entry lists -------------------------------------------------
+
+const List<NavEntry> _inContextCards = [
+  NavEntry(
+    NavEntryKind.inContextLink,
+    'Cards in feed, profile tabs, search, saved, notifications, shared chat cards',
+  ),
+];
+
+const List<NavEntry> _hubRow = [
+  NavEntry(NavEntryKind.profileHubRow, 'Profile & Settings hub row'),
+];
+
+const List<NavEntry> _homeTab = [
+  NavEntry(NavEntryKind.bottomTab, 'Bottom bar, tab 1', tabSlot: 1),
+];
+
+const List<NavEntry> _exploreTab = [
+  NavEntry(NavEntryKind.bottomTab, 'Bottom bar, tab 2', tabSlot: 2),
+];
+
+const List<NavEntry> _chatsTabAndTopBar = [
+  NavEntry(NavEntryKind.bottomTab, 'Bottom bar, tab 4', tabSlot: 4),
+  NavEntry(NavEntryKind.topBarAction, 'Home top bar, chats icon'),
+];
+
+const List<NavEntry> _profileTab = [
+  NavEntry(NavEntryKind.bottomTab, 'Bottom bar, tab 5', tabSlot: 5),
+];
+
+const List<NavEntry> _consoleHubAndHeader = [
+  NavEntry(NavEntryKind.profileHubRow, 'Hub, Business tools group'),
+  NavEntry(NavEntryKind.inContextLink, 'Tab 5 header shortcuts'),
+];
+
+/// The manifest. Order is irrelevant to behavior; it follows the P-113
+/// reachability matrix for readability.
+const List<NavDestination> kNavigationManifest = [
+  // --- Shell tabs ---------------------------------------------------------
+  NavDestination(
+    id: RouteNames.home,
+    routeName: RouteNames.home,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _homeTab,
+      NavAudience.business: _homeTab,
+      NavAudience.staff: _homeTab,
+    },
+  ),
+  NavDestination(
+    id: RouteNames.discover,
+    routeName: RouteNames.discover,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _exploreTab,
+      NavAudience.business: _exploreTab,
+      NavAudience.staff: _exploreTab,
+    },
+  ),
+  NavDestination(
+    id: RouteNames.search,
+    routeName: RouteNames.search,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _searchEntries,
+      NavAudience.business: _searchEntries,
+      NavAudience.staff: _searchEntries,
+    },
+  ),
+  NavDestination(
+    id: RouteNames.chatList,
+    routeName: RouteNames.chatList,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _chatsTabAndTopBar,
+      NavAudience.business: _chatsTabAndTopBar,
+      NavAudience.staff: _chatsTabAndTopBar,
+    },
+  ),
+  NavDestination(
+    id: RouteNames.profile,
+    routeName: RouteNames.profile,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _profileTab,
+      NavAudience.business: _profileTab,
+      NavAudience.staff: _profileTab,
+    },
+  ),
+  NavDestination(
+    id: RouteNames.saved,
+    routeName: RouteNames.saved,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: [
+        NavEntry(NavEntryKind.bottomTab, 'Bottom bar, tab 3', tabSlot: 3),
+        NavEntry(NavEntryKind.profileHubRow, 'Hub row'),
+      ],
+      NavAudience.business: _hubRow,
+      NavAudience.staff: _hubRow,
+    },
+  ),
+  NavDestination(
+    id: kNavCreateId,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(
+          NavEntryKind.bottomTab,
+          'Bottom bar, tab 3 (+), opens the create sheet',
+          tabSlot: 3,
+        ),
+      ],
+    },
+  ),
+  NavDestination(
+    id: RouteNames.moderation,
+    routeName: RouteNames.moderation,
+    allowedFor: _staffOnly,
+    entries: {
+      NavAudience.staff: [
+        NavEntry(
+          NavEntryKind.bottomTab,
+          'Bottom bar, tab 3 (pending badge)',
+          tabSlot: 3,
+        ),
+        NavEntry(NavEntryKind.profileHubRow, 'Hub, Moderation group'),
+      ],
+    },
+  ),
+
+  // --- Social / content detail screens -----------------------------------
+  NavDestination(
+    id: RouteNames.businessProfile,
+    routeName: RouteNames.businessProfile,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _avatarLinks,
+      NavAudience.business: _avatarLinks,
+      NavAudience.staff: _avatarLinks,
+    },
+  ),
+  NavDestination(
+    id: RouteNames.productDetail,
+    routeName: RouteNames.productDetail,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _inContextCards,
+      NavAudience.business: _inContextCards,
+      NavAudience.staff: _inContextCards,
+    },
+  ),
+  NavDestination(
+    id: RouteNames.postDetail,
+    routeName: RouteNames.postDetail,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _inContextCards,
+      NavAudience.business: _inContextCards,
+      NavAudience.staff: _inContextCards,
+    },
+  ),
+  NavDestination(
+    id: RouteNames.reelDetail,
+    routeName: RouteNames.reelDetail,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _inContextCards,
+      NavAudience.business: _inContextCards,
+      NavAudience.staff: _inContextCards,
+    },
+  ),
+  NavDestination(
+    id: RouteNames.storyViewer,
+    routeName: RouteNames.storyViewer,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _storyRings,
+      NavAudience.business: _storyRings,
+      NavAudience.staff: _storyRings,
+    },
+  ),
+  NavDestination(
+    id: RouteNames.chatThread,
+    routeName: RouteNames.chatThread,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _threadLinks,
+      NavAudience.business: _threadLinks,
+      NavAudience.staff: _threadLinks,
+    },
+  ),
+
+  // --- Notifications ------------------------------------------------------
+  NavDestination(
+    id: RouteNames.notifications,
+    routeName: RouteNames.notifications,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _bellEntries,
+      NavAudience.business: _bellEntries,
+      NavAudience.staff: _bellEntries,
+    },
+  ),
+  NavDestination(
+    id: RouteNames.notificationPreferences,
+    routeName: RouteNames.notificationPreferences,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _prefsEntries,
+      NavAudience.business: _prefsEntries,
+      NavAudience.staff: _prefsEntries,
+    },
+  ),
+
+  // --- Settings actions that are not routes -------------------------------
+  NavDestination(
+    id: kNavAppearanceId,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _hubRow,
+      NavAudience.business: _hubRow,
+      NavAudience.staff: _hubRow,
+    },
+  ),
+  NavDestination(
+    id: kNavLanguageId,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _hubRow,
+      NavAudience.business: _hubRow,
+      NavAudience.staff: _hubRow,
+    },
+  ),
+  NavDestination(
+    id: kNavLogoutId,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _hubRow,
+      NavAudience.business: _hubRow,
+      NavAudience.staff: _hubRow,
+    },
+  ),
+
+  // --- Business only ------------------------------------------------------
+  NavDestination(
+    id: RouteNames.businessProfileEdit,
+    routeName: RouteNames.businessProfileEdit,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(NavEntryKind.profileHubRow, 'Hub, Business tools group'),
+        NavEntry(
+          NavEntryKind.inContextLink,
+          'Edit button on the Business public profile',
+        ),
+      ],
+    },
+  ),
+  NavDestination(
+    id: RouteNames.businessConsole,
+    routeName: RouteNames.businessConsole,
+    allowedFor: _businessOnly,
+    entries: {NavAudience.business: _consoleHubAndHeader},
+  ),
+  NavDestination(
+    id: RouteNames.productList,
+    routeName: RouteNames.productList,
+    allowedFor: _businessOnly,
+    entries: {NavAudience.business: _consoleHubAndHeader},
+  ),
+  NavDestination(
+    id: RouteNames.contentList,
+    routeName: RouteNames.contentList,
+    allowedFor: _businessOnly,
+    entries: {NavAudience.business: _consoleHubAndHeader},
+  ),
+  NavDestination(
+    id: RouteNames.storyList,
+    routeName: RouteNames.storyList,
+    allowedFor: _businessOnly,
+    entries: {NavAudience.business: _consoleHubAndHeader},
+  ),
+  NavDestination(
+    id: RouteNames.businessAnalytics,
+    routeName: RouteNames.businessAnalytics,
+    allowedFor: _businessOnly,
+    entries: {NavAudience.business: _consoleHubAndHeader},
+  ),
+  NavDestination(
+    id: RouteNames.productForm,
+    routeName: RouteNames.productForm,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(NavEntryKind.createSheet, 'Create sheet, Product'),
+        NavEntry(NavEntryKind.inContextLink, 'Add button in the products list'),
+      ],
+    },
+  ),
+  NavDestination(
+    id: RouteNames.postForm,
+    routeName: RouteNames.postForm,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(NavEntryKind.createSheet, 'Create sheet, Post'),
+        NavEntry(NavEntryKind.inContextLink, 'Add button in the content list'),
+      ],
+    },
+  ),
+  NavDestination(
+    id: RouteNames.reelForm,
+    routeName: RouteNames.reelForm,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(NavEntryKind.createSheet, 'Create sheet, Reel'),
+        NavEntry(NavEntryKind.inContextLink, 'Add button in the content list'),
+      ],
+    },
+  ),
+  NavDestination(
+    id: RouteNames.storyForm,
+    routeName: RouteNames.storyForm,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(NavEntryKind.createSheet, 'Create sheet, Story'),
+        NavEntry(NavEntryKind.inContextLink, 'Add button in the stories list'),
+      ],
+    },
+  ),
+
+  // --- Staff only ---------------------------------------------------------
+  NavDestination(
+    id: RouteNames.moderationReview,
+    routeName: RouteNames.moderationReview,
+    allowedFor: _staffOnly,
+    entries: {
+      NavAudience.staff: [
+        NavEntry(
+          NavEntryKind.inContextLink,
+          'Item row in the moderation queue',
+        ),
+      ],
+    },
+  ),
+
+  // --- Auth flow (guarded by the router redirect, not part of the shell) ---
+  NavDestination(
+    id: RouteNames.splash,
+    routeName: RouteNames.splash,
+    allowedFor: {},
+    entries: {},
+    authFlowReason:
+        'Cold-start route. The redirect sends it to /login or /home.',
+  ),
+  NavDestination(
+    id: RouteNames.login,
+    routeName: RouteNames.login,
+    allowedFor: {},
+    entries: {},
+    authFlowReason:
+        'Signed-out entry. Signed-in users are redirected to /home.',
+  ),
+  NavDestination(
+    id: RouteNames.register,
+    routeName: RouteNames.register,
+    allowedFor: {},
+    entries: {},
+    authFlowReason:
+        'Signed-out entry, linked from the login screen. Signed-in users are redirected to /home.',
+  ),
+  NavDestination(
+    id: RouteNames.businessOnboarding,
+    routeName: RouteNames.businessOnboarding,
+    allowedFor: {},
+    entries: {},
+    authFlowReason:
+        'Forced by the redirect for a Business account that has no BusinessProfile yet.',
+  ),
+];
+
+const List<NavEntry> _searchEntries = [
+  NavEntry(NavEntryKind.inContextLink, 'Explore tab search bar'),
+  NavEntry(NavEntryKind.inContextLink, 'Search icon in empty states'),
+];
+
+const List<NavEntry> _avatarLinks = [
+  NavEntry(
+    NavEntryKind.inContextLink,
+    'Avatar or name in feed, search, story header, chat header, saved, notifications',
+  ),
+];
+
+const List<NavEntry> _storyRings = [
+  NavEntry(
+    NavEntryKind.inContextLink,
+    'Story rings in the Home tray and in the Explore tab stories bar',
+  ),
+];
+
+const List<NavEntry> _threadLinks = [
+  NavEntry(NavEntryKind.inContextLink, 'Row in the chats list (tab 4)'),
+  NavEntry(NavEntryKind.inContextLink, 'Message button on a Business profile'),
+  NavEntry(NavEntryKind.inContextLink, 'Chat notification'),
+];
+
+const List<NavEntry> _bellEntries = [
+  NavEntry(NavEntryKind.topBarAction, 'Home top bar, bell icon'),
+];
+
+const List<NavEntry> _prefsEntries = [
+  NavEntry(NavEntryKind.profileHubRow, 'Hub row'),
+  NavEntry(NavEntryKind.inContextLink, 'Notification center header'),
+];
+
+/// The bottom-bar entries of [audience], ordered by slot (1..5).
+///
+/// Used by the shell in P-113 STEP 3 and by the locked-layout test.
+List<MapEntry<NavDestination, NavEntry>> bottomTabsFor(NavAudience audience) {
+  final tabs = <MapEntry<NavDestination, NavEntry>>[];
+  for (final destination in kNavigationManifest) {
+    for (final entry in destination.entries[audience] ?? const <NavEntry>[]) {
+      if (entry.kind == NavEntryKind.bottomTab) {
+        tabs.add(MapEntry(destination, entry));
+      }
+    }
+  }
+  tabs.sort((a, b) => a.value.tabSlot!.compareTo(b.value.tabSlot!));
+  return tabs;
+}
+
+
+##### FILE: lib\routing\app_router.dart #####
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../core/shell/app_shell.dart';
+import '../features/auth/domain/user_entity.dart';
+import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/register_screen.dart';
+import '../features/auth/presentation/session_provider.dart';
+import '../features/auth/presentation/splash_screen.dart';
+import '../features/business_console/presentation/analytics_screen.dart';
+import '../features/business_console/presentation/business_console_shell.dart';
+import '../features/business_console/presentation/console_dashboard.dart';
+import '../features/business_profile/presentation/business_onboarding_screen.dart';
+import '../features/business_profile/presentation/business_profile_edit_screen.dart';
+import '../features/business_profile/presentation/business_profile_provider.dart';
+import '../features/business_profile/presentation/business_profile_public_screen.dart';
+import '../features/chat/presentation/chat_list_screen.dart';
+import '../features/chat/presentation/chat_thread_screen.dart';
+import '../features/content/presentation/content_list_screen.dart';
+import '../features/content/presentation/post_detail_screen.dart';
+import '../features/content/presentation/post_form_screen.dart';
+import '../features/content/presentation/reel_detail_screen.dart';
+import '../features/content/presentation/reel_form_screen.dart';
+import '../features/discover/presentation/discover_screen.dart';
+import '../features/feed/presentation/home_feed_screen.dart';
+import '../features/moderation/domain/queue_item_entity.dart';
+import '../features/moderation/presentation/moderation_queue_screen.dart';
+import '../features/moderation/presentation/moderation_review_screen.dart';
+import '../features/notifications/presentation/notification_center_screen.dart';
+import '../features/notifications/presentation/notification_preferences_screen.dart';
+import '../features/profile_hub/presentation/profile_hub_screen.dart';
+import '../features/saved/presentation/saved_screen.dart';
+import '../features/products/domain/product_entity.dart';
+import '../features/products/presentation/product_detail_screen.dart';
+import '../features/products/presentation/product_form_screen.dart';
+import '../features/products/presentation/product_list_screen.dart';
+import '../features/search/presentation/search_screen.dart';
+import '../features/stories/presentation/story_creation_screen.dart';
+import '../features/stories/presentation/story_list_screen.dart';
+import '../features/stories/presentation/story_viewer_screen.dart';
+import '../features/chat/domain/conversation.dart';
+import 'route_error_screen.dart';
+import 'route_names.dart';
+
+/// Part P-007 scope: wires the app's single [GoRouter] instance and its
+/// route table. Every feature screen must be reached through this router —
+/// no feature should build or push its own separate `Navigator`.
+///
+/// ## Auth guard — resolved in Part P-021b
+/// P-007 left the `redirect` callback below as a stub (`TODO(Phase 3)`,
+/// always returning `null`) backed by a fake `_sessionPlaceholderProvider`
+/// that never changed. Part P-021b replaces that placeholder with the real
+/// [sessionProvider] (`SessionNotifier`, Part P-021a) and fills in the
+/// redirect logic.
+///
+/// Routes are split into two groups:
+/// * **Public** (`_publicRoutes`): `/login`, `/register` — reachable only
+///   while signed out.
+/// * **Protected** (everything else — `home`, `discover`, `search`,
+///   `businessProfile`, `productDetail`, `chatList`, `chatThread`,
+///   `notifications`, `businessConsole`, `businessOnboarding` (Part
+///   P-028C1), `businessProfileEdit` (Part P-028C2), and — since Part
+///   P-033 — `productList`/`productForm`): reachable only while signed
+///   in.
+///
+/// `splash` (`/`) is deliberately in neither list — see the dedicated note
+/// further down, on the `redirect` callback itself.
+///
+/// ## Business-account gate — added in Part P-028C1
+///
+/// A **second, Business-account-specific gate**, layered strictly on top
+/// of the base auth gate above (per this part's own Architecture Rules —
+/// "reuses the router-redirect-guard pattern established in P-021 — this
+/// is a second gate, not a replacement"). It only ever runs once the base
+/// gate has already confirmed the user is signed in.
+///
+/// Logic (see the `redirect` callback body below for the real code):
+/// * If the signed-in user's `accountType` is [AccountType.business] AND
+///   [businessProfileProvider] resolves to `AsyncData(null)` (a backend
+///   404 on `GET /api/v1/businesses/me/`, per Part P-026 — "hasn't
+///   completed onboarding yet") AND the target route isn't already
+///   [RouteNames.businessOnboardingPath] itself, redirect there.
+/// * A [AccountType.customer] user is never even *read* from
+///   [businessProfileProvider] — see [_SessionRefreshListenable] below
+///   for how this is enforced at the provider-subscription level too,
+///   not just inside this `if`, per this part's own spec ("Customer-type
+///   users must skip the BusinessProfile existence check entirely").
+/// * While [businessProfileProvider] is still [AsyncLoading] (the very
+///   first read, right after the session itself resolves) or is
+///   [AsyncError] (a genuine fetch failure — distinct from "no profile
+///   yet", per `BusinessProfileNotifier`'s own docstring), this gate
+///   does NOT force a redirect either way — it simply lets the user stay
+///   on whatever route they're already resolving to, and
+///   [_SessionRefreshListenable] re-runs this whole callback the instant
+///   [businessProfileProvider] settles.
+///
+/// ### ⚠️ Known, pre-existing blocker this part does NOT fix (flagged, not silent)
+///
+/// [sessionProvider]'s `User.accountType` is still the documented
+/// **placeholder** from Part P-021a (`_placeholderAccountType`, always
+/// [AccountType.customer] — see `session_provider.dart`'s own
+/// docstring). P-028A's and P-028B's handoff notes both already flagged
+/// this as a real blocker for exactly this gate, and it is **not**
+/// resolved by this part (no backend `/me/`-style account endpoint or
+/// JWT-decoding infra was added here — that's explicitly out of this
+/// part's own scope). The gate logic below is written to be **correct**
+/// once `accountType` is real, but with the placeholder in place, a
+/// signed-in user's `accountType` always reads as `customer` — meaning
+/// this gate structurally cannot yet fire for a real Business account on
+/// a real device. See this feature's `PROJECT_PROGRESS.md` entry for
+/// Part P-028C1 for the full note and the options left for Ahmed to
+/// decide on.
+///
+/// ## Part P-028C2 — what changed here, and what deliberately did NOT
+///
+/// P-028C2 adds exactly one thing to this file: the [GoRoute] for
+/// [RouteNames.businessProfileEditPath] →
+/// `BusinessProfileEditScreen`. The `redirect` callback, the
+/// Business-account gate above, [_SessionRefreshListenable]'s
+/// conditional-subscription mechanism, and the base P-021b auth gate are
+/// all **unchanged** — per P-028C1's own handoff note ("do not redesign
+/// or replace the router-gate logic ... unless real-machine validation
+/// surfaces an actual bug in them"), and per P-028C2's own acceptance
+/// criterion that the onboarding redirect must remain intact after the
+/// edit route is added.
+///
+/// The edit route needs no gate clause of its own: it is a protected
+/// route like any other, so a signed-out user is already bounced to
+/// `/login` by the base gate, and a Business user with no profile is
+/// already bounced to onboarding by the P-028C1 gate above *before* the
+/// edit route can ever render — the gate runs on `matchedLocation` for
+/// every navigation, not just on cold start.
+///
+/// Still NOT implemented, unchanged from P-028C1 and flagged again
+/// rather than silently added: an already-onboarded Business user who
+/// navigates directly to `/business-onboarding` is not bounced to
+/// `/home`. Only the no-profile → onboarding direction exists, which is
+/// the only direction either part's acceptance criteria asked for.
+///
+/// ## Part P-033 — what changed here, and what deliberately did NOT
+///
+/// Adds exactly two [GoRoute]s — [RouteNames.productListPath] →
+/// `ProductListScreen` and [RouteNames.productFormPath] →
+/// `ProductFormScreen` — nested right after [RouteNames.businessConsolePath]
+/// in the table, matching their nested path segment. Neither needs a
+/// gate clause of its own, for the same reason [RouteNames.businessProfileEditPath]
+/// doesn't (see P-028C2's note immediately above): both are ordinary
+/// protected routes, already covered by the base auth gate.
+///
+/// `ProductListScreen`'s `onCreateNew`/`onEditProduct` callbacks (see
+/// that screen's own docstring for why it takes them instead of calling
+/// `context.goNamed` itself) are supplied HERE, in this route's own
+/// `builder:` — exactly the "one-line `builder:`" wiring that screen's
+/// docstring already anticipated, with zero changes needed to
+/// `product_list_screen.dart` itself. `onEditProduct` passes the full
+/// [Product] via `extra:`; `ProductFormScreen`'s own route reads it back
+/// via `state.extra as Product?` — `null` for the plain "Create New" tap,
+/// non-null for an edit tap, matching [RouteNames.productFormPath]'s own
+/// doc on why there's no `:id` path segment here.
+///
+/// ## Part P-040 — moderator gate, and the two new routes
+///
+/// Adds a **third gate**, layered on top of the base auth gate and the
+/// Business-account gate (never replacing either): the whole
+/// `/moderation` prefix ([RouteNames.moderationPath] and anything under
+/// `/moderation/`) is reachable only when the signed-in user has
+/// `isModerator` **or** `isStaff` set (`User`, from `GET /api/v1/auth/me/`
+/// — Part P-020, extended for this part). Anyone else is redirected to
+/// `/home`.
+///
+/// This is enforced HERE, in `redirect`, which runs for every navigation
+/// regardless of how it started (`context.go`, `context.push`, a deep
+/// link, a restored location) — not by hiding a menu entry. A signed-out
+/// user never reaches this gate: the base gate above has already sent
+/// them to `/login`.
+///
+/// The review route additionally needs its [QueueItem], which the queue
+/// screen passes as `extra:` (same convention as
+/// [RouteNames.productForm]). If `extra` is missing or not a
+/// [QueueItem] (a deep link, an app restore) the redirect sends the user
+/// to the queue instead of building a broken screen. The role check runs
+/// first, so a non-moderator is never told anything about this route.
+///
+/// Both routes are wired in the `routes:` table below; the queue's
+/// `onOpenItem` callback is supplied here, in the route's `builder:`, for
+/// the same reason `ProductListScreen`'s callbacks are (see P-033 above):
+/// the screen stays free of any `GoRouter` dependency.
+///
+/// `_SessionRefreshListenable` needs no change: it already re-runs
+/// `redirect` whenever the session changes, which is exactly what
+/// re-evaluates this gate on login/logout.
+///
+/// ## Part P-044 — three new routes, no new gate
+///
+/// Adds [RouteNames.contentListPath] → `ContentListScreen`,
+/// [RouteNames.postFormPath] → `PostFormScreen`, and
+/// [RouteNames.reelFormPath] → `ReelFormScreen`, nested right after
+/// [RouteNames.productFormPath] — same `/business-console/...` prefix
+/// convention as the Part P-033 block immediately above. None of the
+/// three needs a gate clause of its own, for the exact same reason
+/// [RouteNames.productListPath]/[RouteNames.productFormPath] don't: all
+/// three are ordinary protected routes, already covered by the base
+/// auth gate.
+///
+/// `ContentListScreen`'s `onCreatePost`/`onCreateReel` callbacks (see
+/// that screen's own docstring for why it takes them instead of calling
+/// `context.pushNamed` itself) are supplied here, in this route's own
+/// `builder:` — identical wiring shape to `ProductListScreen`'s
+/// `onCreateNew`/`onEditProduct` above. Unlike `productForm`,
+/// `postForm`/`reelForm` read no `extra:` — both forms are strictly
+/// create-only (see each screen's own docstring for why), so there is
+/// no edit-mode payload to hand over.
+///
+/// ## Part P-045 — two new public detail routes, no new gate
+///
+/// Adds [RouteNames.postDetailPath] (`/post/:id`) → `PostDetailScreen`
+/// and [RouteNames.reelDetailPath] (`/reel/:id`) → `ReelDetailScreen`,
+/// placed right after [RouteNames.productDetailPath] since all three are
+/// the same shape: a public, customer-facing "view this exact item by
+/// id" screen. Both read `state.pathParameters[RouteNames.idParam]`,
+/// identically to `productDetail`'s builder immediately above them.
+///
+/// Neither needs a gate clause of its own, for the same reason
+/// `productDetail` doesn't: both are ordinary protected routes, already
+/// covered by the base auth gate — reachable only while signed in, like
+/// everything else in this table outside `_publicRoutes`.
+///
+/// Genuinely new routes, not placeholder replacements: P-007's original
+/// route table never anticipated Posts/Reels as top-level routes at all
+/// (unlike `productDetail`, which replaced an existing P-007 placeholder
+/// screen when Part P-034 built the real one).
+///
+/// ## ⚠️ Corrected after real-device testing — `refreshListenable`, not `ref.watch`
+///
+/// P-007's original design called `ref.watch(sessionProvider)` directly
+/// inside this provider's body, on the theory that "Riverpod's own
+/// rebuild mechanism" would be enough — no `refreshListenable` needed.
+/// P-021b initially shipped exactly that. **On the real device this broke
+/// login visibly**: every time `SessionNotifier` changed `state` — even
+/// the transient `AsyncValue.loading()` set the instant `login()` is
+/// called — Riverpod rebuilds this whole provider, which produced an
+/// entirely NEW [GoRouter] instance. A brand-new `GoRouter` always starts
+/// back at [RouteNames.splashPath] (its `initialLocation`) — it has no
+/// memory of "I was on `/login`." The visible symptom (reported directly
+/// against a real login attempt): tapping "Log in" flashed the splash
+/// screen, `LoginScreen` was unmounted mid-request, and a few seconds
+/// later the user landed back on `/login` with **no error message shown
+/// at all** — because whatever failure/success `login()` eventually
+/// produced was setting `state` on a `SessionNotifier` whose
+/// `LoginScreen` observer no longer existed to react to it.
+///
+/// The fix: build exactly ONE [GoRouter] for the lifetime of this
+/// provider (this provider's body itself never re-runs on a session
+/// change), and instead give it a [_SessionRefreshListenable] via
+/// `refreshListenable` — go_router's own documented mechanism for "an
+/// external source of truth changed, please re-run `redirect` against
+/// whatever page the user is currently on," without rebuilding the
+/// router or losing the current screen. `redirect` below reads
+/// [sessionProvider] (and, since Part P-028C1, [businessProfileProvider])
+/// with `ref.read` (a snapshot at evaluation time), not `ref.watch` —
+/// watching inside `redirect` would have reintroduced the same bug by
+/// making a `redirect` re-run also count as "this provider's dependency
+/// changed."
+///
+/// ## Part P-083 — Business-only gate for `/business-console`
+///
+/// A fourth gate in `redirect`, layered after the P-028C1 Business-account
+/// gate and before the P-040 moderator gate (neither changed): any
+/// location equal to or under `/business-console` is reachable only when
+/// the signed-in user's `accountType` is [AccountType.business]; anyone
+/// else is sent to `/home`. Signed-out users never reach it — the base
+/// gate already sent them to `/login`.
+///
+/// ### Part P-083 — the Business Console shell
+///
+/// The console is a `StatefulShellRoute.indexedStack` (the app's first
+/// shell) with four branches, in this order: 0 Products
+/// ([RouteNames.productListPath]), 1 Posts/Reels
+/// ([RouteNames.contentListPath]), 2 Stories
+/// ([RouteNames.storyListPath]), 3 Analytics
+/// ([RouteNames.businessAnalyticsPath]). Its builder wraps the active
+/// branch in `BusinessConsoleShell`. `/business-console` itself only
+/// redirects to branch 0's root. The four create/edit forms
+/// (`productForm`, `postForm`, `reelForm`, `storyForm`) stay top-level
+/// routes, so they open full-screen above the shell exactly as before.
+/// Every pre-existing route name, path and screen builder is unchanged;
+/// `productList` and `contentList` were only moved into their branches.
+/// Part P-085 replaces the Analytics branch's builder and nothing else.
+///
+/// ## Part P-113 (STEP 2B) - the app shell
+///
+/// A second `StatefulShellRoute.indexedStack` (the first one is the Business
+/// console's) wraps the tab destinations in `AppShell`: bottom bar by account
+/// type, one navigator per tab. It has six branches in the order fixed by
+/// `ShellBranch` (home, discover, saved, moderation, chats, profile); the
+/// Business "+" is not a branch. The redirect guards above are unchanged: the
+/// shell sits inside them. Routes that are not tabs stay top-level and open
+/// above the shell. `home`, `discover`, `saved`, `moderation`, `chatList` and
+/// `profile` moved INTO the shell; their names and paths did not change.
+final appRouterProvider = Provider<GoRouter>((ref) {
+  final refreshListenable = _SessionRefreshListenable(ref);
+  ref.onDispose(refreshListenable.dispose);
+
+  return GoRouter(
+    initialLocation: RouteNames.splashPath,
+    debugLogDiagnostics: true,
+    refreshListenable: refreshListenable,
+    errorBuilder:
+        (BuildContext context, GoRouterState state) => const RouteErrorScreen(),
+    redirect: (BuildContext context, GoRouterState state) {
+      // Snapshot read — NOT ref.watch. See the provider-level doc above
+      // for why watching here would silently reintroduce the exact bug
+      // this refreshListenable rewrite fixes.
+      final session = ref.read(sessionProvider);
+      final location = state.matchedLocation;
+
+      // A login/register/logout call is in flight (SessionNotifier sets
+      // `state` to a bare `AsyncValue.loading()` — see session_provider.dart's
+      // own docstring re: not using `copyWithPrevious`, which is `@internal`
+      // on this Riverpod version). This is NOT the cold-start restore —
+      // main.dart (Part P-021b) gates that case before GoRouter ever mounts,
+      // so by the time this callback runs at all, `isLoading` here can only
+      // mean "a screen just called login()/register()/logout() and is
+      // already showing its own loading UI (e.g. AppButton's isLoading).
+      // Now that the router is a single persistent instance (see above),
+      // returning null here correctly means "stay exactly where you
+      // already are" — it no longer risks losing the current screen.
+      if (session.isLoading) {
+        return null;
+      }
+
+      // Pattern-matched rather than `session.valueOrNull` — that getter
+      // isn't available on this project's pinned flutter_riverpod
+      // version (3.3.2; confirmed via a real `flutter analyze` failure on
+      // the real machine, not assumed). `AsyncData(:final value)` reaches
+      // the same result (null-safe, no previous-value ambiguity since
+      // SessionNotifier never uses `copyWithPrevious` — Part P-021a) and
+      // needs no extra API.
+      final user = switch (session) {
+        AsyncData(:final value) => value,
+        _ => null,
+      };
+      final isLoggedIn = user != null;
+      final isPublicRoute = _publicRoutes.contains(location);
+
+      if (!isLoggedIn) {
+        // Signed out: only /login and /register are reachable. Everything
+        // else — every protected route AND splash — bounces to /login.
+        return isPublicRoute ? null : RouteNames.loginPath;
+      }
+
+      // --- Part P-028C1: second, Business-account-specific gate ---
+      // Layered strictly on top of the base auth gate immediately above —
+      // never a replacement for it, and only ever evaluated once `user`
+      // is known non-null. See this provider's doc comment ("Business-
+      // account gate — added in Part P-028C1") for the full explanation,
+      // including the pre-existing `accountType` placeholder blocker this
+      // part does NOT fix.
+      if (user.accountType == AccountType.business) {
+        final businessProfile = ref.read(businessProfileProvider);
+        final noBusinessProfileYet = switch (businessProfile) {
+          AsyncData(:final value) => value == null,
+          // Still loading (first read) or a genuine fetch failure —
+          // neither is "confirmed no profile yet," so this gate does not
+          // force a redirect either way here. `_SessionRefreshListenable`
+          // re-runs this callback once `businessProfileProvider` settles
+          // into AsyncData.
+          _ => false,
+        };
+        if (noBusinessProfileYet &&
+            location != RouteNames.businessOnboardingPath) {
+          return RouteNames.businessOnboardingPath;
+        }
+      }
+
+      // --- Part P-083: fourth gate, Business Console is Business-only ---
+      // Layered after the base auth gate and the P-028C1 Business-account
+      // gate (both untouched), before the P-040 moderator gate. Evaluated
+      // only once `user` is known non-null, so a signed-out user was
+      // already sent to /login above. Enforced here, in `redirect`, for
+      // every navigation (go, push, deep link, restored location), not by
+      // hiding a menu entry. A Business user with no profile never gets
+      // this far: the P-028C1 gate above already sent them to onboarding.
+      if (_isBusinessConsoleLocation(location) &&
+          user.accountType != AccountType.business) {
+        return RouteNames.homePath;
+      }
+
+      // --- Part P-040: third gate, moderator-only routes ---
+      // Layered on top of both gates above, evaluated only once `user`
+      // is known non-null. See this provider's doc comment ("Part P-040
+      // — moderator gate") for why this lives here and not in a menu.
+      if (_isModerationLocation(location)) {
+        final canModerate = user.isModerator || user.isStaff;
+        if (!canModerate) {
+          return RouteNames.homePath;
+        }
+        // The review screen needs the QueueItem handed over as `extra`;
+        // without it (deep link, restored location) go back to the queue.
+        if (location == RouteNames.moderationReviewPath &&
+            state.extra is! QueueItem) {
+          return RouteNames.moderationPath;
+        }
+      }
+
+      // --- Part P-074 STEP 3: chatThread needs its Conversation handed
+      // over as `extra` (same convention as moderationReview's
+      // QueueItem above) — without it (deep link, restored location) go
+      // back to the conversation list instead of building a broken
+      // screen.
+      if (_isChatThreadLocation(location) && state.extra is! Conversation) {
+        return RouteNames.chatListPath;
+      }
+
+      // Signed in: /login and /register bounce to /home, per the spec's
+      // literal example. splash is ALSO included here — a deliberate
+      // addition beyond the literal spec text (which never mentioned
+      // splash either way), flagged rather than silently decided: splash
+      // is only ever reached as `initialLocation` on the very first
+      // `GoRouter` build (cold start, already gated by main.dart) — once
+      // resolved, it should behave like any other "am I allowed here"
+      // check, not sit unreachable-but-also-unredirected.
+      if (isPublicRoute || location == RouteNames.splashPath) {
+        return RouteNames.homePath;
+      }
+
+      return null;
+    },
+    routes: <RouteBase>[
+      GoRoute(
+        path: RouteNames.splashPath,
+        name: RouteNames.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.loginPath,
+        name: RouteNames.login,
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.registerPath,
+        name: RouteNames.register,
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.businessOnboardingPath,
+        name: RouteNames.businessOnboarding,
+        builder: (context, state) => const BusinessOnboardingScreen(),
+      ),
+      GoRoute(
+        // Part P-028C2. Placed next to the onboarding route on purpose:
+        // the two screens are the same feature's two halves (create
+        // once, then edit), and both are "my own profile," distinct from
+        // the public `businessProfile` (`/business/:id`) route further
+        // down, which is Part P-029's customer-facing screen.
+        path: RouteNames.businessProfileEditPath,
+        name: RouteNames.businessProfileEdit,
+        builder: (context, state) => const BusinessProfileEditScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.searchPath,
+        name: RouteNames.search,
+        builder: (context, state) => const SearchScreen(),
+      ),
+      GoRoute(
+        // Part P-029: replaces P-007's placeholder. The public,
+        // customer-facing "view a business by id" screen — distinct
+        // from businessProfileEdit ("my own profile"), see that
+        // route's own comment above.
+        path: RouteNames.businessProfilePath,
+        name: RouteNames.businessProfile,
+        builder: (context, state) {
+          final id = state.pathParameters[RouteNames.idParam]!;
+          return BusinessProfilePublicScreen(businessId: id);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.productDetailPath,
+        name: RouteNames.productDetail,
+        builder: (context, state) {
+          final id = state.pathParameters[RouteNames.idParam]!;
+          return ProductDetailScreen(productId: id);
+        },
+      ),
+      GoRoute(
+        // Part P-045. A genuinely new route — P-007's original skeleton
+        // never anticipated Posts/Reels as top-level routes, so this is
+        // an additive routing change, not a placeholder replacement
+        // (unlike productDetail's route above). No gate clause of its
+        // own — an ordinary protected route, same as productDetail.
+        path: RouteNames.postDetailPath,
+        name: RouteNames.postDetail,
+        builder: (context, state) {
+          final id = state.pathParameters[RouteNames.idParam]!;
+          return PostDetailScreen(postId: id);
+        },
+      ),
+      GoRoute(
+        // Part P-045. Same reasoning as postDetail immediately above.
+        path: RouteNames.reelDetailPath,
+        name: RouteNames.reelDetail,
+        builder: (context, state) {
+          final id = state.pathParameters[RouteNames.idParam]!;
+          return ReelDetailScreen(reelId: id);
+        },
+      ),
+      GoRoute(
+        // Part P-050. Same "public, customer-facing, id-param" shape as
+        // postDetail/reelDetail immediately above — no gate clause of
+        // its own, an ordinary protected route, reachable only while
+        // signed in like everything else outside _publicRoutes.
+        // `businessName` comes from `context.pushNamed(..., extra:
+        // businessName)` (StoryRingWidget, this part) as a plain
+        // String — `null` when this route is reached without it (a
+        // deep link, a restored location); StoryViewerScreen's own
+        // constructor already treats that as optional/cosmetic, same
+        // as its own docstring says.
+        path: RouteNames.storyViewerPath,
+        name: RouteNames.storyViewer,
+        builder: (context, state) {
+          final id = state.pathParameters[RouteNames.idParam]!;
+          return StoryViewerScreen(
+            businessId: id,
+            businessName: state.extra as String?,
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.chatThreadPath,
+        name: RouteNames.chatThread,
+        builder: (context, state) {
+          // The redirect guard above (Part P-074 STEP 3) already
+          // guarantees `extra` is a Conversation — same pattern as
+          // moderationReview's QueueItem cast just below.
+          return ChatThreadScreen(conversation: state.extra! as Conversation);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.notificationsPath,
+        name: RouteNames.notifications,
+        builder: (context, state) => const NotificationCenterScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.notificationPreferencesPath,
+        name: RouteNames.notificationPreferences,
+        builder: (context, state) => const NotificationPreferencesScreen(),
+      ),
+      StatefulShellRoute.indexedStack(
+        // Part P-113 (STEP 2B). The app shell: one branch per tab
+        // destination of ANY account type, in the order fixed by
+        // `ShellBranch` (lib/core/shell/shell_branches.dart):
+        // 0 home, 1 discover, 2 saved, 3 moderation, 4 chats, 5 profile.
+        // Each account type's bottom bar shows only the branches it needs
+        // (navigation_manifest.dart) but the indexes never change, so every
+        // tab keeps its own back stack and scroll position. Access is still
+        // decided by the redirect guards above (the /moderation gate covers
+        // the moderation branch); the shell never grants or hides a route.
+        // Everything that is not a tab (detail screens, forms, search,
+        // notifications, the Business console, moderation review) stays a
+        // top-level route and opens above the shell.
+        builder:
+            (context, state, navigationShell) =>
+                AppShell(navigationShell: navigationShell),
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.homePath,
+                name: RouteNames.home,
+                builder: (context, state) => const HomeFeedScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.discoverPath,
+                name: RouteNames.discover,
+                builder: (context, state) => const DiscoverScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                // Part P-113 STEP 1 placeholder; STEP 6 replaces the screen.
+                path: RouteNames.savedPath,
+                name: RouteNames.saved,
+                builder: (context, state) => const SavedScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                // Part P-040. Moderator-only - gated by the redirect callback
+                // above, not here. `onOpenItem` hands the tapped item to the
+                // review route as `extra`; the review route stays top-level
+                // so it opens above the shell.
+                path: RouteNames.moderationPath,
+                name: RouteNames.moderation,
+                builder:
+                    (context, state) => ModerationQueueScreen(
+                      onOpenItem:
+                          (item) => context.pushNamed(
+                            RouteNames.moderationReview,
+                            extra: item,
+                          ),
+                    ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.chatListPath,
+                name: RouteNames.chatList,
+                builder: (context, state) => const ChatListScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                // Part P-113 STEP 1 placeholder; STEP 5 replaces the screen.
+                path: RouteNames.profilePath,
+                name: RouteNames.profile,
+                builder: (context, state) => const ProfileHubScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+      GoRoute(
+        // Part P-083. No screen of its own any more: `/business-console`
+        // just lands on branch 0 (Products) of the shell below. The route
+        // keeps its name and path, so `goNamed/pushNamed(businessConsole)`
+        // (the Home debug menu) still works. The old placeholder
+        // `BusinessConsoleScreen` file is no longer referenced here.
+        path: RouteNames.businessConsolePath,
+        name: RouteNames.businessConsole,
+        redirect: (context, state) => RouteNames.productListPath,
+      ),
+      StatefulShellRoute.indexedStack(
+        // Part P-083. See this provider's "Business Console shell" doc
+        // section. Branch order is part of the P-083 contract.
+        builder:
+            (context, state, navigationShell) =>
+                BusinessConsoleShell(navigationShell: navigationShell),
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                // Part P-033. See this provider's own "Part P-033" doc section
+                // above for why the navigation callbacks are wired here rather
+                // than inside `product_list_screen.dart` itself.
+                path: RouteNames.productListPath,
+                name: RouteNames.productList,
+                builder:
+                    (context, state) => ProductListScreen(
+                      header: const ConsoleDashboardCards(),
+                      onCreateNew:
+                          () => context.pushNamed(RouteNames.productForm),
+                      onEditProduct:
+                          (product) => context.pushNamed(
+                            RouteNames.productForm,
+                            extra: product,
+                          ),
+                    ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                // Part P-044. See this provider's "Part P-044" doc section
+                // above for why the navigation callbacks are wired here rather
+                // than inside `content_list_screen.dart` itself (same reasoning
+                // as `productList` above).
+                path: RouteNames.contentListPath,
+                name: RouteNames.contentList,
+                builder:
+                    (context, state) => ContentListScreen(
+                      onCreatePost:
+                          () => context.pushNamed(RouteNames.postForm),
+                      onCreateReel:
+                          () => context.pushNamed(RouteNames.reelForm),
+                    ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.storyListPath,
+                name: RouteNames.storyList,
+                builder: (context, state) => const StoryListScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.businessAnalyticsPath,
+                name: RouteNames.businessAnalytics,
+                builder: (context, state) => const AnalyticsScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+      GoRoute(
+        // Part P-033. `extra` is the full `Product` for edit mode, or
+        // `null` for create mode — see `RouteNames.productFormPath`'s
+        // own doc for why there's no `:id` path segment here instead.
+        path: RouteNames.productFormPath,
+        name: RouteNames.productForm,
+        builder:
+            (context, state) =>
+                ProductFormScreen(existingProduct: state.extra as Product?),
+      ),
+      GoRoute(
+        // Part P-044. Create-only — no `extra:` to read, unlike
+        // `productForm` — see `PostFormScreen`'s own docstring.
+        path: RouteNames.postFormPath,
+        name: RouteNames.postForm,
+        builder: (context, state) => const PostFormScreen(),
+      ),
+      GoRoute(
+        // Part P-044. Same create-only shape as `postForm` above.
+        path: RouteNames.reelFormPath,
+        name: RouteNames.reelForm,
+        builder: (context, state) => const ReelFormScreen(),
+      ),
+      GoRoute(
+        // Part P-051. Same create-only shape as `postForm`/`reelForm`
+        // above — see `RouteNames.storyFormPath`'s own doc for why this
+        // route lives under `/business-console/stories/...` rather than
+        // nested under `contentListPath` alongside Posts/Reels.
+        path: RouteNames.storyFormPath,
+        name: RouteNames.storyForm,
+        builder: (context, state) => const StoryCreationScreen(),
+      ),
+      GoRoute(
+        // Part P-040. The redirect callback guarantees `extra` is a
+        // QueueItem by the time this builder runs (a missing one is
+        // redirected back to the queue), so the cast cannot fail here.
+        path: RouteNames.moderationReviewPath,
+        name: RouteNames.moderationReview,
+        builder:
+            (context, state) =>
+                ModerationReviewScreen(item: state.extra! as QueueItem),
+      ),
+    ],
+  );
+});
+
+/// True for `/business-console` itself and anything under
+/// `/business-console/` — the prefix the Business-only gate in
+/// [appRouterProvider]'s `redirect` protects. Matched on a path-segment
+/// boundary, same reasoning as [_isModerationLocation].
+bool _isBusinessConsoleLocation(String location) {
+  return location == RouteNames.businessConsolePath ||
+      location.startsWith('${RouteNames.businessConsolePath}/');
+}
+
+/// True for `/moderation` itself and anything under `/moderation/` —
+/// the prefix the moderator gate in [appRouterProvider]'s `redirect`
+/// protects. Matched on a path-segment boundary so an unrelated route
+/// that merely starts with the same letters (e.g. `/moderation-tools`)
+/// would not be caught by accident.
+bool _isModerationLocation(String location) {
+  return location == RouteNames.moderationPath ||
+      location.startsWith('${RouteNames.moderationPath}/');
+}
+
+/// True for `/chat/<id>` — the concrete, id-filled location the
+/// `chatThread` route resolves to (`location` is always the matched,
+/// concrete path, never the `:id` pattern itself — see
+/// `_isModerationLocation`'s own note on why this is prefix-based, not
+/// an exact-match against `RouteNames.chatThreadPath`).
+bool _isChatThreadLocation(String location) {
+  return location.startsWith('${RouteNames.chatListPath}/');
+}
+
+/// Routes reachable only while signed out. Everything else in the route
+/// table is "protected" implicitly (see the `redirect` callback above) —
+/// there is no separate `_protectedRoutes` list to keep in sync.
+const _publicRoutes = <String>{RouteNames.loginPath, RouteNames.registerPath};
+
+/// Bridges [sessionProvider] — and, since Part P-028C1, conditionally
+/// [businessProfileProvider] — to `GoRouter`'s `refreshListenable`: the
+/// piece that lets a single, persistent [GoRouter] re-run its `redirect`
+/// callback whenever either changes, without ever rebuilding the router
+/// itself (see [appRouterProvider]'s doc comment for the real-device bug
+/// this fixes). `ref.listen` here is a plain side-effect subscription,
+/// not a `ref.watch` — it does NOT make [appRouterProvider] re-run when
+/// either provider changes; it only calls [notifyListeners], which
+/// `GoRouter` itself is listening to.
+///
+/// ### Part P-028C1 addition — conditional, lazy subscription to [businessProfileProvider]
+///
+/// [businessProfileProvider] is an [AsyncNotifierProvider] whose `build()`
+/// calls `GET /api/v1/businesses/me/` the moment anything creates a
+/// subscription to it (`ref.read`/`ref.watch`/`ref.listen` all force
+/// creation on first access — this is standard Riverpod behavior, not
+/// something specific to this provider). Subscribing to it
+/// unconditionally at construction time — the same way [sessionProvider]
+/// is subscribed to just below — would therefore fire that GET request
+/// for **every** signed-in user, including Customer-type accounts, the
+/// instant the app starts. That directly contradicts this part's own
+/// spec: "Customer-type users must skip the BusinessProfile existence
+/// check entirely."
+///
+/// So this class only calls `ref.listen(businessProfileProvider, ...)`
+/// **once**, lazily, the first time [sessionProvider] itself reports a
+/// signed-in [AccountType.business] user (via [_maybeSubscribeToBusinessProfile],
+/// invoked from the [sessionProvider] listener below, before
+/// [notifyListeners] is called for that same change so `redirect` sees
+/// an already-subscribed [businessProfileProvider] on its very next run).
+/// A [AccountType.customer] session never triggers this subscription at
+/// all, so [businessProfileProvider] is never even built for one —
+/// enforced here at the subscription level, not only inside `redirect`'s
+/// own `if (user.accountType == AccountType.business)` check.
+///
+/// Once subscribed, this class stays subscribed for the rest of the
+/// provider's lifetime (i.e. the app process), even across a later
+/// logout — deliberately not un-subscribed again, since Riverpod has no
+/// built-in "temporarily pause a ref.listen" primitive and building that
+/// is out of this part's scope. This is a real, minor, flagged
+/// simplification (one extra provider kept alive for the rest of the app
+/// session on a device that was ever signed in as Business), not a
+/// silent one — see this feature's `PROJECT_PROGRESS.md` entry for Part
+/// P-028C1.
+class _SessionRefreshListenable extends ChangeNotifier {
+  _SessionRefreshListenable(this._ref) {
+    _ref.listen<AsyncValue<Object?>>(
+      sessionProvider,
+      (previous, next) {
+        _maybeSubscribeToBusinessProfile(next);
+        notifyListeners();
+      },
+      // Catches the case where a session was already restored (a token
+      // existed at cold start) by the time this listener attaches, so
+      // the business-profile subscription decision above isn't missed
+      // waiting for a *second* session change that may never come.
+      fireImmediately: true,
+    );
+  }
+
+  final Ref _ref;
+
+  /// Guards against calling `ref.listen(businessProfileProvider, ...)`
+  /// more than once — see this class's docstring.
+  bool _businessProfileSubscribed = false;
+
+  void _maybeSubscribeToBusinessProfile(AsyncValue<Object?> session) {
+    if (_businessProfileSubscribed) {
+      return;
+    }
+    final user = switch (session) {
+      AsyncData(:final value) => value,
+      _ => null,
+    };
+    if (user is User && user.accountType == AccountType.business) {
+      _businessProfileSubscribed = true;
+      _ref.listen<AsyncValue<Object?>>(
+        businessProfileProvider,
+        (previous, next) => notifyListeners(),
+      );
+    }
+  }
+}
+
+
+##### FILE: lib\core\shell\shell_branches.dart #####
+import '../../routing/route_names.dart';
+
+/// Part P-113 (STEP 2A): the branch order of the app shell.
+///
+/// The app shell (`StatefulShellRoute.indexedStack`, wired into
+/// `app_router.dart` in STEP 2B) has ONE branch per tab destination of ANY
+/// account type. Each account type shows only the branches its bottom bar
+/// needs, but the branch indexes are the same for everybody, so a tab keeps
+/// its own back stack and scroll position no matter who is signed in.
+///
+/// | index | destination (route name) | shown for                    |
+/// |-------|--------------------------|------------------------------|
+/// | 0     | `home`                   | everyone (tab 1)             |
+/// | 1     | `discover`               | everyone (tab 2, Explore)    |
+/// | 2     | `saved`                  | Customer (tab 3)             |
+/// | 3     | `moderation`             | Staff (tab 3)                |
+/// | 4     | `chatList`               | everyone (tab 4)             |
+/// | 5     | `profile`                | everyone (tab 5)             |
+///
+/// The Business "+" is NOT a branch: it opens the create sheet (STEP 7) and
+/// never changes the current tab.
+///
+/// This order is a contract shared by `app_router.dart` (branch order) and
+/// `app_bottom_bar.dart` (tab to branch mapping). Do not reorder it without
+/// changing both.
+abstract final class ShellBranch {
+  static const int home = 0;
+  static const int discover = 1;
+  static const int saved = 2;
+  static const int moderation = 3;
+  static const int chats = 4;
+  static const int profile = 5;
+
+  /// Number of branches the shell route must declare.
+  static const int count = 6;
+
+  /// Route name of each branch root, indexed by branch.
+  static const Map<String, int> byRouteName = <String, int>{
+    RouteNames.home: home,
+    RouteNames.discover: discover,
+    RouteNames.saved: saved,
+    RouteNames.moderation: moderation,
+    RouteNames.chatList: chats,
+    RouteNames.profile: profile,
+  };
+
+  /// The branch index of [routeName], or null when that route is not a tab
+  /// (a create action, or a route that opens above the shell).
+  static int? forRouteName(String? routeName) {
+    if (routeName == null) {
+      return null;
+    }
+    return byRouteName[routeName];
+  }
+}
+
+
+##### FILE: lib\core\shell\app_bottom_bar.dart #####
+import 'package:flutter/material.dart';
+
+import '../../l10n/app_localizations.dart';
+import '../../routing/navigation_manifest.dart';
+import '../../routing/route_names.dart';
+import '../l10n/formatters.dart';
+import '../l10n/l10n_context.dart';
+import '../theme/app_colors.dart';
+import 'shell_branches.dart';
+
+/// Part P-113 (STEP 2A): the persistent bottom navigation bar.
+///
+/// The tabs are NOT written here. They come from the navigation manifest
+/// ([bottomTabsFor]), so the manifest stays the single source of truth for
+/// what each account type sees (locked P-113 table):
+///
+/// | slot | Customer | Business (Trader/Factory) | Staff / Moderator |
+/// |------|----------|---------------------------|-------------------|
+/// | 1    | Home     | Home                      | Home              |
+/// | 2    | Explore  | Explore                   | Explore           |
+/// | 3    | Saved    | Create (+)                | Moderation        |
+/// | 4    | Chats    | Chats                     | Chats             |
+/// | 5    | Profile  | Profile                   | Profile           |
+///
+/// This widget is deliberately free of GoRouter and Riverpod: it receives
+/// the audience, the current shell branch and callbacks. `AppShell` connects
+/// it to the router and the session.
+///
+/// * A tab that is a branch calls [onSelectBranch] with the branch index
+///   ([ShellBranch]). The shell decides what that means (switch tab, or pop
+///   the tab back to its root when it is already selected).
+/// * The Business "+" tab is an action, not a branch: it calls [onCreate]
+///   and never becomes the selected tab.
+/// * [badgeCounts] maps a destination id (a `RouteNames` value) to a count.
+///   A count above zero draws a brand-blue badge on that tab (used for the
+///   Staff moderation tab in STEP 7). Counts are passed in; this widget does
+///   no polling of its own.
+///
+/// Every colour comes from the theme tokens, every label from ARB. There is
+/// no left/right anywhere; the bar mirrors automatically in Arabic.
+class AppBottomBar extends StatelessWidget {
+  const AppBottomBar({
+    required this.audience,
+    required this.currentBranch,
+    required this.onSelectBranch,
+    this.onCreate,
+    this.badgeCounts = const <String, int>{},
+    super.key,
+  });
+
+  final NavAudience audience;
+
+  /// The shell branch that is currently showing (a [ShellBranch] value).
+  final int currentBranch;
+
+  final ValueChanged<int> onSelectBranch;
+
+  /// Called when the Business "+" tab is tapped. Null means "not wired yet".
+  final VoidCallback? onCreate;
+
+  final Map<String, int> badgeCounts;
+
+  /// Key of the bar itself.
+  static const Key barKey = Key('app-nav-bar');
+
+  /// Key of the tab for [destinationId] (a `RouteNames` value, or
+  /// [kNavCreateId] for the Business "+").
+  static Key tabKey(String destinationId) => Key('app-nav-$destinationId');
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final AppColors colors = context.appColors;
+    final AppFormatters formatters = AppFormatters(l10n);
+    final List<MapEntry<NavDestination, NavEntry>> tabs = bottomTabsFor(
+      audience,
+    );
+
+    int selectedIndex = 0;
+    for (int i = 0; i < tabs.length; i++) {
+      final int? branch = ShellBranch.forRouteName(tabs[i].key.routeName);
+      if (branch != null && branch == currentBranch) {
+        selectedIndex = i;
+      }
+    }
+
+    return NavigationBar(
+      key: barKey,
+      selectedIndex: selectedIndex,
+      onDestinationSelected: (int index) {
+        final int? branch = ShellBranch.forRouteName(tabs[index].key.routeName);
+        if (branch == null) {
+          onCreate?.call();
+          return;
+        }
+        onSelectBranch(branch);
+      },
+      destinations: <Widget>[
+        for (final MapEntry<NavDestination, NavEntry> tab in tabs)
+          _destination(
+            id: tab.key.id,
+            l10n: l10n,
+            colors: colors,
+            formatters: formatters,
+          ),
+      ],
+    );
+  }
+
+  Widget _destination({
+    required String id,
+    required AppLocalizations l10n,
+    required AppColors colors,
+    required AppFormatters formatters,
+  }) {
+    final _TabSpec spec = _specFor(id);
+    final int count = badgeCounts[id] ?? 0;
+
+    Widget icon(IconData data) {
+      final Widget base = Icon(data);
+      if (count <= 0) {
+        return base;
+      }
+      return Badge(
+        backgroundColor: colors.brand,
+        textColor: colors.onBrand,
+        label: Text(formatters.compactCount(count)),
+        child: base,
+      );
+    }
+
+    return NavigationDestination(
+      key: tabKey(id),
+      icon: icon(spec.icon),
+      selectedIcon: icon(spec.selectedIcon),
+      label: spec.label(l10n),
+    );
+  }
+}
+
+class _TabSpec {
+  const _TabSpec(this.icon, this.selectedIcon, this.label);
+
+  final IconData icon;
+  final IconData selectedIcon;
+  final String Function(AppLocalizations l10n) label;
+}
+
+/// Icon pair and label of each destination that can appear in a bottom bar.
+/// A destination that reaches the bar through the manifest but is missing
+/// here is a programming error, caught by the tests.
+final Map<String, _TabSpec> _tabSpecs = <String, _TabSpec>{
+  RouteNames.home: _TabSpec(
+    Icons.home_outlined,
+    Icons.home,
+    (AppLocalizations l10n) => l10n.navHome,
+  ),
+  RouteNames.discover: _TabSpec(
+    Icons.explore_outlined,
+    Icons.explore,
+    (AppLocalizations l10n) => l10n.navExplore,
+  ),
+  RouteNames.saved: _TabSpec(
+    Icons.bookmark_border,
+    Icons.bookmark,
+    (AppLocalizations l10n) => l10n.navSaved,
+  ),
+  kNavCreateId: _TabSpec(
+    Icons.add_box_outlined,
+    Icons.add_box,
+    (AppLocalizations l10n) => l10n.navCreate,
+  ),
+  RouteNames.moderation: _TabSpec(
+    Icons.shield_outlined,
+    Icons.shield,
+    (AppLocalizations l10n) => l10n.navModeration,
+  ),
+  RouteNames.chatList: _TabSpec(
+    Icons.chat_bubble_outline,
+    Icons.chat_bubble,
+    (AppLocalizations l10n) => l10n.navChats,
+  ),
+  RouteNames.profile: _TabSpec(
+    Icons.person_outline,
+    Icons.person,
+    (AppLocalizations l10n) => l10n.navProfile,
+  ),
+};
+
+_TabSpec _specFor(String id) {
+  final _TabSpec? spec = _tabSpecs[id];
+  if (spec == null) {
+    throw StateError(
+      'AppBottomBar: no icon/label registered for bottom-bar destination "$id".',
+    );
+  }
+  return spec;
+}
+
+/// Ids that [AppBottomBar] knows how to draw. Exposed for the tests that keep
+/// the manifest and the bar in sync.
+Set<String> get appBottomBarKnownIds => _tabSpecs.keys.toSet();
+
+
+##### FILE: lib\core\shell\app_shell.dart #####
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../features/auth/domain/user_entity.dart';
+import '../../features/auth/presentation/session_provider.dart';
+import '../../features/moderation/presentation/moderation_provider.dart';
+import '../../routing/navigation_manifest.dart';
+import '../../routing/route_names.dart';
+import 'app_bottom_bar.dart';
+import 'create_sheet.dart';
+import 'shell_branches.dart';
+
+/// Part P-113 (STEP 2A, back behaviour STEP 2B, create sheet and moderation
+/// badge STEP 4A): the app shell - the persistent frame around the tabs.
+///
+/// It wraps the branches of the app's `StatefulShellRoute.indexedStack`
+/// (declared in `app_router.dart`) and adds the bottom bar for the signed-in
+/// account type. Each branch keeps its own navigator, so every tab remembers
+/// its back stack and scroll position.
+///
+/// ## Back button
+///
+/// System back on a tab root returns to the Home tab first, and only from
+/// Home does it leave the app:
+/// * a screen pushed INSIDE a tab is popped first;
+/// * on any other tab root, back switches to the Home tab;
+/// * on the Home tab root, back is not intercepted (the app exits).
+///
+/// ## Business "+" (STEP 4A)
+///
+/// Unless [onCreateTap] is given, the "+" tab opens the create sheet
+/// ([showCreateSheet]). It is an action: it never changes the selected tab.
+///
+/// ## Moderation badge (STEP 4A)
+///
+/// For the Staff audience only, the shell reads the EXISTING
+/// `moderationQueueProvider` and shows the number of pending items on the
+/// Moderation tab. No polling and no new request are added; nothing is read
+/// for other account types. Entries of [badgeCounts] win over this value.
+///
+/// ## What it does NOT do
+/// * It does not grant or deny access. Who may open which route is decided by
+///   the router `redirect` guards, which P-113 leaves untouched.
+/// * It has no top bar. Each tab root keeps its own AppBar.
+///
+/// The audience is read from [sessionProvider] through [navAudienceForUser].
+/// While no user is available (a login/logout is in flight) the bar is simply
+/// not drawn; the body keeps its place in the tree, so nothing is remounted.
+class AppShell extends ConsumerWidget {
+  const AppShell({
+    required this.navigationShell,
+    this.onCreateTap,
+    this.badgeCounts = const <String, int>{},
+    super.key,
+  });
+
+  final StatefulNavigationShell navigationShell;
+
+  /// Overrides what the Business "+" tab does. Null opens the create sheet.
+  final VoidCallback? onCreateTap;
+
+  /// Badge counts by destination id, forwarded to [AppBottomBar]. They win
+  /// over the counts the shell computes itself.
+  final Map<String, int> badgeCounts;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<User?> session = ref.watch(sessionProvider);
+    final User? user = switch (session) {
+      AsyncData(:final value) => value,
+      _ => null,
+    };
+    final NavAudience? audience =
+        user == null ? null : navAudienceForUser(user);
+
+    // Staff only: the pending count of the existing moderation queue.
+    final int pendingModeration =
+        audience == NavAudience.staff
+            ? ref.watch(
+              moderationQueueProvider.select(
+                (async) => switch (async) {
+                  AsyncData(:final value) => value.length,
+                  _ => 0,
+                },
+              ),
+            )
+            : 0;
+
+    final Map<String, int> counts = <String, int>{
+      if (pendingModeration > 0) RouteNames.moderation: pendingModeration,
+      ...badgeCounts,
+    };
+
+    return PopScope(
+      // Only the Home tab lets the system back button through (= exit).
+      canPop: navigationShell.currentIndex == ShellBranch.home,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (!didPop) {
+          navigationShell.goBranch(ShellBranch.home);
+        }
+      },
+      child: Scaffold(
+        body: navigationShell,
+        bottomNavigationBar:
+            audience == null
+                ? null
+                : AppBottomBar(
+                  audience: audience,
+                  currentBranch: navigationShell.currentIndex,
+                  onSelectBranch:
+                      (int branch) => navigationShell.goBranch(
+                        branch,
+                        // Tapping the tab you are already on pops it back to
+                        // its branch root (standard bottom-nav behaviour).
+                        initialLocation: branch == navigationShell.currentIndex,
+                      ),
+                  onCreate:
+                      onCreateTap ?? () => unawaited(showCreateSheet(context)),
+                  badgeCounts: counts,
+                ),
+      ),
+    );
+  }
+}
+
+
+##### FILE: lib\features\business_console\presentation\business_console_shell.dart #####
+// lib/features/business_console/presentation/business_console_shell.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/l10n/l10n_context.dart';
+import '../../stories/presentation/story_upload_queue_provider.dart';
+import '../../stories/presentation/story_upload_status_banner.dart';
+
+/// Part P-083 - the Business Console navigational home.
+///
+/// Wraps the four branches of the `/business-console`
+/// `StatefulShellRoute.indexedStack` (wired in `app_router.dart`):
+///
+/// | index | label        | destination key                    |
+/// |-------|--------------|------------------------------------|
+/// | 0     | Products     | `business-console-nav-products`    |
+/// | 1     | Posts/Reels  | `business-console-nav-content`     |
+/// | 2     | Stories      | `business-console-nav-stories`     |
+/// | 3     | Analytics    | `business-console-nav-analytics`   |
+///
+/// Order and keys are the P-083 shared contract - do not change them.
+/// The LABELS are localized since P-115 STEP 5 (English text is unchanged).
+///
+/// ### Decisions (unchanged since P-083)
+///
+/// * No AppBar here: each branch root keeps its own AppBar.
+/// * The story upload banner lives here, above every tab. While uploads
+///   exist it is wrapped in a top SafeArea and the branch content is told the
+///   top inset is already consumed.
+/// * Stable tree: the Column always has the same two children and the
+///   MediaQuery.removePadding wrapper is always present, so the banner
+///   appearing never remounts [navigationShell] or discards tab state.
+/// * No access control here: the router's redirect owns that.
+class BusinessConsoleShell extends ConsumerWidget {
+  const BusinessConsoleShell({required this.navigationShell, super.key});
+
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final hasUploads = ref.watch(
+      storyUploadQueueProvider.select((tasks) => tasks.isNotEmpty),
+    );
+
+    return Scaffold(
+      body: Column(
+        children: [
+          if (hasUploads)
+            const SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: StoryUploadStatusBanner(),
+              ),
+            )
+          else
+            const SizedBox.shrink(),
+          Expanded(
+            child: MediaQuery.removePadding(
+              context: context,
+              removeTop: hasUploads,
+              child: navigationShell,
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        key: const Key('business-console-nav-bar'),
+        selectedIndex: navigationShell.currentIndex,
+        onDestinationSelected:
+            (index) => navigationShell.goBranch(
+              index,
+              // Tapping the tab you are already on pops it back to its
+              // branch root, the standard bottom-nav behaviour.
+              initialLocation: index == navigationShell.currentIndex,
+            ),
+        destinations: [
+          NavigationDestination(
+            key: const Key('business-console-nav-products'),
+            icon: const Icon(Icons.inventory_2_outlined),
+            selectedIcon: const Icon(Icons.inventory_2),
+            label: l10n.consoleNavProducts,
+          ),
+          NavigationDestination(
+            key: const Key('business-console-nav-content'),
+            icon: const Icon(Icons.dynamic_feed_outlined),
+            selectedIcon: const Icon(Icons.dynamic_feed),
+            label: l10n.consoleNavContent,
+          ),
+          NavigationDestination(
+            key: const Key('business-console-nav-stories'),
+            icon: const Icon(Icons.auto_stories_outlined),
+            selectedIcon: const Icon(Icons.auto_stories),
+            label: l10n.consoleNavStories,
+          ),
+          NavigationDestination(
+            key: const Key('business-console-nav-analytics'),
+            icon: const Icon(Icons.insights_outlined),
+            selectedIcon: const Icon(Icons.insights),
+            label: l10n.consoleNavAnalytics,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+##### FILE: lib\features\notifications\presentation\notification_navigator.dart #####
+import 'dart:async';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/deep_link_resolver.dart';
+import '../../../core/push/fcm_service.dart';
+import '../../../routing/app_router.dart';
+import '../../../routing/route_names.dart';
+import '../../chat/data/conversation_repository.dart';
+import '../../chat/domain/conversation.dart';
+import '../domain/app_notification.dart';
+
+/// Part P-082 (STEP 3): the ONE place where a tapped notification becomes
+/// navigation. Every source goes through [open]:
+///
+/// * a row in the notification center (via [openNotification]),
+/// * an in-app foreground banner (via [openPush]),
+/// * a background / terminated-state push tap (via [openPush]).
+///
+/// The route itself always comes from P-080's `resolveDeepLink` — this
+/// class never builds a path by hand.
+///
+/// ### The `chat_thread` special case
+/// `resolveDeepLink('chat_thread', 101)` answers `/chat/101`, but the
+/// router's P-074 redirect guard sends any `/chat/<id>` whose `extra` is
+/// not a [Conversation] to the chat list. So for chat notifications the
+/// [Conversation] is looked up first (the backend has no
+/// conversation-detail endpoint; the list endpoint returns every
+/// conversation in one plain array, same lookup as
+/// `ConversationRepository.startConversationWithBusiness`) and handed
+/// over as `extra`. If it cannot be found or the request fails, the user
+/// lands on the chat list instead of a broken screen.
+///
+/// ### push vs go
+/// Real destinations use `push`, so Back returns to where the user was
+/// (for example the notification center). The `/home` fallback and the
+/// chat-list fallback use `go`: they are "somewhere sensible", not a
+/// destination worth a back stack.
+class NotificationNavigator {
+  NotificationNavigator({
+    required GoRouter router,
+    required ConversationRepository conversationRepository,
+  }) : _router = router,
+       _conversationRepository = conversationRepository;
+
+  final GoRouter _router;
+  final ConversationRepository _conversationRepository;
+
+  /// Navigates to what [deepLinkType] + [targetId] point at. Never throws.
+  ///
+  /// A blank [deepLinkType] means "this notification navigates nowhere"
+  /// (backend contract, P-078): nothing happens.
+  Future<void> open({
+    required String deepLinkType,
+    required int? targetId,
+  }) async {
+    if (deepLinkType.trim().isEmpty) return;
+
+    final route = resolveDeepLink(deepLinkType, targetId);
+
+    // Unknown type, or missing / invalid id.
+    if (route == deepLinkFallbackRoute) {
+      _router.go(route);
+      return;
+    }
+
+    if (deepLinkType == DeepLinkTypes.chatThread) {
+      // `route != fallback` guarantees a valid, positive targetId.
+      final conversation = await _findConversation(targetId!);
+      if (conversation == null) {
+        _router.go(RouteNames.chatListPath);
+        return;
+      }
+      unawaited(_router.push<void>(route, extra: conversation));
+      return;
+    }
+
+    unawaited(_router.push<void>(route));
+  }
+
+  /// A row of the in-app notification center.
+  Future<void> openNotification(AppNotification notification) {
+    return open(
+      deepLinkType: notification.deepLinkType,
+      targetId: notification.targetId,
+    );
+  }
+
+  /// A push message tapped in the foreground banner, or a background /
+  /// terminated-state tap (P-081's [PushDeepLink]).
+  Future<void> openPush(PushDeepLink link) {
+    return open(deepLinkType: link.type, targetId: link.targetId);
+  }
+
+  Future<Conversation?> _findConversation(int conversationId) async {
+    try {
+      final page = await _conversationRepository.listConversations();
+      for (final conversation in page.results) {
+        if (conversation.id == conversationId) return conversation;
+      }
+      return null;
+    } catch (_) {
+      // Any failure (network, auth, parsing) degrades to the chat list.
+      return null;
+    }
+  }
+}
+
+/// Reads the router and the conversation repository lazily, at first use.
+/// Safe to read from outside the widget tree's router subtree (the app
+/// root's banner / tap handlers), because [appRouterProvider] is a single
+/// persistent [GoRouter].
+final notificationNavigatorProvider = Provider<NotificationNavigator>((ref) {
+  return NotificationNavigator(
+    router: ref.watch(appRouterProvider),
+    conversationRepository: ref.watch(conversationRepositoryProvider),
+  );
+});
+

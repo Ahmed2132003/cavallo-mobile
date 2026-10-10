@@ -302,7 +302,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hubAppearance => 'المظهر';
 
   @override
-  String get hubAppearanceSystem => 'النظام';
+  String get hubAppearanceSystem => 'تلقائي';
 
   @override
   String get hubAppearanceLight => 'فاتح';
@@ -320,7 +320,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hubBusinessConsole => 'لوحة النشاط التجاري';
 
   @override
-  String get hubEditBusinessProfile => 'تعديل ملف النشاط';
+  String get hubEditBusinessProfile => 'تعديل ملف النشاط التجاري';
 
   @override
   String get hubProducts => 'المنتجات';
@@ -335,7 +335,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hubAnalytics => 'التحليلات';
 
   @override
-  String get hubFeaturedStatus => 'حالة التمييز';
+  String get hubFeaturedStatus => 'حالة الظهور المميز';
 
   @override
   String get hubFeaturedNo => 'غير مميّز';
@@ -404,7 +404,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get createSheetReel => 'ريل';
 
   @override
-  String get createSheetStory => 'ستوري';
+  String get createSheetStory => 'قصة';
 
   @override
   String get createSheetProduct => 'منتج';
@@ -419,7 +419,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeChatsTooltip => 'المحادثات';
 
   @override
-  String get discoverSearchHint => 'ابحث عن أنشطة ومنتجات ومنشورات';
+  String get discoverSearchHint => 'ابحث عن أنشطة تجارية ومنتجات ومنشورات';
 
   @override
   String get storyYourStory => 'قصتك';
@@ -550,7 +550,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get followButtonFollow => 'متابعة';
 
   @override
-  String get followButtonFollowing => 'متابَع';
+  String get followButtonFollowing => 'تتم المتابعة';
 
   @override
   String followersCountLine(int count, String formatted) {
@@ -740,7 +740,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String productShareText(String name) {
-    return 'شاهد $name على كافالو';
+    return 'شاهد $name على Cavallo';
   }
 
   @override
@@ -853,7 +853,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notifLoadFailed => 'تعذّر تحميل إشعاراتك.';
 
   @override
-  String get notifEmpty => 'لا توجد إشعارات بعد';
+  String get notifEmpty => 'لا توجد إشعارات بعد.';
 
   @override
   String get notifSectionToday => 'اليوم';
@@ -898,7 +898,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notifPrefsLoadFailed => 'تعذّر تحميل إعدادات الإشعارات.';
 
   @override
-  String get notifPrefsSystemFooter => 'إعلانات النظام المهمة تصلك دائمًا.';
+  String get notifPrefsSystemFooter => 'تنبيهات النظام المهمة تصلك دائمًا.';
 
   @override
   String get consoleNavProducts => 'المنتجات';
@@ -1045,7 +1045,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get consoleStoryPublished => 'تم النشر';
 
   @override
-  String get consoleStoryPending => 'قيد الانتظار';
+  String get consoleStoryPending => 'قيد المراجعة';
 
   @override
   String get consoleStoryRejected => 'مرفوضة';
@@ -1087,7 +1087,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get moderationQueueEmpty => 'القائمة فارغة.\nلا يوجد شيء بانتظار المراجعة.';
 
   @override
-  String get moderationNotAllowed => 'حسابك غير مسموح له بمراجعة المحتوى. إذا كان يجب أن يُسمح له، فاطلب من المسؤول إضافته إلى مجموعة المراجعين.';
+  String get moderationNotAllowed => 'ليست لحسابك صلاحية مراجعة المحتوى. إذا كنت بحاجة إليها، فاطلب من المسؤول إضافة حسابك إلى مجموعة Moderator.';
 
   @override
   String get moderationQueueLoadFailed => 'تعذّر تحميل قائمة المراجعة.';
@@ -1151,7 +1151,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get moderationContentTypeReel => 'ريل';
 
   @override
-  String get moderationContentTypeStory => 'ستوري';
+  String get moderationContentTypeStory => 'قصة';
 
   @override
   String get moderationContentTypeUnknown => 'غير معروف';
@@ -1166,7 +1166,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get moderationDetailType => 'النوع';
 
   @override
-  String get moderationDetailSubmittedBy => 'أرسله';
+  String get moderationDetailSubmittedBy => 'أُرسل بواسطة';
 
   @override
   String get moderationDetailPriority => 'الأولوية';
@@ -1335,7 +1335,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get analyticsCommentsReceived => 'التعليقات المستلمة';
 
   @override
-  String get analyticsStoryViews => 'مشاهدات الستوري';
+  String get analyticsStoryViews => 'مشاهدات القصص';
 
   @override
   String get analyticsNewRatings => 'تقييمات جديدة';
@@ -1392,10 +1392,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get commonRemove => 'إزالة';
 
   @override
-  String get contentPostNotFound => 'المنشور غير موجود.\nربما تمت إزالته.';
+  String get contentPostNotFound => 'لم يتم العثور على المنشور.\nربما تمت إزالته.';
 
   @override
-  String get contentReelNotFound => 'الريل غير موجود.\nربما تمت إزالته.';
+  String get contentReelNotFound => 'لم يتم العثور على الريل.\nربما تمت إزالته.';
 
   @override
   String get contentReelPlaybackSoon => 'تشغيل الفيديو — قريبًا';
@@ -1419,7 +1419,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get contentFormChangeVideo => 'تغيير الفيديو';
 
   @override
-  String get contentFormCaption => 'التعليق';
+  String get contentFormCaption => 'النص التوضيحي';
 
   @override
   String get postFormTitle => 'منشور جديد';
@@ -1470,7 +1470,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get productFormActive => 'نشط (ظاهر للعملاء)';
 
   @override
-  String get productFormCategoryRequired => 'الفئة مطلوبة.';
+  String get productFormCategoryRequired => 'التصنيف مطلوب.';
 
   @override
   String get productFormCurrencyRequired => 'العملة مطلوبة.';
@@ -1566,7 +1566,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reelLoadError => 'تعذّر تحميل هذا الريل.';
 
   @override
-  String get commonGenericError => 'حدث خطأ ما. يُرجى المحاولة مرة أخرى.';
+  String get commonGenericError => 'حدث خطأ ما. حاول مرة أخرى.';
 
   @override
   String get validationCaptionRequired => 'النص التوضيحي مطلوب.';
@@ -1611,7 +1611,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get chatConnectionOffline => 'غير متصل';
 
   @override
-  String get chatThreadTyping => 'يكتب…';
+  String get chatThreadTyping => 'جارٍ الكتابة…';
 
   @override
   String get chatThreadEmpty => 'لا توجد رسائل بعد — ابدأ بالتحية!';
@@ -1648,7 +1648,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get chatShareToConversation => 'المشاركة في محادثة';
 
   @override
-  String get chatSharePickerEmpty => 'لا توجد محادثات بعد.\nابدأ محادثة من تبويب الرسائل أولًا.';
+  String get chatSharePickerEmpty => 'لا توجد محادثات بعد.\nابدأ محادثة من تبويب المحادثات أولًا.';
 
   @override
   String get chatSharePickerLoadError => 'تعذّر تحميل محادثاتك.';

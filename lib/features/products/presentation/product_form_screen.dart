@@ -502,8 +502,9 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                   validator: (value) {
                     if (_priceError != null) return _priceError;
                     final text = (value ?? '').trim();
-                    if (text.isEmpty)
+                    if (text.isEmpty) {
                       return context.l10n.validationPriceRequired;
+                    }
                     if (double.tryParse(text) == null) {
                       return context.l10n.validationPriceInvalid;
                     }
@@ -528,8 +529,9 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                   onChanged: (currency) => setState(() => _currency = currency),
                   validator: (currency) {
                     if (_currencyError != null) return _currencyError;
-                    if (currency == null)
+                    if (currency == null) {
                       return context.l10n.productFormCurrencyRequired;
+                    }
                     return null;
                   },
                 ),
