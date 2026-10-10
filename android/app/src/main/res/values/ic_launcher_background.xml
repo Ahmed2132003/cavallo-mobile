@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Cavallo splash colour: the average blue of the horse icon.
+     Used by the launch screen (Android 11 and older) and the Android 12+ system splash. -->
 <resources>
-    <color name="ic_launcher_background">#2F6BFF</color>
+    <color name="ic_launcher_background">#093CC8</color>
 </resources>
