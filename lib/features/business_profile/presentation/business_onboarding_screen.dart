@@ -10,6 +10,7 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../routing/route_names.dart';
 import '../domain/business_profile_entity.dart';
 import 'business_profile_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-028B scope: `lib/features/business_profile/presentation/
 /// business_onboarding_screen.dart` — the "complete your business
@@ -249,7 +250,7 @@ class _BusinessOnboardingScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.bizOnboardTitle)),
+      appBar: CavalloAppBar(title: Text(context.l10n.bizOnboardTitle)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

@@ -5,6 +5,7 @@ import 'app_text_field.dart';
 import 'empty_state_widget.dart';
 import 'error_state_widget.dart';
 import 'loading_indicator.dart';
+import 'cavallo_app_bar.dart';
 
 /// TEMPORARY — DELETE ME once real feature screens exist.
 ///
@@ -41,7 +42,7 @@ class _WidgetGalleryDemoState extends State<WidgetGalleryDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Shared Widgets Demo (P-006)')),
+      appBar: CavalloAppBar(title: const Text('Shared Widgets Demo (P-006)')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

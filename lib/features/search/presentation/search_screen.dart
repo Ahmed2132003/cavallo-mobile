@@ -58,6 +58,7 @@ import '../domain/search_result_entity.dart';
 import 'search_filter_panel.dart';
 import 'search_provider.dart';
 import 'search_result_card.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -137,7 +138,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CavalloAppBar(
         titleSpacing: 0,
         title: Padding(
           padding: const EdgeInsetsDirectional.only(end: 16),

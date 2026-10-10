@@ -11,6 +11,7 @@ import '../../../routing/route_names.dart';
 import '../domain/business_profile_entity.dart';
 import '../domain/business_profile_repository.dart';
 import 'business_profile_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-028C2 scope: `lib/features/business_profile/presentation/
 /// business_profile_edit_screen.dart` — the authenticated Business
@@ -130,7 +131,7 @@ class _BusinessProfileEditScreenState
     final seed = _seed;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CavalloAppBar(
         title: Text(context.l10n.bizProfileTitle),
         // See this screen's docstring, point 7 — always goes to /home,
         // regardless of whether this route has a back-stack entry to

@@ -17,6 +17,7 @@ import '../../../l10n/app_localizations.dart';
 import '../domain/conversation.dart';
 import '../domain/message.dart';
 import '../domain/shared_content.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-074 STEP 3 — the Conversation List screen (`/chat`), replacing
 /// P-007's placeholder IN PLACE (same file, same class name — per rule
@@ -243,7 +244,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.chatListTitle)),
+      appBar: CavalloAppBar(title: Text(l10n.chatListTitle)),
       body: _buildBody(context),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isStartingTestConversation ? null : _startTestConversation,

@@ -22,6 +22,7 @@ import '../domain/message_status.dart';
 import '../domain/shared_content.dart';
 import 'message_bubble_widget.dart';
 import 'outbound_message_queue_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-074 STEP 3 — the Message Thread screen (`/chat/:id`), replacing
 /// P-007's placeholder IN PLACE (same file; class renamed only in its
@@ -498,7 +499,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
           ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CavalloAppBar(
         title: Row(
           children: [
             AppAvatar(name: displayName, size: 36),

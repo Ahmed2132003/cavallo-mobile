@@ -12,6 +12,7 @@ import '../domain/daily_stats_entity.dart';
 import 'analytics_line_chart.dart';
 import 'analytics_provider.dart';
 import 'analytics_summary.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-085 scope: the Business Console's Analytics tab.
 ///
@@ -45,7 +46,7 @@ class AnalyticsScreen extends ConsumerWidget {
     final statsAsync = ref.watch(analyticsStatsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.consoleNavAnalytics)),
+      appBar: CavalloAppBar(title: Text(context.l10n.consoleNavAnalytics)),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(analyticsStatsProvider);

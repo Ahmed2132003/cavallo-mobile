@@ -8,6 +8,7 @@ import '../../../core/l10n/l10n_context.dart';
 import '../../../core/widgets/app_button.dart';
 import 'story_upload_queue_provider.dart';
 import 'story_upload_status_banner.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-051 STEP 4 scope: `lib/features/stories/presentation/
 /// story_creation_screen.dart` — the Story creation form for Business
@@ -168,7 +169,7 @@ class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.consoleStoriesCreate)),
+      appBar: CavalloAppBar(title: Text(context.l10n.consoleStoriesCreate)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),

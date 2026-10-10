@@ -13,6 +13,7 @@ import '../../../l10n/app_localizations.dart';
 import '../domain/queue_item_entity.dart';
 import 'moderation_provider.dart';
 import 'moderation_widgets.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-040 scope: the moderator's item review screen - a larger view
 /// of one queue item with an Approve action and a Reject action that
@@ -166,7 +167,7 @@ class _ModerationReviewScreenState
     final submitter = item.submitterBusinessName;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.moderationReviewTitle)),
+      appBar: CavalloAppBar(title: Text(l10n.moderationReviewTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

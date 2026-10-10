@@ -43,6 +43,7 @@ import '../domain/content_item_entity.dart';
 import '../domain/moderation_status.dart';
 import '../domain/reel_entity.dart';
 import 'own_content_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 class ContentListScreen extends ConsumerStatefulWidget {
   const ContentListScreen({
@@ -101,7 +102,7 @@ class _ContentListScreenState extends ConsumerState<ContentListScreen> {
     contentAsync.whenData(_syncPolling);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.consoleContentTitle)),
+      appBar: CavalloAppBar(title: Text(l10n.consoleContentTitle)),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,

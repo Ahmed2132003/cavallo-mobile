@@ -11,6 +11,7 @@ import '../../../core/widgets/loading_indicator.dart';
 import '../domain/queue_item_entity.dart';
 import 'moderation_provider.dart';
 import 'moderation_widgets.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-040 scope: the moderator's queue list. A dense, scannable list
 /// rather than a decorative one - a moderator clearing many items quickly
@@ -49,7 +50,7 @@ class ModerationQueueScreen extends ConsumerWidget {
     final items = queueAsync.value;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CavalloAppBar(
         title: Text(context.l10n.moderationQueueTitle),
         actions: [
           IconButton(

@@ -9,6 +9,7 @@ import '../../../core/widgets/app_shimmer_box.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../domain/notification_preferences.dart';
 import 'notification_preferences_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-082 (STEP 5): the notification preferences screen.
 ///
@@ -83,7 +84,7 @@ class NotificationPreferencesScreen extends ConsumerWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.notifSettingsTitle)),
+      appBar: CavalloAppBar(title: Text(context.l10n.notifSettingsTitle)),
       body: switch (preferencesAsync) {
         AsyncData(value: final preferences) => ListView(
           padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 24),

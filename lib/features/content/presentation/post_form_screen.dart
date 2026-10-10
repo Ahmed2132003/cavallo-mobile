@@ -10,6 +10,7 @@ import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import 'own_content_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-044 scope: `lib/features/content/presentation/
 /// post_form_screen.dart` — the Post creation form (caption + optional
@@ -224,7 +225,7 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.postFormTitle)),
+      appBar: CavalloAppBar(title: Text(context.l10n.postFormTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),

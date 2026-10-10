@@ -12,6 +12,7 @@ import '../../../core/widgets/loading_indicator.dart';
 import '../../business_console/presentation/console_row.dart';
 import '../domain/product_entity.dart';
 import 'own_products_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-033: the signed-in Business account's own products
 /// (`ownProductsProvider`), each with Edit/Delete, plus a "Create New" action.
@@ -66,7 +67,7 @@ class ProductListScreen extends ConsumerWidget {
     };
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.consoleProductsTitle)),
+      appBar: CavalloAppBar(title: Text(l10n.consoleProductsTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: onCreateNew,
         icon: const Icon(Icons.add),

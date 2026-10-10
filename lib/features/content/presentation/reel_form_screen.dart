@@ -10,6 +10,7 @@ import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import 'own_content_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-044 scope: `lib/features/content/presentation/
 /// reel_form_screen.dart` — the Reel creation form (caption + required
@@ -272,7 +273,7 @@ class _ReelFormScreenState extends ConsumerState<ReelFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.reelFormTitle)),
+      appBar: CavalloAppBar(title: Text(context.l10n.reelFormTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),

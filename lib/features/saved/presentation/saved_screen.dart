@@ -15,6 +15,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../routing/route_names.dart';
 import '../domain/saved_item.dart';
 import 'saved_list_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-113 (STEP 3B): the Saved screen - tab 3 of the Customer bottom bar
 /// and a Profile hub row for every account type. It replaces the STEP 1
@@ -110,7 +111,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
     return DefaultTabController(
       length: SavedContentType.values.length,
       child: Scaffold(
-        appBar: AppBar(
+        appBar: CavalloAppBar(
           title: Text(l10n.hubSaved),
           bottom: TabBar(
             key: SavedScreen.tabBarKey,

@@ -15,6 +15,7 @@ import 'features/notifications/presentation/push_notification_handler.dart';
 import 'features/notifications/presentation/push_session_bridge.dart';
 import 'l10n/app_localizations.dart';
 import 'routing/app_router.dart';
+import 'core/widgets/cavallo_logo.dart';
 
 /// Part P-111: the ThemeMode read from storage BEFORE the first frame
 /// (set once in main(), consumed by the ProviderScope override below).
@@ -199,7 +200,16 @@ class _SocialCommerceAppState extends ConsumerState<SocialCommerceApp> {
           darkTheme: AppTheme.dark,
           themeMode: themeMode,
           home: const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  CavalloLogo(),
+                  SizedBox(height: 24),
+                  CircularProgressIndicator(),
+                ],
+              ),
+            ),
           ),
         );
       }

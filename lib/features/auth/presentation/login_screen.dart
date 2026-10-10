@@ -9,6 +9,7 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../routing/route_names.dart';
 import 'session_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-021b scope (Part 2 of 3 of the original P-021 scope): the real
 /// login screen, replacing P-007's placeholder `LoginScreen` (a bare
@@ -145,7 +146,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final l10n = context.l10n;
     final generalFailure = _generalFailure;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.authLoginTitle)),
+      appBar: CavalloAppBar(title: Text(l10n.authLoginTitle)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

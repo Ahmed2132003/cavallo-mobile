@@ -29,6 +29,7 @@ import '../domain/business_profile_entity.dart';
 import 'business_profile_public_provider.dart';
 import 'own_business_id_provider.dart';
 import 'own_profile_edit_button.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-029: the customer-facing, READ-ONLY business profile screen behind
 /// `/business/:id`.
@@ -85,7 +86,7 @@ class BusinessProfilePublicScreen extends ConsumerWidget {
     final profileAsync = ref.watch(businessProfilePublicProvider(id));
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CavalloAppBar(
         title: Text(context.l10n.profileScreenTitle),
         actions: <Widget>[OwnProfileEditButton(businessId: id)],
       ),

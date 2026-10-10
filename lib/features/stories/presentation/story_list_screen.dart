@@ -15,6 +15,7 @@ import '../../../routing/route_names.dart';
 import '../../business_console/presentation/console_row.dart';
 import '../domain/own_story_entity.dart';
 import 'own_stories_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// The Business Console "Stories" tab: the signed-in business's own stories
 /// (`ownStoriesProvider`) with an honest status per story.
@@ -39,7 +40,7 @@ class StoryListScreen extends ConsumerWidget {
     final now = ref.watch(storyListClockProvider)();
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.consoleNavStories)),
+      appBar: CavalloAppBar(title: Text(l10n.consoleNavStories)),
       floatingActionButton: FloatingActionButton.extended(
         key: const Key('story-list-create-button'),
         heroTag: 'story-list-create',

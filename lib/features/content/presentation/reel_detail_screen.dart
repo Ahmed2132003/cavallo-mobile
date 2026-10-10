@@ -12,6 +12,7 @@ import '../../social/presentation/content_action_row.dart';
 import '../../social/presentation/content_overflow_menu.dart';
 import '../domain/public_reel_entity.dart';
 import 'content_public_providers.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-045 scope: the customer-facing Reel detail screen behind
 /// `/reel/:id`. Same route-newness, states, and "no business name/avatar"
@@ -58,7 +59,7 @@ class ReelDetailScreen extends ConsumerWidget {
     final id = int.tryParse(reelId);
     if (id == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(context.l10n.consoleTypeReel)),
+        appBar: CavalloAppBar(title: Text(context.l10n.consoleTypeReel)),
         body: const SafeArea(child: _NotFoundView()),
       );
     }
@@ -67,7 +68,7 @@ class ReelDetailScreen extends ConsumerWidget {
     final loadedReel = reelAsync.value;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CavalloAppBar(
         title: Text(context.l10n.consoleTypeReel),
         actions:
             loadedReel == null

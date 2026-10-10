@@ -15,6 +15,8 @@ import '../../../core/widgets/loading_indicator.dart';
 import '../data/story_public_repository.dart';
 import '../domain/public_story_entity.dart';
 import 'story_public_provider.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/cavallo_logo.dart';
 
 /// Translucent shades of the fixed black / white media chrome of this screen
 /// (scrim, progress track, secondary text). They are derived from Colors.black
@@ -397,6 +399,13 @@ class _StoryPlayerState extends ConsumerState<_StoryPlayer>
                               maxLines: 1,
                             ),
                           ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsetsDirectional.only(end: 4),
+                        child: CavalloLogo(
+                          compact: true,
+                          color: AppColors.dark.brandText,
                         ),
                       ),
                       IconButton(

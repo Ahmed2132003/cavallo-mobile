@@ -22,6 +22,7 @@ import 'appearance_selector.dart';
 import 'business_shortcuts.dart';
 import 'language_selector.dart';
 import 'settings_rows.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-113 (STEP 3A): the BUSINESS profile of the signed-in Business
 /// account, or null (not a Business account, still loading, or no profile).
@@ -111,7 +112,7 @@ class ProfileHubScreen extends ConsumerWidget {
       // A login or logout is in flight; the router redirect is about to move
       // the user. Draw an empty page instead of guessing a layout.
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.hubTitle)),
+        appBar: CavalloAppBar(title: Text(l10n.hubTitle)),
         body: const SizedBox.shrink(),
       );
     }
@@ -249,7 +250,7 @@ class ProfileHubScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.hubTitle)),
+      appBar: CavalloAppBar(title: Text(l10n.hubTitle)),
       body: ListView(
         children: <Widget>[
           _HubHeader(user: user, audience: audience, business: business),

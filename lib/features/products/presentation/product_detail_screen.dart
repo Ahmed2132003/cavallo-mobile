@@ -23,6 +23,7 @@ import '../../social/presentation/social_interaction_provider.dart';
 import '../domain/product_entity.dart';
 import 'product_price_framing.dart';
 import 'product_public_providers.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-034 scope: the customer-facing, READ-ONLY product detail
 /// screen behind `/product/:id`. Replaces Part P-007's placeholder for
@@ -101,7 +102,7 @@ class ProductDetailScreen extends ConsumerWidget {
     final id = int.tryParse(productId);
     if (id == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.productDetailTitle)),
+        appBar: CavalloAppBar(title: Text(l10n.productDetailTitle)),
         body: const SafeArea(child: _NotFoundView()),
       );
     }
@@ -109,7 +110,7 @@ class ProductDetailScreen extends ConsumerWidget {
     final productAsync = ref.watch(productPublicDetailProvider(id));
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CavalloAppBar(
         title: Text(l10n.productDetailTitle),
         actions: [
           if (productAsync case AsyncData(value: final Product product)) ...[

@@ -10,6 +10,7 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../routing/route_names.dart';
 import '../domain/user_entity.dart';
 import 'session_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-021c scope (Part 3 of 3 of the original P-021 scope): the real
 /// registration screen, replacing P-007's placeholder `RegisterScreen` (a
@@ -189,7 +190,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final l10n = context.l10n;
     final generalFailure = _generalFailure;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.authRegisterTitle)),
+      appBar: CavalloAppBar(title: Text(l10n.authRegisterTitle)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

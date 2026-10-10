@@ -15,6 +15,7 @@ import '../domain/app_notification.dart';
 import 'notification_grouping.dart';
 import 'notification_list_provider.dart';
 import 'notification_navigator.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-082 (STEP 4): the notification center (`/notifications`),
 /// replacing the P-007 placeholder.
@@ -105,7 +106,7 @@ class _NotificationCenterScreenState
     final listAsync = ref.watch(notificationListProvider);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CavalloAppBar(
         title: Text(context.l10n.notifTitle),
         actions: [
           IconButton(

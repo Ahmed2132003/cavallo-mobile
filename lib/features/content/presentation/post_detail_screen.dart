@@ -12,6 +12,7 @@ import '../../social/presentation/content_action_row.dart';
 import '../../social/presentation/content_overflow_menu.dart';
 import '../domain/public_post_entity.dart';
 import 'content_public_providers.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-045 scope: the customer-facing Post detail screen behind
 /// `/post/:id`. A genuinely new route — P-007's original skeleton never
@@ -54,7 +55,7 @@ class PostDetailScreen extends ConsumerWidget {
     final id = int.tryParse(postId);
     if (id == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(context.l10n.consoleTypePost)),
+        appBar: CavalloAppBar(title: Text(context.l10n.consoleTypePost)),
         body: const SafeArea(child: _NotFoundView()),
       );
     }
@@ -63,7 +64,7 @@ class PostDetailScreen extends ConsumerWidget {
     final loadedPost = postAsync.value;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CavalloAppBar(
         title: Text(context.l10n.consoleTypePost),
         actions:
             loadedPost == null

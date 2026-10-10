@@ -15,6 +15,7 @@ import '../data/product_variant_repository_impl.dart';
 import '../domain/product_entity.dart';
 import '../domain/product_variant_entity.dart';
 import 'own_products_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-033 scope: `lib/features/products/presentation/
 /// product_form_screen.dart` — the shared create/edit form
@@ -450,7 +451,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     final categoriesAsync = ref.watch(categoryTreeProvider);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CavalloAppBar(
         title: Text(
           widget.isEditing
               ? context.l10n.productFormEditTitle

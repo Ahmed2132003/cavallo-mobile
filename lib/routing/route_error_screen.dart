@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../core/l10n/l10n_context.dart';
 import '../core/widgets/app_button.dart';
 import 'route_names.dart';
+import '../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-112: the page the router shows for an address it does not know
 /// (go_router's `errorBuilder`). Before this part the user saw go_router's
@@ -15,7 +16,7 @@ class RouteErrorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.routeErrorTitle)),
+      appBar: CavalloAppBar(title: Text(l10n.routeErrorTitle)),
       body: Center(
         child: Padding(
           padding: const EdgeInsetsDirectional.all(24),
