@@ -20,3 +20,18 @@ android/hs_err_pid*.log
 android/.kotlin/
 
 test/goldens/failures/
+
+# Phase 23 working files (not committed)
+bundle_*.txt
+_review_tmp/
+*.bak
+diag_*.txt
+validation_13.txt
+full_13.txt
+closeout_evidence.txt
+chat_logic_diff.txt
+golden_fail*.txt
+phase23_text.txt
+arb_recon.txt
+qa_recon.txt
+golden_recon.txt
