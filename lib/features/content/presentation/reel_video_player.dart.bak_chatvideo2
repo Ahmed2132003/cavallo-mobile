@@ -334,7 +334,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer>
                 padding: EdgeInsets.zero,
                 colors: const VideoProgressColors(
                   playedColor: Colors.white,
-                  bufferedColor: Colors.white54,
+                  bufferedColor: Colors.white38,
                   backgroundColor: Colors.white24,
                 ),
               ),
@@ -372,7 +372,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.error_outline, color: Colors.white54, size: 40),
+          const Icon(Icons.error_outline, color: Colors.white70, size: 40),
           const SizedBox(height: 8),
           Text(
             context.l10n.reelPlayerError,

@@ -86,16 +86,9 @@ class MessageRepository {
           filename: _fileNameOf(mediaPath),
         ),
       });
-      // The app-wide Dio timeouts are 15 s, which aborts any real video
-      // upload (and the server needs time to store the file before it
-      // answers) - same fix as the Reel upload.
       final response = await _dio.post<Map<String, dynamic>>(
         '$_basePath$conversationId/messages/',
         data: data,
-        options: Options(
-          sendTimeout: const Duration(minutes: 30),
-          receiveTimeout: const Duration(minutes: 30),
-        ),
       );
       return Message.fromJson(response.data!);
     } on DioException catch (e) {

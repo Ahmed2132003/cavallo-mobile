@@ -1586,6 +1586,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get chatVideoCannotPlay => 'This video cannot be played here. Its format may not be supported on your device.';
+
+  @override
+  String get chatVideoRetry => 'Try again';
+
+  @override
+  String get chatVideoOpenExternal => 'Open in another app';
+
+  @override
   String chatVideoTooLarge(int maxMb) {
     return 'Video is too large (max $maxMb MB).';
   }

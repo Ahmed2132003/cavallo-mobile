@@ -1646,6 +1646,15 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get chatVideoCannotPlay => 'تعذّر تشغيل هذا الفيديو هنا. قد تكون صيغته غير مدعومة على جهازك.';
+
+  @override
+  String get chatVideoRetry => 'إعادة المحاولة';
+
+  @override
+  String get chatVideoOpenExternal => 'فتح في تطبيق آخر';
+
+  @override
   String chatVideoTooLarge(int maxMb) {
     return 'الفيديو كبير جدًا (الحد الأقصى $maxMb ميغابايت).';
   }

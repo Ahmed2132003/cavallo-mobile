@@ -2075,18 +2075,6 @@
       }
     }
   },
-  "chatVideoCannotPlay": "This video cannot be played here. Its format may not be supported on your device.",
-  "@chatVideoCannotPlay": {
-    "description": "Chat video viewer: shown when the video fails to load or decode."
-  },
-  "chatVideoRetry": "Try again",
-  "@chatVideoRetry": {
-    "description": "Chat video viewer: retry loading the video."
-  },
-  "chatVideoOpenExternal": "Open in another app",
-  "@chatVideoOpenExternal": {
-    "description": "Chat video viewer: open the video URL in an external player/browser."
-  },
   "chatVideoTooLarge": "Video is too large (max {maxMb} MB).",
   "@chatVideoTooLarge": {
     "description": "Snackbar when the chosen video exceeds the size cap.",

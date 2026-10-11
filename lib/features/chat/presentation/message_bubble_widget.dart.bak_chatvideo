@@ -8,7 +8,6 @@ import '../../../core/theme/app_colors.dart';
 import '../domain/message.dart';
 import '../domain/message_status.dart';
 import '../domain/shared_content.dart';
-import 'chat_video_viewer_screen.dart';
 import 'outbound_message_queue_provider.dart';
 import 'shared_content_card.dart';
 
@@ -135,21 +134,11 @@ class MessageBubbleWidget extends StatelessWidget {
     }
 
     final mediaType = message.mediaType;
-    final videoUrl = message.mediaUrl;
-    final canOpenVideo =
-        mediaType == ChatMediaType.video &&
-        videoUrl != null &&
-        videoUrl.isNotEmpty;
     return _BubbleShell(
       text: message.text,
       isMine: isMine,
       isFirstInGroup: isFirstInGroup,
       isLastInGroup: isLastInGroup,
-      onTap:
-          canOpenVideo
-              ? () => openChatVideoViewer(context, networkUrl: videoUrl)
-              : null,
-      tapKey: canOpenVideo ? ValueKey('chatVideoOpen_${message.id}') : null,
       media:
           mediaType == null
               ? null
@@ -258,9 +247,6 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isFailed = outbound.status == OutboundMessageStatus.failed;
     final mediaType = outbound.mediaType;
-    final localVideoPath = outbound.mediaPath;
-    final canPreviewVideo =
-        mediaType == ChatMediaType.video && localVideoPath != null;
 
     return _BubbleShell(
       text: outbound.text,
@@ -268,18 +254,8 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
       isFailed: isFailed,
       isFirstInGroup: isFirstInGroup,
       isLastInGroup: isLastInGroup,
-      onTap:
-          isFailed
-              ? onRetry
-              : (canPreviewVideo
-                  ? () => openChatVideoViewer(context, localPath: localVideoPath)
-                  : null),
-      tapKey:
-          isFailed
-              ? ValueKey('outbound_retry_${outbound.id}')
-              : (canPreviewVideo
-                  ? ValueKey('outbound_open_${outbound.id}')
-                  : null),
+      onTap: isFailed ? onRetry : null,
+      tapKey: isFailed ? ValueKey('outbound_retry_${outbound.id}') : null,
       media:
           mediaType == null
               ? null

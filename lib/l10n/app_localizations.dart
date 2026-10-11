@@ -2801,6 +2801,24 @@ abstract class AppLocalizations {
   /// **'Photo is too large (max {maxMb} MB).'**
   String chatPhotoTooLarge(int maxMb);
 
+  /// Chat video viewer: shown when the video fails to load or decode.
+  ///
+  /// In en, this message translates to:
+  /// **'This video cannot be played here. Its format may not be supported on your device.'**
+  String get chatVideoCannotPlay;
+
+  /// Chat video viewer: retry loading the video.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get chatVideoRetry;
+
+  /// Chat video viewer: open the video URL in an external player/browser.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in another app'**
+  String get chatVideoOpenExternal;
+
   /// Snackbar when the chosen video exceeds the size cap.
   ///
   /// In en, this message translates to:

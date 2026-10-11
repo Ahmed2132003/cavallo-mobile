@@ -370,9 +370,7 @@ class _ReelPageState extends ConsumerState<_ReelPage>
     final reel = widget.reel;
     final playerBuilder = ref.watch(reelPlayerBuilderProvider);
     final theme = Theme.of(context);
-    final shadow = [
-      Shadow(blurRadius: 4, color: Colors.black.withValues(alpha: 0.54)),
-    ];
+    const shadow = [Shadow(blurRadius: 4, color: Colors.black54)];
 
     final profileAsync = ref.watch(
       businessProfilePublicProvider(reel.businessId),

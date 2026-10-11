@@ -110,10 +110,6 @@ dependencies:
   # newest release whose SDK floor fits this project's Flutter/Dart.
   video_player: ^2.9.2
 
-  # Chat video viewer: "open in another app" fallback for a video whose codec
-  # this phone cannot decode in-app (chat_video_viewer_screen.dart).
-  url_launcher: ^6.3.1
-
   # Crash / error reporting (Part P-105, Phase 21). Backs reportError() in
   # lib/core/error_reporting.dart. Pinned exactly (same discipline as
   # share_plus/fl_chart above). 9.30.1 declares Dart >=3.5 / Flutter >=3.24,
