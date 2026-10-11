@@ -35,3 +35,5 @@ phase23_text.txt
 arb_recon.txt
 qa_recon.txt
 golden_recon.txt
+# Script backups (*.bak_chatvideo, *.bak_newchat, ...) must never be committed
+*.bak_*
