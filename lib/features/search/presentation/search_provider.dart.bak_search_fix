@@ -103,13 +103,6 @@ class SearchNotifier extends AsyncNotifier<SearchState> {
   String? _currentQuery;
   SearchFilters _currentFilters = const SearchFilters();
 
-  /// Monotonic id of the most recent [search] call. A slow response for
-  /// an OLDER query (e.g. the text typed a moment ago) must never
-  /// overwrite the results of the query currently on screen, and a
-  /// [loadMore] page fetched for an older query must never be appended
-  /// to a newer result list.
-  int _searchRequestId = 0;
-
   @override
   Future<SearchState> build() async {
     // Deliberately no repository call here — see this file's module
@@ -128,10 +121,9 @@ class SearchNotifier extends AsyncNotifier<SearchState> {
   }) async {
     _currentQuery = q;
     _currentFilters = filters;
-    final requestId = ++_searchRequestId;
 
     state = const AsyncValue<SearchState>.loading();
-    final result = await AsyncValue.guard<SearchState>(() async {
+    state = await AsyncValue.guard<SearchState>(() async {
       final page = await ref
           .read(searchRepositoryProvider)
           .search(q: q, filters: filters);
@@ -141,11 +133,6 @@ class SearchNotifier extends AsyncNotifier<SearchState> {
         hasSearched: true,
       );
     });
-
-    // A newer search() started while this one was in flight - drop this
-    // (now stale) result instead of overwriting the newer one.
-    if (requestId != _searchRequestId) return;
-    state = result;
   }
 
   /// Appends the next page for the CURRENTLY loaded `q`/`filters`
@@ -162,7 +149,6 @@ class SearchNotifier extends AsyncNotifier<SearchState> {
       return;
     }
 
-    final requestId = _searchRequestId;
     state = AsyncData(current.copyWith(isLoadingMore: true));
 
     try {
@@ -173,8 +159,6 @@ class SearchNotifier extends AsyncNotifier<SearchState> {
             filters: _currentFilters,
             cursor: current.nextCursor,
           );
-      // The user started a new search while this page was loading.
-      if (requestId != _searchRequestId) return;
       state = AsyncData(
         current.copyWith(
           items: [...current.items, ...page.items],
@@ -184,9 +168,7 @@ class SearchNotifier extends AsyncNotifier<SearchState> {
         ),
       );
     } catch (_) {
-      if (requestId == _searchRequestId) {
-        state = AsyncData(current.copyWith(isLoadingMore: false));
-      }
+      state = AsyncData(current.copyWith(isLoadingMore: false));
       rethrow;
     }
   }
