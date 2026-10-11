@@ -5,7 +5,6 @@ import '../../../core/network/api_failure.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/network/paginated_response.dart';
 import '../domain/conversation.dart';
-import '../domain/followed_business.dart';
 import '../domain/message.dart';
 
 /// Part P-074 STEP 2 — REST data layer for the Conversation List screen,
@@ -172,44 +171,6 @@ class ConversationRepository {
         if (conversation.id == conversationId) return conversation;
       }
       return null;
-    } on DioException catch (e) {
-      throw e.error as ApiFailure;
-    }
-  }
-
-  /// GET /api/v1/conversations/following/ — the businesses the current
-  /// user follows, for the "New chat" picker (`FollowedBusinessListView`).
-  /// Cursor-paginated (`StandardCursorPagination`): [cursor] is the opaque
-  /// full URL from a previous `PaginatedResponse.next`, same convention as
-  /// [listConversations]. Each row's `businessId` is passed straight to
-  /// [startConversationWithBusiness].
-  Future<PaginatedResponse<FollowedBusiness>> listFollowedBusinesses({
-    String? cursor,
-  }) async {
-    try {
-      final response = await _dio.get<dynamic>(
-        cursor ?? '${_basePath}following/',
-      );
-      final data = response.data;
-
-      if (data is List) {
-        return PaginatedResponse<FollowedBusiness>(
-          results:
-              data
-                  .map(
-                    (json) =>
-                        FollowedBusiness.fromJson(json as Map<String, dynamic>),
-                  )
-                  .toList(),
-          next: null,
-          previous: null,
-        );
-      }
-
-      return PaginatedResponse.fromJson(
-        data as Map<String, dynamic>,
-        FollowedBusiness.fromJson,
-      );
     } on DioException catch (e) {
       throw e.error as ApiFailure;
     }

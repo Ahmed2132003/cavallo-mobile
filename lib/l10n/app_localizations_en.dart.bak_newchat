@@ -778,21 +778,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatListNewChatTest => 'New chat (test)';
 
   @override
-  String get chatListNewChat => 'New chat';
-
-  @override
-  String get newChatSheetTitle => 'New chat';
-
-  @override
-  String get newChatSheetSubtitle => 'Start a conversation with a business you follow';
-
-  @override
-  String get newChatSheetEmpty => 'You are not following any business yet. Follow a business to start chatting with it.';
-
-  @override
-  String get newChatOpenFailed => 'Could not open the conversation. Please try again.';
-
-  @override
   String get chatTestDialogTitle => 'Start test conversation';
 
   @override

@@ -1015,26 +1015,6 @@
   "@chatListNewChatTest": {
     "description": "Label of the temporary manual-testing button on the chat list."
   },
-  "chatListNewChat": "New chat",
-  "@chatListNewChat": {
-    "description": "Label of the new-chat button on the chat list."
-  },
-  "newChatSheetTitle": "New chat",
-  "@newChatSheetTitle": {
-    "description": "Title of the new-chat picker sheet."
-  },
-  "newChatSheetSubtitle": "Start a conversation with a business you follow",
-  "@newChatSheetSubtitle": {
-    "description": "Subtitle of the new-chat picker sheet."
-  },
-  "newChatSheetEmpty": "You are not following any business yet. Follow a business to start chatting with it.",
-  "@newChatSheetEmpty": {
-    "description": "Empty state of the new-chat picker when the user follows nobody."
-  },
-  "newChatOpenFailed": "Could not open the conversation. Please try again.",
-  "@newChatOpenFailed": {
-    "description": "Snackbar when a conversation was started but could not be opened."
-  },
   "chatTestDialogTitle": "Start test conversation",
   "@chatTestDialogTitle": {
     "description": "Title of the temporary test-conversation dialog."

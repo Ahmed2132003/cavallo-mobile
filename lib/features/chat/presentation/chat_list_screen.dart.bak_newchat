@@ -17,7 +17,6 @@ import '../../../l10n/app_localizations.dart';
 import '../domain/conversation.dart';
 import '../domain/message.dart';
 import '../domain/shared_content.dart';
-import 'new_chat_sheet.dart';
 import '../../../core/widgets/cavallo_app_bar.dart';
 
 /// Part P-074 STEP 3 — the Conversation List screen (`/chat`), replacing
@@ -33,12 +32,10 @@ import '../../../core/widgets/cavallo_app_bar.dart';
 /// `ConversationRepository.listConversations`'s own doc comment
 /// describes.
 ///
-/// ### New chat
-/// The "New chat" floating action button opens [showNewChatSheet], which
-/// lists the businesses the current user follows. Picking one starts (or
-/// resumes) the conversation with that business's owner via
-/// `ConversationRepository.startConversationWithBusiness` and opens the
-/// thread, already carrying the real resolved display name.
+/// ### STEP 4 addition — "New chat (test)" floating action button
+/// See [_ChatListScreenState._startTestConversation]'s own doc comment
+/// for why this exists and why it is explicitly a manual-testing aid,
+/// not a designed product entry point.
 ///
 /// ### Part P-115 STEP 2 — restyle only
 /// Presentation only: every field of the state, every repository call, the
@@ -64,7 +61,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
   bool _isLoadingFirstPage = true;
   bool _isLoadingMore = false;
   ApiFailure? _error;
-  bool _isStartingConversation = false;
+  bool _isStartingTestConversation = false;
 
   @override
   void initState() {
@@ -143,52 +140,100 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     );
   }
 
-  /// Quietly re-fetches the first page (no skeleton), used after coming back
-  /// from a thread so a just-created conversation shows up in the list.
-  Future<void> _reloadQuietly() async {
-    try {
-      final page =
-          await ref.read(conversationRepositoryProvider).listConversations();
-      if (!mounted) return;
-      setState(() {
-        _conversations = page.results;
-        _nextCursor = page.next;
-      });
-    } on ApiFailure {
-      // Keep showing what we have; pull-to-refresh is still available.
-    }
-  }
+  /// STEP 4 — manual-testing aid only, NOT part of P-074's original
+  /// scope as written. P-074's own execution prompt assumes
+  /// conversations already exist or are started from elsewhere (e.g. a
+  /// "Message" button on a business profile screen) — no such entry
+  /// point exists anywhere in this codebase yet (confirmed by
+  /// inspecting `lib/features/business_profile/` directly: no
+  /// reference to `ConversationRepository`/`startConversation` anywhere
+  /// outside `lib/features/chat/` itself). Without SOME way to create a
+  /// conversation between two real test accounts, P-074's own
+  /// acceptance criteria — a manual two-account run against the real
+  /// backend — cannot be performed at all.
+  ///
+  /// This button is a deliberately minimal, clearly-temporary bridge:
+  /// it prompts for the other account's numeric user id, calls
+  /// `ConversationRepository.startConversation` (`POST
+  /// /api/v1/conversations/start/`, built in STEP 2), and hand-builds a
+  /// minimal [Conversation] from the response. That endpoint returns
+  /// only `{id, created_at, updated_at, participant_ids}` — see
+  /// `ConversationRepository.startConversation`'s own doc comment for
+  /// why a full [Conversation] can't be parsed from it directly — so
+  /// [ConversationParticipantSummary.displayName] here is a placeholder
+  /// (`"User #<id>"`), not the real resolved name. This is enough to
+  /// satisfy `app_router.dart`'s `extra is Conversation` redirect guard
+  /// and let [ChatThreadScreen] mount and function correctly (it only
+  /// needs `conversation.id` and `conversation.otherParticipant.id` —
+  /// see that screen's own doc comment). Re-opening the same
+  /// conversation later from this list shows the real resolved name,
+  /// since that came from `GET /api/v1/conversations/` — this
+  /// screen's normal fetch.
+  ///
+  /// A real "Message" entry point from a business profile (or anywhere
+  /// else) is out of P-074's scope and should replace this button in a
+  /// later part.
+  Future<void> _startTestConversation() async {
+    final recipientIdText = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: Text(dialogContext.l10n.chatTestDialogTitle),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: dialogContext.l10n.chatTestUserIdLabel,
+              hintText: dialogContext.l10n.chatTestUserIdHint,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(dialogContext.l10n.chatTestCancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(controller.text),
+              child: Text(dialogContext.l10n.chatTestStart),
+            ),
+          ],
+        );
+      },
+    );
 
-  /// FAB handler: pick one of the businesses the user follows, start (or
-  /// resume) the conversation with it, and open the thread.
-  Future<void> _startNewChat() async {
-    final business = await showNewChatSheet(context);
-    if (business == null || !mounted) return;
+    final recipientId = int.tryParse(recipientIdText?.trim() ?? '');
+    if (recipientId == null) return;
 
-    setState(() => _isStartingConversation = true);
+    setState(() => _isStartingTestConversation = true);
     try {
-      final conversation = await ref
+      final conversationId = await ref
           .read(conversationRepositoryProvider)
-          .startConversationWithBusiness(businessId: business.businessId);
+          .startConversation(recipientId: recipientId);
       if (!mounted) return;
-      setState(() => _isStartingConversation = false);
+      setState(() => _isStartingTestConversation = false);
 
-      if (conversation == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(context.l10n.newChatOpenFailed)));
-        return;
-      }
-
-      await context.pushNamed(
-        RouteNames.chatThread,
-        pathParameters: {RouteNames.idParam: conversation.id.toString()},
-        extra: conversation,
+      final placeholderConversation = Conversation(
+        id: conversationId,
+        otherParticipant: ConversationParticipantSummary(
+          id: recipientId,
+          accountType: 'unknown',
+          displayName: context.l10n.chatTestUserPlaceholder(recipientId),
+        ),
+        lastMessage: null,
+        unreadCount: 0,
+        createdAt: DateTime.now(),
       );
-      if (mounted) await _reloadQuietly();
+      if (!mounted) return;
+      context.pushNamed(
+        RouteNames.chatThread,
+        pathParameters: {RouteNames.idParam: conversationId.toString()},
+        extra: placeholderConversation,
+      );
     } on ApiFailure catch (e) {
       if (!mounted) return;
-      setState(() => _isStartingConversation = false);
+      setState(() => _isStartingTestConversation = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(localizedApiError(context.l10n, e))),
       );
@@ -202,16 +247,16 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
       appBar: CavalloAppBar(title: Text(l10n.chatListTitle)),
       body: _buildBody(context),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _isStartingConversation ? null : _startNewChat,
+        onPressed: _isStartingTestConversation ? null : _startTestConversation,
         icon:
-            _isStartingConversation
+            _isStartingTestConversation
                 ? const SizedBox(
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
                 : const Icon(Icons.add_comment_outlined),
-        label: Text(l10n.chatListNewChat),
+        label: Text(l10n.chatListNewChatTest),
       ),
     );
   }

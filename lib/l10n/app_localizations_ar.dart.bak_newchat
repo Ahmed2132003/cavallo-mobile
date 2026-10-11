@@ -806,21 +806,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get chatListNewChatTest => 'محادثة جديدة (تجريبية)';
 
   @override
-  String get chatListNewChat => 'محادثة جديدة';
-
-  @override
-  String get newChatSheetTitle => 'محادثة جديدة';
-
-  @override
-  String get newChatSheetSubtitle => 'ابدأ محادثة مع نشاط تجاري تتابعه';
-
-  @override
-  String get newChatSheetEmpty => 'أنت لا تتابع أي نشاط تجاري بعد. تابع نشاطًا تجاريًا لتبدأ المحادثة معه.';
-
-  @override
-  String get newChatOpenFailed => 'تعذّر فتح المحادثة. حاول مرة أخرى.';
-
-  @override
   String get chatTestDialogTitle => 'بدء محادثة تجريبية';
 
   @override

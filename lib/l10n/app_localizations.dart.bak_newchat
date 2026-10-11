@@ -1397,36 +1397,6 @@ abstract class AppLocalizations {
   /// **'New chat (test)'**
   String get chatListNewChatTest;
 
-  /// Label of the new-chat button on the chat list.
-  ///
-  /// In en, this message translates to:
-  /// **'New chat'**
-  String get chatListNewChat;
-
-  /// Title of the new-chat picker sheet.
-  ///
-  /// In en, this message translates to:
-  /// **'New chat'**
-  String get newChatSheetTitle;
-
-  /// Subtitle of the new-chat picker sheet.
-  ///
-  /// In en, this message translates to:
-  /// **'Start a conversation with a business you follow'**
-  String get newChatSheetSubtitle;
-
-  /// Empty state of the new-chat picker when the user follows nobody.
-  ///
-  /// In en, this message translates to:
-  /// **'You are not following any business yet. Follow a business to start chatting with it.'**
-  String get newChatSheetEmpty;
-
-  /// Snackbar when a conversation was started but could not be opened.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not open the conversation. Please try again.'**
-  String get newChatOpenFailed;
-
   /// Title of the temporary test-conversation dialog.
   ///
   /// In en, this message translates to:
