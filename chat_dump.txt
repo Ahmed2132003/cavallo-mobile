@@ -1,0 +1,3511 @@
+﻿
+
+===== FILE: D:\Cavallo\scd-backend\chat\serializers.py =====
+
+from django.apps import apps
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError as DjangoValidationError
+from rest_framework import serializers
+from rest_framework.exceptions import NotFound
+
+from core.media import validate_upload
+from social.serializers import _preview_for
+
+from .models import Conversation, ConversationParticipant, Message
+
+# ---------------------------------------------------------------------------
+# Part P-076 â€” chat media limits (documented, single source of truth).
+#
+# Images: jpeg/png/webp, 5 MB â€” identical to Post.image / Product.image.
+# Video:  video/mp4 only, 25 MB. Chat video is NOT transcoded (no ffmpeg
+#         pipeline like Reel's), so the stricter 25 MB cap (vs Reel's
+#         100 MB) is the chosen alternative to transcoding. To also accept
+#         iPhone .mov later, add "video/quicktime" to CHAT_VIDEO_MIME_TYPES.
+# ---------------------------------------------------------------------------
+CHAT_IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"]
+CHAT_IMAGE_MAX_BYTES = 5 * 1024 * 1024
+CHAT_VIDEO_MIME_TYPES = ["video/mp4"]
+CHAT_VIDEO_MAX_BYTES = 25 * 1024 * 1024
+
+# ---------------------------------------------------------------------------
+# Part P-077 â€” shared content (Post / Reel / Product) inside a message.
+#
+# Closed whitelist, same philosophy as social/views.py's
+# ALLOWED_CONTENT_TYPES / SHARE_ALLOWED_CONTENT_TYPES: never derived from
+# ContentType.objects.all(), so a model like "user" can never be shared just
+# because it exists. Unlike P-056's Share-tracking endpoint (post/reel only),
+# chat sharing also accepts "product" â€” the Product detail screen's
+# "Share to conversation" needs it.
+# ---------------------------------------------------------------------------
+SHARE_TO_CHAT_CONTENT_TYPES = {
+    "post": ("content", "Post"),
+    "reel": ("content", "Reel"),
+    "product": ("products", "Product"),
+}
+
+
+def _shareable_queryset(model):
+    """
+    Only content that is publicly visible right now may be shared or
+    rendered: Post/Reel via their published_objects manager (P-043),
+    Product via is_active=True (Product.objects already hides
+    soft-deleted rows). Same visibility rules as the public endpoints.
+    """
+    published = getattr(model, "published_objects", None)
+    if published is not None:
+        return published.all()
+    return model.objects.filter(is_active=True)
+
+
+def resolve_shareable_target(content_type_str, object_id):
+    """
+    Resolve a (content_type string, id) pair to (ContentType, instance),
+    the same way P-053's _resolve_like_target does: unknown type ->
+    ValidationError (400), missing/unpublished/inactive target ->
+    NotFound (404).
+    """
+    if content_type_str not in SHARE_TO_CHAT_CONTENT_TYPES:
+        raise serializers.ValidationError(
+            {
+                "shared_content_type": (
+                    f"Unrecognized shared_content_type '{content_type_str}'. "
+                    f"Must be one of: {', '.join(SHARE_TO_CHAT_CONTENT_TYPES)}."
+                )
+            }
+        )
+    app_label, model_name = SHARE_TO_CHAT_CONTENT_TYPES[content_type_str]
+    model = apps.get_model(app_label, model_name)
+    target = _shareable_queryset(model).filter(pk=object_id).first()
+    if target is None:
+        raise NotFound(f"{model_name} not found.")
+    return ContentType.objects.get_for_model(model), target
+
+
+def shared_content_type_label(message):
+    """ "post" / "reel" / "product", or "" when nothing is shared."""
+    if message.shared_content_type_id is None:
+        return ""
+    return ContentType.objects.get_for_id(message.shared_content_type_id).model
+
+
+def build_shared_content_payload(message):
+    """
+    Viewer-INDEPENDENT description of a message's shared content, or None
+    when the message shares nothing. Deliberately carries no per-viewer
+    state (no is_liked / is_saved): the same payload is returned by REST
+    and broadcast over the WebSocket to the other participant. The Flutter
+    client fetches the live, per-viewer entity by (content_type, object_id)
+    and renders PostCard / ReelCard with it.
+
+    `available` is False when the target was unpublished / deactivated /
+    deleted after being shared; `preview` and the business fields are then
+    null so a taken-down item's details never keep leaking through chat.
+    Cost: one query per shared message (documented MVP limitation, same
+    class as ConversationListSerializer's N+1).
+    """
+    label = shared_content_type_label(message)
+    if not label:
+        return None
+
+    payload = {
+        "content_type": label,
+        "object_id": message.shared_object_id,
+        "available": False,
+        "business_id": None,
+        "business_name": None,
+        "preview": None,
+    }
+    model = ContentType.objects.get_for_id(message.shared_content_type_id).model_class()
+    if model is None:
+        return payload
+    target = (
+        _shareable_queryset(model)
+        .select_related("business")
+        .filter(pk=message.shared_object_id)
+        .first()
+    )
+    if target is None:
+        return payload
+
+    payload.update(
+        available=True,
+        business_id=target.business_id,
+        business_name=target.business.business_name,
+        preview=_preview_for(target),
+    )
+    return payload
+
+
+class ConversationSerializer(serializers.ModelSerializer):
+    participant_ids = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Conversation
+        fields = ["id", "created_at", "updated_at", "participant_ids"]
+
+    def get_participant_ids(self, obj):
+        return list(obj.participants.values_list("user_id", flat=True))
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    """
+    `text` Ùˆ`media` Ù‡Ù…Ø§ Ø§Ù„Ø­Ù‚Ù„Ø§Ù† Ø§Ù„Ù‚Ø§Ø¨Ù„Ø§Ù† Ù„Ù„ÙƒØªØ§Ø¨Ø© Ù…Ù† Ø§Ù„Ù€ client (ÙƒÙ„Ø§Ù‡Ù…Ø§
+    Ø§Ø®ØªÙŠØ§Ø±ÙŠØŒ Ù„ÙƒÙ† Ù„Ø§Ø²Ù… ÙˆØ§Ø­Ø¯ Ù…Ù†Ù‡Ù…Ø§ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„). `conversation` Ùˆ`sender`
+    Ø¨ÙŠØªØ­Ø¯Ø¯ÙˆØ§ Ù…Ù† Ø§Ù„Ù€ viewØŒ Ùˆ`media_type` Ø¨ÙŠØªØ­Ø¯Ø¯ Ù‡Ù†Ø§ Ù…Ù† Ù†ÙˆØ¹ Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠ
+    (libmagic Ø¹Ø¨Ø± validate_upload) â€” Ù…Ø´ Ù…Ù† Ø£ÙŠ Ø­Ø§Ø¬Ø© ÙŠØ¨Ø¹ØªÙ‡Ø§ Ø§Ù„Ù€ client.
+
+    Part P-076: Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ù…Ù„Ù Ø¨ÙŠØ³ØªØ®Ø¯Ù… core.media.validate_upload()
+    Ù†ÙØ³Ù‡Ø§ Ø¨Ø¯ÙˆÙ† Ø£ÙŠ Ù…Ù†Ø·Ù‚ ØªØ­Ù‚Ù‚ Ø¨Ø¯ÙŠÙ„. Ù…Ù„Ø­ÙˆØ¸Ø©: validate_upload Ø¨ØªÙØ­Øµ Ø§Ù„Ø­Ø¬Ù…
+    Ù‚Ø¨Ù„ Ø§Ù„Ù†ÙˆØ¹ØŒ ÙÙ„Ùˆ Ø§Ø³ØªØ®Ø¯Ù…Ù†Ø§ Ø³Ù‚Ù Ø§Ù„ØµÙˆØ±Ø© (5MB) Ù…Ø¨Ø§Ø´Ø±Ø© Ù‡ÙŠØªØ±ÙØ¶ ÙÙŠØ¯ÙŠÙˆ 10MB
+    ØºÙ„Ø·. Ø¹Ø´Ø§Ù† ÙƒØ¯Ù‡ Ø§Ù„ÙØ­Øµ Ø¹Ù„Ù‰ Ù…Ø±Ø­Ù„ØªÙŠÙ†ØŒ ÙƒÙ„Ù‡Ù… Ø¹Ù† Ø·Ø±ÙŠÙ‚ Ù†ÙØ³ Ø§Ù„Ø¯Ø§Ù„Ø©:
+      1) Ù†ÙˆØ¹ ØµÙˆØ±Ø© + Ø³Ù‚Ù Ø§Ù„ÙÙŠØ¯ÙŠÙˆ (25MB) â€” Ù†Ø¬Ø­ => ØµÙˆØ±Ø©ØŒ ÙˆØ¨Ø¹Ø¯Ù‡Ø§ Ù†Ø·Ø¨Ù‚ Ø³Ù‚Ù
+         Ø§Ù„ØµÙˆØ±Ø© (5MB) Ø¨Ù†ÙØ³ Ø§Ù„Ø¯Ø§Ù„Ø©.
+      2) Ù„Ùˆ Ø§Ù„Ù†ÙˆØ¹ Ù…Ø´ ØµÙˆØ±Ø© => Ù†ÙˆØ¹ ÙÙŠØ¯ÙŠÙˆ + Ø³Ù‚Ù Ø§Ù„ÙÙŠØ¯ÙŠÙˆ.
+    """
+
+    # Part P-077 â€” write side: two plain inputs (type string + id) resolved
+    # server-side by resolve_shareable_target(); read side: `shared_content`
+    # (viewer-independent payload, see build_shared_content_payload()).
+    # These two declared fields intentionally shadow the model's own
+    # shared_content_type / shared_object_id columns of the same name.
+    shared_content_type = serializers.CharField(write_only=True, required=False)
+    shared_object_id = serializers.IntegerField(
+        write_only=True, required=False, min_value=1
+    )
+    shared_content = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Message
+        fields = [
+            "id",
+            "conversation",
+            "sender",
+            "text",
+            "media",
+            "media_type",
+            "shared_content_type",
+            "shared_object_id",
+            "shared_content",
+            "status",
+            "created_at",
+        ]
+        read_only_fields = [
+            "id",
+            "conversation",
+            "sender",
+            "media_type",
+            "status",
+            "created_at",
+        ]
+
+    def validate_media(self, value):
+        try:
+            validate_upload(value, CHAT_IMAGE_MIME_TYPES, CHAT_VIDEO_MAX_BYTES)
+        except DjangoValidationError as exc:
+            if exc.code != "unsupported_file_type":
+                # file_too_large (Ø£ÙƒØ¨Ø± Ù…Ù† 25MB Ø£ÙŠÙ‹Ø§ ÙƒØ§Ù† Ø§Ù„Ù†ÙˆØ¹) â€” Ù†Ø±ÙØ¶Ù‡ ÙƒÙ…Ø§ Ù‡Ùˆ.
+                raise
+            # Ù…Ø´ ØµÙˆØ±Ø©: ÙŠØ§ ÙÙŠØ¯ÙŠÙˆ Ù…Ø³Ù…ÙˆØ­ØŒ ÙŠØ§ ÙŠØªØ±ÙØ¶ Ø¨Ù†ÙØ³ Ø±Ø³Ø§Ù„Ø© validate_upload.
+            validate_upload(value, CHAT_VIDEO_MIME_TYPES, CHAT_VIDEO_MAX_BYTES)
+            self._media_type = Message.MediaType.VIDEO
+        else:
+            # ØµÙˆØ±Ø© Ø­Ù‚ÙŠÙ‚ÙŠØ©: Ù†Ø·Ø¨Ù‚ Ø³Ù‚Ù Ø§Ù„ØµÙˆØ±Ø© (5MB) Ø¹Ø¨Ø± Ù†ÙØ³ Ø§Ù„Ø¯Ø§Ù„Ø©.
+            validate_upload(value, CHAT_IMAGE_MIME_TYPES, CHAT_IMAGE_MAX_BYTES)
+            self._media_type = Message.MediaType.IMAGE
+        return value
+
+    def validate(self, attrs):
+        text = (attrs.get("text") or "").strip()
+        media = attrs.get("media")
+
+        # Part P-077 â€” shared content: the type string and the id must
+        # come together, may accompany text, but never media.
+        has_shared_type = "shared_content_type" in attrs
+        has_shared_id = "shared_object_id" in attrs
+        if has_shared_type != has_shared_id:
+            raise serializers.ValidationError(
+                "shared_content_type and shared_object_id must be sent together."
+            )
+        has_shared = has_shared_type and has_shared_id
+        if has_shared and media is not None:
+            raise serializers.ValidationError(
+                "A message cannot carry both media and shared content."
+            )
+
+        if not text and media is None and not has_shared:
+            raise serializers.ValidationError(
+                "A message must contain text, media, shared content, "
+                "or text together with shared content."
+            )
+        if media is not None:
+            attrs["media_type"] = self._media_type
+        if has_shared:
+            content_type, _target = resolve_shareable_target(
+                attrs["shared_content_type"], attrs["shared_object_id"]
+            )
+            # Replace the client's string with the resolved ContentType
+            # instance so serializer.save() writes the real FK column.
+            attrs["shared_content_type"] = content_type
+        return attrs
+
+    def get_shared_content(self, obj):
+        return build_shared_content_payload(obj)
+
+
+def _resolve_conversation_participant_display_name(user):
+    """
+    Resolve a display name for a user in a chat context, regardless of
+    account_type. Reasonably resolved via whichever profile data is
+    available (Business or Customer) â€” per P-074's Detailed Implementation.
+
+    Uses getattr() with a default rather than a bare attribute access:
+    Django's reverse-OneToOne descriptor raises a DoesNotExist that is
+    also an AttributeError subclass specifically so this pattern works
+    (same convention already used for the moderation "submitter" object).
+    """
+    business_profile = getattr(user, "business_profile", None)
+    if business_profile is not None:
+        return business_profile.business_name
+
+    customer_profile = getattr(user, "customer_profile", None)
+    if customer_profile is not None:
+        return customer_profile.display_name
+
+    return user.email
+
+
+class ConversationListSerializer(serializers.ModelSerializer):
+    """
+    Read-only serializer for the Conversation List screen (P-074).
+
+    Named distinctly from the plain `ConversationSerializer` above (which
+    `ConversationStartView` already returns, with its `participant_ids`
+    shape) â€” this is a different, additive representation for a different
+    screen, not a replacement.
+
+    NOTE (documented limitation, not silently accepted): last_message and
+    unread_count each run a small extra query per conversation (N+1).
+    Acceptable at MVP scale (a user's conversation count is small); revisit
+    with Prefetch objects if this list ever needs to scale to hundreds of
+    conversations per user.
+
+    Part P-076: last_message now also carries `media_type` (additive) so
+    the list can show a "Photo"/"Video" preview for a media-only message
+    whose `text` is blank.
+    """
+
+    other_participant = serializers.SerializerMethodField()
+    last_message = serializers.SerializerMethodField()
+    unread_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Conversation
+        fields = [
+            "id",
+            "other_participant",
+            "last_message",
+            "unread_count",
+            "created_at",
+        ]
+        read_only_fields = fields
+
+    def get_other_participant(self, obj):
+        request = self.context["request"]
+        participant = (
+            ConversationParticipant.objects.filter(conversation=obj)
+            .exclude(user=request.user)
+            .select_related("user")
+            .first()
+        )
+        if participant is None:
+            # Defensive only â€” every Conversation always has exactly 2
+            # participants per P-066's creation flow; should never happen.
+            return None
+        user = participant.user
+        return {
+            "id": user.id,
+            "account_type": user.account_type,
+            "display_name": _resolve_conversation_participant_display_name(user),
+        }
+
+    def get_last_message(self, obj):
+        message = (
+            Message.objects.filter(conversation=obj).order_by("-created_at").first()
+        )
+        if message is None:
+            return None
+        return {
+            "id": message.id,
+            "text": message.text,
+            "media_type": message.media_type,
+            "shared_content_type": shared_content_type_label(message),
+            "sender_id": message.sender_id,
+            "status": message.status,
+            "created_at": message.created_at,
+        }
+
+    def get_unread_count(self, obj):
+        request = self.context["request"]
+        return (
+            Message.objects.filter(conversation=obj)
+            .exclude(sender=request.user)
+            .exclude(status="read")
+            .count()
+        )
+
+
+===== FILE: D:\Cavallo\scd-backend\chat\test_media_messages.py =====
+
+"""
+Tests for chat media messages (Part P-076, backend half).
+
+Proves media validation goes through the SHARED core.media.validate_upload()
+(spied via wraps=, not reimplemented), the size caps (5 MB image /
+25 MB video), that a media-only message is valid, and that a message with
+neither text nor media is rejected.
+"""
+
+from unittest.mock import patch
+
+import pytest
+from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIClient
+
+from chat.models import Conversation, ConversationParticipant, Message
+from chat.tasks import notify_offline_recipient
+from core.media import validate_upload
+from core.tests.test_media import _DISGUISED_EXE_BYTES, _VALID_PNG_BYTES
+
+User = get_user_model()
+
+pytestmark = pytest.mark.django_db
+
+_VALID_MP4_BYTES = b"\x00\x00\x00\x18ftypmp42\x00\x00\x00\x00mp42isom"
+_MB = 1024 * 1024
+
+
+def _make_user(username):
+    return User.objects.create_user(
+        username=username,
+        email=f"{username}@example.com",
+        password="testpass123",
+        account_type="customer",
+    )
+
+
+def _setup(prefix):
+    sender = _make_user(f"{prefix}_sender")
+    recipient = _make_user(f"{prefix}_recipient")
+    conversation = Conversation.objects.create()
+    ConversationParticipant.objects.create(conversation=conversation, user=sender)
+    ConversationParticipant.objects.create(conversation=conversation, user=recipient)
+    client = APIClient()
+    client.force_authenticate(user=sender)
+    url = reverse(
+        "chat:conversation-messages", kwargs={"conversation_id": conversation.id}
+    )
+    return client, url, conversation, sender, recipient
+
+
+def _png(name="photo.png", extra=0):
+    return SimpleUploadedFile(
+        name, _VALID_PNG_BYTES + b"\0" * extra, content_type="image/png"
+    )
+
+
+def _mp4(name="clip.mp4", extra=0):
+    return SimpleUploadedFile(
+        name, _VALID_MP4_BYTES + b"\0" * extra, content_type="video/mp4"
+    )
+
+
+def test_media_only_image_message_succeeds_via_shared_validate_upload():
+    client, url, conversation, sender, _ = _setup("img_only")
+
+    with patch("chat.serializers.validate_upload", wraps=validate_upload) as spy:
+        response = client.post(url, {"media": _png()}, format="multipart")
+
+    assert response.status_code == status.HTTP_201_CREATED
+    assert spy.called  # the shared function ran â€” not a reimplementation
+    assert response.data["media_type"] == "image"
+    assert response.data["media"]
+    assert response.data["text"] == ""
+    message = Message.objects.get(pk=response.data["id"])
+    assert message.conversation_id == conversation.id
+    assert message.sender_id == sender.id
+    assert message.media_type == Message.MediaType.IMAGE
+    assert message.media
+
+
+def test_video_message_with_caption_succeeds():
+    client, url, _, _, _ = _setup("vid_caption")
+
+    response = client.post(
+        url, {"text": "check this", "media": _mp4()}, format="multipart"
+    )
+
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.data["media_type"] == "video"
+    assert response.data["text"] == "check this"
+    assert response.data["media"]
+
+
+def test_text_only_message_still_works_and_has_no_media():
+    client, url, _, _, _ = _setup("text_only")
+
+    response = client.post(url, {"text": "just text"}, format="json")
+
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.data["text"] == "just text"
+    assert response.data["media"] is None
+    assert response.data["media_type"] == ""
+
+
+def test_disguised_executable_is_rejected_via_shared_validate_upload():
+    client, url, conversation, _, _ = _setup("bad_mime")
+    fake = SimpleUploadedFile(
+        "photo.png", _DISGUISED_EXE_BYTES, content_type="image/png"
+    )
+
+    with patch("chat.serializers.validate_upload", wraps=validate_upload) as spy:
+        response = client.post(url, {"media": fake}, format="multipart")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data["error"]["code"] == "VALIDATION_ERROR"
+    assert spy.called
+    assert not Message.objects.filter(conversation=conversation).exists()
+
+
+def test_image_over_5mb_is_rejected():
+    client, url, conversation, _, _ = _setup("big_img")
+
+    response = client.post(url, {"media": _png(extra=5 * _MB)}, format="multipart")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data["error"]["code"] == "VALIDATION_ERROR"
+    assert not Message.objects.filter(conversation=conversation).exists()
+
+
+def test_video_between_5mb_and_25mb_is_accepted():
+    # Proves video gets the LARGER cap (a 5MB+ file would fail as an image).
+    client, url, _, _, _ = _setup("mid_vid")
+
+    response = client.post(url, {"media": _mp4(extra=5 * _MB + 1)}, format="multipart")
+
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.data["media_type"] == "video"
+
+
+def test_video_over_25mb_is_rejected():
+    client, url, conversation, _, _ = _setup("big_vid")
+
+    response = client.post(url, {"media": _mp4(extra=25 * _MB)}, format="multipart")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data["error"]["code"] == "VALIDATION_ERROR"
+    assert not Message.objects.filter(conversation=conversation).exists()
+
+
+def test_message_with_neither_text_nor_media_is_rejected():
+    client, url, conversation, _, _ = _setup("empty_msg")
+
+    response = client.post(url, {"text": "   "}, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data["error"]["code"] == "VALIDATION_ERROR"
+    assert not Message.objects.filter(conversation=conversation).exists()
+
+
+def test_non_participant_cannot_send_media():
+    _, url, conversation, _, _ = _setup("idor")
+    outsider = _make_user("idor_outsider")
+    outsider_client = APIClient()
+    outsider_client.force_authenticate(user=outsider)
+
+    response = outsider_client.post(url, {"media": _png()}, format="multipart")
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert not Message.objects.filter(conversation=conversation).exists()
+
+
+def test_conversation_list_last_message_exposes_media_type():
+    client, _, conversation, sender, _ = _setup("list_media")
+    Message.objects.create(
+        conversation=conversation,
+        sender=sender,
+        media_type=Message.MediaType.IMAGE,
+    )
+
+    response = client.get(reverse("chat:conversation-list"))
+
+    assert response.status_code == status.HTTP_200_OK
+    last_message = response.data[0]["last_message"]
+    assert last_message["media_type"] == "image"
+    assert last_message["text"] == ""
+
+
+def test_offline_push_body_falls_back_to_media_label_when_text_blank(dispatch_delay):
+    _, _, conversation, sender, recipient = _setup("push_media")
+    message = Message.objects.create(
+        conversation=conversation,
+        sender=sender,
+        media_type=Message.MediaType.VIDEO,
+    )
+
+    notify_offline_recipient(message.id)
+
+    dispatch_delay.assert_called_once()
+    assert dispatch_delay.call_args.kwargs["body"] == "Sent a video"
+    assert dispatch_delay.call_args.kwargs["recipient_id"] == recipient.id
+    assert dispatch_delay.call_args.kwargs["notification_type"] == "chat_message"
+
+
+===== FILE: D:\Cavallo\social_commerce_app\lib\features\chat\domain\conversation.dart =====
+
+import 'message_status.dart';
+import 'message.dart';
+import 'shared_content.dart';
+
+/// Part P-074 STEP 2 â€” the other participant in a 1:1 conversation, as
+/// shown on the Conversation List screen.
+///
+/// Mirrors `ConversationListSerializer.get_other_participant`'s exact
+/// JSON shape (`chat/serializers.py`): `{id, account_type,
+/// display_name}`.
+class ConversationParticipantSummary {
+  const ConversationParticipantSummary({
+    required this.id,
+    required this.accountType,
+    required this.displayName,
+  });
+
+  final int id;
+
+  /// Raw backend account-type string (e.g. `"business"` / `"customer"`)
+  /// â€” kept as a raw `String` rather than a shared enum: this project
+  /// already owns an account-type concept elsewhere (the `accounts`
+  /// app), and duplicating/importing it into `features/chat/domain` is
+  /// out of this part's scope.
+  final String accountType;
+
+  /// Already fully resolved server-side by
+  /// `_resolve_conversation_participant_display_name` (business name,
+  /// then customer display name, then email, in that order) â€” this
+  /// layer does not re-derive it.
+  final String displayName;
+
+  factory ConversationParticipantSummary.fromJson(Map<String, dynamic> json) {
+    return ConversationParticipantSummary(
+      id: json['id'] as int,
+      accountType: json['account_type'] as String,
+      displayName: json['display_name'] as String,
+    );
+  }
+}
+
+/// A conversation's last message, as shown as the list-row preview.
+/// Mirrors `ConversationListSerializer.get_last_message`'s exact JSON
+/// shape.
+class LastMessagePreview {
+  const LastMessagePreview({
+    required this.id,
+    required this.text,
+    required this.senderId,
+    required this.status,
+    required this.createdAt,
+    this.mediaType,
+    this.sharedContentType,
+  });
+
+  final int id;
+  final String text;
+
+  /// Part P-076. `null` for a text-only last message.
+  final ChatMediaType? mediaType;
+
+  /// Part P-077. `null` when the last message shares nothing. Parsed
+  /// from the backend's `shared_content_type` string (`"post"` /
+  /// `"reel"` / `"product"` / `""`).
+  final SharedContentType? sharedContentType;
+  final int senderId;
+  final MessageStatus status;
+  final DateTime createdAt;
+
+  factory LastMessagePreview.fromJson(Map<String, dynamic> json) {
+    return LastMessagePreview(
+      id: json['id'] as int,
+      text: json['text'] as String,
+      senderId: json['sender_id'] as int,
+      status: MessageStatus.fromRaw(json['status'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String),
+      mediaType: ChatMediaType.fromRaw(json['media_type'] as String?),
+      sharedContentType: SharedContentType.fromRaw(
+        json['shared_content_type'] as String?,
+      ),
+    );
+  }
+
+  /// Part P-076 / P-077 â€” what the conversation-list row shows. A
+  /// media-only or shared-content-only message has blank [text], so it
+  /// falls back to a short label instead of an empty subtitle. Text
+  /// always wins when present (a captioned photo, or "check this out!"
+  /// sent together with a shared product, shows its text).
+  String get previewText {
+    if (text.isNotEmpty) return text;
+    switch (mediaType) {
+      case ChatMediaType.image:
+        return 'Photo';
+      case ChatMediaType.video:
+        return 'Video';
+      case null:
+        break;
+    }
+    switch (sharedContentType) {
+      case SharedContentType.post:
+        return 'Shared a post';
+      case SharedContentType.reel:
+        return 'Shared a reel';
+      case SharedContentType.product:
+        return 'Shared a product';
+      case null:
+        return text;
+    }
+  }
+}
+
+/// Part P-074 STEP 2 â€” one row on the Conversation List screen.
+///
+/// Mirrors `ConversationListSerializer`'s exact JSON shape
+/// (`chat/serializers.py`): `{id, other_participant, last_message,
+/// unread_count, created_at}`. Deliberately distinct from the plain
+/// `ConversationSerializer` shape `ConversationStartView` returns
+/// (`{id, created_at, updated_at, participant_ids}`) â€” see
+/// `ConversationRepository.startConversation`'s own doc comment for why
+/// that response is not parsed into this class.
+class Conversation {
+  const Conversation({
+    required this.id,
+    required this.otherParticipant,
+    required this.lastMessage,
+    required this.unreadCount,
+    required this.createdAt,
+  });
+
+  final int id;
+
+  /// Null only in the defensive fallback the backend itself documents as
+  /// "should never happen" (`get_other_participant` returning `None`) â€”
+  /// every real `Conversation` always has exactly 2 participants per
+  /// P-066's creation flow.
+  final ConversationParticipantSummary? otherParticipant;
+
+  /// Null for a brand-new conversation with no messages sent yet.
+  final LastMessagePreview? lastMessage;
+
+  final int unreadCount;
+  final DateTime createdAt;
+
+  factory Conversation.fromJson(Map<String, dynamic> json) {
+    final otherParticipantRaw =
+        json['other_participant'] as Map<String, dynamic>?;
+    final lastMessageRaw = json['last_message'] as Map<String, dynamic>?;
+
+    return Conversation(
+      id: json['id'] as int,
+      otherParticipant:
+          otherParticipantRaw == null
+              ? null
+              : ConversationParticipantSummary.fromJson(otherParticipantRaw),
+      lastMessage:
+          lastMessageRaw == null
+              ? null
+              : LastMessagePreview.fromJson(lastMessageRaw),
+      unreadCount: json['unread_count'] as int,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+  }
+}
+
+
+===== FILE: D:\Cavallo\social_commerce_app\lib\features\chat\domain\message.dart =====
+
+import 'message_status.dart';
+import 'shared_content.dart';
+
+/// Part P-076 â€” the kind of media a chat message carries.
+///
+/// Mirrors the backend's `Message.MediaType` (`"image"` / `"video"`).
+/// The backend sets this from the file's SNIFFED content type, never
+/// from anything the client sends, and leaves it `""` for a text-only
+/// message â€” [fromRaw] maps that empty string (and anything
+/// unrecognized) to `null`, meaning "no media".
+enum ChatMediaType {
+  image,
+  video;
+
+  static ChatMediaType? fromRaw(String? raw) {
+    switch (raw) {
+      case 'image':
+        return ChatMediaType.image;
+      case 'video':
+        return ChatMediaType.video;
+      default:
+        return null;
+    }
+  }
+}
+
+/// Part P-074 STEP 2 â€” a single chat message.
+///
+/// Mirrors `MessageSerializer`'s exact JSON shape (`chat/serializers.py`):
+/// `{id, conversation, sender, text, media, media_type, shared_content,
+/// status, created_at}`. This is the identical wire shape `chat_event.dart`'s
+/// `MessageReceived` already documents for the WebSocket path â€” the same
+/// shape arrives over REST too (initial history fetch, fetch-since, and
+/// the send response), so this entity is the one this feature's data
+/// layer parses REST responses into.
+///
+/// Part P-076: [mediaUrl] / [mediaType] are additive and optional. A
+/// text-only message has both `null`; a media-only message has an empty
+/// [text].
+///
+/// Part P-077: [sharedContent] is additive and optional. `null` for any
+/// message that shares nothing. A shared-content message may also carry
+/// [text] (e.g. "check this out!"), but never media (the backend rejects
+/// that combination).
+class Message {
+  const Message({
+    required this.id,
+    required this.conversationId,
+    required this.senderId,
+    required this.text,
+    required this.status,
+    required this.createdAt,
+    this.mediaUrl,
+    this.mediaType,
+    this.sharedContent,
+  });
+
+  final int id;
+  final int conversationId;
+  final int senderId;
+  final String text;
+  final MessageStatus status;
+  final DateTime createdAt;
+
+  /// Absolute URL of the attached file, or `null` for a text-only message.
+  final String? mediaUrl;
+
+  /// `null` when the message has no media.
+  final ChatMediaType? mediaType;
+
+  /// Part P-077. `null` when the message shares no platform content.
+  final SharedContent? sharedContent;
+
+  factory Message.fromJson(Map<String, dynamic> json) {
+    return Message(
+      id: json['id'] as int,
+      conversationId: json['conversation'] as int,
+      senderId: json['sender'] as int,
+      text: json['text'] as String,
+      status: MessageStatus.fromRaw(json['status'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String),
+      mediaUrl: json['media'] as String?,
+      mediaType: ChatMediaType.fromRaw(json['media_type'] as String?),
+      sharedContent: SharedContent.tryParse(json['shared_content']),
+    );
+  }
+
+  /// Returns a copy with [status] replaced. Not used by this step's
+  /// repositories â€” placed here because a `StatusUpdate` WebSocket event
+  /// (P-073) arriving for an already-loaded message is exactly the case
+  /// this exists for, and that consumption happens in P-074's later
+  /// presentation-layer steps (the message thread screen), not here.
+  Message copyWithStatus(MessageStatus newStatus) {
+    return Message(
+      id: id,
+      conversationId: conversationId,
+      senderId: senderId,
+      text: text,
+      status: newStatus,
+      createdAt: createdAt,
+      mediaUrl: mediaUrl,
+      mediaType: mediaType,
+      sharedContent: sharedContent,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Message &&
+          other.id == id &&
+          other.conversationId == conversationId &&
+          other.senderId == senderId &&
+          other.text == text &&
+          other.status == status &&
+          other.createdAt == createdAt &&
+          other.mediaUrl == mediaUrl &&
+          other.mediaType == mediaType &&
+          other.sharedContent == sharedContent);
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    conversationId,
+    senderId,
+    text,
+    status,
+    createdAt,
+    mediaUrl,
+    mediaType,
+    sharedContent,
+  );
+}
+
+
+===== FILE: D:\Cavallo\social_commerce_app\lib\features\chat\presentation\chat_list_screen.dart =====
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/l10n/error_messages.dart';
+import '../../../core/l10n/formatters.dart';
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/network/api_failure.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_avatar.dart';
+import '../../../core/widgets/app_shimmer_box.dart';
+import '../../../core/widgets/empty_state_widget.dart';
+import '../../../core/widgets/error_state_widget.dart';
+import '../../../routing/route_names.dart';
+import '../data/conversation_repository.dart';
+import '../../../l10n/app_localizations.dart';
+import '../domain/conversation.dart';
+import '../domain/message.dart';
+import '../domain/shared_content.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
+
+/// Part P-074 STEP 3 â€” the Conversation List screen (`/chat`), replacing
+/// P-007's placeholder IN PLACE (same file, same class name â€” per rule
+/// 11 of this project's own process: don't duplicate an existing
+/// file/class, edit it).
+///
+/// Fetches `GET /api/v1/conversations/` via [ConversationRepository]
+/// (STEP 2), displayed in whatever order the backend returns (no
+/// client-side re-sort). Supports pull-to-refresh and cursor-based
+/// "load more" near the bottom, using `PaginatedResponse.next` verbatim
+/// as the next page's request URL â€” the same opaque-cursor contract
+/// `ConversationRepository.listConversations`'s own doc comment
+/// describes.
+///
+/// ### STEP 4 addition â€” "New chat (test)" floating action button
+/// See [_ChatListScreenState._startTestConversation]'s own doc comment
+/// for why this exists and why it is explicitly a manual-testing aid,
+/// not a designed product entry point.
+///
+/// ### Part P-115 STEP 2 â€” restyle only
+/// Presentation only: every field of the state, every repository call, the
+/// pagination cursor logic and the navigation callback are unchanged.
+/// Rows use the P-111 components ([AppAvatar], [AppShimmerBox],
+/// [EmptyStateWidget], [ErrorStateWidget]) and `context.appColors`; every
+/// user-facing string comes from the ARB files. The spec's "online dot" is NOT
+/// drawn: neither the backend nor [ConversationParticipantSummary] carries
+/// presence data (see the note in `chat_thread_screen.dart`), and P-115 forbids
+/// new features and backend changes.
+class ChatListScreen extends ConsumerStatefulWidget {
+  const ChatListScreen({super.key});
+
+  @override
+  ConsumerState<ChatListScreen> createState() => _ChatListScreenState();
+}
+
+class _ChatListScreenState extends ConsumerState<ChatListScreen> {
+  final _scrollController = ScrollController();
+
+  List<Conversation> _conversations = [];
+  String? _nextCursor;
+  bool _isLoadingFirstPage = true;
+  bool _isLoadingMore = false;
+  ApiFailure? _error;
+  bool _isStartingTestConversation = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    _loadFirstPage();
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isLoadingMore || _nextCursor == null) return;
+    final threshold = _scrollController.position.maxScrollExtent - 200;
+    if (_scrollController.position.pixels >= threshold) {
+      _loadNextPage();
+    }
+  }
+
+  Future<void> _loadFirstPage() async {
+    setState(() {
+      _isLoadingFirstPage = true;
+      _error = null;
+    });
+    try {
+      final page =
+          await ref.read(conversationRepositoryProvider).listConversations();
+      if (!mounted) return;
+      setState(() {
+        _conversations = page.results;
+        _nextCursor = page.next;
+        _isLoadingFirstPage = false;
+      });
+    } on ApiFailure catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e;
+        _isLoadingFirstPage = false;
+      });
+    }
+  }
+
+  Future<void> _loadNextPage() async {
+    final cursor = _nextCursor;
+    if (cursor == null) return;
+    setState(() => _isLoadingMore = true);
+    try {
+      final page = await ref
+          .read(conversationRepositoryProvider)
+          .listConversations(cursor: cursor);
+      if (!mounted) return;
+      setState(() {
+        _conversations = [..._conversations, ...page.results];
+        _nextCursor = page.next;
+        _isLoadingMore = false;
+      });
+    } on ApiFailure catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoadingMore = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(localizedApiError(context.l10n, e))),
+      );
+    }
+  }
+
+  void _openConversation(Conversation conversation) {
+    context.pushNamed(
+      RouteNames.chatThread,
+      pathParameters: {RouteNames.idParam: conversation.id.toString()},
+      extra: conversation,
+    );
+  }
+
+  /// STEP 4 â€” manual-testing aid only, NOT part of P-074's original
+  /// scope as written. P-074's own execution prompt assumes
+  /// conversations already exist or are started from elsewhere (e.g. a
+  /// "Message" button on a business profile screen) â€” no such entry
+  /// point exists anywhere in this codebase yet (confirmed by
+  /// inspecting `lib/features/business_profile/` directly: no
+  /// reference to `ConversationRepository`/`startConversation` anywhere
+  /// outside `lib/features/chat/` itself). Without SOME way to create a
+  /// conversation between two real test accounts, P-074's own
+  /// acceptance criteria â€” a manual two-account run against the real
+  /// backend â€” cannot be performed at all.
+  ///
+  /// This button is a deliberately minimal, clearly-temporary bridge:
+  /// it prompts for the other account's numeric user id, calls
+  /// `ConversationRepository.startConversation` (`POST
+  /// /api/v1/conversations/start/`, built in STEP 2), and hand-builds a
+  /// minimal [Conversation] from the response. That endpoint returns
+  /// only `{id, created_at, updated_at, participant_ids}` â€” see
+  /// `ConversationRepository.startConversation`'s own doc comment for
+  /// why a full [Conversation] can't be parsed from it directly â€” so
+  /// [ConversationParticipantSummary.displayName] here is a placeholder
+  /// (`"User #<id>"`), not the real resolved name. This is enough to
+  /// satisfy `app_router.dart`'s `extra is Conversation` redirect guard
+  /// and let [ChatThreadScreen] mount and function correctly (it only
+  /// needs `conversation.id` and `conversation.otherParticipant.id` â€”
+  /// see that screen's own doc comment). Re-opening the same
+  /// conversation later from this list shows the real resolved name,
+  /// since that came from `GET /api/v1/conversations/` â€” this
+  /// screen's normal fetch.
+  ///
+  /// A real "Message" entry point from a business profile (or anywhere
+  /// else) is out of P-074's scope and should replace this button in a
+  /// later part.
+  Future<void> _startTestConversation() async {
+    final recipientIdText = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: Text(dialogContext.l10n.chatTestDialogTitle),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: dialogContext.l10n.chatTestUserIdLabel,
+              hintText: dialogContext.l10n.chatTestUserIdHint,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(dialogContext.l10n.chatTestCancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(controller.text),
+              child: Text(dialogContext.l10n.chatTestStart),
+            ),
+          ],
+        );
+      },
+    );
+
+    final recipientId = int.tryParse(recipientIdText?.trim() ?? '');
+    if (recipientId == null) return;
+
+    setState(() => _isStartingTestConversation = true);
+    try {
+      final conversationId = await ref
+          .read(conversationRepositoryProvider)
+          .startConversation(recipientId: recipientId);
+      if (!mounted) return;
+      setState(() => _isStartingTestConversation = false);
+
+      final placeholderConversation = Conversation(
+        id: conversationId,
+        otherParticipant: ConversationParticipantSummary(
+          id: recipientId,
+          accountType: 'unknown',
+          displayName: context.l10n.chatTestUserPlaceholder(recipientId),
+        ),
+        lastMessage: null,
+        unreadCount: 0,
+        createdAt: DateTime.now(),
+      );
+      if (!mounted) return;
+      context.pushNamed(
+        RouteNames.chatThread,
+        pathParameters: {RouteNames.idParam: conversationId.toString()},
+        extra: placeholderConversation,
+      );
+    } on ApiFailure catch (e) {
+      if (!mounted) return;
+      setState(() => _isStartingTestConversation = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(localizedApiError(context.l10n, e))),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    return Scaffold(
+      appBar: CavalloAppBar(title: Text(l10n.chatListTitle)),
+      body: _buildBody(context),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _isStartingTestConversation ? null : _startTestConversation,
+        icon:
+            _isStartingTestConversation
+                ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+                : const Icon(Icons.add_comment_outlined),
+        label: Text(l10n.chatListNewChatTest),
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    if (_isLoadingFirstPage) {
+      return const _ConversationListSkeleton();
+    }
+    if (_error != null && _conversations.isEmpty) {
+      return ErrorStateWidget(
+        message: localizedApiError(l10n, _error),
+        onRetry: _loadFirstPage,
+      );
+    }
+    if (_conversations.isEmpty) {
+      return EmptyStateWidget(
+        icon: Icons.chat_bubble_outline,
+        message: l10n.chatListEmpty,
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: _loadFirstPage,
+      child: ListView.separated(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: _conversations.length + (_nextCursor != null ? 1 : 0),
+        separatorBuilder: (_, _) => const _RowDivider(),
+        itemBuilder: (context, index) {
+          if (index >= _conversations.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+          final conversation = _conversations[index];
+          return _ConversationTile(
+            conversation: conversation,
+            onTap: () => _openConversation(conversation),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Avatar diameter and gaps shared by the real row and its skeleton, so the
+/// loading state does not jump when the data arrives.
+const double _avatarSize = 52;
+const double _rowGap = 12;
+const double _rowPadding = 16;
+
+/// Hairline between rows, inset so it starts under the text, not the avatar
+/// (`indent` is directional: it flips in Arabic).
+class _RowDivider extends StatelessWidget {
+  const _RowDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      indent: _rowPadding + _avatarSize + _rowGap,
+      color: context.appColors.outline,
+    );
+  }
+}
+
+/// What the row shows under the name. Text always wins; a media-only or
+/// shared-content-only message falls back to a localized label. Mirrors
+/// [LastMessagePreview.previewText] (domain, English only, left untouched)
+/// with ARB strings.
+String _previewLabel(AppLocalizations l10n, LastMessagePreview? last) {
+  if (last == null) return l10n.chatListNoMessages;
+  if (last.text.isNotEmpty) return last.text;
+  switch (last.mediaType) {
+    case ChatMediaType.image:
+      return l10n.chatListPreviewPhoto;
+    case ChatMediaType.video:
+      return l10n.chatListPreviewVideo;
+    case null:
+      break;
+  }
+  switch (last.sharedContentType) {
+    case SharedContentType.post:
+      return l10n.chatListPreviewSharedPost;
+    case SharedContentType.reel:
+      return l10n.chatListPreviewSharedReel;
+    case SharedContentType.product:
+      return l10n.chatListPreviewSharedProduct;
+    case null:
+      return l10n.chatListNoMessages;
+  }
+}
+
+class _ConversationTile extends StatelessWidget {
+  const _ConversationTile({required this.conversation, required this.onTap});
+
+  final Conversation conversation;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final AppColors colors = context.appColors;
+    final TextTheme text = Theme.of(context).textTheme;
+
+    final other = conversation.otherParticipant;
+    final String displayName = other?.displayName ?? l10n.chatListUnknownUser;
+    final LastMessagePreview? lastMessage = conversation.lastMessage;
+    final int unread = conversation.unreadCount;
+    final bool hasUnread = unread > 0;
+
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsetsDirectional.symmetric(
+          horizontal: _rowPadding,
+          vertical: 10,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            AppAvatar(
+              name: displayName,
+              size: _avatarSize,
+              ringGapColor: colors.background,
+            ),
+            const SizedBox(width: _rowGap),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: text.titleSmall?.copyWith(
+                            color: colors.textPrimary,
+                            fontWeight:
+                                hasUnread ? FontWeight.w700 : FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      if (lastMessage != null) ...<Widget>[
+                        const SizedBox(width: 8),
+                        Text(
+                          AppFormatters.of(
+                            context,
+                          ).relativeTime(lastMessage.createdAt),
+                          maxLines: 1,
+                          style: text.bodySmall?.copyWith(
+                            color:
+                                hasUnread
+                                    ? colors.brandText
+                                    : colors.textSecondary,
+                            fontWeight:
+                                hasUnread ? FontWeight.w600 : FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          _previewLabel(l10n, lastMessage),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: text.bodyMedium?.copyWith(
+                            color:
+                                hasUnread
+                                    ? colors.textPrimary
+                                    : colors.textSecondary,
+                            fontWeight:
+                                hasUnread ? FontWeight.w600 : FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      if (hasUnread) ...<Widget>[
+                        const SizedBox(width: 8),
+                        _UnreadBadge(count: unread),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Brand-blue pill with the unread count (capped at `99+`). The count is also
+/// spoken as a full sentence, so the meaning never depends on colour alone.
+class _UnreadBadge extends StatelessWidget {
+  const _UnreadBadge({required this.count});
+
+  final int count;
+
+  static const int _cap = 99;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors colors = context.appColors;
+    final String label = count > _cap ? '$_cap+' : '$count';
+    return Semantics(
+      label: context.l10n.chatListUnreadLabel(count),
+      excludeSemantics: true,
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+        padding: const EdgeInsetsDirectional.symmetric(horizontal: 6),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: colors.brand,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: colors.onBrand,
+            fontWeight: FontWeight.w700,
+            height: 1.2,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// First-load placeholder: the same row anatomy as [_ConversationTile] built
+/// from [AppShimmerBox], instead of a spinner.
+class _ConversationListSkeleton extends StatelessWidget {
+  const _ConversationListSkeleton();
+
+  static const int _rows = 8;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: context.l10n.chatListLoadingLabel,
+      child: ExcludeSemantics(
+        child: ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _rows,
+          itemBuilder:
+              (context, index) => const Padding(
+                padding: EdgeInsetsDirectional.symmetric(
+                  horizontal: _rowPadding,
+                  vertical: 10,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    AppShimmerBox.circle(size: _avatarSize),
+                    SizedBox(width: _rowGap),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          AppShimmerBox(
+                            width: 140,
+                            height: 14,
+                            borderRadius: 6,
+                          ),
+                          SizedBox(height: 8),
+                          AppShimmerBox(height: 12, borderRadius: 6),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+        ),
+      ),
+    );
+  }
+}
+
+
+===== FILE: D:\Cavallo\social_commerce_app\lib\features\chat\presentation\chat_thread_screen.dart =====
+
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../../core/chat/chat_connection_manager.dart';
+import '../../../core/chat/chat_event.dart';
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/l10n/formatters.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_avatar.dart';
+import '../../../core/widgets/app_shimmer_box.dart';
+import '../../../core/network/api_failure.dart';
+import '../data/conversation_repository.dart';
+import '../../../l10n/app_localizations.dart';
+import '../data/message_repository.dart';
+import '../domain/conversation.dart';
+import '../domain/message.dart';
+import '../domain/message_status.dart';
+import '../domain/shared_content.dart';
+import 'message_bubble_widget.dart';
+import 'outbound_message_queue_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
+
+/// Part P-074 STEP 3 â€” the Message Thread screen (`/chat/:id`), replacing
+/// P-007's placeholder IN PLACE (same file; class renamed only in its
+/// constructor signature â€” see this class's own note below on why
+/// `chatId` became `conversation`).
+///
+/// ### Why this takes a full [Conversation], not just an id
+/// Determining "is this message mine or theirs" needs
+/// `conversation.otherParticipant.id` (STEP 2) â€” in a 1:1 conversation,
+/// `message.senderId != otherParticipant.id` is sufficient and means
+/// this screen never needs to know its own signed-in user id at all.
+/// That requires the full [Conversation], not just its id, so
+/// `chat_list_screen.dart` now passes the whole tapped [Conversation] as
+/// `extra:` (the same convention `app_router.dart` already uses for
+/// `QueueItem`/`Product`/`businessName`). `app_router.dart`'s `redirect`
+/// now guarantees `extra` is a [Conversation] before this screen is ever
+/// built â€” see that file's own STEP 3 diff â€” mirroring
+/// `moderationReview`'s existing `QueueItem` guard exactly.
+///
+/// ### Fetch strategy â€” documented, per this part's execution prompt
+/// - **Opening this screen** (this `State`'s `initState`, i.e. every
+///   time the user navigates into a conversation): [ConversationRepository.fetchMessageHistory]
+///   â€” a full, current snapshot from the server. No "resume" logic is
+///   needed here because a fresh screen instance always fetches fresh.
+/// - **A WebSocket reconnect while this screen stays open**
+///   ([ChatConnectionState] transitioning back to `connected` from
+///   `reconnecting`, P-073's own STEP 3 backoff/retry): [MessageRepository.fetchMessagesSince]
+///   using the highest message id already loaded, to fill exactly the
+///   gap the disconnect may have caused without re-fetching everything.
+///
+/// ### mark_delivered / mark_read â€” MVP choices, per this part's own
+/// execution prompt ("document your choice")
+/// - **delivered**: sent for every one of the OTHER participant's
+///   messages not already `delivered`/`read`, the moment they're
+///   fetched (history, fetch-since) or received (`MessageReceived`).
+/// - **read**: uses the simpler of the two offered approximations â€”
+///   everything currently loaded from the other participant, not
+///   already `read`, is marked read whenever this screen is mounted AND
+///   the app is in the foreground (tracked via [WidgetsBindingObserver],
+///   not a real per-bubble `VisibilityDetector`).
+///
+/// ### Presence â€” flagged gap, not fabricated
+/// The verified `chat_event.dart` contract (P-073) has exactly three
+/// server-push event shapes, none of which carries the OTHER
+/// participant's online/offline state, and `ConversationParticipantSummary`
+/// (STEP 2) carries no presence field either. The small label under the
+/// app bar title below therefore shows THIS DEVICE'S OWN socket
+/// connection state (`ChatConnectionState`), not real per-user presence
+/// â€” see that label's own inline comment.
+///
+/// ### Sending â€” Part P-075 STEP 3 (optimistic UI + outbound queue)
+/// Pressing send no longer awaits the REST call here. The text is
+/// handed to [OutboundMessageQueueNotifier.enqueueMessage] and the
+/// field is cleared immediately; the message shows up right away as a
+/// local [OutboundMessageBubbleWidget] at the bottom of the thread
+/// (sending / retrying / failed-tap-to-retry). When the queue reports
+/// success on [OutboundMessageQueueNotifier.sentStream], the
+/// server-confirmed [Message] is upserted into [_messagesById] and the
+/// local bubble is already gone (the queue removes it first).
+///
+/// The queue provider is NOT autoDispose (P-051's same choice), so a
+/// message still retrying when the user leaves this screen keeps
+/// retrying; on re-entry its pending bubble reappears from the queue.
+/// If it succeeds while no thread screen is open, nothing is lost â€” the
+/// next open's history fetch includes it.
+///
+/// Only pending bubbles for THIS conversation are shown. If history
+/// failed to load but pending messages exist, the message list is shown
+/// (with those pending bubbles) instead of the history-error view, so a
+/// failed send is never hidden behind an error screen.
+///
+/// ### BUGFIX (found by P-075 STEP 4's widget tests)
+/// `dispose()` used to call `ref.read(chatConnectionManagerProvider)`.
+/// Riverpod 3 forbids using `ref` once the element is being unmounted
+/// (`Bad state: Using "ref" when a widget is about to or has been
+/// unmounted is unsafe`), so that line threw and the REST of `dispose()`
+/// never ran: the WebSocket was never disconnected and the text/scroll
+/// controllers were never disposed. The manager is now cached in
+/// [_chatManager] during `initState` (when `ref` is still valid) and
+/// `dispose()` uses that field instead.
+class ChatThreadScreen extends ConsumerStatefulWidget {
+  const ChatThreadScreen({super.key, required this.conversation});
+
+  final Conversation conversation;
+
+  @override
+  ConsumerState<ChatThreadScreen> createState() => _ChatThreadScreenState();
+}
+
+class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
+    with WidgetsBindingObserver {
+  final _textController = TextEditingController();
+  final _scrollController = ScrollController();
+
+  /// Cached in `initState` so `dispose()` never has to touch `ref`
+  /// (see this class's BUGFIX note above).
+  late final ChatConnectionManager _chatManager;
+
+  /// Keyed by message id â€” makes upsert/dedupe O(1) and cheaply absorbs
+  /// a `MessageReceived` echo of a message this device itself just sent
+  /// via REST (flagged: `chat_event.dart`'s own doc comment only
+  /// confirms self-exclusion for `typing_indicator` specifically, not
+  /// `chat_message` â€” this dedupe is a defensive choice, not an assumed
+  /// guarantee either way).
+  final Map<int, Message> _messagesById = {};
+
+  StreamSubscription<ChatEvent>? _eventSubscription;
+  StreamSubscription<ChatConnectionState>? _connectionSubscription;
+  StreamSubscription<OutboundMessageSent>? _sentSubscription;
+  ChatConnectionState _connectionState = ChatConnectionState.disconnected;
+  bool _hasConnectedOnce = false;
+
+  bool _isLoadingHistory = true;
+  bool _isAppInForeground = true;
+  bool _otherIsTyping = false;
+  Timer? _typingTimeoutTimer;
+  Timer? _stopTypingTimer;
+
+  ApiFailure? _historyError;
+
+  int get _conversationId => widget.conversation.id;
+  int? get _otherParticipantId => widget.conversation.otherParticipant?.id;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _chatManager = ref.read(chatConnectionManagerProvider);
+    _sentSubscription = ref
+        .read(outboundMessageQueueProvider.notifier)
+        .sentStream
+        .listen(_handleOutboundSent);
+    _connect();
+    _loadHistory();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _typingTimeoutTimer?.cancel();
+    _stopTypingTimer?.cancel();
+    _eventSubscription?.cancel();
+    _connectionSubscription?.cancel();
+    _sentSubscription?.cancel();
+    // Uses the cached [_chatManager], NOT `ref.read` â€” `ref` is unsafe
+    // to use during dispose (see this class's BUGFIX note).
+    _chatManager.sendTyping(false);
+    // A deliberate close, per this part's execution prompt ("On leaving
+    // the screen, call disconnect()"). Fire-and-forget is correct here â€”
+    // this widget is already unmounting.
+    unawaited(_chatManager.disconnect());
+    _textController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _isAppInForeground = state == AppLifecycleState.resumed;
+    if (_isAppInForeground) {
+      _markVisibleMessagesAsRead();
+    }
+  }
+
+  void _connect() {
+    final manager = _chatManager;
+    _connectionSubscription = manager.connectionState.listen((state) {
+      if (!mounted) return;
+      final wasConnected = _connectionState == ChatConnectionState.connected;
+      setState(() => _connectionState = state);
+      if (state == ChatConnectionState.connected) {
+        if (_hasConnectedOnce && !wasConnected) {
+          _catchUpAfterReconnect();
+        }
+        _hasConnectedOnce = true;
+      }
+    });
+    _eventSubscription = manager.eventStream.listen(_handleEvent);
+    unawaited(manager.connect(_conversationId));
+  }
+
+  Future<void> _loadHistory() async {
+    setState(() {
+      _isLoadingHistory = true;
+      _historyError = null;
+    });
+    try {
+      final page = await ref
+          .read(conversationRepositoryProvider)
+          .fetchMessageHistory(_conversationId);
+      if (!mounted) return;
+      // Wire order is newest-first â€” reversed here into oldest-to-newest
+      // (the on-screen order), exactly as `fetchMessageHistory`'s own
+      // doc comment says is this layer's job, not the data layer's.
+      for (final message in page.results.reversed) {
+        _messagesById[message.id] = message;
+      }
+      setState(() => _isLoadingHistory = false);
+      _markDeliveredForLoadedMessages();
+      _markVisibleMessagesAsRead();
+      _scrollToBottomSoon();
+    } on ApiFailure catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _historyError = e;
+        _isLoadingHistory = false;
+      });
+    }
+  }
+
+  Future<void> _catchUpAfterReconnect() async {
+    if (_messagesById.isEmpty) return;
+    final maxId = _messagesById.keys.reduce((a, b) => a > b ? a : b);
+    try {
+      final missed = await ref
+          .read(messageRepositoryProvider)
+          .fetchMessagesSince(
+            conversationId: _conversationId,
+            sinceMessageId: maxId,
+          );
+      if (!mounted || missed.isEmpty) return;
+      setState(() {
+        for (final message in missed) {
+          _messagesById[message.id] = message;
+        }
+      });
+      _markDeliveredForLoadedMessages();
+      _markVisibleMessagesAsRead();
+      _scrollToBottomSoon();
+    } on ApiFailure catch (_) {
+      // Best-effort: a fresh screen open, or the next reconnect, will
+      // retry. Not surfaced as an error banner â€” from the user's
+      // perspective the connection is back up.
+    }
+  }
+
+  void _markDeliveredForLoadedMessages() {
+    final manager = _chatManager;
+    for (final message in _messagesById.values) {
+      if (message.senderId == _otherParticipantId &&
+          message.status == MessageStatus.sent) {
+        manager.sendMarkDelivered(message.id);
+      }
+    }
+  }
+
+  void _markVisibleMessagesAsRead() {
+    if (!_isAppInForeground) return;
+    final manager = _chatManager;
+    for (final message in _messagesById.values) {
+      if (message.senderId == _otherParticipantId &&
+          message.status != MessageStatus.read) {
+        manager.sendMarkRead(message.id);
+      }
+    }
+  }
+
+  void _handleEvent(ChatEvent event) {
+    if (!mounted) return;
+    switch (event) {
+      case MessageReceived():
+        setState(() {
+          _messagesById[event.id] = Message(
+            id: event.id,
+            conversationId: event.conversationId,
+            senderId: event.senderId,
+            text: event.text,
+            status: MessageStatus.fromRaw(event.status),
+            createdAt: event.createdAt,
+            mediaUrl: event.mediaUrl,
+            mediaType: ChatMediaType.fromRaw(event.mediaType),
+            sharedContent: SharedContent.tryParse(event.sharedContent),
+          );
+        });
+        _markDeliveredForLoadedMessages();
+        _markVisibleMessagesAsRead();
+        _scrollToBottomSoon();
+      case StatusUpdate():
+        final existing = _messagesById[event.messageId];
+        if (existing != null) {
+          setState(() {
+            _messagesById[event.messageId] = existing.copyWithStatus(
+              MessageStatus.fromRaw(event.status),
+            );
+          });
+        }
+      case TypingIndicator():
+        _typingTimeoutTimer?.cancel();
+        setState(() => _otherIsTyping = event.isTyping);
+        if (event.isTyping) {
+          // Safety net if the paired "false" frame never arrives â€”
+          // comfortably longer than _onTextChanged's own 2s debounce.
+          _typingTimeoutTimer = Timer(const Duration(seconds: 5), () {
+            if (mounted) setState(() => _otherIsTyping = false);
+          });
+        }
+    }
+  }
+
+  /// Part P-075 STEP 3 â€” a queued message reached the server. The queue
+  /// has already removed its local pending bubble; this puts the real,
+  /// server-confirmed [Message] into the thread. Ignores messages that
+  /// belong to a different conversation (the queue is app-wide).
+  void _handleOutboundSent(OutboundMessageSent event) {
+    if (!mounted) return;
+    if (event.message.conversationId != _conversationId) return;
+    setState(() {
+      _messagesById[event.message.id] = event.message;
+    });
+    _scrollToBottomSoon();
+  }
+
+  void _onTextChanged(String text) {
+    final manager = _chatManager;
+    _stopTypingTimer?.cancel();
+    if (text.isEmpty) {
+      manager.sendTyping(false);
+      return;
+    }
+    manager.sendTyping(true);
+    _stopTypingTimer = Timer(
+      const Duration(seconds: 2),
+      () => manager.sendTyping(false),
+    );
+  }
+
+  /// Part P-075 STEP 3 â€” optimistic send: hands the text to the
+  /// outbound queue and clears the field immediately. The queue owns
+  /// the real REST call, retries and the failed state.
+  void _sendMessage() {
+    final text = _textController.text.trim();
+    if (text.isEmpty) return;
+
+    _stopTypingTimer?.cancel();
+    _chatManager.sendTyping(false);
+
+    ref
+        .read(outboundMessageQueueProvider.notifier)
+        .enqueueMessage(conversationId: _conversationId, text: text);
+    _textController.clear();
+    _scrollToBottomSoon();
+  }
+
+  /// Part P-076 â€” client-side size caps. MUST stay in sync with the
+  /// backend's `CHAT_IMAGE_MAX_BYTES` / `CHAT_VIDEO_MAX_BYTES`
+  /// (`chat/serializers.py`): 5 MB image / 25 MB video. The backend is
+  /// still the final authority (`validate_upload()`); this pre-check only
+  /// avoids uploading a file that is already known to be rejected.
+  static const _maxImageBytes = 5 * 1024 * 1024;
+  static const _maxVideoBytes = 25 * 1024 * 1024;
+
+  /// Part P-076 â€” the attach button: a small sheet to choose Photo or
+  /// Video, then [_pickAndEnqueueMedia].
+  Future<void> _showAttachSheet() async {
+    final choice = await showModalBottomSheet<ChatMediaType>(
+      context: context,
+      builder:
+          (sheetContext) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  key: const Key('chatAttach_photo'),
+                  leading: const Icon(Icons.photo_outlined),
+                  title: Text(sheetContext.l10n.chatAttachPhoto),
+                  onTap:
+                      () => Navigator.of(sheetContext).pop(ChatMediaType.image),
+                ),
+                ListTile(
+                  key: const Key('chatAttach_video'),
+                  leading: const Icon(Icons.videocam_outlined),
+                  title: Text(sheetContext.l10n.chatAttachVideo),
+                  onTap:
+                      () => Navigator.of(sheetContext).pop(ChatMediaType.video),
+                ),
+              ],
+            ),
+          ),
+    );
+    if (choice == null || !mounted) return;
+    await _pickAndEnqueueMedia(choice);
+  }
+
+  /// Part P-076 â€” picks a file (same `image_picker` calls as
+  /// `story_creation_screen.dart`), rejects an over-cap file with a
+  /// SnackBar, and otherwise hands it to the SAME outbound queue as text
+  /// messages. Whatever is typed in the composer is sent as the caption.
+  Future<void> _pickAndEnqueueMedia(ChatMediaType type) async {
+    final picker = ImagePicker();
+    final XFile? picked =
+        type == ChatMediaType.image
+            ? await picker.pickImage(
+              source: ImageSource.gallery,
+              imageQuality: 85,
+              maxWidth: 1920,
+            )
+            : await picker.pickVideo(source: ImageSource.gallery);
+    if (picked == null || !mounted) return;
+
+    final size = await File(picked.path).length();
+    if (!mounted) return;
+    final limit = type == ChatMediaType.image ? _maxImageBytes : _maxVideoBytes;
+    if (size > limit) {
+      final l10n = context.l10n;
+      final maxMb = limit ~/ (1024 * 1024);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            type == ChatMediaType.image
+                ? l10n.chatPhotoTooLarge(maxMb)
+                : l10n.chatVideoTooLarge(maxMb),
+          ),
+        ),
+      );
+      return;
+    }
+
+    _stopTypingTimer?.cancel();
+    _chatManager.sendTyping(false);
+
+    final caption = _textController.text.trim();
+    ref
+        .read(outboundMessageQueueProvider.notifier)
+        .enqueueMediaMessage(
+          conversationId: _conversationId,
+          text: caption,
+          mediaPath: picked.path,
+          mediaType: type,
+        );
+    _textController.clear();
+    _scrollToBottomSoon();
+  }
+
+  void _scrollToBottomSoon() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
+  String _connectionLabel(AppLocalizations l10n) {
+    switch (_connectionState) {
+      case ChatConnectionState.connected:
+        return l10n.chatConnectionOnline;
+      case ChatConnectionState.connecting:
+        return l10n.chatConnectionConnecting;
+      case ChatConnectionState.reconnecting:
+        return l10n.chatConnectionReconnecting;
+      case ChatConnectionState.disconnected:
+        return l10n.chatConnectionOffline;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final AppColors colors = context.appColors;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final displayName =
+        widget.conversation.otherParticipant?.displayName ??
+        l10n.chatThreadFallbackTitle;
+    final sortedMessages =
+        _messagesById.values.toList()
+          ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final pending =
+        ref
+            .watch(outboundMessageQueueProvider)
+            .where((m) => m.conversationId == _conversationId)
+            .toList()
+          ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+    return Scaffold(
+      appBar: CavalloAppBar(
+        title: Row(
+          children: [
+            AppAvatar(name: displayName, size: 36),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    displayName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.titleSmall?.copyWith(
+                      color: colors.textPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  // See this class's own top doc comment ("Presence â€” flagged
+                  // gap, not fabricated"): this is OUR OWN socket state, not
+                  // the other participant's real presence. No online dot.
+                  Text(
+                    _otherIsTyping
+                        ? l10n.chatThreadTyping
+                        : _connectionLabel(l10n),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodySmall?.copyWith(
+                      color:
+                          _otherIsTyping
+                              ? colors.brandText
+                              : colors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(child: _buildMessageList(sortedMessages, pending)),
+          if (_otherIsTyping) const _TypingBubble(),
+          _buildComposer(),
+        ],
+      ),
+    );
+  }
+
+  /// Flat, ordered rows for the list: a date separator whenever the calendar
+  /// day changes, then the confirmed messages, then this conversation's
+  /// pending outbound messages. Presentation only.
+  List<_ThreadItem> _buildItems(
+    List<Message> messages,
+    List<OutboundMessage> pending,
+  ) {
+    final List<_ThreadItem> items = <_ThreadItem>[];
+    DateTime? currentDay;
+
+    void startDayIfNeeded(DateTime createdAt) {
+      final DateTime local = createdAt.toLocal();
+      final DateTime day = DateTime(local.year, local.month, local.day);
+      if (currentDay != day) {
+        items.add(_DateItem(day));
+        currentDay = day;
+      }
+    }
+
+    for (final Message message in messages) {
+      startDayIfNeeded(message.createdAt);
+      items.add(_MessageItem(message, message.senderId != _otherParticipantId));
+    }
+    for (final OutboundMessage outbound in pending) {
+      startDayIfNeeded(outbound.createdAt);
+      items.add(_OutboundItem(outbound));
+    }
+    return items;
+  }
+
+  Widget _buildMessageList(
+    List<Message> messages,
+    List<OutboundMessage> pending,
+  ) {
+    if (_isLoadingHistory) {
+      return const _ThreadSkeleton();
+    }
+    if (_historyError != null && messages.isEmpty && pending.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(_historyError!.message, textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _loadHistory,
+              child: Text(context.l10n.commonRetry),
+            ),
+          ],
+        ),
+      );
+    }
+    if (messages.isEmpty && pending.isEmpty) {
+      return Center(
+        child: Text(
+          context.l10n.chatThreadEmpty,
+          style: TextStyle(color: context.appColors.textSecondary),
+        ),
+      );
+    }
+
+    final queue = ref.read(outboundMessageQueueProvider.notifier);
+    final List<_ThreadItem> items = _buildItems(messages, pending);
+    return ListView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final _ThreadItem item = items[index];
+        switch (item) {
+          case _DateItem():
+            return _DateSeparator(date: item.date);
+          case _MessageItem():
+            return MessageBubbleWidget(
+              message: item.message,
+              isMine: item.isMine,
+              isFirstInGroup: _isGroupStart(items, index),
+              isLastInGroup: _isGroupEnd(items, index),
+            );
+          case _OutboundItem():
+            final outbound = item.outbound;
+            return OutboundMessageBubbleWidget(
+              key: ValueKey('outbound_bubble_${outbound.id}'),
+              outbound: outbound,
+              isFirstInGroup: _isGroupStart(items, index),
+              isLastInGroup: _isGroupEnd(items, index),
+              onRetry: () => queue.retryFailedMessage(outbound.id),
+              onDiscard: () => queue.discardFailedMessage(outbound.id),
+            );
+        }
+      },
+    );
+  }
+
+  Widget _buildComposer() {
+    final AppColors colors = context.appColors;
+    final OutlineInputBorder pill = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(24),
+      borderSide: BorderSide.none,
+    );
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colors.outline)),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            children: [
+              IconButton(
+                key: const Key('chatComposer_attachButton'),
+                icon: Icon(Icons.attach_file, color: colors.textSecondary),
+                onPressed: _showAttachSheet,
+              ),
+              Expanded(
+                child: TextField(
+                  controller: _textController,
+                  onChanged: _onTextChanged,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: (_) => _sendMessage(),
+                  decoration: InputDecoration(
+                    hintText: context.l10n.chatComposerHint,
+                    filled: true,
+                    fillColor: colors.surfaceVariant,
+                    isDense: true,
+                    border: pill,
+                    enabledBorder: pill,
+                    focusedBorder: pill,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Icons.send mirrors in RTL (matchTextDirection).
+              IconButton(
+                icon: const Icon(Icons.send, size: 20),
+                style: IconButton.styleFrom(
+                  backgroundColor: colors.brand,
+                  foregroundColor: colors.onBrand,
+                ),
+                onPressed: _sendMessage,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Presentation-only helpers (Part P-115 STEP 3B). No send / queue / delivery
+// logic below this line.
+// ---------------------------------------------------------------------------
+
+sealed class _ThreadItem {
+  const _ThreadItem();
+}
+
+final class _DateItem extends _ThreadItem {
+  const _DateItem(this.date);
+
+  final DateTime date;
+}
+
+final class _MessageItem extends _ThreadItem {
+  const _MessageItem(this.message, this.isMine);
+
+  final Message message;
+  final bool isMine;
+}
+
+final class _OutboundItem extends _ThreadItem {
+  const _OutboundItem(this.outbound);
+
+  final OutboundMessage outbound;
+}
+
+/// Who a row belongs to: true = me, false = the other person, null = not a
+/// bubble (a date separator, which also ends a group).
+bool? _mineOf(_ThreadItem item) => switch (item) {
+  _DateItem() => null,
+  _MessageItem(:final isMine) => isMine,
+  _OutboundItem() => true,
+};
+
+bool _isGroupStart(List<_ThreadItem> items, int index) =>
+    index == 0 || _mineOf(items[index - 1]) != _mineOf(items[index]);
+
+bool _isGroupEnd(List<_ThreadItem> items, int index) =>
+    index == items.length - 1 ||
+    _mineOf(items[index + 1]) != _mineOf(items[index]);
+
+class _DateSeparator extends StatelessWidget {
+  const _DateSeparator({required this.date});
+
+  final DateTime date;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors colors = context.appColors;
+    return Center(
+      child: Container(
+        key: const ValueKey('chatThread_dateSeparator'),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        decoration: BoxDecoration(
+          color: colors.surfaceVariant,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          AppFormatters(context.l10n).absoluteDate(date),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colors.textSecondary),
+        ),
+      ),
+    );
+  }
+}
+
+/// "The other person is typing": three STATIC dots in a received-style
+/// bubble. Deliberately not animated (no new animation in this phase, and it
+/// keeps the golden deterministic).
+class _TypingBubble extends StatelessWidget {
+  const _TypingBubble();
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors colors = context.appColors;
+    Widget dot(double alpha) => Container(
+      width: 7,
+      height: 7,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: colors.textSecondary.withValues(alpha: alpha),
+      ),
+    );
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Semantics(
+        label: context.l10n.chatThreadTyping,
+        child: Container(
+          key: const ValueKey('chatThread_typingDots'),
+          margin: const EdgeInsetsDirectional.fromSTEB(12, 2, 12, 6),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: colors.surfaceVariant,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              dot(0.4),
+              const SizedBox(width: 4),
+              dot(0.7),
+              const SizedBox(width: 4),
+              dot(1),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ThreadSkeleton extends StatelessWidget {
+  const _ThreadSkeleton();
+
+  static const int _rows = 6;
+
+  @override
+  Widget build(BuildContext context) {
+    return ExcludeSemantics(
+      child: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: _rows,
+        itemBuilder: (context, index) {
+          final bool mine = index.isOdd;
+          return Padding(
+            padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: 12,
+              vertical: 6,
+            ),
+            child: Align(
+              alignment:
+                  mine
+                      ? AlignmentDirectional.centerEnd
+                      : AlignmentDirectional.centerStart,
+              child: AppShimmerBox(
+                width: index % 3 == 0 ? 220 : 160,
+                height: 40,
+                borderRadius: 20,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+
+===== FILE: D:\Cavallo\social_commerce_app\lib\features\chat\presentation\message_bubble_widget.dart =====
+
+import 'dart:io';
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/theme/app_colors.dart';
+import '../domain/message.dart';
+import '../domain/message_status.dart';
+import '../domain/shared_content.dart';
+import 'outbound_message_queue_provider.dart';
+import 'shared_content_card.dart';
+
+/// Chat bubbles.
+///
+/// Part P-115 STEP 3A: restyle only. Own bubbles are brand blue with white
+/// text, received bubbles use surfaceVariant, corners are 20 with the corners
+/// on the sender's side tightened to 4 between consecutive messages from the
+/// same sender (grouping is decided by the caller and passed in as
+/// [MessageBubbleWidget.isFirstInGroup] / [MessageBubbleWidget.isLastInGroup];
+/// it is presentation only). Everything is directional, so the layout mirrors
+/// in Arabic. No send / queue / delivery logic lives here.
+
+const double _bubbleRadius = 20;
+const double _groupedRadius = 4;
+
+BorderRadiusDirectional _radiusFor({
+  required bool isMine,
+  required bool isFirstInGroup,
+  required bool isLastInGroup,
+}) {
+  const Radius big = Radius.circular(_bubbleRadius);
+  final Radius top = Radius.circular(
+    isFirstInGroup ? _bubbleRadius : _groupedRadius,
+  );
+  final Radius bottom = Radius.circular(
+    isLastInGroup ? _bubbleRadius : _groupedRadius,
+  );
+  if (isMine) {
+    return BorderRadiusDirectional.only(
+      topStart: big,
+      bottomStart: big,
+      topEnd: top,
+      bottomEnd: bottom,
+    );
+  }
+  return BorderRadiusDirectional.only(
+    topStart: top,
+    bottomStart: bottom,
+    topEnd: big,
+    bottomEnd: big,
+  );
+}
+
+/// The colours of one bubble, all taken from [AppColors].
+class _Tone {
+  const _Tone({
+    required this.background,
+    required this.text,
+    required this.meta,
+    required this.readTick,
+  });
+
+  final Color background;
+  final Color text;
+  final Color meta;
+  final Color readTick;
+}
+
+_Tone _toneFor(AppColors c, {required bool isMine, bool isFailed = false}) {
+  if (isFailed) {
+    return _Tone(
+      background: c.dangerSubtle,
+      text: c.dangerText,
+      meta: c.dangerText.withValues(alpha: 0.8),
+      readTick: c.dangerText,
+    );
+  }
+  if (isMine) {
+    return _Tone(
+      background: c.brand,
+      text: c.onBrand,
+      meta: c.onBrand.withValues(alpha: 0.75),
+      readTick: c.onBrand,
+    );
+  }
+  return _Tone(
+    background: c.surfaceVariant,
+    text: c.textPrimary,
+    meta: c.textSecondary,
+    readTick: c.brandText,
+  );
+}
+
+/// For a time / tick line that sits on the page, outside any bubble.
+_Tone _toneOnBackground(AppColors c) {
+  return _Tone(
+    background: Colors.transparent,
+    text: c.textPrimary,
+    meta: c.textSecondary,
+    readTick: c.brandText,
+  );
+}
+
+class MessageBubbleWidget extends StatelessWidget {
+  const MessageBubbleWidget({
+    super.key,
+    required this.message,
+    required this.isMine,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
+  });
+
+  final Message message;
+  final bool isMine;
+
+  /// First message of a run from the same sender (full top corners).
+  final bool isFirstInGroup;
+
+  /// Last message of a run from the same sender (full bottom corners).
+  final bool isLastInGroup;
+
+  @override
+  Widget build(BuildContext context) {
+    final shared = message.sharedContent;
+    if (shared != null) {
+      return _SharedContentBubble(
+        message: message,
+        shared: shared,
+        isMine: isMine,
+        isFirstInGroup: isFirstInGroup,
+        isLastInGroup: isLastInGroup,
+      );
+    }
+
+    final mediaType = message.mediaType;
+    return _BubbleShell(
+      text: message.text,
+      isMine: isMine,
+      isFirstInGroup: isFirstInGroup,
+      isLastInGroup: isLastInGroup,
+      media:
+          mediaType == null
+              ? null
+              : _MediaPreview(type: mediaType, networkUrl: message.mediaUrl),
+      footerBuilder: (tone) => _deliveredFooter(message, isMine, tone),
+    );
+  }
+}
+
+Widget _deliveredFooter(Message message, bool isMine, _Tone tone) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(
+        _formatTime(message.createdAt),
+        style: TextStyle(color: tone.meta, fontSize: 11),
+      ),
+      if (isMine) ...[
+        const SizedBox(width: 4),
+        _StatusIcon(status: message.status, tone: tone),
+      ],
+    ],
+  );
+}
+
+class _SharedContentBubble extends StatelessWidget {
+  const _SharedContentBubble({
+    required this.message,
+    required this.shared,
+    required this.isMine,
+    required this.isFirstInGroup,
+    required this.isLastInGroup,
+  });
+
+  final Message message;
+  final SharedContent shared;
+  final bool isMine;
+  final bool isFirstInGroup;
+  final bool isLastInGroup;
+
+  @override
+  Widget build(BuildContext context) {
+    // Same 75%-of-screen rule as the text bubble, capped so a card is
+    // never absurdly wide on a tablet.
+    final cardWidth = math.min(MediaQuery.of(context).size.width * 0.75, 300.0);
+    final bool hasText = message.text.isNotEmpty;
+
+    return Column(
+      crossAxisAlignment:
+          isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: EdgeInsetsDirectional.fromSTEB(
+            12,
+            isFirstInGroup ? 6 : 2,
+            12,
+            0,
+          ),
+          child: SizedBox(
+            width: cardWidth,
+            child: SharedContentCard(sharedContent: shared),
+          ),
+        ),
+        if (hasText)
+          _BubbleShell(
+            text: message.text,
+            isMine: isMine,
+            // The text bubble is attached under the card.
+            isFirstInGroup: false,
+            isLastInGroup: isLastInGroup,
+            footerBuilder: (tone) => _deliveredFooter(message, isMine, tone),
+          )
+        else
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 4, 16, 6),
+            child: _deliveredFooter(
+              message,
+              isMine,
+              _toneOnBackground(context.appColors),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class OutboundMessageBubbleWidget extends StatelessWidget {
+  const OutboundMessageBubbleWidget({
+    super.key,
+    required this.outbound,
+    required this.onRetry,
+    required this.onDiscard,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
+  });
+
+  final OutboundMessage outbound;
+  final VoidCallback onRetry;
+  final VoidCallback onDiscard;
+
+  final bool isFirstInGroup;
+  final bool isLastInGroup;
+
+  @override
+  Widget build(BuildContext context) {
+    final isFailed = outbound.status == OutboundMessageStatus.failed;
+    final mediaType = outbound.mediaType;
+
+    return _BubbleShell(
+      text: outbound.text,
+      isMine: true,
+      isFailed: isFailed,
+      isFirstInGroup: isFirstInGroup,
+      isLastInGroup: isLastInGroup,
+      onTap: isFailed ? onRetry : null,
+      tapKey: isFailed ? ValueKey('outbound_retry_${outbound.id}') : null,
+      media:
+          mediaType == null
+              ? null
+              : _MediaPreview(type: mediaType, localPath: outbound.mediaPath),
+      footerBuilder: (tone) {
+        if (isFailed) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.error_outline, size: 14, color: tone.text),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      context.l10n.chatBubbleFailedTapRetry,
+                      style: TextStyle(
+                        color: tone.text,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    key: ValueKey('outbound_discard_${outbound.id}'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onDiscard,
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Icon(Icons.close, size: 16, color: tone.text),
+                    ),
+                  ),
+                ],
+              ),
+              if (outbound.errorMessage != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  outbound.errorMessage!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(color: tone.meta, fontSize: 10),
+                ),
+              ],
+            ],
+          );
+        }
+
+        final isRetrying = outbound.status == OutboundMessageStatus.retrying;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _formatTime(outbound.createdAt),
+              style: TextStyle(color: tone.meta, fontSize: 11),
+            ),
+            if (isRetrying) ...[
+              const SizedBox(width: 4),
+              Text(
+                context.l10n.chatBubbleRetrying,
+                style: TextStyle(color: tone.meta, fontSize: 11),
+              ),
+            ],
+            const SizedBox(width: 4),
+            Icon(Icons.schedule, size: 14, color: tone.meta),
+          ],
+        );
+      },
+    );
+  }
+}
+
+String _formatTime(DateTime dt) {
+  final local = dt.toLocal();
+  final hour = local.hour.toString().padLeft(2, '0');
+  final minute = local.minute.toString().padLeft(2, '0');
+  return '$hour:$minute';
+}
+
+class _BubbleShell extends StatelessWidget {
+  const _BubbleShell({
+    required this.text,
+    required this.isMine,
+    required this.footerBuilder,
+    this.media,
+    this.isFailed = false,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
+    this.onTap,
+    this.tapKey,
+  });
+
+  final String text;
+  final bool isMine;
+  final Widget Function(_Tone tone) footerBuilder;
+  final Widget? media;
+  final bool isFailed;
+  final bool isFirstInGroup;
+  final bool isLastInGroup;
+  final VoidCallback? onTap;
+  final Key? tapKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors colors = context.appColors;
+    final _Tone tone = _toneFor(colors, isMine: isMine, isFailed: isFailed);
+
+    final bubble = Container(
+      margin: EdgeInsetsDirectional.fromSTEB(
+        12,
+        isFirstInGroup ? 6 : 1,
+        12,
+        isLastInGroup ? 6 : 1,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        color: tone.background,
+        borderRadius: _radiusFor(
+          isMine: isMine,
+          isFirstInGroup: isFirstInGroup,
+          isLastInGroup: isLastInGroup,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (media != null) media!,
+          if (media != null && text.isNotEmpty) const SizedBox(height: 6),
+          if (text.isNotEmpty)
+            Text(
+              text,
+              style: TextStyle(color: tone.text, fontSize: 15, height: 1.35),
+            ),
+          const SizedBox(height: 4),
+          footerBuilder(tone),
+        ],
+      ),
+    );
+
+    return Align(
+      alignment:
+          isMine
+              ? AlignmentDirectional.centerEnd
+              : AlignmentDirectional.centerStart,
+      child:
+          onTap == null
+              ? bubble
+              : GestureDetector(
+                key: tapKey,
+                behavior: HitTestBehavior.opaque,
+                onTap: onTap,
+                child: bubble,
+              ),
+    );
+  }
+}
+
+class _MediaPreview extends StatelessWidget {
+  const _MediaPreview({required this.type, this.networkUrl, this.localPath});
+
+  final ChatMediaType type;
+  final String? networkUrl;
+  final String? localPath;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors colors = context.appColors;
+
+    Widget placeholder(IconData icon) => Container(
+      color: colors.surfaceVariant,
+      alignment: Alignment.center,
+      child: Icon(icon, size: 40, color: colors.textSecondary),
+    );
+
+    final Widget content;
+    final path = localPath;
+    final url = networkUrl;
+    if (type == ChatMediaType.video) {
+      content = Stack(
+        fit: StackFit.expand,
+        children: [placeholder(Icons.movie_outlined), const _PlayIconOverlay()],
+      );
+    } else if (path != null) {
+      content = Image.file(
+        File(path),
+        fit: BoxFit.cover,
+        errorBuilder:
+            (context, error, stackTrace) =>
+                placeholder(Icons.broken_image_outlined),
+      );
+    } else if (url != null && url.isNotEmpty) {
+      content = Image.network(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder:
+            (context, error, stackTrace) =>
+                placeholder(Icons.broken_image_outlined),
+      );
+    } else {
+      content = placeholder(Icons.image_outlined);
+    }
+
+    return ConstrainedBox(
+      key: ValueKey('chatMedia_${type.name}'),
+      constraints: const BoxConstraints(maxWidth: 200),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: AspectRatio(aspectRatio: 4 / 3, child: content),
+      ),
+    );
+  }
+}
+
+class _PlayIconOverlay extends StatelessWidget {
+  const _PlayIconOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.45),
+          shape: BoxShape.circle,
+        ),
+        padding: const EdgeInsets.all(10),
+        child: const Icon(Icons.play_arrow, color: Colors.white, size: 32),
+      ),
+    );
+  }
+}
+
+class _StatusIcon extends StatelessWidget {
+  const _StatusIcon({required this.status, required this.tone});
+
+  final MessageStatus status;
+  final _Tone tone;
+
+  @override
+  Widget build(BuildContext context) {
+    // Sent = one tick, delivered = two ticks, read = two ticks in the
+    // emphasised colour. The tick COUNT separates sent from the rest; read
+    // is the full-strength tick.
+    switch (status) {
+      case MessageStatus.read:
+        return Icon(Icons.done_all, size: 14, color: tone.readTick);
+      case MessageStatus.delivered:
+        return Icon(Icons.done_all, size: 14, color: tone.meta);
+      case MessageStatus.sent:
+      case MessageStatus.unknown:
+        return Icon(Icons.done, size: 14, color: tone.meta);
+    }
+  }
+}
+
+
+===== FILE: D:\Cavallo\social_commerce_app\lib\features\content\presentation\reel_form_screen.dart =====
+
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
+
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/network/api_failure.dart';
+import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_text_field.dart';
+import 'own_content_provider.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
+
+/// Part P-044 scope: `lib/features/content/presentation/
+/// reel_form_screen.dart` - the Reel creation form (caption + required
+/// video), calling `OwnContentNotifier.createReel` (STEP 4 of this
+/// part) - always a multipart request, since `content.models.Reel.video`
+/// is REQUIRED (no `null=True`/`blank=True`, unlike `Post.image`) and
+/// `content.serializers.ReelSerializer.validate_video` always runs.
+///
+/// Create-only, same reasoning as `PostFormScreen` - this part's spec
+/// asks only for creation screens, and `ReelDetailView`'s PATCH (Part
+/// P-042) has no Flutter caller in this part's scope either.
+///
+/// ### Upload UX pattern - reused/adapted from `ProductFormScreen`
+/// (Part P-033), per this part's own spec, adapted for video:
+/// * `image_picker`'s `pickVideo(source: ImageSource.gallery)` - the
+///   same package already used for Post's/Product's image picking,
+///   just its video-picking method instead of `pickImage`. No new
+///   dependency added.
+/// * The picked video gets a real inline preview (tap to play/pause,
+///   looping, muted) built on `video_player` - the same package the Reel
+///   viewer uses - plus the file size. If the preview cannot be created on a
+///   device it falls back to a static "video selected" box; uploading is
+///   never blocked by the preview.
+/// * Large uploads can take minutes: `ReelRepositoryImpl.createReel` uses long
+///   per-request timeouts and this screen shows an "uploading" hint.
+/// * A Reel has no "existing video" branch to preview either
+///   (create-only, same as Post) - the preview only ever has the two
+///   states just described (none picked yet / one picked).
+/// * Field-level backend errors read from a [ValidationFailure]'s
+///   `fields` map, keyed by `content.serializers.ReelSerializer`'s own
+///   field names (`caption`, `video`) - same `switch (failure)` shape
+///   as `PostFormScreen._submit`'s catch block. A missing video is
+///   additionally caught client-side, before ever calling the
+///   repository - see [_submit]'s own guard, since `video` has no
+///   [TextEditingController]/[FormField] for `Form.validate()` to run
+///   against the way [AppTextField]'s caption does.
+///
+/// ### Navigation - same deliberate, flagged choice as
+/// `PostFormScreen`/`ProductFormScreen`
+///
+/// No `RouteNames` dependency (STEP 8 of this part wires the route
+/// in). On success, calls `Navigator.of(context).pop(true)`;
+/// `ContentListScreen`'s `onCreateReel` callback (Part P-044 STEP 5)
+/// is the seam that will eventually push this screen.
+///
+/// ### Why the created Reel doesn't need to be polled from here
+///
+/// A successful `createReel` returns the raw, just-uploaded Reel
+/// (`processing_status: "uploaded"`) - this screen pops immediately
+/// after that, on success, without waiting for transcoding.
+/// `ContentListScreen`'s own polling (Part P-044 STEP 5, already
+/// implemented) is what observes the status progress to `"ready"` once
+/// the user is back on that screen - this file has no polling logic of
+/// its own.
+class ReelFormScreen extends ConsumerStatefulWidget {
+  const ReelFormScreen({super.key});
+
+  @override
+  ConsumerState<ReelFormScreen> createState() => _ReelFormScreenState();
+}
+
+class _ReelFormScreenState extends ConsumerState<ReelFormScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _captionController = TextEditingController();
+
+  File? _videoFile;
+  int? _videoBytes;
+  bool _isSubmitting = false;
+
+  /// Backend-driven, field-specific error text - same convention as
+  /// `PostFormScreen`'s own `_captionError`/`_imageError` pair, keyed
+  /// by `ReelSerializer`'s field names (`caption`, `video`).
+  String? _captionError;
+
+  /// Covers BOTH a backend-reported `video` validation error (e.g. an
+  /// unsupported format/oversized file, from `ReelSerializer.
+  /// validate_video`) AND the purely local "you haven't picked a video
+  /// yet" case - shown in the same place either way, see
+  /// [_buildVideoPicker].
+  String? _videoError;
+
+  /// Any failure that doesn't map onto a specific field above.
+  String? _generalError;
+
+  @override
+  void dispose() {
+    _captionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickVideo() async {
+    final picked = await ImagePicker().pickVideo(source: ImageSource.gallery);
+    if (picked == null) return;
+    final file = File(picked.path);
+    int? bytes;
+    try {
+      bytes = await file.length();
+    } catch (_) {
+      bytes = null;
+    }
+    if (!mounted) return;
+    setState(() {
+      _videoFile = file;
+      _videoBytes = bytes;
+      _videoError = null;
+    });
+  }
+
+  void _removeVideo() {
+    setState(() {
+      _videoFile = null;
+      _videoBytes = null;
+    });
+  }
+
+  String _formatSize(int bytes) {
+    const mb = 1024 * 1024;
+    if (bytes >= mb) return '${(bytes / mb).toStringAsFixed(1)} MB';
+    return '${(bytes / 1024).toStringAsFixed(0)} KB';
+  }
+
+  Future<void> _submit() async {
+    setState(() {
+      _captionError = null;
+      _videoError = null;
+      _generalError = null;
+    });
+
+    final formValid = _formKey.currentState?.validate() ?? false;
+    // `video` has no Form-registered field to carry this error the way
+    // `AppTextField`'s `validator` does for `caption` - checked here,
+    // explicitly, before ever calling the repository. See this class's
+    // module docstring.
+    final videoMissing = _videoFile == null;
+    if (videoMissing) {
+      setState(() => _videoError = context.l10n.reelVideoRequired);
+    }
+    if (!formValid || videoMissing) {
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      await ref
+          .read(ownContentProvider.notifier)
+          .createReel(
+            caption: _captionController.text.trim(),
+            videoFile: _videoFile!,
+          );
+
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } catch (error) {
+      final failure = switch (error) {
+        DioException(error: final ApiFailure f) => f,
+        ApiFailure() => error,
+        _ => null,
+      };
+      if (!mounted) return;
+      setState(() {
+        if (failure == null) {
+          _generalError = context.l10n.commonGenericError;
+          return;
+        }
+        switch (failure) {
+          case ValidationFailure(:final fields):
+            _captionError = fields['caption']?.join(' ');
+            _videoError = fields['video']?.join(' ');
+            if (_captionError == null && _videoError == null) {
+              _generalError = failure.message;
+            }
+          case AuthFailure() ||
+              NetworkFailure() ||
+              ServerFailure() ||
+              UnknownFailure():
+            _generalError = failure.message;
+        }
+      });
+      _formKey.currentState?.validate();
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
+  }
+
+  Widget _buildVideoPicker(BuildContext context) {
+    final theme = Theme.of(context);
+    const previewWidth = 160.0;
+    const previewHeight = 240.0;
+
+    Widget preview;
+    final videoFile = _videoFile;
+    if (videoFile != null) {
+      preview = SizedBox(
+        width: previewWidth,
+        height: previewHeight,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: _PickedVideoPreview(
+            key: ValueKey(videoFile.path),
+            file: videoFile,
+          ),
+        ),
+      );
+    } else {
+      preview = Container(
+        width: previewWidth,
+        height: previewHeight,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Icon(Icons.video_call_outlined),
+      );
+    }
+
+    final bytes = _videoBytes;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.l10n.contentFormVideoLabel),
+        const SizedBox(height: 8),
+        preview,
+        if (videoFile != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            [
+              videoFile.uri.pathSegments.last,
+              if (bytes != null) _formatSize(bytes),
+            ].join(' - '),
+            style: theme.textTheme.bodySmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            TextButton.icon(
+              key: const Key('reelForm_pickVideoButton'),
+              onPressed: _isSubmitting ? null : _pickVideo,
+              icon: const Icon(Icons.video_library_outlined),
+              label: Text(
+                _videoFile == null
+                    ? context.l10n.contentFormChooseVideo
+                    : context.l10n.contentFormChangeVideo,
+              ),
+            ),
+            if (_videoFile != null)
+              TextButton(
+                key: const Key('reelForm_removeVideoButton'),
+                onPressed: _isSubmitting ? null : _removeVideo,
+                child: Text(context.l10n.commonRemove),
+              ),
+          ],
+        ),
+        if (_videoError != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              _videoError!,
+              style: TextStyle(color: theme.colorScheme.error, fontSize: 12),
+            ),
+          ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CavalloAppBar(title: Text(context.l10n.reelFormTitle)),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AppTextField(
+                  key: const Key('reelForm_captionField'),
+                  label: context.l10n.contentFormCaption,
+                  controller: _captionController,
+                  maxLines: 4,
+                  validator: (value) {
+                    if (_captionError != null) return _captionError;
+                    if ((value ?? '').trim().isEmpty) {
+                      return context.l10n.validationCaptionRequired;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildVideoPicker(context),
+                const SizedBox(height: 8),
+                Text(
+                  context.l10n.reelFormReviewNote,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                if (_isSubmitting) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    context.l10n.reelFormUploading,
+                    key: const Key('reelForm_uploadingHint'),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+                if (_generalError != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    _generalError!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 24),
+                AppButton(
+                  key: const Key('reelForm_submitButton'),
+                  label: context.l10n.reelFormSubmit,
+                  isLoading: _isSubmitting,
+                  onPressed: _submit,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Small looping, muted inline preview of the picked local video file.
+/// Tap toggles play/pause. Falls back to a static "video selected" tile when
+/// the platform cannot create the preview - it only ever affects this
+/// preview, never the upload.
+class _PickedVideoPreview extends StatefulWidget {
+  const _PickedVideoPreview({super.key, required this.file});
+
+  final File file;
+
+  @override
+  State<_PickedVideoPreview> createState() => _PickedVideoPreviewState();
+}
+
+class _PickedVideoPreviewState extends State<_PickedVideoPreview> {
+  VideoPlayerController? _controller;
+  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final controller = VideoPlayerController.file(widget.file);
+    _controller = controller;
+    try {
+      await controller.initialize();
+      await controller.setLooping(true);
+      await controller.setVolume(0);
+      if (!mounted) return;
+      setState(() {});
+      await controller.play();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _failed = true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  void _toggle() {
+    final controller = _controller;
+    if (controller == null || !controller.value.isInitialized) return;
+    if (controller.value.isPlaying) {
+      controller.pause();
+    } else {
+      controller.play();
+    }
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final controller = _controller;
+
+    if (_failed || controller == null) {
+      return _fallback(theme);
+    }
+    if (!controller.value.isInitialized) {
+      return ColoredBox(
+        color: theme.colorScheme.surfaceContainerHighest,
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final size = controller.value.size;
+    return GestureDetector(
+      onTap: _toggle,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          const ColoredBox(color: Colors.black),
+          FittedBox(
+            fit: BoxFit.cover,
+            clipBehavior: Clip.hardEdge,
+            child: SizedBox(
+              width: size.width <= 0 ? 1 : size.width,
+              height: size.height <= 0 ? 1 : size.height,
+              child: VideoPlayer(controller),
+            ),
+          ),
+          if (!controller.value.isPlaying)
+            const Center(
+              child: Icon(
+                Icons.play_circle_outline,
+                color: Colors.white,
+                size: 48,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _fallback(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.play_circle_outline,
+            size: 40,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            widget.file.uri.pathSegments.last,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+===== FILE: D:\Cavallo\social_commerce_app\lib\features\stories\presentation\story_creation_screen.dart =====
+
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../../core/l10n/l10n_context.dart';
+import '../../../core/widgets/app_button.dart';
+import 'story_upload_queue_provider.dart';
+import 'story_upload_status_banner.dart';
+import '../../../core/widgets/cavallo_app_bar.dart';
+
+/// Part P-051 STEP 4 scope: `lib/features/stories/presentation/
+/// story_creation_screen.dart` â€” the Story creation form for Business
+/// accounts. Lets a business pick a single image or short video, then
+/// hands it straight to [StoryUploadQueueNotifier.enqueueUpload]
+/// (STEP 2/3) rather than uploading inline itself â€” every retry,
+/// backoff, and failure-state decision already lives in that provider,
+/// so this screen's only real job is media selection plus rendering
+/// [StoryUploadStatusBanner] so the business always sees the true
+/// upload state, per Section 27's explicit requirement.
+///
+/// No caption, text-overlay, or product-link field â€” matching
+/// `story_creation_repository.dart`'s own already-flagged finding that
+/// `StorySerializer` has exactly one writable field (`media`). Building
+/// UI for fields the backend doesn't accept would be its own kind of
+/// dishonest screen, not a literal requirement of this part.
+///
+/// ### FLAGGED SCOPE DECISION 4 â€” image vs video picker, two buttons
+///
+/// `StorySerializer.validate_media` (confirmed in
+/// `story_creation_repository.dart`'s own class doc) accepts either an
+/// image or a short video under Story's single `media` field, but
+/// `image_picker`'s API is two separate methods (`pickImage`/
+/// `pickVideo`) â€” there's no single "pick either" call, unlike the
+/// backend's single field. Two explicit buttons ("Add Photo" / "Add
+/// Video") are used instead of one "Add Media" button behind a
+/// picker-type popup menu, matching `ContentListScreen`'s (P-044)
+/// precedent of two explicit creation entry points for a two-way
+/// choice.
+///
+/// ### FLAGGED SCOPE DECISION 5 â€” no video preview/playback
+///
+/// No video-playback package (`video_player` or similar) exists
+/// anywhere in this codebase's `pubspec.yaml` â€” `image_picker` is the
+/// only media-related dependency (see its own pubspec comment: "the
+/// first content-creation screen in this app to need an image
+/// upload"). Adding one is a real dependency-and-scope decision beyond
+/// what this part's own Files Expected list asks for (three files,
+/// none of them a pubspec change), so a picked video is shown as a
+/// plain file-name placeholder card (`Icons.videocam`), not an actual
+/// video preview. Flagged here rather than silently reaching for a new
+/// package.
+class StoryCreationScreen extends ConsumerStatefulWidget {
+  const StoryCreationScreen({super.key});
+
+  @override
+  ConsumerState<StoryCreationScreen> createState() =>
+      _StoryCreationScreenState();
+}
+
+class _StoryCreationScreenState extends ConsumerState<StoryCreationScreen> {
+  File? _mediaFile;
+  bool _isVideo = false;
+  String? _mediaError;
+
+  Future<void> _pickImage() async {
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
+    if (picked == null) return;
+    setState(() {
+      _mediaFile = File(picked.path);
+      _isVideo = false;
+      _mediaError = null;
+    });
+  }
+
+  Future<void> _pickVideo() async {
+    final picked = await ImagePicker().pickVideo(source: ImageSource.gallery);
+    if (picked == null) return;
+    setState(() {
+      _mediaFile = File(picked.path);
+      _isVideo = true;
+      _mediaError = null;
+    });
+  }
+
+  /// Hands [_mediaFile] to the queue and resets this form so the
+  /// business can immediately start a second Story if they want â€” the
+  /// upload itself continues in the background regardless of whether
+  /// this screen stays open (`enqueueUpload` returns the moment the
+  /// task is added to the queue, not when the upload finishes).
+  void _submit() {
+    final mediaFile = _mediaFile;
+    if (mediaFile == null) {
+      setState(() => _mediaError = context.l10n.storyAddMediaFirst);
+      return;
+    }
+
+    ref.read(storyUploadQueueProvider.notifier).enqueueUpload(mediaFile);
+
+    setState(() {
+      _mediaFile = null;
+      _isVideo = false;
+      _mediaError = null;
+    });
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(context.l10n.storyUploadStarted)));
+  }
+
+  Widget _buildMediaPreview(ThemeData theme) {
+    final mediaFile = _mediaFile;
+    if (mediaFile == null) {
+      return Container(
+        key: const Key('storyCreation_emptyMediaPlaceholder'),
+        height: 220,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          border: Border.all(color: theme.dividerColor),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(context.l10n.storyNoMediaSelected),
+      );
+    }
+
+    if (_isVideo) {
+      // See FLAGGED SCOPE DECISION 5 above â€” no real video preview.
+      return Container(
+        key: const Key('storyCreation_videoPreviewPlaceholder'),
+        height: 220,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.videocam, size: 48),
+            const SizedBox(height: 8),
+            Text(
+              mediaFile.uri.pathSegments.last,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.file(
+        mediaFile,
+        key: const Key('storyCreation_imagePreview'),
+        height: 220,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: CavalloAppBar(title: Text(context.l10n.consoleStoriesCreate)),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Any upload already in the queue (from this screen or a
+              // prior visit) shows here too â€” see this file's own
+              // FLAGGED SCOPE DECISION 6 (in
+              // story_upload_status_banner.dart) for why there are two
+              // homes for it, not one app-wide overlay.
+              const StoryUploadStatusBanner(),
+              _buildMediaPreview(theme),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton.icon(
+                      key: const Key('storyCreation_pickImageButton'),
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.photo_library_outlined),
+                      label: Text(context.l10n.storyAddPhoto),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextButton.icon(
+                      key: const Key('storyCreation_pickVideoButton'),
+                      onPressed: _pickVideo,
+                      icon: const Icon(Icons.videocam_outlined),
+                      label: Text(context.l10n.storyAddVideo),
+                    ),
+                  ),
+                ],
+              ),
+              if (_mediaError != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _mediaError!,
+                  style: TextStyle(color: theme.colorScheme.error),
+                ),
+              ],
+              const SizedBox(height: 24),
+              AppButton(
+                key: const Key('storyCreation_submitButton'),
+                label: context.l10n.storyPostButton,
+                onPressed: _submit,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+

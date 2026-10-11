@@ -2107,21 +2107,5 @@
   "sharedContentUnavailable": "This content is no longer available",
   "@sharedContentUnavailable": {
     "description": "Shared content was removed after sharing."
-  },
-  "reelPlayerMute": "Mute",
-  "@reelPlayerMute": {
-    "description": "Tooltip of the mute button on the full-screen reel player."
-  },
-  "reelPlayerUnmute": "Unmute",
-  "@reelPlayerUnmute": {
-    "description": "Tooltip of the unmute button on the full-screen reel player."
-  },
-  "reelPlayerError": "Could not play this video.",
-  "@reelPlayerError": {
-    "description": "Shown over the reel player when the video fails to load, next to a Retry button."
-  },
-  "reelFormUploading": "Uploading your video... large videos can take a few minutes. Please keep this screen open.",
-  "@reelFormUploading": {
-    "description": "Hint shown under the reel form while the video is uploading."
   }
 }

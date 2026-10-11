@@ -2842,6 +2842,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This content is no longer available'**
   String get sharedContentUnavailable;
+
+  /// Tooltip of the mute button on the full-screen reel player.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute'**
+  String get reelPlayerMute;
+
+  /// Tooltip of the unmute button on the full-screen reel player.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmute'**
+  String get reelPlayerUnmute;
+
+  /// Shown over the reel player when the video fails to load, next to a Retry button.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not play this video.'**
+  String get reelPlayerError;
+
+  /// Hint shown under the reel form while the video is uploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading your video... large videos can take a few minutes. Please keep this screen open.'**
+  String get reelFormUploading;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

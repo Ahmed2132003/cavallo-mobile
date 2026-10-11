@@ -232,8 +232,7 @@ class RefreshInterceptor extends Interceptor {
         final retryOptions =
             err.requestOptions
               ..headers['Authorization'] = 'Bearer $newAccess'
-              ..extra[_retriedFlag] = true
-              ..data = _freshBody(err.requestOptions.data);
+              ..extra[_retriedFlag] = true;
 
         final retried = await _dio.fetch<dynamic>(retryOptions);
         handler.resolve(retried);
@@ -280,9 +279,7 @@ class RefreshInterceptor extends Interceptor {
   ) async {
     final accessToken = await _tokenStorage.getAccessToken();
 
-    final retryOptions = err.requestOptions
-      ..extra[_retriedFlag] = true
-      ..data = _freshBody(err.requestOptions.data);
+    final retryOptions = err.requestOptions..extra[_retriedFlag] = true;
     if (accessToken != null && accessToken.isNotEmpty) {
       retryOptions.headers['Authorization'] = 'Bearer $accessToken';
     }
@@ -347,14 +344,4 @@ class RefreshInterceptor extends Interceptor {
     final normalized = path.startsWith('http') ? Uri.parse(path).path : path;
     return normalized == refreshPath || normalized.endsWith(refreshPath);
   }
-}
-
-/// A multipart FormData can only be sent once; re-sending the same instance
-/// after the token refresh throws "already finalized", which made any upload
-/// started with an expired access token fail. A clone is a fresh copy.
-dynamic _freshBody(dynamic data) {
-  if (data is FormData) {
-    return data.clone();
-  }
-  return data;
 }

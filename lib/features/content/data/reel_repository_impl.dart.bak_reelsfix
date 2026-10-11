@@ -46,15 +46,9 @@ class ReelRepositoryImpl implements ReelRepository {
       ),
     });
 
-    // The app-wide Dio timeouts are 15 s, which aborts any real video upload
-    // (and the server also needs time to store the file before answering).
     final response = await _dio.post<Map<String, dynamic>>(
       _reelsPath,
       data: data,
-      options: Options(
-        sendTimeout: const Duration(minutes: 30),
-        receiveTimeout: const Duration(minutes: 30),
-      ),
     );
 
     return ReelResponseDto.fromJson(response.data!).toEntity();

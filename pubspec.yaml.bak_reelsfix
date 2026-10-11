@@ -105,11 +105,6 @@ dependencies:
   # fail to resolve).
   fl_chart: 1.0.0
 
-  # Real video playback for Reels (replaces the old "Coming soon" stub) and
-  # the inline preview in the reel upload form. Caret on purpose: pub picks the
-  # newest release whose SDK floor fits this project's Flutter/Dart.
-  video_player: ^2.9.2
-
   # Crash / error reporting (Part P-105, Phase 21). Backs reportError() in
   # lib/core/error_reporting.dart. Pinned exactly (same discipline as
   # share_plus/fl_chart above). 9.30.1 declares Dart >=3.5 / Flutter >=3.24,

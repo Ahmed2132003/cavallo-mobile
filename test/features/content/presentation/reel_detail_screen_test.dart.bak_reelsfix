@@ -6,9 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:social_commerce_app/core/network/api_failure.dart';
 import 'package:social_commerce_app/core/network/paginated_response.dart';
 import 'package:social_commerce_app/core/widgets/app_button.dart';
-import 'package:social_commerce_app/features/business_profile/data/business_profile_public_repository.dart';
-import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
-import 'package:social_commerce_app/features/business_profile/domain/business_profile_public_repository.dart';
 import 'package:social_commerce_app/features/content/data/reel_public_repository.dart';
 import 'package:social_commerce_app/features/content/domain/public_reel_entity.dart';
 import 'package:social_commerce_app/features/content/domain/reel_public_repository.dart';
@@ -44,7 +41,7 @@ class _FakeReelPublicRepository implements ReelPublicRepository {
     return result;
   }
 
-  // Unused by this screen - implemented to satisfy the interface.
+  // Unused by this screen — implemented to satisfy the interface.
   @override
   Future<PaginatedResponse<PublicReel>> fetchBusinessReels(
     int businessId,
@@ -54,37 +51,6 @@ class _FakeReelPublicRepository implements ReelPublicRepository {
     previous: null,
   );
 }
-
-class _FakeBusinessProfilePublicRepository
-    implements BusinessProfilePublicRepository {
-  @override
-  Future<BusinessProfile?> fetchPublicProfile(int id) async {
-    return BusinessProfile(
-      id: id,
-      businessName: 'Test Business',
-      businessType: BusinessType.trader,
-      country: 'Egypt',
-      city: 'Cairo',
-      isVerified: false,
-    );
-  }
-}
-
-const _reel602 = PublicReel(
-  id: 602,
-  businessId: 7,
-  caption: 'Second reel in the pager.',
-  videoUrl: 'https://example.com/reel-602.mp4',
-);
-
-const _reelWithoutVideo = PublicReel(
-  id: 603,
-  businessId: 7,
-  caption: 'Has no video url, must never be paged in.',
-);
-
-Future<PaginatedResponse<PublicReel>> _emptyPage({String? cursorUrl}) async =>
-    const PaginatedResponse<PublicReel>(results: [], next: null, previous: null);
 
 const _reel = PublicReel(
   id: 601,
@@ -100,7 +66,6 @@ Future<void> _pumpScreen(
   required String reelId,
   required _FakeReelPublicRepository repository,
   FakeSocialInteractionRepository? social,
-  ReelFeedLoader? feedLoader,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -109,21 +74,6 @@ Future<void> _pumpScreen(
         socialInteractionRepositoryProvider.overrideWithValue(
           social ?? FakeSocialInteractionRepository(),
         ),
-        businessProfilePublicRepositoryProvider.overrideWithValue(
-          _FakeBusinessProfilePublicRepository(),
-        ),
-        reelFeedLoaderProvider.overrideWithValue(feedLoader ?? _emptyPage),
-        // The real surface is the platform video plugin; tests use a stub.
-        reelPlayerBuilderProvider.overrideWithValue(
-          (context, args) => SizedBox.expand(
-            child: Center(
-              child: Text(
-                'player ${args.reel.id} active=${args.isActive} '
-                'muted=${args.muted}',
-              ),
-            ),
-          ),
-        ),
       ],
       child: MaterialApp(home: ReelDetailScreen(reelId: reelId)),
     ),
@@ -131,7 +81,7 @@ Future<void> _pumpScreen(
 }
 
 void main() {
-  group('ReelDetailScreen - non-numeric id', () {
+  group('ReelDetailScreen — non-numeric id', () {
     testWidgets(
       'shows not-found immediately, without calling the repository',
       (tester) async {
@@ -153,7 +103,7 @@ void main() {
     );
   });
 
-  group('ReelDetailScreen - loading', () {
+  group('ReelDetailScreen — loading', () {
     testWidgets('shows a LoadingIndicator before the fetch resolves', (
       tester,
     ) async {
@@ -173,33 +123,51 @@ void main() {
     });
   });
 
-  group('ReelDetailScreen - found', () {
+  group('ReelDetailScreen — found', () {
     testWidgets(
-      'plays the tapped reel and shows business name, caption and actions',
+      'shows the caption, the formatted duration, the real action row and '
+      'the comments section',
       (tester) async {
         final repository = _FakeReelPublicRepository(result: _reel);
 
         await _pumpScreen(tester, reelId: '601', repository: repository);
         await tester.pumpAndSettle();
 
-        expect(find.text('player 601 active=true muted=false'), findsOneWidget);
-        expect(find.text('Test Business'), findsOneWidget);
         expect(
           find.text('A published reel, seen at /reel/601.'),
           findsOneWidget,
         );
+        // 125 seconds -> 2:05, per ReelDetailScreen's own `_formatDuration`
+        // (mm:ss, no leading hour segment).
+        expect(find.text('2:05'), findsOneWidget);
         expect(find.byIcon(Icons.favorite_border), findsOneWidget);
-        expect(find.byTooltip('Like'), findsOneWidget);
-        expect(find.byTooltip('Comment'), findsOneWidget);
-        expect(find.byTooltip('Share'), findsOneWidget);
-        expect(find.byTooltip('Save'), findsOneWidget);
-
-        // The old "coming soon" stub is gone for good.
-        expect(find.byIcon(Icons.play_arrow), findsNothing);
+        expect(find.text('Comments'), findsOneWidget);
       },
     );
 
-    testWidgets('an empty caption shows no caption text', (tester) async {
+    testWidgets('no durationSeconds means no duration label is shown', (
+      tester,
+    ) async {
+      final repository = _FakeReelPublicRepository(
+        result: const PublicReel(
+          id: 602,
+          businessId: 7,
+          caption: 'No duration on this one.',
+        ),
+      );
+
+      await _pumpScreen(tester, reelId: '602', repository: repository);
+      await tester.pumpAndSettle();
+
+      // No mm:ss label anywhere on screen when durationSeconds is null —
+      // nothing else on this screen (caption, comments section copy)
+      // contains a colon either.
+      expect(find.textContaining(':'), findsNothing);
+    });
+
+    testWidgets('an empty caption shows the placeholder copy', (
+      tester,
+    ) async {
       final repository = _FakeReelPublicRepository(
         result: const PublicReel(id: 603, businessId: 7, caption: ''),
       );
@@ -207,23 +175,28 @@ void main() {
       await _pumpScreen(tester, reelId: '603', repository: repository);
       await tester.pumpAndSettle();
 
-      expect(find.text('player 603 active=true muted=false'), findsOneWidget);
+      expect(find.text('No caption.'), findsOneWidget);
     });
 
-    testWidgets('the mute button mutes the player and flips its tooltip', (
-      tester,
-    ) async {
-      final repository = _FakeReelPublicRepository(result: _reel);
+    testWidgets(
+      'tapping the play stub shows an honest "coming soon" SnackBar '
+      'instead of pretending to play real video',
+      (tester) async {
+        final repository = _FakeReelPublicRepository(result: _reel);
 
-      await _pumpScreen(tester, reelId: '601', repository: repository);
-      await tester.pumpAndSettle();
+        await _pumpScreen(tester, reelId: '601', repository: repository);
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.byTooltip('Mute'));
-      await tester.pumpAndSettle();
+        final playIcon = find.byIcon(Icons.play_arrow);
+        await tester.ensureVisible(playIcon);
+        await tester.pumpAndSettle();
 
-      expect(find.text('player 601 active=true muted=true'), findsOneWidget);
-      expect(find.byTooltip('Unmute'), findsOneWidget);
-    });
+        await tester.tap(playIcon);
+        await tester.pump();
+
+        expect(find.text('Video playback — Coming soon'), findsOneWidget);
+      },
+    );
 
     testWidgets(
       'tapping Like shows the liked state immediately, before any response',
@@ -239,9 +212,14 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        // Close the gate only now, after the initial comment load finished.
         social.gate = Completer<void>();
 
-        await tester.tap(find.byTooltip('Like'));
+        final likeButton = find.byTooltip('Like');
+        await tester.ensureVisible(likeButton);
+        await tester.pumpAndSettle();
+
+        await tester.tap(likeButton);
         await tester.pump();
 
         expect(find.byIcon(Icons.favorite), findsOneWidget);
@@ -254,110 +232,64 @@ void main() {
       },
     );
 
-    testWidgets('the Comment button opens the comments sheet', (tester) async {
-      final repository = _FakeReelPublicRepository(result: _reel);
-
-      await _pumpScreen(tester, reelId: '601', repository: repository);
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byTooltip('Comment'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Comments'), findsWidgets);
-      expect(find.byType(TextField), findsOneWidget);
-    });
-
-    testWidgets('the "..." menu appears once loaded and reports the Reel', (
-      tester,
-    ) async {
-      final repository = _FakeReelPublicRepository(result: _reel);
-      final social = FakeSocialInteractionRepository();
-
-      await _pumpScreen(
-        tester,
-        reelId: '601',
-        repository: repository,
-        social: social,
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byTooltip('More options'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Report'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Other'));
-      await tester.pump();
-      await tester.tap(find.widgetWithText(FilledButton, 'Submit'));
-      await tester.pumpAndSettle();
-
-      expect(social.calls, contains('report:reel:601:other'));
-    });
-  });
-
-  group('ReelDetailScreen - vertical pager', () {
     testWidgets(
-      'more published reels are appended and swiping up activates the next '
-      'one (duplicates and reels without a video are never paged in)',
+      'posting a comment adds it to the list and bumps the comment count',
       (tester) async {
         final repository = _FakeReelPublicRepository(result: _reel);
-        final cursorsRequested = <String?>[];
-
-        Future<PaginatedResponse<PublicReel>> loader({
-          String? cursorUrl,
-        }) async {
-          cursorsRequested.add(cursorUrl);
-          return const PaginatedResponse<PublicReel>(
-            results: [_reel, _reel602, _reelWithoutVideo],
-            next: null,
-            previous: null,
-          );
-        }
+        final social = FakeSocialInteractionRepository();
 
         await _pumpScreen(
           tester,
           reelId: '601',
           repository: repository,
-          feedLoader: loader,
+          social: social,
         );
         await tester.pumpAndSettle();
 
-        expect(cursorsRequested, [null]);
-        expect(find.text('player 601 active=true muted=false'), findsOneWidget);
-
-        await tester.fling(find.byType(PageView), const Offset(0, -500), 2000);
+        final field = find.byType(TextField);
+        await tester.ensureVisible(field);
         await tester.pumpAndSettle();
 
-        expect(find.text('player 602 active=true muted=false'), findsOneWidget);
-        expect(find.text('Second reel in the pager.'), findsOneWidget);
-        expect(find.textContaining('player 603'), findsNothing);
+        await tester.enterText(field, 'nice reel');
+        await tester.tap(find.byIcon(Icons.send));
+        await tester.pumpAndSettle();
+
+        expect(social.calls, contains('createComment:reel:601'));
+        expect(find.text('nice reel'), findsOneWidget);
+        expect(find.text('1'), findsOneWidget);
       },
     );
 
-    testWidgets('a failing "more reels" call never breaks the tapped reel', (
-      tester,
-    ) async {
-      final repository = _FakeReelPublicRepository(result: _reel);
+    testWidgets(
+      'the AppBar "..." menu appears once loaded and reports the Reel',
+      (tester) async {
+        final repository = _FakeReelPublicRepository(result: _reel);
+        final social = FakeSocialInteractionRepository();
 
-      Future<PaginatedResponse<PublicReel>> failingLoader({
-        String? cursorUrl,
-      }) async {
-        throw const ServerFailure(message: 'boom');
-      }
+        await _pumpScreen(
+          tester,
+          reelId: '601',
+          repository: repository,
+          social: social,
+        );
+        await tester.pumpAndSettle();
 
-      await _pumpScreen(
-        tester,
-        reelId: '601',
-        repository: repository,
-        feedLoader: failingLoader,
-      );
-      await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('More options'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Report'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Other'));
+        await tester.pump();
+        await tester.tap(find.widgetWithText(FilledButton, 'Submit'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('player 601 active=true muted=false'), findsOneWidget);
-    });
+        expect(social.calls, contains('report:reel:601:other'));
+      },
+    );
   });
 
   group(
-    'ReelDetailScreen - not found (numeric id, real 404 / unpublished / not-ready)',
+    'ReelDetailScreen — not found (numeric id, real 404 / unpublished / not-ready)',
     () {
       testWidgets(
         'AsyncData(null) shows the not-found state, not a generic error',
@@ -380,7 +312,7 @@ void main() {
     },
   );
 
-  group('ReelDetailScreen - error', () {
+  group('ReelDetailScreen — error', () {
     testWidgets(
       'a genuine failure shows the backend message and a Retry button',
       (tester) async {

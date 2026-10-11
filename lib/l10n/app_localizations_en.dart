@@ -1607,4 +1607,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sharedContentUnavailable => 'This content is no longer available';
+
+  @override
+  String get reelPlayerMute => 'Mute';
+
+  @override
+  String get reelPlayerUnmute => 'Unmute';
+
+  @override
+  String get reelPlayerError => 'Could not play this video.';
+
+  @override
+  String get reelFormUploading => 'Uploading your video... large videos can take a few minutes. Please keep this screen open.';
 }
