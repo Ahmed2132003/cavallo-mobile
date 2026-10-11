@@ -424,6 +424,7 @@ class _ProfileAvatar extends ConsumerWidget {
         hasStories ? 0 : AppAvatar.ringWidth + AppAvatar.ringGap,
       ),
       child: AppAvatar(
+        imageUrl: profile.avatarUrl,
         name: profile.businessName,
         size: _size,
         ring: ring,

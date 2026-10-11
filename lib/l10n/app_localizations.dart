@@ -2914,6 +2914,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Uploading your video... large videos can take a few minutes. Please keep this screen open.'**
   String get reelFormUploading;
+
+  /// Business forms: button that picks a profile photo when there is none.
+  ///
+  /// In en, this message translates to:
+  /// **'Add profile photo'**
+  String get bizAvatarAdd;
+
+  /// Business forms: button that picks a different profile photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get bizAvatarChange;
+
+  /// Business forms: button that removes the profile photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get bizAvatarRemove;
+
+  /// Snackbar after the business profile photo was uploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo updated.'**
+  String get bizAvatarUpdated;
+
+  /// Snackbar after the business profile photo was removed.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo removed.'**
+  String get bizAvatarRemoved;
+
+  /// Snackbar when picking or uploading the profile photo failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update the photo. Please try again.'**
+  String get bizAvatarUploadFailed;
+
+  /// Snackbar after onboarding when only the photo upload failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile was created, but the photo could not be uploaded. You can add it from Edit profile.'**
+  String get bizAvatarUploadLater;
+
+  /// Accessibility label of the business profile photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Business profile photo'**
+  String get bizAvatarSemantic;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

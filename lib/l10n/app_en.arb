@@ -2155,5 +2155,37 @@
   "reelFormUploading": "Uploading your video... large videos can take a few minutes. Please keep this screen open.",
   "@reelFormUploading": {
     "description": "Hint shown under the reel form while the video is uploading."
+  },
+  "bizAvatarAdd": "Add profile photo",
+  "@bizAvatarAdd": {
+    "description": "Business forms: button that picks a profile photo when there is none."
+  },
+  "bizAvatarChange": "Change photo",
+  "@bizAvatarChange": {
+    "description": "Business forms: button that picks a different profile photo."
+  },
+  "bizAvatarRemove": "Remove photo",
+  "@bizAvatarRemove": {
+    "description": "Business forms: button that removes the profile photo."
+  },
+  "bizAvatarUpdated": "Profile photo updated.",
+  "@bizAvatarUpdated": {
+    "description": "Snackbar after the business profile photo was uploaded."
+  },
+  "bizAvatarRemoved": "Profile photo removed.",
+  "@bizAvatarRemoved": {
+    "description": "Snackbar after the business profile photo was removed."
+  },
+  "bizAvatarUploadFailed": "Could not update the photo. Please try again.",
+  "@bizAvatarUploadFailed": {
+    "description": "Snackbar when picking or uploading the profile photo failed."
+  },
+  "bizAvatarUploadLater": "Your profile was created, but the photo could not be uploaded. You can add it from Edit profile.",
+  "@bizAvatarUploadLater": {
+    "description": "Snackbar after onboarding when only the photo upload failed."
+  },
+  "bizAvatarSemantic": "Business profile photo",
+  "@bizAvatarSemantic": {
+    "description": "Accessibility label of the business profile photo."
   }
 }

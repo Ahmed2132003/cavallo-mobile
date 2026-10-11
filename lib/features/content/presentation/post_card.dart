@@ -43,6 +43,7 @@ class PostCard extends StatelessWidget {
     required this.businessName,
     this.onTap,
     this.isBusinessVerified = false,
+    this.businessAvatarUrl,
   });
 
   final PublicPost post;
@@ -53,6 +54,9 @@ class PostCard extends StatelessWidget {
   /// The caller resolves it (the Home feed reads the public business profile);
   /// callers that do not know it keep the default and show no mark.
   final bool isBusinessVerified;
+
+  /// Business profile photo for the header avatar (`null` = initials).
+  final String? businessAvatarUrl;
 
   /// Post media box: width divided by height (1:1, Instagram square).
   static const double mediaAspectRatio = 1;
@@ -85,6 +89,7 @@ class PostCard extends StatelessWidget {
               objectId: post.id,
               isVerified: isBusinessVerified,
               isFeatured: post.isFeatured,
+              businessAvatarUrl: businessAvatarUrl,
             ),
             MediaCarousel(
               imageUrls: imageUrls,

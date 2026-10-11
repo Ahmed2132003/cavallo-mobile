@@ -35,6 +35,7 @@ class ReelCard extends StatelessWidget {
     required this.businessName,
     this.onTap,
     this.isBusinessVerified = false,
+    this.businessAvatarUrl,
   });
 
   final PublicReel reel;
@@ -44,6 +45,9 @@ class ReelCard extends StatelessWidget {
   /// Part P-114 STEP 2: shows the blue Verified mark after the business name.
   /// Same contract as `PostCard.isBusinessVerified`.
   final bool isBusinessVerified;
+
+  /// Business profile photo for the header avatar (`null` = initials).
+  final String? businessAvatarUrl;
 
   /// Reel media box: width divided by height (9:16).
   static const double mediaAspectRatio = 9 / 16;
@@ -71,6 +75,7 @@ class ReelCard extends StatelessWidget {
               objectId: reel.id,
               isVerified: isBusinessVerified,
               isFeatured: reel.isFeatured,
+              businessAvatarUrl: businessAvatarUrl,
             ),
             AspectRatio(
               aspectRatio: mediaAspectRatio,

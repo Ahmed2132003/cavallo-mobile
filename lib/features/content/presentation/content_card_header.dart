@@ -28,6 +28,7 @@ class ContentCardHeader extends StatelessWidget {
     required this.objectId,
     this.isVerified = false,
     this.isFeatured = false,
+    this.businessAvatarUrl,
   });
 
   final String businessName;
@@ -42,6 +43,9 @@ class ContentCardHeader extends StatelessWidget {
   /// Shows the amber [FeaturedBadge] (the OWNING business is Featured).
   final bool isFeatured;
 
+  /// Profile photo of the business; `null` shows the name's initials.
+  final String? businessAvatarUrl;
+
   static const double avatarSize = 32;
 
   @override
@@ -55,7 +59,11 @@ class ContentCardHeader extends StatelessWidget {
       padding: const EdgeInsetsDirectional.fromSTEB(12, 8, 0, 8),
       child: Row(
         children: <Widget>[
-          AppAvatar(name: businessName, size: avatarSize),
+          AppAvatar(
+            imageUrl: businessAvatarUrl,
+            name: businessName,
+            size: avatarSize,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Row(

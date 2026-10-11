@@ -50,6 +50,7 @@ class SharedContent {
     required this.available,
     this.businessId,
     this.businessName,
+    this.businessAvatarUrl,
     this.previewText,
     this.previewImageUrl,
   });
@@ -59,6 +60,9 @@ class SharedContent {
   final bool available;
   final int? businessId;
   final String? businessName;
+
+  /// Profile photo of the sharing business (`business_avatar`), or `null`.
+  final String? businessAvatarUrl;
   final String? previewText;
   final String? previewImageUrl;
 
@@ -79,6 +83,7 @@ class SharedContent {
     final previewImageUrl = preview?['preview_image_url'];
     final businessId = raw['business_id'];
     final businessName = raw['business_name'];
+    final businessAvatar = raw['business_avatar'];
 
     return SharedContent(
       type: type,
@@ -86,6 +91,10 @@ class SharedContent {
       available: raw['available'] == true,
       businessId: businessId is int ? businessId : null,
       businessName: businessName is String ? businessName : null,
+      businessAvatarUrl:
+          businessAvatar is String && businessAvatar.isNotEmpty
+              ? businessAvatar
+              : null,
       previewText: previewText is String ? previewText : null,
       previewImageUrl:
           previewImageUrl is String && previewImageUrl.isNotEmpty
@@ -103,6 +112,7 @@ class SharedContent {
           other.available == available &&
           other.businessId == businessId &&
           other.businessName == businessName &&
+          other.businessAvatarUrl == businessAvatarUrl &&
           other.previewText == previewText &&
           other.previewImageUrl == previewImageUrl);
 
@@ -113,6 +123,7 @@ class SharedContent {
     available,
     businessId,
     businessName,
+    businessAvatarUrl,
     previewText,
     previewImageUrl,
   );

@@ -10,6 +10,7 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../routing/route_names.dart';
 import '../domain/business_profile_entity.dart';
 import '../domain/business_profile_repository.dart';
+import 'business_avatar_editor.dart';
 import 'business_profile_provider.dart';
 import '../../../core/widgets/cavallo_app_bar.dart';
 
@@ -151,7 +152,23 @@ class _BusinessProfileEditScreenState
             // `==`/`hashCode` over every field (Part P-028A), so an
             // unchanged profile keeps the exact same key and the form's
             // own state is preserved across unrelated rebuilds.
-            key: ValueKey<BusinessProfile>(profile),
+            key: ValueKey<Object>(
+              // Every field EXCEPT the photo: changing the photo must not
+              // re-seed the form and wipe unsaved text edits.
+              Object.hash(
+                profile.id,
+                profile.businessName,
+                profile.businessType,
+                profile.country,
+                profile.city,
+                profile.description,
+                profile.phoneNumber,
+                profile.categoryId,
+                profile.isVerified,
+                profile.followerCount,
+                profile.isFeatured,
+              ),
+            ),
             profile: profile,
           ),
           (null, AsyncError(:final error)) => _ErrorView(error: error),
@@ -441,6 +458,8 @@ class _BusinessProfileEditFormState
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const BusinessAvatarEditor(),
+              const SizedBox(height: 16),
               AppTextField(
                 label: context.l10n.bizFieldName,
                 controller: _businessNameController,

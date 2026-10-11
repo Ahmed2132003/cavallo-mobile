@@ -95,7 +95,16 @@ class _StoryRingByBusinessId extends ConsumerWidget {
       _ => '',
     };
 
-    return StoryRingWidget(businessId: businessId, businessName: businessName);
+    final String? avatarUrl = switch (profileAsync) {
+      AsyncData(value: final profile) => profile?.avatarUrl,
+      _ => null,
+    };
+
+    return StoryRingWidget(
+      businessId: businessId,
+      businessName: businessName,
+      avatarUrl: avatarUrl,
+    );
   }
 }
 

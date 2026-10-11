@@ -1643,4 +1643,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reelFormUploading => 'Uploading your video... large videos can take a few minutes. Please keep this screen open.';
+
+  @override
+  String get bizAvatarAdd => 'Add profile photo';
+
+  @override
+  String get bizAvatarChange => 'Change photo';
+
+  @override
+  String get bizAvatarRemove => 'Remove photo';
+
+  @override
+  String get bizAvatarUpdated => 'Profile photo updated.';
+
+  @override
+  String get bizAvatarRemoved => 'Profile photo removed.';
+
+  @override
+  String get bizAvatarUploadFailed => 'Could not update the photo. Please try again.';
+
+  @override
+  String get bizAvatarUploadLater => 'Your profile was created, but the photo could not be uploaded. You can add it from Edit profile.';
+
+  @override
+  String get bizAvatarSemantic => 'Business profile photo';
 }

@@ -336,6 +336,7 @@ class _ConversationTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             AppAvatar(
+              imageUrl: other?.avatarUrl,
               name: displayName,
               size: _avatarSize,
               ringGapColor: colors.background,

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +11,7 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../routing/route_names.dart';
 import '../domain/business_profile_entity.dart';
+import 'business_avatar_picker.dart';
 import 'business_profile_provider.dart';
 import '../../../core/widgets/cavallo_app_bar.dart';
 
@@ -140,6 +143,26 @@ class _BusinessOnboardingScreenState
 
   bool _isSubmitting = false;
 
+  /// Profile photo picked on this screen, uploaded right after the profile is
+  /// created (the photo endpoint needs an existing profile). Optional.
+  Uint8List? _avatarBytes;
+  String? _avatarFilename;
+
+  Future<void> _pickAvatar() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    try {
+      final PickedAvatar? picked = await pickBusinessAvatar();
+      if (picked == null || !mounted) return;
+      setState(() {
+        _avatarBytes = picked.bytes;
+        _avatarFilename = picked.filename;
+      });
+    } catch (_) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.bizAvatarUploadFailed)));
+    }
+  }
+
   /// Backend-driven, field-specific error text — set only from a
   /// [ValidationFailure]'s `fields` map (Part P-004), keyed by the
   /// confirmed real backend field names (`business_name`,
@@ -193,10 +216,16 @@ class _BusinessOnboardingScreenState
 
     final trimmedDescription = _descriptionController.text.trim();
 
+    // Captured before the awaits: creating the profile can make the router
+    // leave this screen, after which `ref`/`context` must not be used.
+    final notifier = ref.read(businessProfileProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final avatarBytes = _avatarBytes;
+    final avatarFilename = _avatarFilename;
+
     try {
-      await ref
-          .read(businessProfileProvider.notifier)
-          .createProfile(
+      await notifier.createProfile(
             businessName: _businessNameController.text.trim(),
             businessType: _businessType,
             country: _countryController.text.trim(),
@@ -204,6 +233,20 @@ class _BusinessOnboardingScreenState
             description: trimmedDescription.isEmpty ? null : trimmedDescription,
             phoneNumber: _phoneNumber,
           );
+      // The profile now exists. A failing photo upload must not undo that:
+      // tell the user and let them add the photo later from Edit profile.
+      if (avatarBytes != null && avatarFilename != null) {
+        try {
+          await notifier.uploadAvatar(
+            bytes: avatarBytes,
+            filename: avatarFilename,
+          );
+        } catch (_) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.bizAvatarUploadLater)),
+          );
+        }
+      }
       if (!mounted) return;
       context.goNamed(RouteNames.home);
     } on ApiFailure catch (failure) {
@@ -261,6 +304,20 @@ class _BusinessOnboardingScreenState
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Center(
+                    child: BusinessAvatarPicker(
+                      businessName: _businessNameController.text,
+                      localBytes: _avatarBytes,
+                      isBusy: _isSubmitting,
+                      onPick: _pickAvatar,
+                      onRemove:
+                          () => setState(() {
+                            _avatarBytes = null;
+                            _avatarFilename = null;
+                          }),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   AppTextField(
                     label: context.l10n.bizFieldName,
                     controller: _businessNameController,

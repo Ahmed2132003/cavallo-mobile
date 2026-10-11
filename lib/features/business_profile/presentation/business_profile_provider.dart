@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/business_avatar_repository.dart';
 import '../data/business_profile_repository_impl.dart';
 import '../domain/business_profile_entity.dart';
 import '../domain/business_profile_repository.dart';
+import 'business_profile_public_provider.dart';
 
 /// Part P-028A scope: `businessProfileProvider` — the single source of
 /// truth for "does the signed-in Business account have a profile yet,
@@ -192,6 +194,38 @@ class BusinessProfileNotifier extends AsyncNotifier<BusinessProfile?> {
   /// not here, so "the profile was deleted server-side" correctly
   /// re-arms Part P-028C1's onboarding redirect rather than showing an
   /// error.
+  /// Uploads a new profile photo. Unlike the other mutations this does NOT
+  /// pass through `AsyncLoading` (the edit form must not flash or re-seed);
+  /// on success the current profile is replaced by one carrying the new URL,
+  /// and the public profile cache is invalidated so every screen showing this
+  /// business (feed, stories, search...) re-fetches the new photo. A failure
+  /// is rethrown and leaves the state untouched.
+  Future<void> uploadAvatar({
+    required List<int> bytes,
+    required String filename,
+  }) async {
+    final url = await ref
+        .read(businessAvatarRepositoryProvider)
+        .upload(bytes: bytes, filename: filename);
+    _applyAvatar(url);
+  }
+
+  /// Removes the profile photo (same state rules as [uploadAvatar]).
+  Future<void> removeAvatar() async {
+    final url = await ref.read(businessAvatarRepositoryProvider).remove();
+    _applyAvatar(url);
+  }
+
+  void _applyAvatar(String? url) {
+    final current = switch (state) {
+      AsyncData(:final value) => value,
+      _ => null,
+    };
+    if (current == null) return;
+    state = AsyncValue.data(current.withAvatarUrl(url));
+    ref.invalidate(businessProfilePublicProvider(current.id));
+  }
+
   Future<void> refreshProfile() async {
     state = const AsyncValue<BusinessProfile?>.loading();
     state = await AsyncValue.guard<BusinessProfile?>(

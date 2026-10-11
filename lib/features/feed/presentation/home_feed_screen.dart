@@ -246,12 +246,18 @@ class _FeedListItem extends ConsumerWidget {
       _ => false,
     };
 
+    final String? avatarUrl = switch (profileAsync) {
+      AsyncData(value: final profile) => profile?.avatarUrl,
+      _ => null,
+    };
+
     // Part P-114 STEP 2: no wrapper padding; each card carries its own
     // bottom hairline (full-width Instagram list).
     return switch (item) {
       PostFeedItem(:final post) => PostCard(
         post: post,
         businessName: businessName,
+        businessAvatarUrl: avatarUrl,
         isBusinessVerified: isVerified,
         onTap:
             () => context.pushNamed(
@@ -262,6 +268,7 @@ class _FeedListItem extends ConsumerWidget {
       ReelFeedItem(:final reel) => ReelCard(
         reel: reel,
         businessName: businessName,
+        businessAvatarUrl: avatarUrl,
         isBusinessVerified: isVerified,
         onTap:
             () => context.pushNamed(

@@ -13,6 +13,7 @@ class ConversationParticipantSummary {
     required this.id,
     required this.accountType,
     required this.displayName,
+    this.avatarUrl,
   });
 
   final int id;
@@ -30,11 +31,19 @@ class ConversationParticipantSummary {
   /// layer does not re-derive it.
   final String displayName;
 
+  /// Profile photo of a Business participant (`avatar`); `null` for
+  /// customers and businesses without one - the UI shows initials.
+  final String? avatarUrl;
+
   factory ConversationParticipantSummary.fromJson(Map<String, dynamic> json) {
     return ConversationParticipantSummary(
       id: json['id'] as int,
       accountType: json['account_type'] as String,
       displayName: json['display_name'] as String,
+      avatarUrl: switch (json['avatar']) {
+        final String url when url.isNotEmpty => url,
+        _ => null,
+      },
     );
   }
 }

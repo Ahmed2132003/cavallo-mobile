@@ -5,12 +5,12 @@ import '../../../core/l10n/error_messages.dart';
 import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_avatar.dart';
 import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/conversation_repository.dart';
 import '../domain/followed_business.dart';
+import 'followed_business_avatar.dart';
 
 /// "New chat" picker — a bottom sheet listing the businesses the current
 /// user follows (`GET /api/v1/conversations/following/`). Resolves to the
@@ -188,7 +188,7 @@ class _NewChatSheetState extends ConsumerState<NewChatSheet> {
         final String subtitle = _subtitle(l10n, business);
         return ListTile(
           key: ValueKey('newChat_${business.businessId}'),
-          leading: AppAvatar(name: business.businessName, size: 44),
+          leading: FollowedBusinessAvatar(business: business),
           title: Text(
             business.businessName,
             maxLines: 1,

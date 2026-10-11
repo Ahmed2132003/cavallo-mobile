@@ -104,6 +104,7 @@ class BusinessProfile {
     required this.isVerified,
     this.followerCount = 0,
     this.isFeatured = false,
+    this.avatarUrl,
   });
 
   final int id;
@@ -143,6 +144,11 @@ class BusinessProfile {
   /// this app can set it or start a purchase (ADR-006).
   final bool isFeatured;
 
+  /// Business profile photo URL (a short-lived signed URL from the backend),
+  /// or `null` when the business has none - the UI then shows the initials
+  /// of [businessName] (see `AppAvatar`).
+  final String? avatarUrl;
+
   BusinessProfile copyWith({
     int? id,
     String? businessName,
@@ -155,6 +161,7 @@ class BusinessProfile {
     bool? isVerified,
     int? followerCount,
     bool? isFeatured,
+    String? avatarUrl,
   }) {
     return BusinessProfile(
       id: id ?? this.id,
@@ -168,6 +175,26 @@ class BusinessProfile {
       isVerified: isVerified ?? this.isVerified,
       followerCount: followerCount ?? this.followerCount,
       isFeatured: isFeatured ?? this.isFeatured,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+    );
+  }
+
+  /// Same profile with exactly [url] as its photo, where `null` REMOVES it.
+  /// [copyWith] cannot do that (its `null` means "keep").
+  BusinessProfile withAvatarUrl(String? url) {
+    return BusinessProfile(
+      id: id,
+      businessName: businessName,
+      businessType: businessType,
+      country: country,
+      city: city,
+      description: description,
+      phoneNumber: phoneNumber,
+      categoryId: categoryId,
+      isVerified: isVerified,
+      followerCount: followerCount,
+      isFeatured: isFeatured,
+      avatarUrl: url,
     );
   }
 
@@ -185,7 +212,8 @@ class BusinessProfile {
           other.categoryId == categoryId &&
           other.isVerified == isVerified &&
           other.followerCount == followerCount &&
-          other.isFeatured == isFeatured);
+          other.isFeatured == isFeatured &&
+          other.avatarUrl == avatarUrl);
 
   @override
   int get hashCode => Object.hash(
@@ -200,6 +228,7 @@ class BusinessProfile {
     isVerified,
     followerCount,
     isFeatured,
+    avatarUrl,
   );
 
   @override

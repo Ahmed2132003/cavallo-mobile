@@ -14,6 +14,8 @@ import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_indicator.dart';
 import '../data/story_public_repository.dart';
 import '../domain/public_story_entity.dart';
+import '../../business_profile/presentation/business_avatar_provider.dart';
+import '../../business_profile/presentation/business_profile_public_provider.dart';
 import 'story_public_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/cavallo_logo.dart';
@@ -373,7 +375,25 @@ class _StoryPlayerState extends ConsumerState<_StoryPlayer>
                   end: 4,
                   child: Row(
                     children: [
-                      AppAvatar(name: widget.businessName, size: 32),
+                      AppAvatar(
+                        // Only reuse a business profile that is ALREADY loaded
+                        // (the tray ring / profile screen that opened this
+                        // viewer keeps it alive). The viewer never starts its
+                        // own network request just for the photo; on a deep
+                        // link it simply shows the initials.
+                        imageUrl:
+                            ref.exists(
+                                  businessProfilePublicProvider(
+                                    widget.businessId,
+                                  ),
+                                )
+                                ? ref.watch(
+                                  businessAvatarUrlProvider(widget.businessId),
+                                )
+                                : null,
+                        name: widget.businessName,
+                        size: 32,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Row(

@@ -29,6 +29,7 @@ class BusinessProfileResponseDto {
     required this.isVerified,
     required this.followerCount,
     this.isFeatured = false,
+    this.avatarUrl,
   });
 
   factory BusinessProfileResponseDto.fromJson(Map<String, dynamic> json) {
@@ -65,6 +66,12 @@ class BusinessProfileResponseDto {
       // Part P-110: defensive default. The public profile read is cached
       // server-side for 5 min, so an older cached payload may lack the key.
       isFeatured: (json['is_featured'] as bool?) ?? false,
+      // `avatar` is the profile photo URL, or null / missing when the business
+      // has none (older cached payloads lack the key).
+      avatarUrl: switch (json['avatar']) {
+        final String url when url.isNotEmpty => url,
+        _ => null,
+      },
     );
   }
 
@@ -82,6 +89,9 @@ class BusinessProfileResponseDto {
   /// Part P-110: read-only Featured flag (P-087), display-only.
   final bool isFeatured;
 
+  /// Profile photo URL (wire key `avatar`), `null` when none.
+  final String? avatarUrl;
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'business_name': businessName,
@@ -94,5 +104,6 @@ class BusinessProfileResponseDto {
     'is_verified': isVerified,
     'follower_count': followerCount,
     'is_featured': isFeatured,
+    if (avatarUrl != null) 'avatar': avatarUrl,
   };
 }

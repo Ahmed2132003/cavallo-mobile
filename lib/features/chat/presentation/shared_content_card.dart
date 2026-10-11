@@ -73,6 +73,7 @@ class SharedContentCard extends ConsumerWidget {
           AsyncData(value: final PublicPost post) => PostCard(
             post: post,
             businessName: businessName,
+            businessAvatarUrl: shared.businessAvatarUrl,
             onTap: () => _open(context),
           ),
           AsyncData(value: null) => const _UnavailableCard(),
@@ -84,6 +85,7 @@ class SharedContentCard extends ConsumerWidget {
           AsyncData(value: final PublicReel reel) => ReelCard(
             reel: reel,
             businessName: businessName,
+            businessAvatarUrl: shared.businessAvatarUrl,
             onTap: () => _open(context),
           ),
           AsyncData(value: null) => const _UnavailableCard(),

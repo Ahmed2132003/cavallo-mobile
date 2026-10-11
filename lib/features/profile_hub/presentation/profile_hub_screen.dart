@@ -373,7 +373,7 @@ class _HubHeader extends StatelessWidget {
       padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 4),
       child: Row(
         children: <Widget>[
-          AppAvatar(name: title, size: 64),
+          AppAvatar(imageUrl: business?.avatarUrl, name: title, size: 64),
           const SizedBox(width: 16),
           Expanded(
             child: Column(

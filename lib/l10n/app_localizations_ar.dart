@@ -1703,4 +1703,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reelFormUploading => 'جارٍ رفع الفيديو... قد يستغرق الفيديو الكبير بضع دقائق. أبقِ هذه الشاشة مفتوحة.';
+
+  @override
+  String get bizAvatarAdd => 'إضافة صورة الملف';
+
+  @override
+  String get bizAvatarChange => 'تغيير الصورة';
+
+  @override
+  String get bizAvatarRemove => 'إزالة الصورة';
+
+  @override
+  String get bizAvatarUpdated => 'تم تحديث صورة الملف.';
+
+  @override
+  String get bizAvatarRemoved => 'تمت إزالة صورة الملف.';
+
+  @override
+  String get bizAvatarUploadFailed => 'تعذّر تحديث الصورة. حاول مرة أخرى.';
+
+  @override
+  String get bizAvatarUploadLater => 'تم إنشاء ملفك، لكن تعذّر رفع الصورة. يمكنك إضافتها من تعديل الملف.';
+
+  @override
+  String get bizAvatarSemantic => 'صورة ملف النشاط التجاري';
 }

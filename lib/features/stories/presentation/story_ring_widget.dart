@@ -31,10 +31,15 @@ class StoryRingWidget extends ConsumerWidget {
     super.key,
     required this.businessId,
     required this.businessName,
+    this.avatarUrl,
   });
 
   final int businessId;
   final String businessName;
+
+  /// Business profile photo (`null` = initials). Passed by the caller, which
+  /// already resolves the public profile, so this widget stays provider-free.
+  final String? avatarUrl;
 
   /// Diameter of the photo inside the ring.
   static const double avatarSize = 62;
@@ -84,6 +89,7 @@ class StoryRingWidget extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               AppAvatar(
+                imageUrl: avatarUrl,
                 name: businessName,
                 size: avatarSize,
                 ring: hasUnviewed ? AppAvatarRing.unseen : AppAvatarRing.seen,

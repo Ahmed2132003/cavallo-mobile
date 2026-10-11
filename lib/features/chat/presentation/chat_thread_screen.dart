@@ -503,7 +503,11 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
       appBar: CavalloAppBar(
         title: Row(
           children: [
-            AppAvatar(name: displayName, size: 36),
+            AppAvatar(
+              imageUrl: widget.conversation.otherParticipant?.avatarUrl,
+              name: displayName,
+              size: 36,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Column(

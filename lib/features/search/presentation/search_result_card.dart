@@ -139,6 +139,7 @@ class _BusinessResultRow extends StatelessWidget {
       child: Row(
         children: <Widget>[
           AppAvatar(
+            imageUrl: business.avatarUrl,
             name: business.businessName,
             size: 52,
             ringGapColor: colors.background,
