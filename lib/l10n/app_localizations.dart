@@ -617,6 +617,30 @@ abstract class AppLocalizations {
   /// **'About'**
   String get hubAbout;
 
+  /// About dialog title: the name of the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Cavallo'**
+  String get aboutAppName;
+
+  /// About dialog body: short description of what the app is.
+  ///
+  /// In en, this message translates to:
+  /// **'Cavallo is a social commerce app that connects traders and factories with customers. Share reels, posts and stories, discover products and businesses, and chat directly to get deals done, all in one place.'**
+  String get aboutDescription;
+
+  /// About dialog: developer credit line.
+  ///
+  /// In en, this message translates to:
+  /// **'Developed by Eng. Ahmed Ibrahim'**
+  String get aboutDevelopedBy;
+
+  /// About dialog: button that closes the dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get aboutClose;
+
   /// Hub row and confirm button: sign out of the account.
   ///
   /// In en, this message translates to:

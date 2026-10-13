@@ -338,6 +338,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hubAbout => 'About';
 
   @override
+  String get aboutAppName => 'Cavallo';
+
+  @override
+  String get aboutDescription => 'Cavallo is a social commerce app that connects traders and factories with customers. Share reels, posts and stories, discover products and businesses, and chat directly to get deals done, all in one place.';
+
+  @override
+  String get aboutDevelopedBy => 'Developed by Eng. Ahmed Ibrahim';
+
+  @override
+  String get aboutClose => 'Close';
+
+  @override
   String get hubLogOut => 'Log out';
 
   @override

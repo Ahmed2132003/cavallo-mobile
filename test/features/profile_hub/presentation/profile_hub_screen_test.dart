@@ -416,12 +416,57 @@ void main() {
       expect(find.text('Profile & Settings'), findsOneWidget);
     });
 
-    testWidgets('About opens the about dialog', (WidgetTester tester) async {
+    testWidgets('About opens a custom dialog without the licenses button', (
+      WidgetTester tester,
+    ) async {
       await _pump(tester, user: _customer);
       await tester.tap(_row(ProfileHubScreen.aboutId));
       await tester.pumpAndSettle();
 
-      expect(find.byType(AboutDialog), findsOneWidget);
+      final Finder dialog = find.byKey(ProfileHubScreen.aboutDialogKey);
+      expect(dialog, findsOneWidget);
+      expect(find.byType(AboutDialog), findsNothing);
+      expect(find.text('View licenses'), findsNothing);
+      expect(
+        find.descendant(of: dialog, matching: find.text('Cavallo')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: dialog, matching: find.text('Developed by Eng. Ahmed Ibrahim')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: dialog, matching: find.text('Close')),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(ProfileHubScreen.aboutCloseKey));
+      await tester.pumpAndSettle();
+      expect(dialog, findsNothing);
+    });
+
+    testWidgets('About dialog is Arabic when the app language is Arabic', (
+      WidgetTester tester,
+    ) async {
+      await _pump(tester, user: _customer, locale: const Locale('ar'));
+      await tester.tap(_row(ProfileHubScreen.aboutId));
+      await tester.pumpAndSettle();
+
+      final Finder dialog = find.byKey(ProfileHubScreen.aboutDialogKey);
+      expect(dialog, findsOneWidget);
+      expect(find.text('View licenses'), findsNothing);
+      expect(
+        find.descendant(of: dialog, matching: find.text('قبالو')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: dialog, matching: find.text('تم تطويره بواسطة م. أحمد إبراهيم')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: dialog, matching: find.text('إغلاق')),
+        findsOneWidget,
+      );
     });
   });
 

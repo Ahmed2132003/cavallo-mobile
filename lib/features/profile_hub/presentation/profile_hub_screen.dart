@@ -96,6 +96,8 @@ class ProfileHubScreen extends ConsumerWidget {
   static const Key logoutDialogKey = Key('hub-logout-dialog');
   static const Key logoutCancelKey = Key('hub-logout-cancel');
   static const Key logoutConfirmKey = Key('hub-logout-confirm');
+  static const Key aboutDialogKey = Key('hub-about-dialog');
+  static const Key aboutCloseKey = Key('hub-about-close');
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -268,11 +270,7 @@ class ProfileHubScreen extends ConsumerWidget {
                 key: rowKey(aboutId),
                 icon: Icons.info_outline,
                 title: l10n.hubAbout,
-                onTap:
-                    () => showAboutDialog(
-                      context: context,
-                      applicationName: l10n.appTitle,
-                    ),
+                onTap: () => _showAbout(context),
               ),
             ],
           ),
@@ -291,6 +289,42 @@ class ProfileHubScreen extends ConsumerWidget {
           const SizedBox(height: 24),
         ],
       ),
+    );
+  }
+
+  /// Shows the About dialog: what the app is and who built it. It is a plain
+  /// [AlertDialog] on purpose: Flutter's `showAboutDialog` always adds a
+  /// "View licenses" button, which this app does not expose.
+  Future<void> _showAbout(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    return showDialog<void>(
+      context: context,
+      builder:
+          (BuildContext dialogContext) => AlertDialog(
+            key: aboutDialogKey,
+            title: Text(l10n.aboutAppName),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(l10n.aboutDescription),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.aboutDevelopedBy,
+                    style: Theme.of(dialogContext).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                key: aboutCloseKey,
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text(l10n.aboutClose),
+              ),
+            ],
+          ),
     );
   }
 

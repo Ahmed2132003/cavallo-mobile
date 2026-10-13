@@ -350,6 +350,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hubAbout => 'عن التطبيق';
 
   @override
+  String get aboutAppName => 'قبالو';
+
+  @override
+  String get aboutDescription => 'قبالو تطبيق تجارة اجتماعية يربط بين التجار والمصانع والعملاء. شارك الريلز والمنشورات والقصص، واكتشف المنتجات والأنشطة التجارية، وتواصل مباشرة لإتمام صفقاتك في مكان واحد.';
+
+  @override
+  String get aboutDevelopedBy => 'تم تطويره بواسطة م. أحمد إبراهيم';
+
+  @override
+  String get aboutClose => 'إغلاق';
+
+  @override
   String get hubLogOut => 'تسجيل الخروج';
 
   @override

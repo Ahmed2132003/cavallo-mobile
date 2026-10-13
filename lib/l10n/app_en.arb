@@ -415,6 +415,22 @@
   "@hubAbout": {
     "description": "Hub row: opens the About dialog."
   },
+  "aboutAppName": "Cavallo",
+  "@aboutAppName": {
+    "description": "About dialog title: the name of the app."
+  },
+  "aboutDescription": "Cavallo is a social commerce app that connects traders and factories with customers. Share reels, posts and stories, discover products and businesses, and chat directly to get deals done, all in one place.",
+  "@aboutDescription": {
+    "description": "About dialog body: short description of what the app is."
+  },
+  "aboutDevelopedBy": "Developed by Eng. Ahmed Ibrahim",
+  "@aboutDevelopedBy": {
+    "description": "About dialog: developer credit line."
+  },
+  "aboutClose": "Close",
+  "@aboutClose": {
+    "description": "About dialog: button that closes the dialog."
+  },
   "hubLogOut": "Log out",
   "@hubLogOut": {
     "description": "Hub row and confirm button: sign out of the account."
