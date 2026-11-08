@@ -138,9 +138,8 @@ Widget _wrapWithRouter(AuthRepository fakeRepository) {
       GoRoute(
         path: RouteNames.loginPath,
         name: RouteNames.login,
-        builder:
-            (context, state) =>
-                const Scaffold(body: Text('LOGIN_SCREEN_PLACEHOLDER')),
+        builder: (context, state) =>
+            const Scaffold(body: Text('LOGIN_SCREEN_PLACEHOLDER')),
       ),
     ],
   );
@@ -166,8 +165,10 @@ Future<void> _enterValidForm(
 
 const String _emailRejected =
     'This email address cannot be used. Please check it or try another one.';
-const String _confirmRejected = 'The passwords you entered do not match.';
-const String _accountTypeRejected = 'Please choose a valid account type.';
+const String _confirmRejected =
+    'The passwords you entered do not match.';
+const String _accountTypeRejected =
+    'Please choose a valid account type.';
 const String _validationError =
     'Some of the information you entered could not be accepted. Please check it and try again.';
 const String _serverError =
@@ -186,20 +187,23 @@ void main() {
   });
 
   group('RegisterScreen — local validation', () {
-    testWidgets('shows a required-field error for all three fields on an empty '
-        'submit, without calling the repository', (tester) async {
-      final fakeRepo = _FakeAuthRepository();
-      await tester.pumpWidget(_wrap(fakeRepo));
-      await tester.pumpAndSettle();
+    testWidgets(
+      'shows a required-field error for all three fields on an empty '
+      'submit, without calling the repository',
+      (tester) async {
+        final fakeRepo = _FakeAuthRepository();
+        await tester.pumpWidget(_wrap(fakeRepo));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(AppButton, 'Create account'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(AppButton, 'Create account'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Email is required.'), findsOneWidget);
-      expect(find.text('Password is required.'), findsOneWidget);
-      expect(find.text('Please confirm your password.'), findsOneWidget);
-      expect(fakeRepo.registerCallCount, 0);
-    });
+        expect(find.text('Email is required.'), findsOneWidget);
+        expect(find.text('Password is required.'), findsOneWidget);
+        expect(find.text('Please confirm your password.'), findsOneWidget);
+        expect(fakeRepo.registerCallCount, 0);
+      },
+    );
 
     testWidgets(
       'shows a format error for an invalid email, without calling the '
@@ -240,187 +244,183 @@ void main() {
     );
   });
 
-  group(
-    'RegisterScreen — submitting (confirmed auto-login-after-register)',
-    () {
-      testWidgets(
-        'a valid submit calls AuthRepository.register with the trimmed '
-        'email, the selected account type, and shows a loading indicator '
-        'while the register call is in flight',
-        (tester) async {
-          final registerCompleter = Completer<User>();
-          final fakeRepo = _FakeAuthRepository(
-            registerBehavior: () => registerCompleter.future,
-          );
-          await tester.pumpWidget(_wrap(fakeRepo));
-          await tester.pumpAndSettle();
-
-          await _enterValidForm(tester, email: '  new@example.com  ');
-          await tester.tap(find.widgetWithText(AppButton, 'Create account'));
-          await tester.pump(); // one frame — do NOT settle, request is stuck
-
-          expect(fakeRepo.registerCallCount, 1);
-          expect(fakeRepo.lastEmail, 'new@example.com'); // trimmed
-          expect(fakeRepo.lastAccountType, AccountType.customer); // default
-          expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-          registerCompleter.complete(
-            const User(
-              id: 2,
-              email: 'new@example.com',
-              accountType: AccountType.customer,
-              isModerator: false,
-              isStaff: false,
-            ),
-          );
-          await tester.pumpAndSettle();
-        },
-      );
-
-      testWidgets(
-        'selecting "Business" before submitting passes AccountType.business '
-        'to the repository',
-        (tester) async {
-          final fakeRepo = _FakeAuthRepository();
-          await tester.pumpWidget(_wrap(fakeRepo));
-          await tester.pumpAndSettle();
-
-          await tester.tap(find.text('Business'));
-          await tester.pumpAndSettle();
-          await _enterValidForm(tester);
-          await tester.tap(find.widgetWithText(AppButton, 'Create account'));
-          await tester.pumpAndSettle();
-
-          expect(fakeRepo.lastAccountType, AccountType.business);
-        },
-      );
-
-      testWidgets(
-        'a successful register chains straight into AuthRepository.login '
-        'with the same credentials — the confirmed auto-login decision',
-        (tester) async {
-          final fakeRepo = _FakeAuthRepository();
-          await tester.pumpWidget(_wrap(fakeRepo));
-          await tester.pumpAndSettle();
-
-          await _enterValidForm(
-            tester,
-            email: 'new@example.com',
-            password: 'correct-horse-battery-staple',
-          );
-          await tester.tap(find.widgetWithText(AppButton, 'Create account'));
-          await tester.pumpAndSettle();
-
-          expect(fakeRepo.registerCallCount, 1);
-          expect(fakeRepo.loginCallCount, 1);
-        },
-      );
-
-      testWidgets(
-        'a ValidationFailure from register with an email field error is '
-        'shown under the email field, and login is never called',
-        (tester) async {
-          final fakeRepo = _FakeAuthRepository(
-            registerBehavior:
-                () =>
-                    throw const ValidationFailure(
-                      message: 'Invalid data.',
-                      fields: {
-                        'email': ['A user with this email already exists.'],
-                      },
-                    ),
-          );
-          await tester.pumpWidget(_wrap(fakeRepo));
-          await tester.pumpAndSettle();
-
-          await _enterValidForm(tester);
-          await tester.tap(find.widgetWithText(AppButton, 'Create account'));
-          await tester.pumpAndSettle();
-
-          expect(find.text(_emailRejected), findsOneWidget);
-          expect(fakeRepo.loginCallCount, 0);
-        },
-      );
-
-      testWidgets(
-        'a ValidationFailure from register with a password_confirm field '
-        'error is shown under the confirm-password field',
-        (tester) async {
-          final fakeRepo = _FakeAuthRepository(
-            registerBehavior:
-                () =>
-                    throw const ValidationFailure(
-                      message: 'Invalid data.',
-                      fields: {
-                        'password_confirm': ["Passwords didn't match."],
-                      },
-                    ),
-          );
-          await tester.pumpWidget(_wrap(fakeRepo));
-          await tester.pumpAndSettle();
-
-          await _enterValidForm(tester);
-          await tester.tap(find.widgetWithText(AppButton, 'Create account'));
-          await tester.pumpAndSettle();
-
-          expect(find.text(_confirmRejected), findsOneWidget);
-        },
-      );
-
-      testWidgets(
-        'a ValidationFailure from register with an account_type field '
-        'error is shown beneath the account-type selector',
-        (tester) async {
-          final fakeRepo = _FakeAuthRepository(
-            registerBehavior:
-                () =>
-                    throw const ValidationFailure(
-                      message: 'Invalid data.',
-                      fields: {
-                        'account_type': ['Not a valid choice.'],
-                      },
-                    ),
-          );
-          await tester.pumpWidget(_wrap(fakeRepo));
-          await tester.pumpAndSettle();
-
-          await _enterValidForm(tester);
-          await tester.tap(find.widgetWithText(AppButton, 'Create account'));
-          await tester.pumpAndSettle();
-
-          expect(find.text(_accountTypeRejected), findsOneWidget);
-        },
-      );
-
-      testWidgets(
-        'a non-field ValidationFailure from register is shown as a general '
-        'error',
-        (tester) async {
-          final fakeRepo = _FakeAuthRepository(
-            registerBehavior:
-                () =>
-                    throw const ValidationFailure(
-                      message: 'Something about the request was invalid.',
-                      fields: {},
-                    ),
-          );
-          await tester.pumpWidget(_wrap(fakeRepo));
-          await tester.pumpAndSettle();
-
-          await _enterValidForm(tester);
-          await tester.tap(find.widgetWithText(AppButton, 'Create account'));
-          await tester.pumpAndSettle();
-
-          expect(find.text(_validationError), findsOneWidget);
-        },
-      );
-
-      testWidgets('a ServerFailure from register is shown as a general error', (
-        tester,
-      ) async {
+  group('RegisterScreen — submitting (confirmed auto-login-after-register)', () {
+    testWidgets(
+      'a valid submit calls AuthRepository.register with the trimmed '
+      'email, the selected account type, and shows a loading indicator '
+      'while the register call is in flight',
+      (tester) async {
+        final registerCompleter = Completer<User>();
         final fakeRepo = _FakeAuthRepository(
-          registerBehavior:
-              () => throw const ServerFailure(message: 'Something went wrong.'),
+          registerBehavior: () => registerCompleter.future,
+        );
+        await tester.pumpWidget(_wrap(fakeRepo));
+        await tester.pumpAndSettle();
+
+        await _enterValidForm(tester, email: '  new@example.com  ');
+        await tester.tap(find.widgetWithText(AppButton, 'Create account'));
+        await tester.pump(); // one frame — do NOT settle, request is stuck
+
+        expect(fakeRepo.registerCallCount, 1);
+        expect(fakeRepo.lastEmail, 'new@example.com'); // trimmed
+        expect(fakeRepo.lastAccountType, AccountType.customer); // default
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+        registerCompleter.complete(
+          const User(
+            id: 2,
+            email: 'new@example.com',
+            accountType: AccountType.customer,
+            isModerator: false,
+            isStaff: false,
+          ),
+        );
+        await tester.pumpAndSettle();
+      },
+    );
+
+    testWidgets(
+      'selecting "Business" before submitting passes AccountType.business '
+      'to the repository',
+      (tester) async {
+        final fakeRepo = _FakeAuthRepository();
+        await tester.pumpWidget(_wrap(fakeRepo));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Business'));
+        await tester.pumpAndSettle();
+        await _enterValidForm(tester);
+        await tester.tap(find.widgetWithText(AppButton, 'Create account'));
+        await tester.pumpAndSettle();
+
+        expect(fakeRepo.lastAccountType, AccountType.business);
+      },
+    );
+
+    testWidgets(
+      'a successful register chains straight into AuthRepository.login '
+      'with the same credentials — the confirmed auto-login decision',
+      (tester) async {
+        final fakeRepo = _FakeAuthRepository();
+        await tester.pumpWidget(_wrap(fakeRepo));
+        await tester.pumpAndSettle();
+
+        await _enterValidForm(
+          tester,
+          email: 'new@example.com',
+          password: 'correct-horse-battery-staple',
+        );
+        await tester.tap(find.widgetWithText(AppButton, 'Create account'));
+        await tester.pumpAndSettle();
+
+        expect(fakeRepo.registerCallCount, 1);
+        expect(fakeRepo.loginCallCount, 1);
+      },
+    );
+
+    testWidgets(
+      'a ValidationFailure from register with an email field error is '
+      'shown under the email field, and login is never called',
+      (tester) async {
+        final fakeRepo = _FakeAuthRepository(
+          registerBehavior: () => throw const ValidationFailure(
+            message: 'Invalid data.',
+            fields: {
+              'email': ['A user with this email already exists.'],
+            },
+          ),
+        );
+        await tester.pumpWidget(_wrap(fakeRepo));
+        await tester.pumpAndSettle();
+
+        await _enterValidForm(tester);
+        await tester.tap(find.widgetWithText(AppButton, 'Create account'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text(_emailRejected),
+          findsOneWidget,
+        );
+        expect(fakeRepo.loginCallCount, 0);
+      },
+    );
+
+    testWidgets(
+      'a ValidationFailure from register with a password_confirm field '
+      'error is shown under the confirm-password field',
+      (tester) async {
+        final fakeRepo = _FakeAuthRepository(
+          registerBehavior: () => throw const ValidationFailure(
+            message: 'Invalid data.',
+            fields: {
+              'password_confirm': ["Passwords didn't match."],
+            },
+          ),
+        );
+        await tester.pumpWidget(_wrap(fakeRepo));
+        await tester.pumpAndSettle();
+
+        await _enterValidForm(tester);
+        await tester.tap(find.widgetWithText(AppButton, 'Create account'));
+        await tester.pumpAndSettle();
+
+        expect(find.text(_confirmRejected), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'a ValidationFailure from register with an account_type field '
+      'error is shown beneath the account-type selector',
+      (tester) async {
+        final fakeRepo = _FakeAuthRepository(
+          registerBehavior: () => throw const ValidationFailure(
+            message: 'Invalid data.',
+            fields: {
+              'account_type': ['Not a valid choice.'],
+            },
+          ),
+        );
+        await tester.pumpWidget(_wrap(fakeRepo));
+        await tester.pumpAndSettle();
+
+        await _enterValidForm(tester);
+        await tester.tap(find.widgetWithText(AppButton, 'Create account'));
+        await tester.pumpAndSettle();
+
+        expect(find.text(_accountTypeRejected), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'a non-field ValidationFailure from register is shown as a general '
+      'error',
+      (tester) async {
+        final fakeRepo = _FakeAuthRepository(
+          registerBehavior: () => throw const ValidationFailure(
+            message: 'Something about the request was invalid.',
+            fields: {},
+          ),
+        );
+        await tester.pumpWidget(_wrap(fakeRepo));
+        await tester.pumpAndSettle();
+
+        await _enterValidForm(tester);
+        await tester.tap(find.widgetWithText(AppButton, 'Create account'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text(_validationError),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'a ServerFailure from register is shown as a general error',
+      (tester) async {
+        final fakeRepo = _FakeAuthRepository(
+          registerBehavior: () =>
+              throw const ServerFailure(message: 'Something went wrong.'),
         );
         await tester.pumpWidget(_wrap(fakeRepo));
         await tester.pumpAndSettle();
@@ -430,33 +430,30 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text(_serverError), findsOneWidget);
-      });
-    },
-  );
+      },
+    );
+  });
 
-  group(
-    'RegisterScreen — chained-login failure after a successful register',
-    () {
-      testWidgets(
-        'shows a degraded-landing message and navigates to /login, since '
-        'the account already exists at that point',
-        (tester) async {
-          final fakeRepo = _FakeAuthRepository(
-            loginBehavior:
-                () => throw const NetworkFailure(message: 'No connection.'),
-          );
-          await tester.pumpWidget(_wrapWithRouter(fakeRepo));
-          await tester.pumpAndSettle();
+  group('RegisterScreen — chained-login failure after a successful register', () {
+    testWidgets(
+      'shows a degraded-landing message and navigates to /login, since '
+      'the account already exists at that point',
+      (tester) async {
+        final fakeRepo = _FakeAuthRepository(
+          loginBehavior: () =>
+              throw const NetworkFailure(message: 'No connection.'),
+        );
+        await tester.pumpWidget(_wrapWithRouter(fakeRepo));
+        await tester.pumpAndSettle();
 
-          await _enterValidForm(tester);
-          await tester.tap(find.widgetWithText(AppButton, 'Create account'));
-          await tester.pumpAndSettle();
+        await _enterValidForm(tester);
+        await tester.tap(find.widgetWithText(AppButton, 'Create account'));
+        await tester.pumpAndSettle();
 
-          expect(fakeRepo.registerCallCount, 1);
-          expect(fakeRepo.loginCallCount, 1);
-          expect(find.text('LOGIN_SCREEN_PLACEHOLDER'), findsOneWidget);
-        },
-      );
-    },
-  );
+        expect(fakeRepo.registerCallCount, 1);
+        expect(fakeRepo.loginCallCount, 1);
+        expect(find.text('LOGIN_SCREEN_PLACEHOLDER'), findsOneWidget);
+      },
+    );
+  });
 }
