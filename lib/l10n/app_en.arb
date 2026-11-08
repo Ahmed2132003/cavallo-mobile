@@ -2317,5 +2317,30 @@
   "authResetThrottled": "Too many attempts. Please try again later.",
   "@authResetThrottled": {
     "description": "Forgot-password flow: shown when the server throttles a request (HTTP 429)."
+  },
+  "authForgotPasswordLink": "Forgot password?",
+  "@authForgotPasswordLink": {
+    "description": "Login screen: link to the forgot-password flow."
+  },
+  "authResetOtpNeutralHint": "If {email} is registered, a 6-digit code is on its way.",
+  "@authResetOtpNeutralHint": {
+    "description": "Forgot-password step 2: neutral text (the server answers the same for every address, so it does not say the code was sent). {email} is the address the user typed.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authResetOtpExpiry": "The code is valid for 5 minutes.",
+  "@authResetOtpExpiry": {
+    "description": "Forgot-password step 2: how long the code is valid (matches the backend OTP lifetime of 300 seconds)."
+  },
+  "authResetShowPassword": "Show password",
+  "@authResetShowPassword": {
+    "description": "Forgot-password step 3: tooltip of the button that reveals the typed password."
+  },
+  "authResetHidePassword": "Hide password",
+  "@authResetHidePassword": {
+    "description": "Forgot-password step 3: tooltip of the button that hides the typed password."
   }
 }

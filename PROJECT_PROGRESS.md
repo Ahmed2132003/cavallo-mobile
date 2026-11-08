@@ -32,3 +32,25 @@
 **Not verified:** the verify/confirm endpoints were NOT exercised against the real backend (unit tests use a mocked Dio adapter shaped from the backend code). No UI exists yet, so no manual walk-through was possible.
 
 **Known, unrelated to this change:** some existing test still issues real requests to localhost:8095 (`/posts/`, `/reels/`, `/stories/`) and gets 400. It does not fail the suite. To be tracked separately.
+
+---
+
+## Forgot-password SCREENS - branch `feature/forgot-password-state` (2026-11-08)
+
+**Scope:** the three real screens (email -> code -> new password) replace the placeholders; login got a "Forgot password?" link and an optional prefilled email.
+
+**What was added:**
+- `forgot_password_screens.dart`: step 1 (email, neutral text, 429 + network retry), step 2 (6-digit code read from backend `_OTP_PATTERN`, 60 s resend cooldown, 5-minute note, unified 400 shown as "invalid or expired", back to change email), step 3 (new password + confirm, show/hide, weak-password text under the field, dead token restarts at step 1). Success: flow state wiped, snackbar, back to /login with the email filled (route `extra`, nothing stored). No automatic login.
+- `AppTextField`: 4 optional params (inputFormatters, suffixIcon, textInputAction, onChanged) - backward compatible, every existing call site unchanged.
+- `LoginScreen`: link between login and register (disabled while submitting; passes the typed email), optional `initialEmail`.
+- L10n: 5 new keys in EN + AR (link, neutral hint, expiry note, show/hide password).
+- Goldens: 12 new PNGs in `test/goldens/p116_forgot_password/`.
+
+**Verification (REAL results of the script run):**
+- flutter gen-l10n: PASS
+- flutter analyze: PASS
+- Targeted tests (new tests + auth + routing + l10n guards + core widgets): 00:24 +135: All tests passed!
+- Goldens: generated 12, stable on 3 consecutive runs
+- flutter test (FULL): 04:17 +1696: All tests passed!
+
+**NOT run by this script (manual, on the emulator + real backend):** the end-to-end walk-through (real email delivery, wrong / expired code, throttling, offline per step, language and theme switching). Status: **NOT RUN** until the person fills it in.

@@ -1761,4 +1761,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authResetThrottled => 'Too many attempts. Please try again later.';
+
+  @override
+  String get authForgotPasswordLink => 'Forgot password?';
+
+  @override
+  String authResetOtpNeutralHint(String email) {
+    return 'If $email is registered, a 6-digit code is on its way.';
+  }
+
+  @override
+  String get authResetOtpExpiry => 'The code is valid for 5 minutes.';
+
+  @override
+  String get authResetShowPassword => 'Show password';
+
+  @override
+  String get authResetHidePassword => 'Hide password';
 }
