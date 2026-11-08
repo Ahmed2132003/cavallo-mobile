@@ -69,7 +69,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorServer => 'حدث خطأ من جانبنا. حاول مرة أخرى لاحقًا.';
 
   @override
-  String get errorAuthentication => 'تعذّر التحقق من هويتك. سجّل الدخول مرة أخرى.';
+  String get errorAuthentication =>
+      'تعذّر التحقق من هويتك. سجّل الدخول مرة أخرى.';
 
   @override
   String get errorNotAuthorized => 'غير مسموح لك بتنفيذ هذا الإجراء.';
@@ -84,16 +85,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorBadRequest => 'تعذّر إتمام الطلب.';
 
   @override
-  String get errorValidation => 'تعذّر قبول بعض البيانات التي أدخلتها. راجعها وحاول مرة أخرى.';
+  String get errorValidation =>
+      'تعذّر قبول بعض البيانات التي أدخلتها. راجعها وحاول مرة أخرى.';
 
   @override
-  String get errorThrottled => 'محاولات كثيرة في وقت قصير. انتظر قليلًا ثم حاول مرة أخرى.';
+  String get errorThrottled =>
+      'محاولات كثيرة في وقت قصير. انتظر قليلًا ثم حاول مرة أخرى.';
 
   @override
-  String get errorConflict => 'تغيّرت حالة هذا العنصر بالفعل. حدّث الصفحة وحاول مرة أخرى.';
+  String get errorConflict =>
+      'تغيّرت حالة هذا العنصر بالفعل. حدّث الصفحة وحاول مرة أخرى.';
 
   @override
-  String get errorServiceUnavailable => 'هذه الخدمة غير متاحة حاليًا. حاول مرة أخرى لاحقًا.';
+  String get errorServiceUnavailable =>
+      'هذه الخدمة غير متاحة حاليًا. حاول مرة أخرى لاحقًا.';
 
   @override
   String get errorCancelled => 'تم إلغاء الطلب.';
@@ -118,24 +123,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String monthName(String month) {
-    String _temp0 = intl.Intl.selectLogic(
-      month,
-      {
-        'january': 'يناير',
-        'february': 'فبراير',
-        'march': 'مارس',
-        'april': 'أبريل',
-        'may': 'مايو',
-        'june': 'يونيو',
-        'july': 'يوليو',
-        'august': 'أغسطس',
-        'september': 'سبتمبر',
-        'october': 'أكتوبر',
-        'november': 'نوفمبر',
-        'december': 'ديسمبر',
-        'other': '$month',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(month, {
+      'january': 'يناير',
+      'february': 'فبراير',
+      'march': 'مارس',
+      'april': 'أبريل',
+      'may': 'مايو',
+      'june': 'يونيو',
+      'july': 'يوليو',
+      'august': 'أغسطس',
+      'september': 'سبتمبر',
+      'october': 'أكتوبر',
+      'november': 'نوفمبر',
+      'december': 'ديسمبر',
+      'other': '$month',
+    });
     return '$_temp0';
   }
 
@@ -151,16 +153,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String currencyLabel(String currency) {
-    String _temp0 = intl.Intl.selectLogic(
-      currency,
-      {
-        'egp': 'ج.م',
-        'sar': 'ر.س',
-        'aed': 'د.إ',
-        'jod': 'د.أ',
-        'other': '$currency',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(currency, {
+      'egp': 'ج.م',
+      'sar': 'ر.س',
+      'aed': 'د.إ',
+      'jod': 'د.أ',
+      'other': '$currency',
+    });
     return '$_temp0';
   }
 
@@ -221,19 +220,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authPasswordsDoNotMatch => 'كلمتا المرور غير متطابقتين.';
 
   @override
-  String get authInvalidCredentials => 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+  String get authInvalidCredentials =>
+      'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
 
   @override
-  String get authAutoLoginFailed => 'تم إنشاء الحساب، لكن تعذّر تسجيل الدخول تلقائيًا. يرجى تسجيل الدخول.';
+  String get authAutoLoginFailed =>
+      'تم إنشاء الحساب، لكن تعذّر تسجيل الدخول تلقائيًا. يرجى تسجيل الدخول.';
 
   @override
-  String get authFieldErrorEmail => 'لا يمكن استخدام هذا البريد الإلكتروني. تحقق منه أو جرّب بريدًا آخر.';
+  String get authFieldErrorEmail =>
+      'لا يمكن استخدام هذا البريد الإلكتروني. تحقق منه أو جرّب بريدًا آخر.';
 
   @override
-  String get authFieldErrorPassword => 'لا يمكن استخدام كلمة المرور هذه. يرجى اختيار كلمة أخرى.';
+  String get authFieldErrorPassword =>
+      'لا يمكن استخدام كلمة المرور هذه. يرجى اختيار كلمة أخرى.';
 
   @override
-  String get authFieldErrorPasswordConfirm => 'كلمتا المرور اللتان أدخلتهما غير متطابقتين.';
+  String get authFieldErrorPasswordConfirm =>
+      'كلمتا المرور اللتان أدخلتهما غير متطابقتين.';
 
   @override
   String get authFieldErrorAccountType => 'يرجى اختيار نوع حساب صالح.';
@@ -251,7 +255,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get routeErrorTitle => 'الصفحة غير موجودة';
 
   @override
-  String get routeErrorMessage => 'الصفحة التي تبحث عنها غير موجودة أو تم نقلها.';
+  String get routeErrorMessage =>
+      'الصفحة التي تبحث عنها غير موجودة أو تم نقلها.';
 
   @override
   String get routeErrorGoHome => 'العودة إلى الرئيسية';
@@ -353,7 +358,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aboutAppName => 'قبالو';
 
   @override
-  String get aboutDescription => 'قبالو تطبيق تجارة اجتماعية يربط بين التجار والمصانع والعملاء. شارك الريلز والمنشورات والقصص، واكتشف المنتجات والأنشطة التجارية، وتواصل مباشرة لإتمام صفقاتك في مكان واحد.';
+  String get aboutDescription =>
+      'قبالو تطبيق تجارة اجتماعية يربط بين التجار والمصانع والعملاء. شارك الريلز والمنشورات والقصص، واكتشف المنتجات والأنشطة التجارية، وتواصل مباشرة لإتمام صفقاتك في مكان واحد.';
 
   @override
   String get aboutDevelopedBy => 'تم تطويره بواسطة م. أحمد إبراهيم';
@@ -368,7 +374,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hubLogOutConfirmTitle => 'تسجيل الخروج؟';
 
   @override
-  String get hubLogOutConfirmMessage => 'ستحتاج إلى تسجيل الدخول مرة أخرى لاستخدام حسابك.';
+  String get hubLogOutConfirmMessage =>
+      'ستحتاج إلى تسجيل الدخول مرة أخرى لاستخدام حسابك.';
 
   @override
   String get hubCancel => 'إلغاء';
@@ -383,13 +390,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get savedTabProducts => 'المنتجات';
 
   @override
-  String get savedEmptyPosts => 'لا توجد منشورات محفوظة بعد. اضغط على علامة الحفظ في أي منشور ليظهر هنا.';
+  String get savedEmptyPosts =>
+      'لا توجد منشورات محفوظة بعد. اضغط على علامة الحفظ في أي منشور ليظهر هنا.';
 
   @override
-  String get savedEmptyReels => 'لا توجد ريلز محفوظة بعد. اضغط على علامة الحفظ في أي ريل ليظهر هنا.';
+  String get savedEmptyReels =>
+      'لا توجد ريلز محفوظة بعد. اضغط على علامة الحفظ في أي ريل ليظهر هنا.';
 
   @override
-  String get savedEmptyProducts => 'لا توجد منتجات محفوظة بعد. اضغط على علامة الحفظ في أي منتج ليظهر هنا.';
+  String get savedEmptyProducts =>
+      'لا توجد منتجات محفوظة بعد. اضغط على علامة الحفظ في أي منتج ليظهر هنا.';
 
   @override
   String get savedUnsave => 'إزالة من المحفوظات';
@@ -526,7 +536,8 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get feedEmptyMessage => 'خلاصتك فارغة حاليًا.\nتابع بعض الأنشطة التجارية، أو عد لاحقًا.';
+  String get feedEmptyMessage =>
+      'خلاصتك فارغة حاليًا.\nتابع بعض الأنشطة التجارية، أو عد لاحقًا.';
 
   @override
   String get feedLoadFailed => 'تعذّر تحميل خلاصتك.';
@@ -589,7 +600,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileMessageFailed => 'تعذّر بدء المحادثة. حاول مرة أخرى.';
 
   @override
-  String get profileNotFound => 'لم يتم العثور على النشاط التجاري.\nربما تمت إزالته.';
+  String get profileNotFound =>
+      'لم يتم العثور على النشاط التجاري.\nربما تمت إزالته.';
 
   @override
   String get profileLoadFailed => 'تعذّر تحميل ملف هذا النشاط التجاري.';
@@ -612,7 +624,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profilePostsEmpty => 'لم يشارك هذا النشاط التجاري أي منشورات بعد.';
 
   @override
-  String get profilePostsLoadFailed => 'تعذّر تحميل منشورات هذا النشاط التجاري.';
+  String get profilePostsLoadFailed =>
+      'تعذّر تحميل منشورات هذا النشاط التجاري.';
 
   @override
   String get profileReelsEmpty => 'لم يشارك هذا النشاط التجاري أي ريلز بعد.';
@@ -624,7 +637,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileProductsEmpty => 'لم يضف هذا النشاط التجاري أي منتجات بعد.';
 
   @override
-  String get profileProductsLoadFailed => 'تعذّر تحميل منتجات هذا النشاط التجاري.';
+  String get profileProductsLoadFailed =>
+      'تعذّر تحميل منتجات هذا النشاط التجاري.';
 
   @override
   String get profileInfoType => 'نوع النشاط';
@@ -656,10 +670,12 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get searchIdlePrompt => 'ابحث عن تجار ومصانع ومنتجات.\nاكتب كلمة أو اختر فلترًا للبدء.';
+  String get searchIdlePrompt =>
+      'ابحث عن تجار ومصانع ومنتجات.\nاكتب كلمة أو اختر فلترًا للبدء.';
 
   @override
-  String get searchNoResults => 'لم يتم العثور على نتائج. جرّب بحثًا مختلفًا أو عدّل الفلاتر.';
+  String get searchNoResults =>
+      'لم يتم العثور على نتائج. جرّب بحثًا مختلفًا أو عدّل الفلاتر.';
 
   @override
   String get searchLoadFailed => 'تعذّر تحميل نتائج البحث.';
@@ -668,7 +684,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchResultsLoadingLabel => 'جارٍ تحميل النتائج';
 
   @override
-  String get discoverEmpty => 'لا يوجد ما يمكن اكتشافه بعد.\nعد قريبًا لترى أنشطة تجارية جديدة.';
+  String get discoverEmpty =>
+      'لا يوجد ما يمكن اكتشافه بعد.\nعد قريبًا لترى أنشطة تجارية جديدة.';
 
   @override
   String get discoverLoadFailed => 'تعذّر تحميل صفحة الاستكشاف الآن.';
@@ -733,10 +750,12 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get productPriceNote => 'السعر تقريبي وقابل للتفاوض مباشرة مع النشاط التجاري. راسل النشاط التجاري للتأكيد.';
+  String get productPriceNote =>
+      'السعر تقريبي وقابل للتفاوض مباشرة مع النشاط التجاري. راسل النشاط التجاري للتأكيد.';
 
   @override
-  String get productNotFoundMessage => 'لم يتم العثور على المنتج.\nربما تمت إزالته.';
+  String get productNotFoundMessage =>
+      'لم يتم العثور على المنتج.\nربما تمت إزالته.';
 
   @override
   String get productLoadFailed => 'تعذّر تحميل هذا المنتج.';
@@ -771,7 +790,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get commentsEmpty => 'لا توجد تعليقات بعد. كن أول من يعلّق.';
 
   @override
-  String get commentsPendingReview => 'قيد المراجعة: مخفي عن المستخدمين الآخرين';
+  String get commentsPendingReview =>
+      'قيد المراجعة: مخفي عن المستخدمين الآخرين';
 
   @override
   String get commentsLoadMore => 'تحميل المزيد من التعليقات';
@@ -827,7 +847,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get newChatSheetSubtitle => 'ابدأ محادثة مع نشاط تجاري تتابعه';
 
   @override
-  String get newChatSheetEmpty => 'أنت لا تتابع أي نشاط تجاري بعد. تابع نشاطًا تجاريًا لتبدأ المحادثة معه.';
+  String get newChatSheetEmpty =>
+      'أنت لا تتابع أي نشاط تجاري بعد. تابع نشاطًا تجاريًا لتبدأ المحادثة معه.';
 
   @override
   String get newChatOpenFailed => 'تعذّر فتح المحادثة. حاول مرة أخرى.';
@@ -916,7 +937,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notifPrefSocialTitle => 'النشاط الاجتماعي';
 
   @override
-  String get notifPrefSocialSubtitle => 'متابعون وتعليقات وإعجابات ومشاركات وتقييمات جديدة.';
+  String get notifPrefSocialSubtitle =>
+      'متابعون وتعليقات وإعجابات ومشاركات وتقييمات جديدة.';
 
   @override
   String get notifPrefsSaveFailed => 'تعذّر حفظ تفضيلك. حاول مرة أخرى.';
@@ -970,7 +992,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get consoleProductsCreate => 'إنشاء جديد';
 
   @override
-  String get consoleProductsEmpty => 'لا توجد منتجات بعد.\nاضغط «إنشاء جديد» لإضافة أول منتج لك.';
+  String get consoleProductsEmpty =>
+      'لا توجد منتجات بعد.\nاضغط «إنشاء جديد» لإضافة أول منتج لك.';
 
   @override
   String get consoleProductsLoadFailed => 'تعذّر تحميل منتجاتك.';
@@ -1023,7 +1046,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get consoleContentNewReel => 'ريل جديد';
 
   @override
-  String get consoleContentEmpty => 'لا توجد منشورات أو ريلز بعد.\nاضغط «منشور جديد» أو «ريل جديد» لمشاركة أول محتوى لك.';
+  String get consoleContentEmpty =>
+      'لا توجد منشورات أو ريلز بعد.\nاضغط «منشور جديد» أو «ريل جديد» لمشاركة أول محتوى لك.';
 
   @override
   String get consoleContentLoadFailed => 'تعذّر تحميل محتواك.';
@@ -1058,7 +1082,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get consoleStoriesCreate => 'إنشاء قصة';
 
   @override
-  String get consoleStoriesEmpty => 'لا توجد قصص بعد.\nاضغط «إنشاء قصة» لمشاركة أول قصة لك.';
+  String get consoleStoriesEmpty =>
+      'لا توجد قصص بعد.\nاضغط «إنشاء قصة» لمشاركة أول قصة لك.';
 
   @override
   String get consoleStoriesLoadFailed => 'تعذّر تحميل قصصك.';
@@ -1111,10 +1136,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get moderationQueueTitle => 'قائمة المراجعة';
 
   @override
-  String get moderationQueueEmpty => 'القائمة فارغة.\nلا يوجد شيء بانتظار المراجعة.';
+  String get moderationQueueEmpty =>
+      'القائمة فارغة.\nلا يوجد شيء بانتظار المراجعة.';
 
   @override
-  String get moderationNotAllowed => 'ليست لحسابك صلاحية مراجعة المحتوى. إذا كنت بحاجة إليها، فاطلب من المسؤول إضافة حسابك إلى مجموعة Moderator.';
+  String get moderationNotAllowed =>
+      'ليست لحسابك صلاحية مراجعة المحتوى. إذا كنت بحاجة إليها، فاطلب من المسؤول إضافة حسابك إلى مجموعة Moderator.';
 
   @override
   String get moderationQueueLoadFailed => 'تعذّر تحميل قائمة المراجعة.';
@@ -1205,7 +1232,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get moderationDetailQueueItem => 'عنصر القائمة';
 
   @override
-  String get moderationWaitingNote => 'مدة الانتظار محسوبة حتى آخر تحديث للقائمة.';
+  String get moderationWaitingNote =>
+      'مدة الانتظار محسوبة حتى آخر تحديث للقائمة.';
 
   @override
   String get moderationReject => 'رفض';
@@ -1220,13 +1248,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get moderationItemRejected => 'تم رفض العنصر';
 
   @override
-  String get moderationApproveFailed => 'تعذّرت الموافقة على هذا العنصر. حاول مرة أخرى.';
+  String get moderationApproveFailed =>
+      'تعذّرت الموافقة على هذا العنصر. حاول مرة أخرى.';
 
   @override
   String get moderationRejectFailed => 'تعذّر رفض هذا العنصر. حاول مرة أخرى.';
 
   @override
-  String get moderationAlreadyHandled => 'تمت معالجة هذا العنصر بواسطة شخص آخر أو لم يعد موجودًا. تمت إزالته من قائمتك.';
+  String get moderationAlreadyHandled =>
+      'تمت معالجة هذا العنصر بواسطة شخص آخر أو لم يعد موجودًا. تمت إزالته من قائمتك.';
 
   @override
   String get moderationRejectTitle => 'رفض المحتوى';
@@ -1264,7 +1294,8 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get analyticsUtcNote => 'تُحتسب الأيام بالتوقيت العالمي المنسّق (UTC). الأيام التي لا يوجد لها سجل لا تُرسم على أنها صفر.';
+  String get analyticsUtcNote =>
+      'تُحتسب الأيام بالتوقيت العالمي المنسّق (UTC). الأيام التي لا يوجد لها سجل لا تُرسم على أنها صفر.';
 
   @override
   String get analyticsChartFollowersTitle => 'المتابعون الجدد حسب اليوم';
@@ -1306,7 +1337,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get analyticsRatingsHeading => 'التقييمات';
 
   @override
-  String get analyticsRatingEmpty => 'لم يتم تسجيل أي تقييم بعد، لذلك لا يوجد اتجاه تقييم لرسمه.';
+  String get analyticsRatingEmpty =>
+      'لم يتم تسجيل أي تقييم بعد، لذلك لا يوجد اتجاه تقييم لرسمه.';
 
   @override
   String get analyticsChartRatingTitle => 'متوسط التقييم حسب اليوم';
@@ -1327,7 +1359,8 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get analyticsRatingNote => 'كل نقطة هي متوسط التقييم المحفوظ عند تجميع ذلك اليوم. الأيام السابقة لأول تقييم لا تُرسم.';
+  String get analyticsRatingNote =>
+      'كل نقطة هي متوسط التقييم المحفوظ عند تجميع ذلك اليوم. الأيام السابقة لأول تقييم لا تُرسم.';
 
   @override
   String get analyticsCatalogHeading => 'حجم الكتالوج';
@@ -1419,10 +1452,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get commonRemove => 'إزالة';
 
   @override
-  String get contentPostNotFound => 'لم يتم العثور على المنشور.\nربما تمت إزالته.';
+  String get contentPostNotFound =>
+      'لم يتم العثور على المنشور.\nربما تمت إزالته.';
 
   @override
-  String get contentReelNotFound => 'لم يتم العثور على الريل.\nربما تمت إزالته.';
+  String get contentReelNotFound =>
+      'لم يتم العثور على الريل.\nربما تمت إزالته.';
 
   @override
   String get contentReelPlaybackSoon => 'تشغيل الفيديو — قريبًا';
@@ -1461,7 +1496,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reelFormTitle => 'ريل جديد';
 
   @override
-  String get reelFormReviewNote => 'تتم معالجة الفيديو أولًا ثم مراجعته قبل أن يظهر للعملاء. ستجد حالته في قائمة المحتوى الخاصة بك.';
+  String get reelFormReviewNote =>
+      'تتم معالجة الفيديو أولًا ثم مراجعته قبل أن يظهر للعملاء. ستجد حالته في قائمة المحتوى الخاصة بك.';
 
   @override
   String get reelFormSubmit => 'نشر الريل';
@@ -1658,7 +1694,8 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get chatVideoCannotPlay => 'تعذّر تشغيل هذا الفيديو هنا. قد تكون صيغته غير مدعومة على جهازك.';
+  String get chatVideoCannotPlay =>
+      'تعذّر تشغيل هذا الفيديو هنا. قد تكون صيغته غير مدعومة على جهازك.';
 
   @override
   String get chatVideoRetry => 'إعادة المحاولة';
@@ -1684,7 +1721,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get chatShareToConversation => 'المشاركة في محادثة';
 
   @override
-  String get chatSharePickerEmpty => 'لا توجد محادثات بعد.\nابدأ محادثة من تبويب المحادثات أولًا.';
+  String get chatSharePickerEmpty =>
+      'لا توجد محادثات بعد.\nابدأ محادثة من تبويب المحادثات أولًا.';
 
   @override
   String get chatSharePickerLoadError => 'تعذّر تحميل محادثاتك.';
@@ -1714,7 +1752,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reelPlayerError => 'تعذّر تشغيل هذا الفيديو.';
 
   @override
-  String get reelFormUploading => 'جارٍ رفع الفيديو... قد يستغرق الفيديو الكبير بضع دقائق. أبقِ هذه الشاشة مفتوحة.';
+  String get reelFormUploading =>
+      'جارٍ رفع الفيديو... قد يستغرق الفيديو الكبير بضع دقائق. أبقِ هذه الشاشة مفتوحة.';
 
   @override
   String get bizAvatarAdd => 'إضافة صورة الملف';
@@ -1735,8 +1774,96 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bizAvatarUploadFailed => 'تعذّر تحديث الصورة. حاول مرة أخرى.';
 
   @override
-  String get bizAvatarUploadLater => 'تم إنشاء ملفك، لكن تعذّر رفع الصورة. يمكنك إضافتها من تعديل الملف.';
+  String get bizAvatarUploadLater =>
+      'تم إنشاء ملفك، لكن تعذّر رفع الصورة. يمكنك إضافتها من تعديل الملف.';
 
   @override
   String get bizAvatarSemantic => 'صورة ملف النشاط التجاري';
+
+  @override
+  String get authResetEmailTitle => 'نسيت كلمة المرور';
+
+  @override
+  String get authResetEmailSubtitle =>
+      'أدخل البريد الإلكتروني لحسابك وسنرسل إليك رمز تحقق.';
+
+  @override
+  String get authResetEmailSubmit => 'إرسال الرمز';
+
+  @override
+  String get authResetOtpTitle => 'تحقق من بريدك الإلكتروني';
+
+  @override
+  String authResetOtpSubtitle(String email) {
+    return 'أدخل الرمز المكوّن من 6 أرقام الذي أرسلناه إلى $email.';
+  }
+
+  @override
+  String get authResetOtpLabel => 'رمز التحقق';
+
+  @override
+  String get authResetOtpSubmit => 'تحقق من الرمز';
+
+  @override
+  String get authResetOtpRequired => 'أدخل رمز التحقق.';
+
+  @override
+  String get authResetOtpInvalid =>
+      'رمز التحقق غير صحيح أو انتهت صلاحيته. تحقق منه أو اطلب رمزًا جديدًا.';
+
+  @override
+  String get authResetResendButton => 'إعادة إرسال الرمز';
+
+  @override
+  String authResetResendCooldown(int seconds) {
+    return 'إعادة الإرسال بعد $seconds ث';
+  }
+
+  @override
+  String get authResetResendSent => 'تم إرسال رمز جديد.';
+
+  @override
+  String get authResetChangeEmail => 'استخدام بريد إلكتروني آخر';
+
+  @override
+  String get authResetNewPasswordTitle => 'تعيين كلمة مرور جديدة';
+
+  @override
+  String get authResetNewPasswordSubtitle => 'اختر كلمة مرور جديدة لحسابك.';
+
+  @override
+  String get authResetNewPasswordLabel => 'كلمة المرور الجديدة';
+
+  @override
+  String get authResetConfirmPasswordLabel => 'تأكيد كلمة المرور الجديدة';
+
+  @override
+  String get authResetNewPasswordSubmit => 'إعادة تعيين كلمة المرور';
+
+  @override
+  String get authResetPasswordRequired => 'أدخل كلمة المرور الجديدة.';
+
+  @override
+  String get authResetPasswordsDoNotMatch => 'كلمتا المرور غير متطابقتين.';
+
+  @override
+  String get authResetPasswordWeak =>
+      'لا يمكن استخدام كلمة المرور هذه. اختر كلمة مرور أقوى.';
+
+  @override
+  String get authResetSessionExpired =>
+      'انتهت صلاحية جلسة الاستعادة. يرجى البدء من جديد.';
+
+  @override
+  String get authResetSuccessTitle => 'تم تحديث كلمة المرور';
+
+  @override
+  String get authResetSuccessBody =>
+      'تم تغيير كلمة المرور. سجّل الدخول بكلمة المرور الجديدة.';
+
+  @override
+  String get authResetBackToLogin => 'العودة إلى تسجيل الدخول';
+
+  @override
+  String get authResetThrottled => 'محاولات كثيرة. يرجى المحاولة لاحقًا.';
 }

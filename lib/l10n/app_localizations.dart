@@ -62,7 +62,8 @@ import 'app_localizations_en.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,17 +84,18 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
-    Locale('en')
+    Locale('en'),
   ];
 
   /// Application title shown in the OS task switcher.
@@ -2986,9 +2989,166 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Business profile photo'**
   String get bizAvatarSemantic;
+
+  /// Forgot-password step 1 (email): screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password'**
+  String get authResetEmailTitle;
+
+  /// Forgot-password step 1: explanatory text under the title.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your account email and we will send you a verification code.'**
+  String get authResetEmailSubtitle;
+
+  /// Forgot-password step 1: button that requests the verification code.
+  ///
+  /// In en, this message translates to:
+  /// **'Send code'**
+  String get authResetEmailSubmit;
+
+  /// Forgot-password step 2 (code): screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your email'**
+  String get authResetOtpTitle;
+
+  /// Forgot-password step 2: explains where the code was sent. {email} is the address the user typed.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code we sent to {email}.'**
+  String authResetOtpSubtitle(String email);
+
+  /// Forgot-password step 2: label of the code field.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code'**
+  String get authResetOtpLabel;
+
+  /// Forgot-password step 2: button that checks the code.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify code'**
+  String get authResetOtpSubmit;
+
+  /// Forgot-password step 2: shown when the code field is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the verification code.'**
+  String get authResetOtpRequired;
+
+  /// Forgot-password step 2: shown when the server rejects the code (wrong, expired or too many tries; the server does not say which).
+  ///
+  /// In en, this message translates to:
+  /// **'This code is invalid or has expired. Check it or request a new code.'**
+  String get authResetOtpInvalid;
+
+  /// Forgot-password step 2: button that asks for a new code once the wait is over.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get authResetResendButton;
+
+  /// Forgot-password step 2: disabled resend button while the wait runs. {seconds} is the whole number of seconds left (Western digits).
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {seconds}s'**
+  String authResetResendCooldown(int seconds);
+
+  /// Forgot-password step 2: confirmation after resending.
+  ///
+  /// In en, this message translates to:
+  /// **'A new code has been sent.'**
+  String get authResetResendSent;
+
+  /// Forgot-password step 2: link that goes back to step 1.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a different email'**
+  String get authResetChangeEmail;
+
+  /// Forgot-password step 3 (new password): screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a new password'**
+  String get authResetNewPasswordTitle;
+
+  /// Forgot-password step 3: explanatory text under the title.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a new password for your account.'**
+  String get authResetNewPasswordSubtitle;
+
+  /// Forgot-password step 3: label of the new password field.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get authResetNewPasswordLabel;
+
+  /// Forgot-password step 3: label of the confirmation field.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get authResetConfirmPasswordLabel;
+
+  /// Forgot-password step 3: button that saves the new password.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get authResetNewPasswordSubmit;
+
+  /// Forgot-password step 3: shown when the password field is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a new password.'**
+  String get authResetPasswordRequired;
+
+  /// Forgot-password step 3: shown when the two password fields differ.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get authResetPasswordsDoNotMatch;
+
+  /// Forgot-password step 3: shown when the server rejects the password as too weak or common.
+  ///
+  /// In en, this message translates to:
+  /// **'This password cannot be used. Choose a stronger one.'**
+  String get authResetPasswordWeak;
+
+  /// Forgot-password step 3: shown when the server says the reset token is wrong or expired; the flow restarts at step 1.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reset session has expired. Please start again.'**
+  String get authResetSessionExpired;
+
+  /// Forgot-password done state: title.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated'**
+  String get authResetSuccessTitle;
+
+  /// Forgot-password done state: explanatory text.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been changed. Log in with your new password.'**
+  String get authResetSuccessBody;
+
+  /// Forgot-password done state: button that returns to the login screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to log in'**
+  String get authResetBackToLogin;
+
+  /// Forgot-password flow: shown when the server throttles a request (HTTP 429).
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please try again later.'**
+  String get authResetThrottled;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -2997,25 +3157,26 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['ar', 'en'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['ar', 'en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'ar': return AppLocalizationsAr();
-    case 'en': return AppLocalizationsEn();
+    case 'ar':
+      return AppLocalizationsAr();
+    case 'en':
+      return AppLocalizationsEn();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

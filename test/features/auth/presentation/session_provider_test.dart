@@ -103,6 +103,24 @@ class FakeAuthRepository implements AuthRepository {
     }
     return fetchMeResult;
   }
+
+  // The password-reset methods are not exercised by session_provider_test.dart.
+  @override
+  Future<void> requestPasswordReset({required String email}) =>
+      throw UnimplementedError('Not exercised by session_provider_test.dart');
+
+  @override
+  Future<String> verifyPasswordResetOtp({
+    required String email,
+    required String otp,
+  }) => throw UnimplementedError('Not exercised by session_provider_test.dart');
+
+  @override
+  Future<void> confirmPasswordReset({
+    required String email,
+    required String resetToken,
+    required String newPassword,
+  }) => throw UnimplementedError('Not exercised by session_provider_test.dart');
 }
 
 /// Builds a [DioException] shaped exactly like what `ErrorInterceptor`
@@ -123,130 +141,118 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('SessionNotifier.build (restoreSession)', () {
-    test(
-      'resolves to null (unauthenticated) when no access token is stored, '
-      'and never calls fetchMe',
-      () async {
-        FlutterSecureStorage.setMockInitialValues({});
-        final fakeAuth = FakeAuthRepository();
-        final container = ProviderContainer(
-          overrides: [authRepositoryProvider.overrideWithValue(fakeAuth)],
-        );
-        addTearDown(container.dispose);
+    test('resolves to null (unauthenticated) when no access token is stored, '
+        'and never calls fetchMe', () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      final fakeAuth = FakeAuthRepository();
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWithValue(fakeAuth)],
+      );
+      addTearDown(container.dispose);
 
-        final result = await container.read(sessionProvider.future);
+      final result = await container.read(sessionProvider.future);
 
-        expect(result, isNull);
-        expect(fakeAuth.fetchMeCallCount, 0);
-      },
-    );
+      expect(result, isNull);
+      expect(fakeAuth.fetchMeCallCount, 0);
+    });
 
-    test(
-      'resolves to the real User from fetchMe() when an access token is '
-      'already stored',
-      () async {
-        FlutterSecureStorage.setMockInitialValues({});
-        final tokenStorage = SecureTokenStorage();
-        await tokenStorage.saveTokens(
-          access: 'seeded-access-token',
-          refresh: 'seeded-refresh-token',
-        );
-        final fakeAuth = FakeAuthRepository();
-        final container = ProviderContainer(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeAuth),
-            secureTokenStorageProvider.overrideWithValue(tokenStorage),
-          ],
-        );
-        addTearDown(container.dispose);
+    test('resolves to the real User from fetchMe() when an access token is '
+        'already stored', () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      final tokenStorage = SecureTokenStorage();
+      await tokenStorage.saveTokens(
+        access: 'seeded-access-token',
+        refresh: 'seeded-refresh-token',
+      );
+      final fakeAuth = FakeAuthRepository();
+      final container = ProviderContainer(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(fakeAuth),
+          secureTokenStorageProvider.overrideWithValue(tokenStorage),
+        ],
+      );
+      addTearDown(container.dispose);
 
-        final result = await container.read(sessionProvider.future);
+      final result = await container.read(sessionProvider.future);
 
-        expect(result, fakeAuth.fetchMeResult);
-        expect(result!.accountType, AccountType.business);
-        expect(fakeAuth.fetchMeCallCount, 1);
-      },
-    );
+      expect(result, fakeAuth.fetchMeResult);
+      expect(result!.accountType, AccountType.business);
+      expect(fakeAuth.fetchMeCallCount, 1);
+    });
 
-    test(
-      'resolves to null and clears the stored token when fetchMe fails '
-      'with AuthFailure (expired/invalid token)',
-      () async {
-        FlutterSecureStorage.setMockInitialValues({});
-        final tokenStorage = SecureTokenStorage();
-        await tokenStorage.saveTokens(access: 'stale-access', refresh: 'r');
-        final fakeAuth = FakeAuthRepository()
-          ..fetchMeError = _dioFailure(
-            const AuthFailure(message: 'Unauthorized'),
-          );
-        final container = ProviderContainer(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeAuth),
-            secureTokenStorageProvider.overrideWithValue(tokenStorage),
-          ],
-        );
-        addTearDown(container.dispose);
+    test('resolves to null and clears the stored token when fetchMe fails '
+        'with AuthFailure (expired/invalid token)', () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      final tokenStorage = SecureTokenStorage();
+      await tokenStorage.saveTokens(access: 'stale-access', refresh: 'r');
+      final fakeAuth =
+          FakeAuthRepository()
+            ..fetchMeError = _dioFailure(
+              const AuthFailure(message: 'Unauthorized'),
+            );
+      final container = ProviderContainer(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(fakeAuth),
+          secureTokenStorageProvider.overrideWithValue(tokenStorage),
+        ],
+      );
+      addTearDown(container.dispose);
 
-        final result = await container.read(sessionProvider.future);
+      final result = await container.read(sessionProvider.future);
 
-        expect(result, isNull);
-        expect(await tokenStorage.getAccessToken(), isNull);
-      },
-    );
+      expect(result, isNull);
+      expect(await tokenStorage.getAccessToken(), isNull);
+    });
 
-    test(
-      'surfaces as AsyncError (does not silently sign out) when fetchMe '
-      'fails with a non-auth failure',
-      () async {
-        FlutterSecureStorage.setMockInitialValues({});
-        final tokenStorage = SecureTokenStorage();
-        await tokenStorage.saveTokens(access: 'a', refresh: 'r');
-        final fakeAuth = FakeAuthRepository()
-          ..fetchMeError = _dioFailure(
-            const ServerFailure(message: 'boom'),
-          );
-        final container = ProviderContainer(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeAuth),
-            secureTokenStorageProvider.overrideWithValue(tokenStorage),
-          ],
-          // Riverpod 3.x automatically retries a provider whose build()
-          // throws, with a real (non-mocked) exponential backoff of up
-          // to 6.4s per attempt — see
-          // https://riverpod.dev/docs/concepts2/retry. That retried
-          // `_restoreSession()` was the actual cause of this test's 30s
-          // timeout, not the assertion style. Disabling retry here
-          // matches Riverpod's own documented recommendation for
-          // asserting error behavior in unit tests.
-          retry: (retryCount, error) => null,
-        );
+    test('surfaces as AsyncError (does not silently sign out) when fetchMe '
+        'fails with a non-auth failure', () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      final tokenStorage = SecureTokenStorage();
+      await tokenStorage.saveTokens(access: 'a', refresh: 'r');
+      final fakeAuth =
+          FakeAuthRepository()
+            ..fetchMeError = _dioFailure(const ServerFailure(message: 'boom'));
+      final container = ProviderContainer(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(fakeAuth),
+          secureTokenStorageProvider.overrideWithValue(tokenStorage),
+        ],
+        // Riverpod 3.x automatically retries a provider whose build()
+        // throws, with a real (non-mocked) exponential backoff of up
+        // to 6.4s per attempt — see
+        // https://riverpod.dev/docs/concepts2/retry. That retried
+        // `_restoreSession()` was the actual cause of this test's 30s
+        // timeout, not the assertion style. Disabling retry here
+        // matches Riverpod's own documented recommendation for
+        // asserting error behavior in unit tests.
+        retry: (retryCount, error) => null,
+      );
 
-        // `sessionProvider.future` here is the initial-build future (the
-        // very first read of this provider on this container). Both the
-        // closure form (`() => container.read(...)`) and passing the
-        // Future directly to `expectLater(..., throwsA(...))` were
-        // observed to leave this specific rejection unobserved by the
-        // matcher — the test hung until the 30s timeout and only then
-        // surfaced a Riverpod dispose-during-loading StateError instead
-        // of the real DioException. A plain `await` inside `try/catch`
-        // sidesteps that matcher/AsyncNotifierProvider interaction
-        // entirely and matches the directly-awaited pattern the two
-        // tests above already use successfully.
-        Object? caughtError;
-        try {
-          await container.read(sessionProvider.future);
-          fail('Expected sessionProvider.future to throw a DioException.');
-        } catch (error) {
-          caughtError = error;
-        }
+      // `sessionProvider.future` here is the initial-build future (the
+      // very first read of this provider on this container). Both the
+      // closure form (`() => container.read(...)`) and passing the
+      // Future directly to `expectLater(..., throwsA(...))` were
+      // observed to leave this specific rejection unobserved by the
+      // matcher — the test hung until the 30s timeout and only then
+      // surfaced a Riverpod dispose-during-loading StateError instead
+      // of the real DioException. A plain `await` inside `try/catch`
+      // sidesteps that matcher/AsyncNotifierProvider interaction
+      // entirely and matches the directly-awaited pattern the two
+      // tests above already use successfully.
+      Object? caughtError;
+      try {
+        await container.read(sessionProvider.future);
+        fail('Expected sessionProvider.future to throw a DioException.');
+      } catch (error) {
+        caughtError = error;
+      }
 
-        expect(caughtError, isA<DioException>());
-        expect(container.read(sessionProvider).hasError, isTrue);
-        // The stored token must NOT have been cleared — this was not a
-        // confirmed-invalid-token case, just a transient failure.
-        expect(await tokenStorage.getAccessToken(), 'a');
-      },
-    );
+      expect(caughtError, isA<DioException>());
+      expect(container.read(sessionProvider).hasError, isTrue);
+      // The stored token must NOT have been cleared — this was not a
+      // confirmed-invalid-token case, just a transient failure.
+      expect(await tokenStorage.getAccessToken(), 'a');
+    });
   });
 
   group('SessionNotifier.login', () {
@@ -298,8 +304,9 @@ void main() {
     test('transitions state to AsyncError and rethrows when login() '
         'succeeds but the follow-up fetchMe() call fails', () async {
       FlutterSecureStorage.setMockInitialValues({});
-      final fakeAuth = FakeAuthRepository()
-        ..fetchMeError = _dioFailure(const ServerFailure(message: 'boom'));
+      final fakeAuth =
+          FakeAuthRepository()
+            ..fetchMeError = _dioFailure(const ServerFailure(message: 'boom'));
       final container = ProviderContainer(
         overrides: [authRepositoryProvider.overrideWithValue(fakeAuth)],
       );
@@ -387,114 +394,106 @@ void main() {
       expect(container.read(sessionProvider).value, isNull);
     });
 
-    test(
-      'Part BUGFIX-058: force-clears a previously-seeded '
-      'contentInteractionProvider key on logout, so the next account '
-      'signed into this same running app instance never sees the '
-      'previous account\'s Like/Save state for the same content',
-      () async {
-        FlutterSecureStorage.setMockInitialValues({});
-        final tokenStorage = SecureTokenStorage();
-        await tokenStorage.saveTokens(access: 'account-a-token', refresh: 'r');
-        final fakeAuth = FakeAuthRepository();
-        final fakeSocial = FakeSocialInteractionRepository();
-        final container = ProviderContainer(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeAuth),
-            secureTokenStorageProvider.overrideWithValue(tokenStorage),
-            socialInteractionRepositoryProvider.overrideWithValue(fakeSocial),
-          ],
-        );
-        addTearDown(container.dispose);
-        await container.read(sessionProvider.future); // Account A signed in
+    test('Part BUGFIX-058: force-clears a previously-seeded '
+        'contentInteractionProvider key on logout, so the next account '
+        'signed into this same running app instance never sees the '
+        'previous account\'s Like/Save state for the same content', () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      final tokenStorage = SecureTokenStorage();
+      await tokenStorage.saveTokens(access: 'account-a-token', refresh: 'r');
+      final fakeAuth = FakeAuthRepository();
+      final fakeSocial = FakeSocialInteractionRepository();
+      final container = ProviderContainer(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(fakeAuth),
+          secureTokenStorageProvider.overrideWithValue(tokenStorage),
+          socialInteractionRepositoryProvider.overrideWithValue(fakeSocial),
+        ],
+      );
+      addTearDown(container.dispose);
+      await container.read(sessionProvider.future); // Account A signed in
 
-        // Simulate what ContentActionRow's deferred seed does once Account
-        // A's real per-viewer data comes back from the backend: Account A
-        // has liked this post.
-        container
-            .read(contentInteractionProvider(_postKey).notifier)
-            .seed(
-              isLiked: true,
-              isSaved: false,
-              likesCount: 5,
-              commentsCount: 0,
-              sharesCount: 0,
-            );
-        expect(
-          container.read(contentInteractionProvider(_postKey)).isLiked,
-          isTrue,
-        );
+      // Simulate what ContentActionRow's deferred seed does once Account
+      // A's real per-viewer data comes back from the backend: Account A
+      // has liked this post.
+      container
+          .read(contentInteractionProvider(_postKey).notifier)
+          .seed(
+            isLiked: true,
+            isSaved: false,
+            likesCount: 5,
+            commentsCount: 0,
+            sharesCount: 0,
+          );
+      expect(
+        container.read(contentInteractionProvider(_postKey)).isLiked,
+        isTrue,
+      );
 
-        // Account A logs out — still the same running app
-        // instance/container. This is exactly the scenario BUGFIX-058
-        // fixes.
-        await container.read(sessionProvider.notifier).logout();
+      // Account A logs out — still the same running app
+      // instance/container. This is exactly the scenario BUGFIX-058
+      // fixes.
+      await container.read(sessionProvider.notifier).logout();
 
-        // The key must now resolve to a brand-new default state, not
-        // Account A's seeded isLiked: true — proving `ref.invalidate`
-        // actually forced this specific, previously-seeded key to rebuild,
-        // not merely that invalidation is reachable in theory.
-        final afterLogout = container.read(
-          contentInteractionProvider(_postKey),
-        );
-        expect(afterLogout.isLiked, isFalse);
-        expect(afterLogout.likesCount, 0);
+      // The key must now resolve to a brand-new default state, not
+      // Account A's seeded isLiked: true — proving `ref.invalidate`
+      // actually forced this specific, previously-seeded key to rebuild,
+      // not merely that invalidation is reachable in theory.
+      final afterLogout = container.read(contentInteractionProvider(_postKey));
+      expect(afterLogout.isLiked, isFalse);
+      expect(afterLogout.likesCount, 0);
 
-        // Account B signs in, in the same running container/app instance.
-        fakeAuth.fetchMeResult = const User(
-          id: 99,
-          email: 'account-b@example.com',
-          accountType: AccountType.customer,
-          isModerator: false,
-          isStaff: false,
-        );
-        await container
-            .read(sessionProvider.notifier)
-            .login(email: 'account-b@example.com', password: 'account-b-pw');
+      // Account B signs in, in the same running container/app instance.
+      fakeAuth.fetchMeResult = const User(
+        id: 99,
+        email: 'account-b@example.com',
+        accountType: AccountType.customer,
+        isModerator: false,
+        isStaff: false,
+      );
+      await container
+          .read(sessionProvider.notifier)
+          .login(email: 'account-b@example.com', password: 'account-b-pw');
 
-        // Nothing re-seeds this key until ContentActionRow's own deferred
-        // seed runs for Account B's real per-viewer data (that widget's
-        // job, not logout()'s) — what's being verified here is only that
-        // Account A's value is gone, not that Account B's value has
-        // already arrived.
-        expect(
-          container.read(contentInteractionProvider(_postKey)).isLiked,
-          isFalse,
-        );
-      },
-    );
+      // Nothing re-seeds this key until ContentActionRow's own deferred
+      // seed runs for Account B's real per-viewer data (that widget's
+      // job, not logout()'s) — what's being verified here is only that
+      // Account A's value is gone, not that Account B's value has
+      // already arrived.
+      expect(
+        container.read(contentInteractionProvider(_postKey)).isLiked,
+        isFalse,
+      );
+    });
   });
 
   group('SessionNotifier.invalidateSession (Part P-022B)', () {
-    test(
-      'synchronously resets state to unauthenticated (null), without '
-      'calling AuthRepository at all',
-      () async {
-        FlutterSecureStorage.setMockInitialValues({});
-        final tokenStorage = SecureTokenStorage();
-        await tokenStorage.saveTokens(access: 'a', refresh: 'r');
-        final fakeAuth = FakeAuthRepository();
-        final container = ProviderContainer(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeAuth),
-            secureTokenStorageProvider.overrideWithValue(tokenStorage),
-          ],
-        );
-        addTearDown(container.dispose);
-        // Resolve the cold-start restore first, landing authenticated
-        // (a token is stored) — this is the state a real failed-refresh
-        // scenario would be invalidating away from.
-        await container.read(sessionProvider.future);
-        expect(container.read(sessionProvider).value, isNotNull);
+    test('synchronously resets state to unauthenticated (null), without '
+        'calling AuthRepository at all', () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      final tokenStorage = SecureTokenStorage();
+      await tokenStorage.saveTokens(access: 'a', refresh: 'r');
+      final fakeAuth = FakeAuthRepository();
+      final container = ProviderContainer(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(fakeAuth),
+          secureTokenStorageProvider.overrideWithValue(tokenStorage),
+        ],
+      );
+      addTearDown(container.dispose);
+      // Resolve the cold-start restore first, landing authenticated
+      // (a token is stored) — this is the state a real failed-refresh
+      // scenario would be invalidating away from.
+      await container.read(sessionProvider.future);
+      expect(container.read(sessionProvider).value, isNotNull);
 
-        container.read(sessionProvider.notifier).invalidateSession();
+      container.read(sessionProvider.notifier).invalidateSession();
 
-        expect(container.read(sessionProvider).value, isNull);
-        // Confirms this method is a pure local state reset, not a wrapper
-        // around AuthRepository.logout() (which would have incremented
-        // this counter).
-        expect(fakeAuth.logoutCallCount, 0);
-      },
-    );
+      expect(container.read(sessionProvider).value, isNull);
+      // Confirms this method is a pure local state reset, not a wrapper
+      // around AuthRepository.logout() (which would have incremented
+      // this counter).
+      expect(fakeAuth.logoutCallCount, 0);
+    });
   });
 }

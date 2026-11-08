@@ -112,4 +112,38 @@ abstract class AuthRepository {
   /// that decides what a 401 here means for session state, not this
   /// repository.
   Future<User> fetchMe();
+
+  /// Calls `POST /api/v1/auth/password-reset/request/`. The backend answers
+  /// `202` with the same body for every well-formed email (it never says
+  /// whether the account exists), so success carries no information and
+  /// this returns nothing.
+  ///
+  /// Like [register], this never touches `SecureTokenStorage` and never
+  /// changes the session. Failures surface as a `DioException` whose
+  /// `.error` is an `ApiFailure`: a `ValidationFailure` (malformed email) or
+  /// the throttled `UnknownFailure` (`code == 'THROTTLED'`, HTTP 429).
+  Future<void> requestPasswordReset({required String email});
+
+  /// Calls `POST /api/v1/auth/password-reset/verify/` and returns the
+  /// one-time `reset_token` (valid 300 seconds on the backend). The token is
+  /// NOT a login token: it is returned to the caller only, never stored.
+  ///
+  /// Every failure (wrong, expired or used-up OTP, unknown email) is the same
+  /// unified `400` -> `ValidationFailure` with empty `fields`.
+  Future<String> verifyPasswordResetOtp({
+    required String email,
+    required String otp,
+  });
+
+  /// Calls `POST /api/v1/auth/password-reset/confirm/`. Does not log the user
+  /// in and does not touch tokens or the session.
+  ///
+  /// A weak password is a `ValidationFailure` whose `fields['new_password']`
+  /// is set (and the reset token stays valid); a wrong or expired token is
+  /// the unified `400` `ValidationFailure` with empty `fields`.
+  Future<void> confirmPasswordReset({
+    required String email,
+    required String resetToken,
+    required String newPassword,
+  });
 }

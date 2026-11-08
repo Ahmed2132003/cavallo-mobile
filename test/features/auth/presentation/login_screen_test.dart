@@ -72,6 +72,24 @@ class _FakeAuthRepository implements AuthRepository {
     fetchMeCallCount++;
     return _defaultUser;
   }
+
+  // The password-reset methods are not exercised by login_screen_test.dart.
+  @override
+  Future<void> requestPasswordReset({required String email}) =>
+      throw UnimplementedError('Not exercised by login_screen_test.dart');
+
+  @override
+  Future<String> verifyPasswordResetOtp({
+    required String email,
+    required String otp,
+  }) => throw UnimplementedError('Not exercised by login_screen_test.dart');
+
+  @override
+  Future<void> confirmPasswordReset({
+    required String email,
+    required String resetToken,
+    required String newPassword,
+  }) => throw UnimplementedError('Not exercised by login_screen_test.dart');
 }
 
 Widget _wrap(AuthRepository fakeRepository) {
