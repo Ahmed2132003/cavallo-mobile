@@ -53,4 +53,4 @@
 - Goldens: generated 12, stable on 3 consecutive runs
 - flutter test (FULL): 04:17 +1696: All tests passed!
 
-**NOT run by this script (manual, on the emulator + real backend):** the end-to-end walk-through (real email delivery, wrong / expired code, throttling, offline per step, language and theme switching). Status: **NOT RUN** until the person fills it in.
+**Manual end-to-end (emulator + real backend):** PASSED on 2026-11-08 - the walk-through was run on the emulator against the real backend. Status: **DONE**.
