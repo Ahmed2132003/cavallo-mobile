@@ -3142,6 +3142,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Too many attempts. Please try again later.'**
   String get authResetThrottled;
+
+  /// Login screen: link to the forgot-password flow.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get authForgotPasswordLink;
+
+  /// Forgot-password step 2: neutral text (the server answers the same for every address, so it does not say the code was sent). {email} is the address the user typed.
+  ///
+  /// In en, this message translates to:
+  /// **'If {email} is registered, a 6-digit code is on its way.'**
+  String authResetOtpNeutralHint(String email);
+
+  /// Forgot-password step 2: how long the code is valid (matches the backend OTP lifetime of 300 seconds).
+  ///
+  /// In en, this message translates to:
+  /// **'The code is valid for 5 minutes.'**
+  String get authResetOtpExpiry;
+
+  /// Forgot-password step 3: tooltip of the button that reveals the typed password.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get authResetShowPassword;
+
+  /// Forgot-password step 3: tooltip of the button that hides the typed password.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get authResetHidePassword;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

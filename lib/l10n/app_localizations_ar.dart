@@ -1821,4 +1821,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get authResetThrottled => 'محاولات كثيرة. يرجى المحاولة لاحقًا.';
+
+  @override
+  String get authForgotPasswordLink => 'نسيت كلمة المرور؟';
+
+  @override
+  String authResetOtpNeutralHint(String email) {
+    return 'إذا كان البريد $email مسجّلًا لدينا، سيصلك رمز مكوّن من 6 أرقام.';
+  }
+
+  @override
+  String get authResetOtpExpiry => 'الرمز صالح لمدة 5 دقائق.';
+
+  @override
+  String get authResetShowPassword => 'إظهار كلمة المرور';
+
+  @override
+  String get authResetHidePassword => 'إخفاء كلمة المرور';
 }

@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/shell/app_shell.dart';
 import '../features/auth/domain/user_entity.dart';
-import '../features/auth/presentation/forgot_password_placeholder_screens.dart';
+import '../features/auth/presentation/forgot_password_screens.dart';
 import '../features/auth/presentation/forgot_password_provider.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
@@ -446,7 +446,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.loginPath,
         name: RouteNames.login,
-        builder: (context, state) => const LoginScreen(),
+        builder:
+            (context, state) => LoginScreen(
+              initialEmail:
+                  state.extra is String ? state.extra as String : null,
+            ),
       ),
       GoRoute(
         path: RouteNames.registerPath,
@@ -456,7 +460,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.forgotPasswordPath,
         name: RouteNames.forgotPassword,
-        builder: (context, state) => const ForgotPasswordEmailScreen(),
+        builder:
+            (context, state) => ForgotPasswordEmailScreen(
+              initialEmail:
+                  state.extra is String ? state.extra as String : null,
+            ),
       ),
       GoRoute(
         path: RouteNames.forgotPasswordVerifyPath,
