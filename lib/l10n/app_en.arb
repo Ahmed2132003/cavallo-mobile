@@ -2203,5 +2203,144 @@
   "bizAvatarSemantic": "Business profile photo",
   "@bizAvatarSemantic": {
     "description": "Accessibility label of the business profile photo."
+  },
+  "authResetEmailTitle": "Forgot password",
+  "@authResetEmailTitle": {
+    "description": "Forgot-password step 1 (email): screen title."
+  },
+  "authResetEmailSubtitle": "Enter your account email and we will send you a verification code.",
+  "@authResetEmailSubtitle": {
+    "description": "Forgot-password step 1: explanatory text under the title."
+  },
+  "authResetEmailSubmit": "Send code",
+  "@authResetEmailSubmit": {
+    "description": "Forgot-password step 1: button that requests the verification code."
+  },
+  "authResetOtpTitle": "Verify your email",
+  "@authResetOtpTitle": {
+    "description": "Forgot-password step 2 (code): screen title."
+  },
+  "authResetOtpSubtitle": "Enter the 6-digit code we sent to {email}.",
+  "@authResetOtpSubtitle": {
+    "description": "Forgot-password step 2: explains where the code was sent. {email} is the address the user typed.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authResetOtpLabel": "Verification code",
+  "@authResetOtpLabel": {
+    "description": "Forgot-password step 2: label of the code field."
+  },
+  "authResetOtpSubmit": "Verify code",
+  "@authResetOtpSubmit": {
+    "description": "Forgot-password step 2: button that checks the code."
+  },
+  "authResetOtpRequired": "Enter the verification code.",
+  "@authResetOtpRequired": {
+    "description": "Forgot-password step 2: shown when the code field is empty."
+  },
+  "authResetOtpInvalid": "This code is invalid or has expired. Check it or request a new code.",
+  "@authResetOtpInvalid": {
+    "description": "Forgot-password step 2: shown when the server rejects the code (wrong, expired or too many tries; the server does not say which)."
+  },
+  "authResetResendButton": "Resend code",
+  "@authResetResendButton": {
+    "description": "Forgot-password step 2: button that asks for a new code once the wait is over."
+  },
+  "authResetResendCooldown": "Resend code in {seconds}s",
+  "@authResetResendCooldown": {
+    "description": "Forgot-password step 2: disabled resend button while the wait runs. {seconds} is the whole number of seconds left (Western digits).",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authResetResendSent": "A new code has been sent.",
+  "@authResetResendSent": {
+    "description": "Forgot-password step 2: confirmation after resending."
+  },
+  "authResetChangeEmail": "Use a different email",
+  "@authResetChangeEmail": {
+    "description": "Forgot-password step 2: link that goes back to step 1."
+  },
+  "authResetNewPasswordTitle": "Set a new password",
+  "@authResetNewPasswordTitle": {
+    "description": "Forgot-password step 3 (new password): screen title."
+  },
+  "authResetNewPasswordSubtitle": "Choose a new password for your account.",
+  "@authResetNewPasswordSubtitle": {
+    "description": "Forgot-password step 3: explanatory text under the title."
+  },
+  "authResetNewPasswordLabel": "New password",
+  "@authResetNewPasswordLabel": {
+    "description": "Forgot-password step 3: label of the new password field."
+  },
+  "authResetConfirmPasswordLabel": "Confirm new password",
+  "@authResetConfirmPasswordLabel": {
+    "description": "Forgot-password step 3: label of the confirmation field."
+  },
+  "authResetNewPasswordSubmit": "Reset password",
+  "@authResetNewPasswordSubmit": {
+    "description": "Forgot-password step 3: button that saves the new password."
+  },
+  "authResetPasswordRequired": "Enter a new password.",
+  "@authResetPasswordRequired": {
+    "description": "Forgot-password step 3: shown when the password field is empty."
+  },
+  "authResetPasswordsDoNotMatch": "Passwords do not match.",
+  "@authResetPasswordsDoNotMatch": {
+    "description": "Forgot-password step 3: shown when the two password fields differ."
+  },
+  "authResetPasswordWeak": "This password cannot be used. Choose a stronger one.",
+  "@authResetPasswordWeak": {
+    "description": "Forgot-password step 3: shown when the server rejects the password as too weak or common."
+  },
+  "authResetSessionExpired": "Your reset session has expired. Please start again.",
+  "@authResetSessionExpired": {
+    "description": "Forgot-password step 3: shown when the server says the reset token is wrong or expired; the flow restarts at step 1."
+  },
+  "authResetSuccessTitle": "Password updated",
+  "@authResetSuccessTitle": {
+    "description": "Forgot-password done state: title."
+  },
+  "authResetSuccessBody": "Your password has been changed. Log in with your new password.",
+  "@authResetSuccessBody": {
+    "description": "Forgot-password done state: explanatory text."
+  },
+  "authResetBackToLogin": "Back to log in",
+  "@authResetBackToLogin": {
+    "description": "Forgot-password done state: button that returns to the login screen."
+  },
+  "authResetThrottled": "Too many attempts. Please try again later.",
+  "@authResetThrottled": {
+    "description": "Forgot-password flow: shown when the server throttles a request (HTTP 429)."
+  },
+  "authForgotPasswordLink": "Forgot password?",
+  "@authForgotPasswordLink": {
+    "description": "Login screen: link to the forgot-password flow."
+  },
+  "authResetOtpNeutralHint": "If {email} is registered, a 6-digit code is on its way.",
+  "@authResetOtpNeutralHint": {
+    "description": "Forgot-password step 2: neutral text (the server answers the same for every address, so it does not say the code was sent). {email} is the address the user typed.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authResetOtpExpiry": "The code is valid for 5 minutes.",
+  "@authResetOtpExpiry": {
+    "description": "Forgot-password step 2: how long the code is valid (matches the backend OTP lifetime of 300 seconds)."
+  },
+  "authResetShowPassword": "Show password",
+  "@authResetShowPassword": {
+    "description": "Forgot-password step 3: tooltip of the button that reveals the typed password."
+  },
+  "authResetHidePassword": "Hide password",
+  "@authResetHidePassword": {
+    "description": "Forgot-password step 3: tooltip of the button that hides the typed password."
   }
 }

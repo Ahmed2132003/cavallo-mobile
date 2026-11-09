@@ -8,6 +8,10 @@ import '../domain/user_entity.dart';
 import 'dtos/login_request_dto.dart';
 import 'dtos/logout_request_dto.dart';
 import 'dtos/me_response_dto.dart';
+import 'dtos/password_reset_confirm_request_dto.dart';
+import 'dtos/password_reset_request_dto.dart';
+import 'dtos/password_reset_verify_request_dto.dart';
+import 'dtos/password_reset_verify_response_dto.dart';
 import 'dtos/register_request_dto.dart';
 import 'dtos/register_response_dto.dart';
 import 'dtos/token_pair_dto.dart';
@@ -48,6 +52,11 @@ class AuthRepositoryImpl implements AuthRepository {
   static const _refreshPath = '/api/v1/auth/refresh/';
   static const _logoutPath = '/api/v1/auth/logout/';
   static const _mePath = '/api/v1/auth/me/';
+  static const _passwordResetRequestPath =
+      '/api/v1/auth/password-reset/request/';
+  static const _passwordResetVerifyPath = '/api/v1/auth/password-reset/verify/';
+  static const _passwordResetConfirmPath =
+      '/api/v1/auth/password-reset/confirm/';
 
   @override
   Future<User> register({
@@ -169,6 +178,47 @@ class AuthRepositoryImpl implements AuthRepository {
       accountType: AccountType.fromWire(dto.accountType),
       isModerator: dto.isModerator,
       isStaff: dto.isStaff,
+    );
+  }
+
+  @override
+  Future<void> requestPasswordReset({required String email}) async {
+    // Body ignored on purpose (same 202 text for every email). No token
+    // storage, no session change: this flow is unauthenticated.
+    await _dio.post<dynamic>(
+      _passwordResetRequestPath,
+      data: PasswordResetRequestDto(email: email).toJson(),
+    );
+  }
+
+  @override
+  Future<String> verifyPasswordResetOtp({
+    required String email,
+    required String otp,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      _passwordResetVerifyPath,
+      data: PasswordResetVerifyRequestDto(email: email, otp: otp).toJson(),
+    );
+    // Returned to the caller only: the reset token is not a login token and
+    // must never reach SecureTokenStorage.
+    return PasswordResetVerifyResponseDto.fromJson(response.data!).resetToken;
+  }
+
+  @override
+  Future<void> confirmPasswordReset({
+    required String email,
+    required String resetToken,
+    required String newPassword,
+  }) async {
+    await _dio.post<dynamic>(
+      _passwordResetConfirmPath,
+      data:
+          PasswordResetConfirmRequestDto(
+            email: email,
+            resetToken: resetToken,
+            newPassword: newPassword,
+          ).toJson(),
     );
   }
 }

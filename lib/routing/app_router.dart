@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../core/shell/app_shell.dart';
 import '../features/auth/domain/user_entity.dart';
+import '../features/auth/presentation/forgot_password_screens.dart';
+import '../features/auth/presentation/forgot_password_provider.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/auth/presentation/session_provider.dart';
@@ -345,9 +347,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isPublicRoute = _publicRoutes.contains(location);
 
       if (!isLoggedIn) {
-        // Signed out: only /login and /register are reachable. Everything
+        // Signed out: only the public routes are reachable. Everything
         // else — every protected route AND splash — bounces to /login.
-        return isPublicRoute ? null : RouteNames.loginPath;
+        if (!isPublicRoute) {
+          return RouteNames.loginPath;
+        }
+        // Forgot-password steps 2 and 3 need the in-memory flow state. Opened
+        // without it (cold start, deep link, restored location) they go back
+        // to step 1. Only evaluated for signed-out users: a signed-in user
+        // never gets here, the public-route check further down sends them to
+        // /home.
+        return _forgotPasswordStepRedirect(ref, location);
       }
 
       // --- Part P-028C1: second, Business-account-specific gate ---
@@ -436,12 +446,35 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.loginPath,
         name: RouteNames.login,
-        builder: (context, state) => const LoginScreen(),
+        builder:
+            (context, state) => LoginScreen(
+              initialEmail:
+                  state.extra is String ? state.extra as String : null,
+            ),
       ),
       GoRoute(
         path: RouteNames.registerPath,
         name: RouteNames.register,
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.forgotPasswordPath,
+        name: RouteNames.forgotPassword,
+        builder:
+            (context, state) => ForgotPasswordEmailScreen(
+              initialEmail:
+                  state.extra is String ? state.extra as String : null,
+            ),
+      ),
+      GoRoute(
+        path: RouteNames.forgotPasswordVerifyPath,
+        name: RouteNames.forgotPasswordVerify,
+        builder: (context, state) => const ForgotPasswordOtpScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.forgotPasswordNewPasswordPath,
+        name: RouteNames.forgotPasswordNewPassword,
+        builder: (context, state) => const ForgotPasswordNewPasswordScreen(),
       ),
       GoRoute(
         path: RouteNames.businessOnboardingPath,
@@ -787,7 +820,33 @@ bool _isChatThreadLocation(String location) {
 /// Routes reachable only while signed out. Everything else in the route
 /// table is "protected" implicitly (see the `redirect` callback above) —
 /// there is no separate `_protectedRoutes` list to keep in sync.
-const _publicRoutes = <String>{RouteNames.loginPath, RouteNames.registerPath};
+const _publicRoutes = <String>{
+  RouteNames.loginPath,
+  RouteNames.registerPath,
+  RouteNames.forgotPasswordPath,
+  RouteNames.forgotPasswordVerifyPath,
+  RouteNames.forgotPasswordNewPasswordPath,
+};
+
+/// Step guard of the forgot-password flow. Returns the path to redirect to,
+/// or null to stay. Step 2 needs the flow to be at the code step; step 3 at
+/// the new-password step (or `done`, whose success state the real screen
+/// shows on that route). Reading the autoDispose provider here is safe: when
+/// no forgot-password screen is mounted it just builds a blank state (step
+/// email), which is exactly the "no state" answer.
+String? _forgotPasswordStepRedirect(Ref ref, String location) {
+  final step = ref.read(forgotPasswordProvider).step;
+  if (location == RouteNames.forgotPasswordVerifyPath &&
+      step != ForgotPasswordStep.otp) {
+    return RouteNames.forgotPasswordPath;
+  }
+  if (location == RouteNames.forgotPasswordNewPasswordPath &&
+      step != ForgotPasswordStep.newPassword &&
+      step != ForgotPasswordStep.done) {
+    return RouteNames.forgotPasswordPath;
+  }
+  return null;
+}
 
 /// Bridges [sessionProvider] — and, since Part P-028C1, conditionally
 /// [businessProfileProvider] — to `GoRouter`'s `refreshListenable`: the

@@ -500,6 +500,30 @@ const List<NavDestination> kNavigationManifest = [
         'Signed-out entry, linked from the login screen. Signed-in users are redirected to /home.',
   ),
   NavDestination(
+    id: RouteNames.forgotPassword,
+    routeName: RouteNames.forgotPassword,
+    allowedFor: {},
+    entries: {},
+    authFlowReason:
+        'Signed-out forgot-password step 1 (email). Signed-in users are redirected to /home.',
+  ),
+  NavDestination(
+    id: RouteNames.forgotPasswordVerify,
+    routeName: RouteNames.forgotPasswordVerify,
+    allowedFor: {},
+    entries: {},
+    authFlowReason:
+        'Signed-out forgot-password step 2 (code). Without flow state the redirect sends it back to /forgot-password; signed-in users go to /home.',
+  ),
+  NavDestination(
+    id: RouteNames.forgotPasswordNewPassword,
+    routeName: RouteNames.forgotPasswordNewPassword,
+    allowedFor: {},
+    entries: {},
+    authFlowReason:
+        'Signed-out forgot-password step 3 (new password). Without flow state the redirect sends it back to /forgot-password; signed-in users go to /home.',
+  ),
+  NavDestination(
     id: RouteNames.businessOnboarding,
     routeName: RouteNames.businessOnboarding,
     allowedFor: {},

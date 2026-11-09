@@ -1679,4 +1679,103 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bizAvatarSemantic => 'Business profile photo';
+
+  @override
+  String get authResetEmailTitle => 'Forgot password';
+
+  @override
+  String get authResetEmailSubtitle => 'Enter your account email and we will send you a verification code.';
+
+  @override
+  String get authResetEmailSubmit => 'Send code';
+
+  @override
+  String get authResetOtpTitle => 'Verify your email';
+
+  @override
+  String authResetOtpSubtitle(String email) {
+    return 'Enter the 6-digit code we sent to $email.';
+  }
+
+  @override
+  String get authResetOtpLabel => 'Verification code';
+
+  @override
+  String get authResetOtpSubmit => 'Verify code';
+
+  @override
+  String get authResetOtpRequired => 'Enter the verification code.';
+
+  @override
+  String get authResetOtpInvalid => 'This code is invalid or has expired. Check it or request a new code.';
+
+  @override
+  String get authResetResendButton => 'Resend code';
+
+  @override
+  String authResetResendCooldown(int seconds) {
+    return 'Resend code in ${seconds}s';
+  }
+
+  @override
+  String get authResetResendSent => 'A new code has been sent.';
+
+  @override
+  String get authResetChangeEmail => 'Use a different email';
+
+  @override
+  String get authResetNewPasswordTitle => 'Set a new password';
+
+  @override
+  String get authResetNewPasswordSubtitle => 'Choose a new password for your account.';
+
+  @override
+  String get authResetNewPasswordLabel => 'New password';
+
+  @override
+  String get authResetConfirmPasswordLabel => 'Confirm new password';
+
+  @override
+  String get authResetNewPasswordSubmit => 'Reset password';
+
+  @override
+  String get authResetPasswordRequired => 'Enter a new password.';
+
+  @override
+  String get authResetPasswordsDoNotMatch => 'Passwords do not match.';
+
+  @override
+  String get authResetPasswordWeak => 'This password cannot be used. Choose a stronger one.';
+
+  @override
+  String get authResetSessionExpired => 'Your reset session has expired. Please start again.';
+
+  @override
+  String get authResetSuccessTitle => 'Password updated';
+
+  @override
+  String get authResetSuccessBody => 'Your password has been changed. Log in with your new password.';
+
+  @override
+  String get authResetBackToLogin => 'Back to log in';
+
+  @override
+  String get authResetThrottled => 'Too many attempts. Please try again later.';
+
+  @override
+  String get authForgotPasswordLink => 'Forgot password?';
+
+  @override
+  String authResetOtpNeutralHint(String email) {
+    return 'If $email is registered, a 6-digit code is on its way.';
+  }
+
+  @override
+  String get authResetOtpExpiry => 'The code is valid for 5 minutes.';
+
+  @override
+  String get authResetShowPassword => 'Show password';
+
+  @override
+  String get authResetHidePassword => 'Hide password';
 }

@@ -74,6 +74,12 @@ class RouteNames {
   static const String splash = 'splash';
   static const String login = 'login';
   static const String register = 'register';
+
+  /// Forgot-password flow (placeholder screens for now; the real screens
+  /// come next). Public, signed-out only, like [login] / [register].
+  static const String forgotPassword = 'forgotPassword';
+  static const String forgotPasswordVerify = 'forgotPasswordVerify';
+  static const String forgotPasswordNewPassword = 'forgotPasswordNewPassword';
   static const String home = 'home';
   static const String discover = 'discover';
   static const String search = 'search';
@@ -194,6 +200,19 @@ class RouteNames {
   static const String splashPath = '/';
   static const String loginPath = '/login';
   static const String registerPath = '/register';
+
+  /// Forgot-password step 1 (email).
+  static const String forgotPasswordPath = '/forgot-password';
+
+  /// Forgot-password step 2 (code). Needs the flow state: opened without it
+  /// (cold start, deep link) the router sends the user back to
+  /// [forgotPasswordPath].
+  static const String forgotPasswordVerifyPath = '/forgot-password/verify';
+
+  /// Forgot-password step 3 (new password). Same guard as
+  /// [forgotPasswordVerifyPath].
+  static const String forgotPasswordNewPasswordPath =
+      '/forgot-password/new-password';
   static const String homePath = '/home';
   static const String discoverPath = '/discover';
   static const String searchPath = '/search';

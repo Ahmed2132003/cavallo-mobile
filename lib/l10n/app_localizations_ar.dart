@@ -1739,4 +1739,103 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get bizAvatarSemantic => 'صورة ملف النشاط التجاري';
+
+  @override
+  String get authResetEmailTitle => 'نسيت كلمة المرور';
+
+  @override
+  String get authResetEmailSubtitle => 'أدخل البريد الإلكتروني لحسابك وسنرسل إليك رمز تحقق.';
+
+  @override
+  String get authResetEmailSubmit => 'إرسال الرمز';
+
+  @override
+  String get authResetOtpTitle => 'تحقق من بريدك الإلكتروني';
+
+  @override
+  String authResetOtpSubtitle(String email) {
+    return 'أدخل الرمز المكوّن من 6 أرقام الذي أرسلناه إلى $email.';
+  }
+
+  @override
+  String get authResetOtpLabel => 'رمز التحقق';
+
+  @override
+  String get authResetOtpSubmit => 'تحقق من الرمز';
+
+  @override
+  String get authResetOtpRequired => 'أدخل رمز التحقق.';
+
+  @override
+  String get authResetOtpInvalid => 'رمز التحقق غير صحيح أو انتهت صلاحيته. تحقق منه أو اطلب رمزًا جديدًا.';
+
+  @override
+  String get authResetResendButton => 'إعادة إرسال الرمز';
+
+  @override
+  String authResetResendCooldown(int seconds) {
+    return 'إعادة الإرسال بعد $seconds ث';
+  }
+
+  @override
+  String get authResetResendSent => 'تم إرسال رمز جديد.';
+
+  @override
+  String get authResetChangeEmail => 'استخدام بريد إلكتروني آخر';
+
+  @override
+  String get authResetNewPasswordTitle => 'تعيين كلمة مرور جديدة';
+
+  @override
+  String get authResetNewPasswordSubtitle => 'اختر كلمة مرور جديدة لحسابك.';
+
+  @override
+  String get authResetNewPasswordLabel => 'كلمة المرور الجديدة';
+
+  @override
+  String get authResetConfirmPasswordLabel => 'تأكيد كلمة المرور الجديدة';
+
+  @override
+  String get authResetNewPasswordSubmit => 'إعادة تعيين كلمة المرور';
+
+  @override
+  String get authResetPasswordRequired => 'أدخل كلمة المرور الجديدة.';
+
+  @override
+  String get authResetPasswordsDoNotMatch => 'كلمتا المرور غير متطابقتين.';
+
+  @override
+  String get authResetPasswordWeak => 'لا يمكن استخدام كلمة المرور هذه. اختر كلمة مرور أقوى.';
+
+  @override
+  String get authResetSessionExpired => 'انتهت صلاحية جلسة الاستعادة. يرجى البدء من جديد.';
+
+  @override
+  String get authResetSuccessTitle => 'تم تحديث كلمة المرور';
+
+  @override
+  String get authResetSuccessBody => 'تم تغيير كلمة المرور. سجّل الدخول بكلمة المرور الجديدة.';
+
+  @override
+  String get authResetBackToLogin => 'العودة إلى تسجيل الدخول';
+
+  @override
+  String get authResetThrottled => 'محاولات كثيرة. يرجى المحاولة لاحقًا.';
+
+  @override
+  String get authForgotPasswordLink => 'نسيت كلمة المرور؟';
+
+  @override
+  String authResetOtpNeutralHint(String email) {
+    return 'إذا كان البريد $email مسجّلًا لدينا، سيصلك رمز مكوّن من 6 أرقام.';
+  }
+
+  @override
+  String get authResetOtpExpiry => 'الرمز صالح لمدة 5 دقائق.';
+
+  @override
+  String get authResetShowPassword => 'إظهار كلمة المرور';
+
+  @override
+  String get authResetHidePassword => 'إخفاء كلمة المرور';
 }

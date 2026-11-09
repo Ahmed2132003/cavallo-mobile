@@ -2986,6 +2986,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Business profile photo'**
   String get bizAvatarSemantic;
+
+  /// Forgot-password step 1 (email): screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password'**
+  String get authResetEmailTitle;
+
+  /// Forgot-password step 1: explanatory text under the title.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your account email and we will send you a verification code.'**
+  String get authResetEmailSubtitle;
+
+  /// Forgot-password step 1: button that requests the verification code.
+  ///
+  /// In en, this message translates to:
+  /// **'Send code'**
+  String get authResetEmailSubmit;
+
+  /// Forgot-password step 2 (code): screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your email'**
+  String get authResetOtpTitle;
+
+  /// Forgot-password step 2: explains where the code was sent. {email} is the address the user typed.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code we sent to {email}.'**
+  String authResetOtpSubtitle(String email);
+
+  /// Forgot-password step 2: label of the code field.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code'**
+  String get authResetOtpLabel;
+
+  /// Forgot-password step 2: button that checks the code.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify code'**
+  String get authResetOtpSubmit;
+
+  /// Forgot-password step 2: shown when the code field is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the verification code.'**
+  String get authResetOtpRequired;
+
+  /// Forgot-password step 2: shown when the server rejects the code (wrong, expired or too many tries; the server does not say which).
+  ///
+  /// In en, this message translates to:
+  /// **'This code is invalid or has expired. Check it or request a new code.'**
+  String get authResetOtpInvalid;
+
+  /// Forgot-password step 2: button that asks for a new code once the wait is over.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get authResetResendButton;
+
+  /// Forgot-password step 2: disabled resend button while the wait runs. {seconds} is the whole number of seconds left (Western digits).
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {seconds}s'**
+  String authResetResendCooldown(int seconds);
+
+  /// Forgot-password step 2: confirmation after resending.
+  ///
+  /// In en, this message translates to:
+  /// **'A new code has been sent.'**
+  String get authResetResendSent;
+
+  /// Forgot-password step 2: link that goes back to step 1.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a different email'**
+  String get authResetChangeEmail;
+
+  /// Forgot-password step 3 (new password): screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a new password'**
+  String get authResetNewPasswordTitle;
+
+  /// Forgot-password step 3: explanatory text under the title.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a new password for your account.'**
+  String get authResetNewPasswordSubtitle;
+
+  /// Forgot-password step 3: label of the new password field.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get authResetNewPasswordLabel;
+
+  /// Forgot-password step 3: label of the confirmation field.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get authResetConfirmPasswordLabel;
+
+  /// Forgot-password step 3: button that saves the new password.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get authResetNewPasswordSubmit;
+
+  /// Forgot-password step 3: shown when the password field is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a new password.'**
+  String get authResetPasswordRequired;
+
+  /// Forgot-password step 3: shown when the two password fields differ.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get authResetPasswordsDoNotMatch;
+
+  /// Forgot-password step 3: shown when the server rejects the password as too weak or common.
+  ///
+  /// In en, this message translates to:
+  /// **'This password cannot be used. Choose a stronger one.'**
+  String get authResetPasswordWeak;
+
+  /// Forgot-password step 3: shown when the server says the reset token is wrong or expired; the flow restarts at step 1.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reset session has expired. Please start again.'**
+  String get authResetSessionExpired;
+
+  /// Forgot-password done state: title.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated'**
+  String get authResetSuccessTitle;
+
+  /// Forgot-password done state: explanatory text.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been changed. Log in with your new password.'**
+  String get authResetSuccessBody;
+
+  /// Forgot-password done state: button that returns to the login screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to log in'**
+  String get authResetBackToLogin;
+
+  /// Forgot-password flow: shown when the server throttles a request (HTTP 429).
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please try again later.'**
+  String get authResetThrottled;
+
+  /// Login screen: link to the forgot-password flow.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get authForgotPasswordLink;
+
+  /// Forgot-password step 2: neutral text (the server answers the same for every address, so it does not say the code was sent). {email} is the address the user typed.
+  ///
+  /// In en, this message translates to:
+  /// **'If {email} is registered, a 6-digit code is on its way.'**
+  String authResetOtpNeutralHint(String email);
+
+  /// Forgot-password step 2: how long the code is valid (matches the backend OTP lifetime of 300 seconds).
+  ///
+  /// In en, this message translates to:
+  /// **'The code is valid for 5 minutes.'**
+  String get authResetOtpExpiry;
+
+  /// Forgot-password step 3: tooltip of the button that reveals the typed password.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get authResetShowPassword;
+
+  /// Forgot-password step 3: tooltip of the button that hides the typed password.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get authResetHidePassword;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

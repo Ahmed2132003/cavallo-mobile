@@ -17,8 +17,11 @@ class LoggingInterceptor extends Interceptor {
       // ignore: avoid_print
       print('[HTTP] --> ${options.method} ${options.uri}');
       if (options.data != null) {
+        // The password-reset bodies carry an OTP, a reset token and a new
+        // password: they are never printed, not even in dev builds.
+        final sensitive = options.path.contains('/password-reset/');
         // ignore: avoid_print
-        print('[HTTP]     body: ${options.data}');
+        print('[HTTP]     body: ${sensitive ? '<redacted>' : options.data}');
       }
     }
     handler.next(options);
