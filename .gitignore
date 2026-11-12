@@ -37,3 +37,5 @@ qa_recon.txt
 golden_recon.txt
 # Script backups (*.bak_chatvideo, *.bak_newchat, ...) must never be committed
 *.bak_*
+# Test APKs built by scripts/build_test_apk.ps1
+/dist/
