@@ -9,6 +9,7 @@ import '../../../core/network/api_failure.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/auth_logo_header.dart';
 import '../../../core/widgets/cavallo_app_bar.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../routing/route_names.dart';
@@ -164,6 +165,8 @@ class _ForgotPasswordEmailScreenState
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    const AuthLogoHeader(size: 104),
+                    const SizedBox(height: 24),
                     _Intro(l10n.authResetEmailSubtitle),
                     AppTextField(
                       label: l10n.authEmailLabel,
