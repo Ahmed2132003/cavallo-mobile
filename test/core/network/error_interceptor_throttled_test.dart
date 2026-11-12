@@ -128,6 +128,14 @@ void main() {
             RequestOptions(
               path: '/api/v1/auth/login/',
               method: 'POST',
+              data: {'password': 'LoginPassw0rd!'},
+            ),
+            RequestInterceptorHandler(),
+          );
+          interceptor.onRequest(
+            RequestOptions(
+              path: '/api/v1/posts/',
+              method: 'POST',
               data: {'marker': 'visible'},
             ),
             RequestInterceptorHandler(),
@@ -140,6 +148,8 @@ void main() {
 
       expect(printed.join('\n'), isNot(contains('Str0ng!Passw0rd')));
       expect(printed.join('\n'), contains('<redacted>'));
+      // Every /auth/ body is redacted, login included.
+      expect(printed.join('\n'), isNot(contains('LoginPassw0rd!')));
       // Other endpoints keep their existing dev logging.
       expect(printed.join('\n'), contains('visible'));
     },
