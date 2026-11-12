@@ -9,6 +9,7 @@ import 'package:social_commerce_app/features/auth/data/auth_repository_impl.dart
 import 'package:social_commerce_app/features/auth/domain/auth_repository.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/login_screen.dart';
+import 'package:social_commerce_app/core/widgets/auth_logo_header.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Hand-rolled fake, matching this project's existing test convention
@@ -269,4 +270,32 @@ void main() {
       },
     );
   });
+
+group('LoginScreen - logo header', () {
+  testWidgets('shows the logo header above the fields', (tester) async {
+    await tester.pumpWidget(_wrap(_FakeAuthRepository()));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AuthLogoHeader), findsOneWidget);
+  });
+
+  testWidgets('no overflow on 320x568, also with the keyboard open', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(_wrap(_FakeAuthRepository()));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+
+    tester.view.viewInsets = const FakeViewPadding(bottom: 280);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(AuthLogoHeader), findsOneWidget);
+  });
+});
 }

@@ -7,6 +7,7 @@ import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/auth_logo_header.dart';
 import '../../../routing/route_names.dart';
 import 'session_provider.dart';
 import '../../../core/widgets/cavallo_app_bar.dart';
@@ -177,6 +178,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const AuthLogoHeader(size: 104),
+                  const SizedBox(height: 24),
                   AppTextField(
                     label: l10n.authEmailLabel,
                     controller: _emailController,

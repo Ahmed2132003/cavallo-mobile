@@ -12,6 +12,7 @@ import 'package:social_commerce_app/features/auth/domain/auth_repository.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/forgot_password_provider.dart';
 import 'package:social_commerce_app/features/auth/presentation/forgot_password_screens.dart';
+import 'package:social_commerce_app/core/widgets/auth_logo_header.dart';
 import 'package:social_commerce_app/l10n/app_localizations.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
 
@@ -610,4 +611,30 @@ void main() {
       expect(find.text(_l10n.authResetThrottled), findsOneWidget);
     });
   });
+
+group('Step 1 - logo header', () {
+  _flowTest('shows the logo header above the email field', (tester) async {
+    await _pump(tester, _FakeRepo());
+
+    expect(find.byType(AuthLogoHeader), findsOneWidget);
+  });
+
+  _flowTest('no overflow on 320x568, also with the keyboard open', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(tester, _FakeRepo());
+    expect(tester.takeException(), isNull);
+
+    tester.view.viewInsets = const FakeViewPadding(bottom: 280);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(AuthLogoHeader), findsOneWidget);
+  });
+});
 }
