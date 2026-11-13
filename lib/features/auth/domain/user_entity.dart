@@ -63,6 +63,8 @@ class User {
     required this.accountType,
     required this.isModerator,
     required this.isStaff,
+    this.displayName = '',
+    this.avatarUrl,
   });
 
   final int id;
@@ -83,6 +85,27 @@ class User {
   /// [isModerator].
   final bool isStaff;
 
+  /// Part P-116B: the name shown for this account (`display_name` of
+  /// `GET /auth/me/`). Empty when the backend sent none.
+  final String displayName;
+
+  /// Part P-116B: personal profile photo URL (`avatar`), or null.
+  final String? avatarUrl;
+
+  /// Same user with a new name / photo (null removes the photo, which
+  /// `copyWith` cannot express).
+  User withProfile({required String displayName, required String? avatarUrl}) {
+    return User(
+      id: id,
+      email: email,
+      accountType: accountType,
+      isModerator: isModerator,
+      isStaff: isStaff,
+      displayName: displayName,
+      avatarUrl: avatarUrl,
+    );
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -91,13 +114,24 @@ class User {
           other.email == email &&
           other.accountType == accountType &&
           other.isModerator == isModerator &&
-          other.isStaff == isStaff);
+          other.isStaff == isStaff &&
+          other.displayName == displayName &&
+          other.avatarUrl == avatarUrl);
 
   @override
-  int get hashCode => Object.hash(id, email, accountType, isModerator, isStaff);
+  int get hashCode => Object.hash(
+    id,
+    email,
+    accountType,
+    isModerator,
+    isStaff,
+    displayName,
+    avatarUrl,
+  );
 
   @override
   String toString() =>
       'User(id: $id, email: $email, accountType: $accountType, '
-      'isModerator: $isModerator, isStaff: $isStaff)';
+      'isModerator: $isModerator, isStaff: $isStaff, '
+      'displayName: $displayName, avatarUrl: $avatarUrl)';
 }

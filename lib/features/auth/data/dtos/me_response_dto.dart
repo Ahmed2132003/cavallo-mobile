@@ -15,6 +15,8 @@ class MeResponseDto {
     required this.accountType,
     required this.isModerator,
     required this.isStaff,
+    this.displayName = '',
+    this.avatarUrl,
   });
 
   factory MeResponseDto.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,14 @@ class MeResponseDto {
       accountType: json['account_type'] as String,
       isModerator: json['is_moderator'] as bool,
       isStaff: json['is_staff'] as bool,
+      displayName: switch (json['display_name']) {
+        final String name => name,
+        _ => '',
+      },
+      avatarUrl: switch (json['avatar']) {
+        final String url when url.isNotEmpty => url,
+        _ => null,
+      },
     );
   }
 
@@ -38,4 +48,10 @@ class MeResponseDto {
 
   final bool isModerator;
   final bool isStaff;
+
+  /// Part P-116B: `display_name` (empty when absent).
+  final String displayName;
+
+  /// Part P-116B: `avatar` URL, or null for null / empty / missing.
+  final String? avatarUrl;
 }

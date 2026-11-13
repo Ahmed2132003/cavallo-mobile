@@ -9,6 +9,56 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get hubEditMyProfile => 'تعديل الملف الشخصي';
+
+  @override
+  String get editProfileTitle => 'تعديل ملفي الشخصي';
+
+  @override
+  String get editProfileNameLabel => 'اسم العرض';
+
+  @override
+  String get editProfileNameTooLong => 'يجب ألا يزيد اسم العرض عن 80 حرفًا.';
+
+  @override
+  String get editProfilePhotoSemantic => 'صورة الملف الشخصي. اضغط للتغيير.';
+
+  @override
+  String get editProfilePickFromGallery => 'اختيار من المعرض';
+
+  @override
+  String get editProfileRemovePhoto => 'إزالة الصورة';
+
+  @override
+  String get editProfileSave => 'حفظ التغييرات';
+
+  @override
+  String get editProfileNoChanges => 'لا توجد تغييرات للحفظ.';
+
+  @override
+  String get editProfileSaved => 'تم تحديث الملف الشخصي.';
+
+  @override
+  String get editProfilePhotoUnsupported => 'اختر صورة بصيغة JPEG أو PNG أو WebP.';
+
+  @override
+  String editProfilePhotoTooLarge(int maxMb) {
+    return 'الصورة كبيرة جدًا (الحد الأقصى $maxMb ميجابايت).';
+  }
+
+  @override
+  String get editProfilePhotoPickFailed => 'تعذّر فتح الصورة. حاول مرة أخرى.';
+
+  @override
+  String get editProfileAvatarRejected => 'تعذّر على الخادم قبول هذه الصورة. جرّب صورة أخرى.';
+
+  @override
+  String get editProfileNameRejected => 'تعذّر على الخادم قبول اسم العرض هذا.';
+
+  @override
+  String get editProfileLoadingLabel => 'جارٍ تحميل ملفك الشخصي';
+
+  @override
   String get appTitle => 'منصة اكتشاف التجار والمصانع';
 
   @override

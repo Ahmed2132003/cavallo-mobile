@@ -324,7 +324,12 @@ class RouteNames {
   /// Same staging as [saved]: name and path now, GoRoute in STEP 2, real
   /// screen in STEP 3.
   static const String profile = 'profile';
+
+  /// Part P-116B: "Edit my profile" (display name + photo) for every account
+  /// type. Top-level (opens above the shell), reached from a Profile hub row.
   static const String profilePath = '/profile';
+  static const String editMyProfile = 'editMyProfile';
+  static const String editMyProfilePath = '/profile/edit';
 
   /// Path-parameter key shared by [businessProfilePath], [productDetailPath],
   /// [chatThreadPath], [postDetailPath], [reelDetailPath] and

@@ -9,6 +9,56 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get hubEditMyProfile => 'Edit profile';
+
+  @override
+  String get editProfileTitle => 'Edit my profile';
+
+  @override
+  String get editProfileNameLabel => 'Display name';
+
+  @override
+  String get editProfileNameTooLong => 'Display name must be 80 characters or fewer.';
+
+  @override
+  String get editProfilePhotoSemantic => 'Profile photo. Tap to change.';
+
+  @override
+  String get editProfilePickFromGallery => 'Choose from gallery';
+
+  @override
+  String get editProfileRemovePhoto => 'Remove photo';
+
+  @override
+  String get editProfileSave => 'Save changes';
+
+  @override
+  String get editProfileNoChanges => 'No changes to save.';
+
+  @override
+  String get editProfileSaved => 'Profile updated.';
+
+  @override
+  String get editProfilePhotoUnsupported => 'Choose a JPEG, PNG or WebP image.';
+
+  @override
+  String editProfilePhotoTooLarge(int maxMb) {
+    return 'Photo is too large (max $maxMb MB).';
+  }
+
+  @override
+  String get editProfilePhotoPickFailed => 'Could not open the photo. Please try again.';
+
+  @override
+  String get editProfileAvatarRejected => 'The server could not accept this photo. Try a different one.';
+
+  @override
+  String get editProfileNameRejected => 'The server could not accept this display name.';
+
+  @override
+  String get editProfileLoadingLabel => 'Loading your profile';
+
+  @override
   String get appTitle => 'Social Commerce Discovery Platform';
 
   @override

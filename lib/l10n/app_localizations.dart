@@ -95,6 +95,102 @@ abstract class AppLocalizations {
     Locale('en')
   ];
 
+  /// No description provided for @hubEditMyProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get hubEditMyProfile;
+
+  /// No description provided for @editProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit my profile'**
+  String get editProfileTitle;
+
+  /// No description provided for @editProfileNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get editProfileNameLabel;
+
+  /// No description provided for @editProfileNameTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name must be 80 characters or fewer.'**
+  String get editProfileNameTooLong;
+
+  /// No description provided for @editProfilePhotoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo. Tap to change.'**
+  String get editProfilePhotoSemantic;
+
+  /// No description provided for @editProfilePickFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get editProfilePickFromGallery;
+
+  /// No description provided for @editProfileRemovePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get editProfileRemovePhoto;
+
+  /// No description provided for @editProfileSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get editProfileSave;
+
+  /// No description provided for @editProfileNoChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes to save.'**
+  String get editProfileNoChanges;
+
+  /// No description provided for @editProfileSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated.'**
+  String get editProfileSaved;
+
+  /// No description provided for @editProfilePhotoUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a JPEG, PNG or WebP image.'**
+  String get editProfilePhotoUnsupported;
+
+  /// Edit profile: snackbar when the chosen photo exceeds the size limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo is too large (max {maxMb} MB).'**
+  String editProfilePhotoTooLarge(int maxMb);
+
+  /// No description provided for @editProfilePhotoPickFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the photo. Please try again.'**
+  String get editProfilePhotoPickFailed;
+
+  /// No description provided for @editProfileAvatarRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'The server could not accept this photo. Try a different one.'**
+  String get editProfileAvatarRejected;
+
+  /// No description provided for @editProfileNameRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'The server could not accept this display name.'**
+  String get editProfileNameRejected;
+
+  /// No description provided for @editProfileLoadingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your profile'**
+  String get editProfileLoadingLabel;
+
   /// Application title shown in the OS task switcher.
   ///
   /// In en, this message translates to:

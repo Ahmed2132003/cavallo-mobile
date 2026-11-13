@@ -32,6 +32,7 @@ import '../features/moderation/presentation/moderation_review_screen.dart';
 import '../features/notifications/presentation/notification_center_screen.dart';
 import '../features/notifications/presentation/notification_preferences_screen.dart';
 import '../features/profile_hub/presentation/profile_hub_screen.dart';
+import '../features/profile_hub/presentation/edit_my_profile_screen.dart';
 import '../features/saved/presentation/saved_screen.dart';
 import '../features/products/domain/product_entity.dart';
 import '../features/products/presentation/product_detail_screen.dart';
@@ -578,6 +579,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.notificationPreferencesPath,
         name: RouteNames.notificationPreferences,
         builder: (context, state) => const NotificationPreferencesScreen(),
+      ),
+      GoRoute(
+        // Part P-116B. Top-level, so it opens above the shell; reached from
+        // the Profile hub row. No guard of its own: signed-in users only,
+        // by the base gate.
+        path: RouteNames.editMyProfilePath,
+        name: RouteNames.editMyProfile,
+        builder: (context, state) => const EditMyProfileScreen(),
       ),
       StatefulShellRoute.indexedStack(
         // Part P-113 (STEP 2B). The app shell: one branch per tab

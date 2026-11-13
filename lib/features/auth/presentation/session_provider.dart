@@ -7,6 +7,7 @@ import '../../social/presentation/social_interaction_provider.dart';
 import '../data/auth_repository_impl.dart';
 import '../domain/auth_repository.dart';
 import '../domain/user_entity.dart';
+import '../../profile_hub/data/my_profile_repository.dart';
 
 /// Part P-021a scope (Part 1 of 3 of the original P-021 scope): the
 /// single global source of truth for "who is logged in," per
@@ -175,8 +176,48 @@ class SessionNotifier extends AsyncNotifier<User?> {
   /// so independently); this method's only job is to flip in-memory state
   /// so the router's redirect guard (Part P-021b) reacts immediately and
   /// sends the user to `/login`.
+  /// Part P-022B: minimal invalidation entrypoint for `RefreshInterceptor`
+  /// (via `sessionInvalidatorProvider`). Synchronously resets [state] to
+  /// unauthenticated; it does not touch [SecureTokenStorage].
   void invalidateSession() {
     state = const AsyncValue.data(null);
+  }
+
+  /// Part P-116B: edits the signed-in user's name / photo and puts the result
+  /// straight into [state] (no second request when the response carries the
+  /// profile; otherwise one `fetchMe`).
+  ///
+  /// Does NOT set [state] to loading (the router and the hub would blank).
+  /// On failure [state] is untouched and the error is rethrown.
+  Future<void> updateMyProfile({
+    String? displayName,
+    List<int>? avatarBytes,
+    String? avatarFilename,
+    bool removeAvatar = false,
+  }) async {
+    final User? current = switch (state) {
+      AsyncData(:final value) => value,
+      _ => null,
+    };
+    if (current == null) {
+      throw StateError('updateMyProfile called without a signed-in user.');
+    }
+    final MyProfileUpdate? result = await ref
+        .read(myProfileRepositoryProvider)
+        .update(
+          displayName: displayName,
+          avatarBytes: avatarBytes,
+          avatarFilename: avatarFilename,
+          removeAvatar: removeAvatar,
+        );
+    final User next =
+        result == null
+            ? await _authRepository.fetchMe()
+            : current.withProfile(
+              displayName: result.displayName,
+              avatarUrl: result.avatarUrl,
+            );
+    state = AsyncValue.data(next);
   }
 }
 

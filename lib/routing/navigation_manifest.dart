@@ -339,7 +339,16 @@ const List<NavDestination> kNavigationManifest = [
       NavAudience.staff: _prefsEntries,
     },
   ),
-
+  NavDestination(
+    id: RouteNames.editMyProfile,
+    routeName: RouteNames.editMyProfile,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _hubRow,
+      NavAudience.business: _hubRow,
+      NavAudience.staff: _hubRow,
+    },
+  ),
   // --- Settings actions that are not routes -------------------------------
   NavDestination(
     id: kNavAppearanceId,

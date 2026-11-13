@@ -147,6 +147,13 @@ class ProfileHubScreen extends ConsumerWidget {
     }
 
     final List<Widget> libraryRows = <Widget>[
+      if (ids.contains(RouteNames.editMyProfile))
+        navRow(
+          RouteNames.editMyProfile,
+          Icons.person_outline,
+          l10n.hubEditMyProfile,
+          () => context.pushNamed(RouteNames.editMyProfile),
+        ),
       if (ids.contains(RouteNames.saved))
         navRow(
           RouteNames.saved,
@@ -390,10 +397,11 @@ class _HubHeader extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
 
     final String? businessName = business?.businessName;
+    final String personalName = user.displayName.trim();
     final String title =
         (businessName != null && businessName.trim().isNotEmpty)
             ? businessName
-            : user.email;
+            : (personalName.isNotEmpty ? personalName : user.email);
     final bool showEmailLine = title != user.email;
 
     final String typeLabel = switch (audience) {
@@ -407,7 +415,11 @@ class _HubHeader extends StatelessWidget {
       padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 4),
       child: Row(
         children: <Widget>[
-          AppAvatar(imageUrl: business?.avatarUrl, name: title, size: 64),
+          AppAvatar(
+            imageUrl: business?.avatarUrl ?? user.avatarUrl,
+            name: title,
+            size: 64,
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(

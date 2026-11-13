@@ -1,5 +1,29 @@
 {
   "@@locale": "en",
+  "hubEditMyProfile": "Edit profile",
+  "editProfileTitle": "Edit my profile",
+  "editProfileNameLabel": "Display name",
+  "editProfileNameTooLong": "Display name must be 80 characters or fewer.",
+  "editProfilePhotoSemantic": "Profile photo. Tap to change.",
+  "editProfilePickFromGallery": "Choose from gallery",
+  "editProfileRemovePhoto": "Remove photo",
+  "editProfileSave": "Save changes",
+  "editProfileNoChanges": "No changes to save.",
+  "editProfileSaved": "Profile updated.",
+  "editProfilePhotoUnsupported": "Choose a JPEG, PNG or WebP image.",
+  "editProfilePhotoTooLarge": "Photo is too large (max {maxMb} MB).",
+  "@editProfilePhotoTooLarge": {
+    "description": "Edit profile: snackbar when the chosen photo exceeds the size limit.",
+    "placeholders": {
+      "maxMb": {
+        "type": "int"
+      }
+    }
+  },
+  "editProfilePhotoPickFailed": "Could not open the photo. Please try again.",
+  "editProfileAvatarRejected": "The server could not accept this photo. Try a different one.",
+  "editProfileNameRejected": "The server could not accept this display name.",
+  "editProfileLoadingLabel": "Loading your profile",
   "appTitle": "Social Commerce Discovery Platform",
   "@appTitle": {
     "description": "Application title shown in the OS task switcher."
