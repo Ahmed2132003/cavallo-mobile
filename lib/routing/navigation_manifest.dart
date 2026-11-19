@@ -424,6 +424,32 @@ const List<NavDestination> kNavigationManifest = [
     entries: {NavAudience.business: _consoleHubAndHeader},
   ),
   NavDestination(
+    id: RouteNames.ordersList,
+    routeName: RouteNames.ordersList,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(
+          NavEntryKind.inContextLink,
+          'Business Console bottom bar, Orders tab',
+        ),
+      ],
+    },
+  ),
+  NavDestination(
+    id: RouteNames.orderDetail,
+    routeName: RouteNames.orderDetail,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(
+          NavEntryKind.inContextLink,
+          'Order row in the Orders list, and Details on the order card in chat',
+        ),
+      ],
+    },
+  ),
+  NavDestination(
     id: RouteNames.productForm,
     routeName: RouteNames.productForm,
     allowedFor: _businessOnly,

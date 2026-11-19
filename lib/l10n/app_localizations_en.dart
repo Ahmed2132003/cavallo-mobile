@@ -1828,4 +1828,251 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authResetHidePassword => 'Hide password';
+
+  @override
+  String get ordersStatusPending => 'Pending';
+
+  @override
+  String get ordersStatusConfirmed => 'Confirmed';
+
+  @override
+  String get ordersStatusProcessing => 'Processing';
+
+  @override
+  String get ordersStatusShipped => 'Shipped';
+
+  @override
+  String get ordersStatusDelivered => 'Delivered';
+
+  @override
+  String get ordersStatusCancelled => 'Cancelled';
+
+  @override
+  String get ordersStatusUnknown => 'Unknown';
+
+  @override
+  String get ordersFilterAll => 'All';
+
+  @override
+  String get ordersTitle => 'Orders';
+
+  @override
+  String get consoleNavOrders => 'Orders';
+
+  @override
+  String get ordersOverviewTitle => 'Overview';
+
+  @override
+  String get ordersOverviewTotal => 'Total orders';
+
+  @override
+  String get ordersSearchHint => 'Search by order number';
+
+  @override
+  String get ordersSearchClear => 'Clear search';
+
+  @override
+  String get ordersEmptyTitle => 'No orders yet';
+
+  @override
+  String get ordersEmptyBody => 'Sales you record from chat will appear here.';
+
+  @override
+  String get ordersEmptyFilteredTitle => 'No orders with this status';
+
+  @override
+  String get ordersEmptySearchTitle => 'No order matches your search';
+
+  @override
+  String get ordersErrorLoad => 'Could not load orders.';
+
+  @override
+  String ordersTruncatedNote(int count) {
+    return 'Showing the latest $count orders only.';
+  }
+
+  @override
+  String get ordersCustomerLabel => 'Customer';
+
+  @override
+  String get ordersProductLabel => 'Product';
+
+  @override
+  String get ordersQuantityLabel => 'Quantity';
+
+  @override
+  String get ordersUnitPriceLabel => 'Agreed unit price';
+
+  @override
+  String get ordersTotalLabel => 'Total';
+
+  @override
+  String get ordersCurrencyLabel => 'Currency';
+
+  @override
+  String get ordersStatusLabel => 'Status';
+
+  @override
+  String ordersQuantityTimesPrice(int quantity, String price) {
+    return '$quantity × $price';
+  }
+
+  @override
+  String ordersCreatedAt(String date) {
+    return 'Created $date';
+  }
+
+  @override
+  String ordersConfirmedAt(String date) {
+    return 'Confirmed $date';
+  }
+
+  @override
+  String ordersCompletedAt(String date) {
+    return 'Delivered $date';
+  }
+
+  @override
+  String ordersCancelledAt(String date) {
+    return 'Cancelled $date';
+  }
+
+  @override
+  String get ordersTimelineTitle => 'Timeline';
+
+  @override
+  String get ordersTimelineCreated => 'Order recorded';
+
+  @override
+  String ordersTimelineStatusChanged(String from, String to) {
+    return 'Status changed from $from to $to';
+  }
+
+  @override
+  String get ordersNotesTitle => 'Notes';
+
+  @override
+  String get ordersNotesEmpty => 'No notes yet.';
+
+  @override
+  String get ordersCustomerNote => 'Customer note';
+
+  @override
+  String get ordersInternalNote => 'Internal note';
+
+  @override
+  String get ordersInternalBadge => 'Internal';
+
+  @override
+  String get ordersOpenConversation => 'Open conversation';
+
+  @override
+  String get ordersOpenDetails => 'Details';
+
+  @override
+  String get ordersUpdateStatus => 'Update status';
+
+  @override
+  String get ordersChangeStatusTitle => 'Change status';
+
+  @override
+  String get ordersStatusNoteHint => 'Note for the customer (optional)';
+
+  @override
+  String get ordersStatusNoTransitions => 'This order cannot change status anymore.';
+
+  @override
+  String get ordersStatusChanged => 'Status updated.';
+
+  @override
+  String get ordersAddNote => 'Add note';
+
+  @override
+  String get ordersNoteHint => 'Write a note';
+
+  @override
+  String get ordersNoteInternalToggle => 'Internal note (hidden from the customer)';
+
+  @override
+  String get ordersNoteAdded => 'Note added.';
+
+  @override
+  String get ordersNoteRequired => 'Write a note first.';
+
+  @override
+  String get ordersActionSave => 'Save';
+
+  @override
+  String get ordersActionCancel => 'Cancel';
+
+  @override
+  String get ordersRecordSale => 'Record Sale';
+
+  @override
+  String get ordersRecordSaleTitle => 'Record a sale';
+
+  @override
+  String get ordersFieldCustomerNote => 'Note for the customer';
+
+  @override
+  String get ordersFieldInternalNote => 'Internal note (only you)';
+
+  @override
+  String get ordersSummaryTitle => 'Summary';
+
+  @override
+  String ordersSummaryLine(int quantity, String price, String total) {
+    return '$quantity × $price = $total';
+  }
+
+  @override
+  String get ordersConfirmRecord => 'Confirm and record';
+
+  @override
+  String get ordersSubmitting => 'Recording…';
+
+  @override
+  String get ordersRetryRecord => 'Try again';
+
+  @override
+  String ordersRecordedSuccess(String orderNumber) {
+    return 'Sale recorded as $orderNumber.';
+  }
+
+  @override
+  String ordersAlreadyRecorded(String orderNumber) {
+    return 'This sale was already recorded as $orderNumber.';
+  }
+
+  @override
+  String get ordersCurrencyAutoNote => 'The currency of the product is applied automatically.';
+
+  @override
+  String get ordersValidationQuantity => 'Enter a whole number from 1 to 100000.';
+
+  @override
+  String get ordersValidationPrice => 'Enter a price above 0 with up to 2 decimals.';
+
+  @override
+  String get ordersErrorNetwork => 'No connection. Check your internet and try again.';
+
+  @override
+  String get ordersErrorGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get ordersErrorSafeRetry => 'Trying again will not create a duplicate order.';
+
+  @override
+  String ordersProductFallback(int id) {
+    return 'Product #$id';
+  }
+
+  @override
+  String get ordersDetailsTitle => 'Order details';
+
+  @override
+  String get ordersNotFound => 'Order not found.';
+
+  @override
+  String get ordersConversationUnavailable => 'Could not open the conversation.';
 }

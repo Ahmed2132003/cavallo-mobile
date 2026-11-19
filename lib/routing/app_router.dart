@@ -17,6 +17,8 @@ import '../features/business_profile/presentation/business_onboarding_screen.dar
 import '../features/business_profile/presentation/business_profile_edit_screen.dart';
 import '../features/business_profile/presentation/business_profile_provider.dart';
 import '../features/business_profile/presentation/business_profile_public_screen.dart';
+import '../features/orders/presentation/order_details_screen.dart';
+import '../features/orders/presentation/orders_list_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_thread_screen.dart';
 import '../features/content/presentation/content_list_screen.dart';
@@ -750,6 +752,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
+          // Part BI-03. Appended LAST so the P-083 branch order (0..3) is
+          // untouched; Orders is branch 4.
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.ordersListPath,
+                name: RouteNames.ordersList,
+                builder: (context, state) => const OrdersListScreen(),
+              ),
+            ],
+          ),
         ],
       ),
       GoRoute(
@@ -761,6 +774,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder:
             (context, state) =>
                 ProductFormScreen(existingProduct: state.extra as Product?),
+      ),
+      GoRoute(
+        // Part BI-03. Top-level like `productForm`, under the
+        // `/business-console` prefix so the Business-only gate covers it.
+        // The id is a path segment (no `extra`), so the route is still valid
+        // after an app restart.
+        path: RouteNames.orderDetailPath,
+        name: RouteNames.orderDetail,
+        builder: (context, state) {
+          final id = state.pathParameters[RouteNames.idParam]!;
+          return OrderDetailsScreen(orderId: id);
+        },
       ),
       GoRoute(
         // Part P-044. Create-only — no `extra:` to read, unlike

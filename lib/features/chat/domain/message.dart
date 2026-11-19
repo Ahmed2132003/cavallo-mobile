@@ -1,3 +1,4 @@
+import '../../orders/domain/order_summary.dart';
 import 'message_status.dart';
 import 'shared_content.dart';
 
@@ -53,6 +54,7 @@ class Message {
     this.mediaUrl,
     this.mediaType,
     this.sharedContent,
+    this.order,
   });
 
   final int id;
@@ -71,6 +73,12 @@ class Message {
   /// Part P-077. `null` when the message shares no platform content.
   final SharedContent? sharedContent;
 
+  /// Part BI-03. The order the merchant recorded from this message, or
+  /// `null` (absent key, `null` value or an unrecognizable payload).
+  /// Backward-compatible: old payloads without `order` parse exactly as
+  /// before.
+  final OrderSummary? order;
+
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
       id: json['id'] as int,
@@ -82,6 +90,7 @@ class Message {
       mediaUrl: json['media'] as String?,
       mediaType: ChatMediaType.fromRaw(json['media_type'] as String?),
       sharedContent: SharedContent.tryParse(json['shared_content']),
+      order: OrderSummary.tryParse(json['order']),
     );
   }
 
@@ -101,6 +110,7 @@ class Message {
       mediaUrl: mediaUrl,
       mediaType: mediaType,
       sharedContent: sharedContent,
+      order: order,
     );
   }
 
@@ -116,7 +126,8 @@ class Message {
           other.createdAt == createdAt &&
           other.mediaUrl == mediaUrl &&
           other.mediaType == mediaType &&
-          other.sharedContent == sharedContent);
+          other.sharedContent == sharedContent &&
+          other.order == order);
 
   @override
   int get hashCode => Object.hash(
@@ -129,5 +140,6 @@ class Message {
     mediaUrl,
     mediaType,
     sharedContent,
+    order,
   );
 }

@@ -196,6 +196,12 @@ class RouteNames {
   /// in `app_router.dart`, this route stays as it is.
   static const String businessAnalytics = 'businessAnalytics';
 
+  /// Part BI-03 — the merchant's orders list (Business Console tab).
+  static const String ordersList = 'ordersList';
+
+  /// Part BI-03 — one order. Uses [idParam].
+  static const String orderDetail = 'orderDetail';
+
   // --- Route paths (used inside GoRoute(path: ...)) ---
   static const String splashPath = '/';
   static const String loginPath = '/login';
@@ -312,6 +318,13 @@ class RouteNames {
 
   /// Part P-083 — see [businessAnalytics].
   static const String businessAnalyticsPath = '/business-console/analytics';
+
+  /// Part BI-03 — see [ordersList]. Under `/business-console`, so the
+  /// Business-only gate in the router covers it.
+  static const String ordersListPath = '/business-console/orders';
+
+  /// Part BI-03 — see [orderDetail].
+  static const String orderDetailPath = '/business-console/orders/:id';
 
   /// Part P-113: the Saved screen (Posts / Reels / Products tabs), tab 3 of
   /// the Customer bottom bar and a Profile hub row for every account type.

@@ -159,11 +159,18 @@ class ConversationRepository {
   /// business, or when the business no longer exists).
   Future<Conversation?> startConversationWithBusiness({
     required int businessId,
+    int? productId,
   }) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         '${_basePath}start/',
-        data: {'business_id': businessId},
+        // Part BI-03: `product_id` is optional and only sent together with
+        // `business_id` (the backend rejects it with `recipient_id`). Without
+        // a product the body is exactly what it always was.
+        data: {
+          'business_id': businessId,
+          if (productId != null) 'product_id': productId,
+        },
       );
       final conversationId = response.data!['id'] as int;
 

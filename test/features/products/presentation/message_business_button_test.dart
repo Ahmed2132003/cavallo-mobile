@@ -39,12 +39,15 @@ class _FakeConversationRepository extends ConversationRepository {
   Object? errorToThrow;
   Conversation? result;
   final List<int> startedBusinessIds = [];
+  final List<int?> startedProductIds = [];
 
   @override
   Future<Conversation?> startConversationWithBusiness({
     required int businessId,
+    int? productId,
   }) async {
     startedBusinessIds.add(businessId);
+    startedProductIds.add(productId);
     final pending = gate;
     if (pending != null) await pending.future;
     final error = errorToThrow;
@@ -136,12 +139,18 @@ void main() {
 
   testWidgets('tapping "Message Business" starts the conversation with THIS '
       "product's business and opens its thread", (tester) async {
-    await _pump(tester, conversations: conversations, openedExtras: openedExtras);
+    await _pump(
+      tester,
+      conversations: conversations,
+      openedExtras: openedExtras,
+    );
 
     await tester.tap(find.widgetWithText(AppButton, 'Message Business'));
     await tester.pumpAndSettle();
 
     expect(conversations.startedBusinessIds, [7]);
+    // Part BI-03: the product being viewed is sent along with the business.
+    expect(conversations.startedProductIds, [10]);
     expect(find.text('THREAD_5'), findsOneWidget);
 
     final extra = openedExtras.single;
@@ -157,7 +166,11 @@ void main() {
     tester,
   ) async {
     conversations.gate = Completer<void>();
-    await _pump(tester, conversations: conversations, openedExtras: openedExtras);
+    await _pump(
+      tester,
+      conversations: conversations,
+      openedExtras: openedExtras,
+    );
 
     await tester.tap(find.widgetWithText(AppButton, 'Message Business'));
     await tester.pump();
@@ -188,7 +201,11 @@ void main() {
       message: 'Cannot start a conversation with yourself.',
       fields: {},
     );
-    await _pump(tester, conversations: conversations, openedExtras: openedExtras);
+    await _pump(
+      tester,
+      conversations: conversations,
+      openedExtras: openedExtras,
+    );
 
     await tester.tap(find.widgetWithText(AppButton, 'Message Business'));
     await tester.pump();
@@ -207,7 +224,11 @@ void main() {
     tester,
   ) async {
     conversations.result = null;
-    await _pump(tester, conversations: conversations, openedExtras: openedExtras);
+    await _pump(
+      tester,
+      conversations: conversations,
+      openedExtras: openedExtras,
+    );
 
     await tester.tap(find.widgetWithText(AppButton, 'Message Business'));
     await tester.pump();

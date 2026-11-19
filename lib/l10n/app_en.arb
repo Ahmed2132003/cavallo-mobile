@@ -2366,5 +2366,128 @@
   "authResetHidePassword": "Hide password",
   "@authResetHidePassword": {
     "description": "Forgot-password step 3: tooltip of the button that hides the typed password."
-  }
+  },
+  "ordersStatusPending": "Pending",
+  "ordersStatusConfirmed": "Confirmed",
+  "ordersStatusProcessing": "Processing",
+  "ordersStatusShipped": "Shipped",
+  "ordersStatusDelivered": "Delivered",
+  "ordersStatusCancelled": "Cancelled",
+  "ordersStatusUnknown": "Unknown",
+  "ordersFilterAll": "All",
+  "ordersTitle": "Orders",
+  "consoleNavOrders": "Orders",
+  "ordersOverviewTitle": "Overview",
+  "ordersOverviewTotal": "Total orders",
+  "ordersSearchHint": "Search by order number",
+  "ordersSearchClear": "Clear search",
+  "ordersEmptyTitle": "No orders yet",
+  "ordersEmptyBody": "Sales you record from chat will appear here.",
+  "ordersEmptyFilteredTitle": "No orders with this status",
+  "ordersEmptySearchTitle": "No order matches your search",
+  "ordersErrorLoad": "Could not load orders.",
+  "ordersTruncatedNote": "Showing the latest {count} orders only.",
+  "@ordersTruncatedNote": {
+    "description": "Orders list: shown when loading stopped at the page cap.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "ordersCustomerLabel": "Customer",
+  "ordersProductLabel": "Product",
+  "ordersQuantityLabel": "Quantity",
+  "ordersUnitPriceLabel": "Agreed unit price",
+  "ordersTotalLabel": "Total",
+  "ordersCurrencyLabel": "Currency",
+  "ordersStatusLabel": "Status",
+  "ordersQuantityTimesPrice": "{quantity} × {price}",
+  "@ordersQuantityTimesPrice": {
+    "description": "Order card: quantity times the agreed unit price.",
+    "placeholders": { "quantity": { "type": "int" }, "price": { "type": "String" } }
+  },
+  "ordersCreatedAt": "Created {date}",
+  "@ordersCreatedAt": {
+    "description": "Order: creation date.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "ordersConfirmedAt": "Confirmed {date}",
+  "@ordersConfirmedAt": {
+    "description": "Order: confirmation date.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "ordersCompletedAt": "Delivered {date}",
+  "@ordersCompletedAt": {
+    "description": "Order: delivery date.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "ordersCancelledAt": "Cancelled {date}",
+  "@ordersCancelledAt": {
+    "description": "Order: cancellation date.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "ordersTimelineTitle": "Timeline",
+  "ordersTimelineCreated": "Order recorded",
+  "ordersTimelineStatusChanged": "Status changed from {from} to {to}",
+  "@ordersTimelineStatusChanged": {
+    "description": "Order timeline entry for a status change.",
+    "placeholders": { "from": { "type": "String" }, "to": { "type": "String" } }
+  },
+  "ordersNotesTitle": "Notes",
+  "ordersNotesEmpty": "No notes yet.",
+  "ordersCustomerNote": "Customer note",
+  "ordersInternalNote": "Internal note",
+  "ordersInternalBadge": "Internal",
+  "ordersOpenConversation": "Open conversation",
+  "ordersOpenDetails": "Details",
+  "ordersUpdateStatus": "Update status",
+  "ordersChangeStatusTitle": "Change status",
+  "ordersStatusNoteHint": "Note for the customer (optional)",
+  "ordersStatusNoTransitions": "This order cannot change status anymore.",
+  "ordersStatusChanged": "Status updated.",
+  "ordersAddNote": "Add note",
+  "ordersNoteHint": "Write a note",
+  "ordersNoteInternalToggle": "Internal note (hidden from the customer)",
+  "ordersNoteAdded": "Note added.",
+  "ordersNoteRequired": "Write a note first.",
+  "ordersActionSave": "Save",
+  "ordersActionCancel": "Cancel",
+  "ordersRecordSale": "Record Sale",
+  "ordersRecordSaleTitle": "Record a sale",
+  "ordersFieldCustomerNote": "Note for the customer",
+  "ordersFieldInternalNote": "Internal note (only you)",
+  "ordersSummaryTitle": "Summary",
+  "ordersSummaryLine": "{quantity} × {price} = {total}",
+  "@ordersSummaryLine": {
+    "description": "Record Sale summary line.",
+    "placeholders": {
+      "quantity": { "type": "int" },
+      "price": { "type": "String" },
+      "total": { "type": "String" }
+    }
+  },
+  "ordersConfirmRecord": "Confirm and record",
+  "ordersSubmitting": "Recording…",
+  "ordersRetryRecord": "Try again",
+  "ordersRecordedSuccess": "Sale recorded as {orderNumber}.",
+  "@ordersRecordedSuccess": {
+    "description": "Snackbar after a sale was recorded.",
+    "placeholders": { "orderNumber": { "type": "String" } }
+  },
+  "ordersAlreadyRecorded": "This sale was already recorded as {orderNumber}.",
+  "@ordersAlreadyRecorded": {
+    "description": "Snackbar when the server returned the existing order.",
+    "placeholders": { "orderNumber": { "type": "String" } }
+  },
+  "ordersCurrencyAutoNote": "The currency of the product is applied automatically.",
+  "ordersValidationQuantity": "Enter a whole number from 1 to 100000.",
+  "ordersValidationPrice": "Enter a price above 0 with up to 2 decimals.",
+  "ordersErrorNetwork": "No connection. Check your internet and try again.",
+  "ordersErrorGeneric": "Something went wrong. Please try again.",
+  "ordersErrorSafeRetry": "Trying again will not create a duplicate order.",
+  "ordersProductFallback": "Product #{id}",
+  "@ordersProductFallback": {
+    "description": "Fallback product name when the real name is not loaded.",
+    "placeholders": { "id": { "type": "int" } }
+  },
+  "ordersDetailsTitle": "Order details",
+  "ordersNotFound": "Order not found.",
+  "ordersConversationUnavailable": "Could not open the conversation."
 }

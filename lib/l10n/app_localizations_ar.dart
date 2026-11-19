@@ -1888,4 +1888,251 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get authResetHidePassword => 'إخفاء كلمة المرور';
+
+  @override
+  String get ordersStatusPending => 'قيد الانتظار';
+
+  @override
+  String get ordersStatusConfirmed => 'تم التأكيد';
+
+  @override
+  String get ordersStatusProcessing => 'قيد التجهيز';
+
+  @override
+  String get ordersStatusShipped => 'تم الشحن';
+
+  @override
+  String get ordersStatusDelivered => 'تم التسليم';
+
+  @override
+  String get ordersStatusCancelled => 'ملغي';
+
+  @override
+  String get ordersStatusUnknown => 'غير معروف';
+
+  @override
+  String get ordersFilterAll => 'الكل';
+
+  @override
+  String get ordersTitle => 'الأوردرات';
+
+  @override
+  String get consoleNavOrders => 'الأوردرات';
+
+  @override
+  String get ordersOverviewTitle => 'نظرة عامة';
+
+  @override
+  String get ordersOverviewTotal => 'إجمالي الأوردرات';
+
+  @override
+  String get ordersSearchHint => 'ابحث برقم الأوردر';
+
+  @override
+  String get ordersSearchClear => 'مسح البحث';
+
+  @override
+  String get ordersEmptyTitle => 'لا توجد أوردرات بعد';
+
+  @override
+  String get ordersEmptyBody => 'ستظهر هنا عمليات البيع التي تسجّلها من المحادثات.';
+
+  @override
+  String get ordersEmptyFilteredTitle => 'لا توجد أوردرات بهذه الحالة';
+
+  @override
+  String get ordersEmptySearchTitle => 'لا يوجد أوردر مطابق لبحثك';
+
+  @override
+  String get ordersErrorLoad => 'تعذّر تحميل الأوردرات.';
+
+  @override
+  String ordersTruncatedNote(int count) {
+    return 'يتم عرض آخر $count أوردر فقط.';
+  }
+
+  @override
+  String get ordersCustomerLabel => 'العميل';
+
+  @override
+  String get ordersProductLabel => 'المنتج';
+
+  @override
+  String get ordersQuantityLabel => 'الكمية';
+
+  @override
+  String get ordersUnitPriceLabel => 'سعر الوحدة المتفق عليه';
+
+  @override
+  String get ordersTotalLabel => 'الإجمالي';
+
+  @override
+  String get ordersCurrencyLabel => 'العملة';
+
+  @override
+  String get ordersStatusLabel => 'الحالة';
+
+  @override
+  String ordersQuantityTimesPrice(int quantity, String price) {
+    return '$quantity × $price';
+  }
+
+  @override
+  String ordersCreatedAt(String date) {
+    return 'أُنشئ في $date';
+  }
+
+  @override
+  String ordersConfirmedAt(String date) {
+    return 'أُكِّد في $date';
+  }
+
+  @override
+  String ordersCompletedAt(String date) {
+    return 'سُلِّم في $date';
+  }
+
+  @override
+  String ordersCancelledAt(String date) {
+    return 'أُلغي في $date';
+  }
+
+  @override
+  String get ordersTimelineTitle => 'السجل الزمني';
+
+  @override
+  String get ordersTimelineCreated => 'تم تسجيل الأوردر';
+
+  @override
+  String ordersTimelineStatusChanged(String from, String to) {
+    return 'تغيّرت الحالة من $from إلى $to';
+  }
+
+  @override
+  String get ordersNotesTitle => 'الملاحظات';
+
+  @override
+  String get ordersNotesEmpty => 'لا توجد ملاحظات بعد.';
+
+  @override
+  String get ordersCustomerNote => 'ملاحظة العميل';
+
+  @override
+  String get ordersInternalNote => 'ملاحظة داخلية';
+
+  @override
+  String get ordersInternalBadge => 'داخلية';
+
+  @override
+  String get ordersOpenConversation => 'فتح المحادثة';
+
+  @override
+  String get ordersOpenDetails => 'التفاصيل';
+
+  @override
+  String get ordersUpdateStatus => 'تحديث الحالة';
+
+  @override
+  String get ordersChangeStatusTitle => 'تغيير الحالة';
+
+  @override
+  String get ordersStatusNoteHint => 'ملاحظة للعميل (اختياري)';
+
+  @override
+  String get ordersStatusNoTransitions => 'لا يمكن تغيير حالة هذا الأوردر بعد الآن.';
+
+  @override
+  String get ordersStatusChanged => 'تم تحديث الحالة.';
+
+  @override
+  String get ordersAddNote => 'إضافة ملاحظة';
+
+  @override
+  String get ordersNoteHint => 'اكتب ملاحظة';
+
+  @override
+  String get ordersNoteInternalToggle => 'ملاحظة داخلية (مخفية عن العميل)';
+
+  @override
+  String get ordersNoteAdded => 'تمت إضافة الملاحظة.';
+
+  @override
+  String get ordersNoteRequired => 'اكتب ملاحظة أولًا.';
+
+  @override
+  String get ordersActionSave => 'حفظ';
+
+  @override
+  String get ordersActionCancel => 'إلغاء';
+
+  @override
+  String get ordersRecordSale => 'تسجيل عملية شراء';
+
+  @override
+  String get ordersRecordSaleTitle => 'تسجيل عملية شراء';
+
+  @override
+  String get ordersFieldCustomerNote => 'ملاحظة للعميل';
+
+  @override
+  String get ordersFieldInternalNote => 'ملاحظة داخلية (لك فقط)';
+
+  @override
+  String get ordersSummaryTitle => 'الملخص';
+
+  @override
+  String ordersSummaryLine(int quantity, String price, String total) {
+    return '$quantity × $price = $total';
+  }
+
+  @override
+  String get ordersConfirmRecord => 'تأكيد وتسجيل';
+
+  @override
+  String get ordersSubmitting => 'جارٍ التسجيل…';
+
+  @override
+  String get ordersRetryRecord => 'حاول مرة أخرى';
+
+  @override
+  String ordersRecordedSuccess(String orderNumber) {
+    return 'تم تسجيل العملية برقم $orderNumber.';
+  }
+
+  @override
+  String ordersAlreadyRecorded(String orderNumber) {
+    return 'تم تسجيل هذه العملية مسبقًا برقم $orderNumber.';
+  }
+
+  @override
+  String get ordersCurrencyAutoNote => 'تُطبَّق عملة المنتج تلقائيًا.';
+
+  @override
+  String get ordersValidationQuantity => 'أدخل عددًا صحيحًا من 1 إلى 100000.';
+
+  @override
+  String get ordersValidationPrice => 'أدخل سعرًا أكبر من 0 بحد أقصى خانتين عشريتين.';
+
+  @override
+  String get ordersErrorNetwork => 'لا يوجد اتصال. تحقق من الإنترنت وحاول مرة أخرى.';
+
+  @override
+  String get ordersErrorGeneric => 'حدث خطأ ما. حاول مرة أخرى.';
+
+  @override
+  String get ordersErrorSafeRetry => 'إعادة المحاولة لن تُنشئ أوردرًا مكررًا.';
+
+  @override
+  String ordersProductFallback(int id) {
+    return 'منتج رقم $id';
+  }
+
+  @override
+  String get ordersDetailsTitle => 'تفاصيل الأوردر';
+
+  @override
+  String get ordersNotFound => 'الأوردر غير موجود.';
+
+  @override
+  String get ordersConversationUnavailable => 'تعذّر فتح المحادثة.';
 }

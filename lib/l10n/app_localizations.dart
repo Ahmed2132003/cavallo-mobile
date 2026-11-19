@@ -3268,6 +3268,456 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hide password'**
   String get authResetHidePassword;
+
+  /// No description provided for @ordersStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get ordersStatusPending;
+
+  /// No description provided for @ordersStatusConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get ordersStatusConfirmed;
+
+  /// No description provided for @ordersStatusProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing'**
+  String get ordersStatusProcessing;
+
+  /// No description provided for @ordersStatusShipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipped'**
+  String get ordersStatusShipped;
+
+  /// No description provided for @ordersStatusDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered'**
+  String get ordersStatusDelivered;
+
+  /// No description provided for @ordersStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get ordersStatusCancelled;
+
+  /// No description provided for @ordersStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get ordersStatusUnknown;
+
+  /// No description provided for @ordersFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get ordersFilterAll;
+
+  /// No description provided for @ordersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get ordersTitle;
+
+  /// No description provided for @consoleNavOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get consoleNavOrders;
+
+  /// No description provided for @ordersOverviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get ordersOverviewTitle;
+
+  /// No description provided for @ordersOverviewTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total orders'**
+  String get ordersOverviewTotal;
+
+  /// No description provided for @ordersSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by order number'**
+  String get ordersSearchHint;
+
+  /// No description provided for @ordersSearchClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get ordersSearchClear;
+
+  /// No description provided for @ordersEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No orders yet'**
+  String get ordersEmptyTitle;
+
+  /// No description provided for @ordersEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales you record from chat will appear here.'**
+  String get ordersEmptyBody;
+
+  /// No description provided for @ordersEmptyFilteredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No orders with this status'**
+  String get ordersEmptyFilteredTitle;
+
+  /// No description provided for @ordersEmptySearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No order matches your search'**
+  String get ordersEmptySearchTitle;
+
+  /// No description provided for @ordersErrorLoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load orders.'**
+  String get ordersErrorLoad;
+
+  /// Orders list: shown when loading stopped at the page cap.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing the latest {count} orders only.'**
+  String ordersTruncatedNote(int count);
+
+  /// No description provided for @ordersCustomerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer'**
+  String get ordersCustomerLabel;
+
+  /// No description provided for @ordersProductLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Product'**
+  String get ordersProductLabel;
+
+  /// No description provided for @ordersQuantityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get ordersQuantityLabel;
+
+  /// No description provided for @ordersUnitPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Agreed unit price'**
+  String get ordersUnitPriceLabel;
+
+  /// No description provided for @ordersTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get ordersTotalLabel;
+
+  /// No description provided for @ordersCurrencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get ordersCurrencyLabel;
+
+  /// No description provided for @ordersStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get ordersStatusLabel;
+
+  /// Order card: quantity times the agreed unit price.
+  ///
+  /// In en, this message translates to:
+  /// **'{quantity} × {price}'**
+  String ordersQuantityTimesPrice(int quantity, String price);
+
+  /// Order: creation date.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {date}'**
+  String ordersCreatedAt(String date);
+
+  /// Order: confirmation date.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed {date}'**
+  String ordersConfirmedAt(String date);
+
+  /// Order: delivery date.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered {date}'**
+  String ordersCompletedAt(String date);
+
+  /// Order: cancellation date.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled {date}'**
+  String ordersCancelledAt(String date);
+
+  /// No description provided for @ordersTimelineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeline'**
+  String get ordersTimelineTitle;
+
+  /// No description provided for @ordersTimelineCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Order recorded'**
+  String get ordersTimelineCreated;
+
+  /// Order timeline entry for a status change.
+  ///
+  /// In en, this message translates to:
+  /// **'Status changed from {from} to {to}'**
+  String ordersTimelineStatusChanged(String from, String to);
+
+  /// No description provided for @ordersNotesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get ordersNotesTitle;
+
+  /// No description provided for @ordersNotesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No notes yet.'**
+  String get ordersNotesEmpty;
+
+  /// No description provided for @ordersCustomerNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer note'**
+  String get ordersCustomerNote;
+
+  /// No description provided for @ordersInternalNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal note'**
+  String get ordersInternalNote;
+
+  /// No description provided for @ordersInternalBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal'**
+  String get ordersInternalBadge;
+
+  /// No description provided for @ordersOpenConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Open conversation'**
+  String get ordersOpenConversation;
+
+  /// No description provided for @ordersOpenDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get ordersOpenDetails;
+
+  /// No description provided for @ordersUpdateStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Update status'**
+  String get ordersUpdateStatus;
+
+  /// No description provided for @ordersChangeStatusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change status'**
+  String get ordersChangeStatusTitle;
+
+  /// No description provided for @ordersStatusNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Note for the customer (optional)'**
+  String get ordersStatusNoteHint;
+
+  /// No description provided for @ordersStatusNoTransitions.
+  ///
+  /// In en, this message translates to:
+  /// **'This order cannot change status anymore.'**
+  String get ordersStatusNoTransitions;
+
+  /// No description provided for @ordersStatusChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Status updated.'**
+  String get ordersStatusChanged;
+
+  /// No description provided for @ordersAddNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Add note'**
+  String get ordersAddNote;
+
+  /// No description provided for @ordersNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a note'**
+  String get ordersNoteHint;
+
+  /// No description provided for @ordersNoteInternalToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal note (hidden from the customer)'**
+  String get ordersNoteInternalToggle;
+
+  /// No description provided for @ordersNoteAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Note added.'**
+  String get ordersNoteAdded;
+
+  /// No description provided for @ordersNoteRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a note first.'**
+  String get ordersNoteRequired;
+
+  /// No description provided for @ordersActionSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get ordersActionSave;
+
+  /// No description provided for @ordersActionCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get ordersActionCancel;
+
+  /// No description provided for @ordersRecordSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Record Sale'**
+  String get ordersRecordSale;
+
+  /// No description provided for @ordersRecordSaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a sale'**
+  String get ordersRecordSaleTitle;
+
+  /// No description provided for @ordersFieldCustomerNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note for the customer'**
+  String get ordersFieldCustomerNote;
+
+  /// No description provided for @ordersFieldInternalNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal note (only you)'**
+  String get ordersFieldInternalNote;
+
+  /// No description provided for @ordersSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get ordersSummaryTitle;
+
+  /// Record Sale summary line.
+  ///
+  /// In en, this message translates to:
+  /// **'{quantity} × {price} = {total}'**
+  String ordersSummaryLine(int quantity, String price, String total);
+
+  /// No description provided for @ordersConfirmRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm and record'**
+  String get ordersConfirmRecord;
+
+  /// No description provided for @ordersSubmitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording…'**
+  String get ordersSubmitting;
+
+  /// No description provided for @ordersRetryRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get ordersRetryRecord;
+
+  /// Snackbar after a sale was recorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale recorded as {orderNumber}.'**
+  String ordersRecordedSuccess(String orderNumber);
+
+  /// Snackbar when the server returned the existing order.
+  ///
+  /// In en, this message translates to:
+  /// **'This sale was already recorded as {orderNumber}.'**
+  String ordersAlreadyRecorded(String orderNumber);
+
+  /// No description provided for @ordersCurrencyAutoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The currency of the product is applied automatically.'**
+  String get ordersCurrencyAutoNote;
+
+  /// No description provided for @ordersValidationQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a whole number from 1 to 100000.'**
+  String get ordersValidationQuantity;
+
+  /// No description provided for @ordersValidationPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a price above 0 with up to 2 decimals.'**
+  String get ordersValidationPrice;
+
+  /// No description provided for @ordersErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check your internet and try again.'**
+  String get ordersErrorNetwork;
+
+  /// No description provided for @ordersErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get ordersErrorGeneric;
+
+  /// No description provided for @ordersErrorSafeRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Trying again will not create a duplicate order.'**
+  String get ordersErrorSafeRetry;
+
+  /// Fallback product name when the real name is not loaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Product #{id}'**
+  String ordersProductFallback(int id);
+
+  /// No description provided for @ordersDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Order details'**
+  String get ordersDetailsTitle;
+
+  /// No description provided for @ordersNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Order not found.'**
+  String get ordersNotFound;
+
+  /// No description provided for @ordersConversationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the conversation.'**
+  String get ordersConversationUnavailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
