@@ -54,3 +54,36 @@
 - flutter test (FULL): 04:17 +1696: All tests passed!
 
 **Manual end-to-end (emulator + real backend):** PASSED on 2026-11-08 - the walk-through was run on the emulator against the real backend. Status: **DONE**.
+
+
+---
+
+## PART BI-03 - Chat order creation and Orders management - branch `part-116b-edit-profile` (2026-11-19)
+
+**Scope:** a merchant records a sale from a Product card in chat; the order appears as a card under that message for both sides; the merchant manages orders from a new Orders tab in the Business Console.
+
+**What was added:**
+- Feature `lib/features/orders/`: entities (Order, OrderNote, OrderStatusEvent/OrderEvents, OrderSummary), DTOs (merchant and customer serializers kept separate), `OrdersRepository`, providers, `OrdersListScreen`, `OrderDetailsScreen`, change-status and add-note sheets, `RecordSaleSheet`, status chips (colour + icon), money helpers in integer minor units.
+- Chat: `Message.order` (nullable, old payloads parse as before), `OrderMessageCard`, "Record Sale" button (only for the business that owns the shared product, only while the message has no order).
+- Idempotency: `createFromChat` is safe to repeat; the server answers a repeat with HTTP 200 and the same order. The sheet disables the button while sending and retries with the SAME source message id.
+- Privacy: `internal_note` is never read in the customer parser; internal events are dropped client-side again; the chat card never renders an internal note.
+- Conversation start: `startConversationWithBusiness(productId:)` sends `business_id` + `product_id`; `product_detail_screen` passes the product id. The call without a product is unchanged.
+- Routing: `ordersList` (Console branch 4, appended so branches 0..3 are unchanged) and `orderDetail` (`/business-console/orders/:id`, id in the path so it survives a restart), covered by the Business-only gate; entries in `navigation_manifest.dart`.
+- L10n: all strings in EN + AR.
+- Tests: DTOs, money, repository contract, providers, list / details / sheets / record-sale widgets, chat button visibility and order card (merchant vs customer), conversation start with product, routing. Fixed the fake in `message_business_button_test.dart` for the new `productId` parameter.
+
+**Verification (fill in with the REAL output of your run):**
+- flutter gen-l10n: ?
+- flutter analyze: ?
+- Targeted tests: ?
+- flutter test (FULL): ?
+
+**Not verified:** nothing was run against the real backend. The contract is taken from `api_contract_BI01.md` only. Manual walk-through on the emulator (record a sale, retry after a dropped connection, status change seen by the customer, Arabic/RTL, Dark) is still to do.
+
+**Remaining gaps:**
+- No orders count endpoint: Overview counters are computed from at most `kOrdersMaxPages` (10) loaded pages and the list says so when truncated. Status filtering is client-side; only search is server-side.
+- No "get one conversation" endpoint: "Open conversation" scans the conversation list (up to 10 pages) and shows "could not open" if not found.
+- The WebSocket `MessageReceived` path in `ChatThreadScreen` builds `Message` without `order`, so a customer sees the order card under the shared product only after the thread is reloaded (or the card's own live fetch, once the message carries `order`). A real-time order event is not part of the contract.
+- There is no customer "my orders" screen; the customer endpoint is used only by the chat card.
+- The Console now has 5 destinations; any older widget test that counts `NavigationDestination`s in the console shell must be checked in the full run.
+- Customer name in the sheet is the other participant's display name (correct only because a business is always the merchant).
