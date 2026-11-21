@@ -18,6 +18,7 @@ import '../../stories/presentation/story_upload_status_banner.dart';
 /// | 1     | Posts/Reels  | `business-console-nav-content`     |
 /// | 2     | Stories      | `business-console-nav-stories`     |
 /// | 3     | Analytics    | `business-console-nav-analytics`   |
+/// | 4     | Orders       | `business-console-nav-orders`      |
 ///
 /// Order and keys are the P-083 shared contract - do not change them.
 /// The LABELS are localized since P-115 STEP 5 (English text is unchanged).
@@ -43,6 +44,10 @@ class BusinessConsoleShell extends ConsumerWidget {
     final hasUploads = ref.watch(
       storyUploadQueueProvider.select((tasks) => tasks.isNotEmpty),
     );
+
+    // The Orders destination exists only when the router wired its branch
+    // (5 branches). A 4-branch shell shows exactly the P-083 four.
+    final bool showOrders = navigationShell.route.branches.length > 4;
 
     return Scaffold(
       body: Column(
@@ -101,6 +106,15 @@ class BusinessConsoleShell extends ConsumerWidget {
             selectedIcon: const Icon(Icons.insights),
             label: l10n.consoleNavAnalytics,
           ),
+          // Part BI-03. Appended after Analytics: indexes 0..3 are the P-083
+          // contract and stay as they are.
+          if (showOrders)
+            NavigationDestination(
+              key: const Key('business-console-nav-orders'),
+              icon: const Icon(Icons.receipt_long_outlined),
+              selectedIcon: const Icon(Icons.receipt_long),
+              label: l10n.consoleNavOrders,
+            ),
         ],
       ),
     );

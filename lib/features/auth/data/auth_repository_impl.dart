@@ -178,6 +178,8 @@ class AuthRepositoryImpl implements AuthRepository {
       accountType: AccountType.fromWire(dto.accountType),
       isModerator: dto.isModerator,
       isStaff: dto.isStaff,
+      displayName: dto.displayName,
+      avatarUrl: dto.avatarUrl,
     );
   }
 

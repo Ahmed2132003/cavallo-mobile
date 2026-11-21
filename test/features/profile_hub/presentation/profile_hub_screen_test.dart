@@ -118,6 +118,7 @@ GoRouter _stubRouter() {
       stub(RouteNames.contentList, RouteNames.contentListPath),
       stub(RouteNames.storyList, RouteNames.storyListPath),
       stub(RouteNames.businessAnalytics, RouteNames.businessAnalyticsPath),
+      stub(RouteNames.editMyProfile, RouteNames.editMyProfilePath),
     ],
   );
 }
@@ -170,7 +171,10 @@ Set<String> _drawnRowIds(WidgetTester tester) {
   });
   return tester
       .widgetList(rows)
-      .map((Widget w) => (w.key! as ValueKey<String>).value.substring(prefix.length))
+      .map(
+        (Widget w) =>
+            (w.key! as ValueKey<String>).value.substring(prefix.length),
+      )
       .toSet();
 }
 
@@ -189,8 +193,7 @@ void main() {
           await _pump(
             tester,
             user: entry.value,
-            business:
-                entry.key == NavAudience.business ? _profile() : null,
+            business: entry.key == NavAudience.business ? _profile() : null,
           );
 
           final Set<String> expected = <String>{
@@ -390,6 +393,19 @@ void main() {
       });
     }
 
+    for (final User u in <User>[_customer, _business, _staff]) {
+      testWidgets('P-116B: Edit profile row opens for ${u.email}', (
+        WidgetTester tester,
+      ) async {
+        await expectTapOpens(
+          tester,
+          user: u,
+          rowId: RouteNames.editMyProfile,
+          routeName: RouteNames.editMyProfile,
+          business: u == _business ? _profile() : null,
+        );
+      });
+    }
     testWidgets('Moderation queue (Staff)', (WidgetTester tester) async {
       await expectTapOpens(
         tester,
@@ -405,7 +421,10 @@ void main() {
       await _pump(tester, user: _customer);
       await tester.tap(_row(RouteNames.notificationPreferences));
       await tester.pumpAndSettle();
-      expect(find.text('stub:${RouteNames.notificationPreferences}'), findsOneWidget);
+      expect(
+        find.text('stub:${RouteNames.notificationPreferences}'),
+        findsOneWidget,
+      );
 
       final NavigatorState navigator = tester.state<NavigatorState>(
         find.byType(Navigator).first,
@@ -432,7 +451,10 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.descendant(of: dialog, matching: find.text('Developed by Eng. Ahmed Ibrahim')),
+        find.descendant(
+          of: dialog,
+          matching: find.text('Developed by Eng. Ahmed Ibrahim'),
+        ),
         findsOneWidget,
       );
       expect(
@@ -460,7 +482,10 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.descendant(of: dialog, matching: find.text('تم تطويره بواسطة م. أحمد إبراهيم')),
+        find.descendant(
+          of: dialog,
+          matching: find.text('تم تطويره بواسطة م. أحمد إبراهيم'),
+        ),
         findsOneWidget,
       );
       expect(

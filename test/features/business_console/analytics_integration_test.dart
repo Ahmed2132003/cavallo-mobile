@@ -8,6 +8,8 @@ import 'package:social_commerce_app/core/network/paginated_response.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
 import 'package:social_commerce_app/features/business_console/data/analytics_repository.dart';
+import 'package:social_commerce_app/features/business_console/data/business_analytics_repository.dart';
+import 'package:social_commerce_app/features/business_console/presentation/analytics_dashboard_screen.dart';
 import 'package:social_commerce_app/features/business_console/presentation/analytics_screen.dart';
 import 'package:social_commerce_app/features/business_console/presentation/business_console_shell.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
@@ -21,7 +23,9 @@ import 'package:social_commerce_app/main.dart';
 import 'package:social_commerce_app/routing/app_router.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
 
+import 'bi_fixtures.dart';
 import 'fake_analytics_repository.dart';
+import 'fake_business_analytics_repository.dart';
 
 /// Part P-085 (Chat 3): router-level integration test for the Analytics
 /// screen.
@@ -145,10 +149,13 @@ class _FakeProductRepository implements ProductRepository {
 }
 
 class _App {
-  _App(this.container, this.analytics);
+  _App(this.container, this.analytics, this.bi);
 
   final ProviderContainer container;
   final FakeAnalyticsRepository analytics;
+
+  /// The repository the BI dashboard (BI-04) actually reads.
+  final FakeBusinessAnalyticsRepository bi;
 
   GoRouter get router => container.read(appRouterProvider);
 
@@ -170,6 +177,10 @@ Future<_App> _pumpApp(
   addTearDown(tester.view.resetDevicePixelRatio);
 
   final fake = analytics ?? FakeAnalyticsRepository(stats: knownTrendStats());
+  final biFake = FakeBusinessAnalyticsRepository(
+    overview: biOverview(),
+    ordersSummary: biOrdersSummary(),
+  );
   final container = ProviderContainer(
     overrides: [
       sessionProvider.overrideWith(() => _FakeSessionNotifier(user)),
@@ -178,6 +189,7 @@ Future<_App> _pumpApp(
       ),
       productRepositoryProvider.overrideWithValue(_FakeProductRepository()),
       analyticsRepositoryProvider.overrideWithValue(fake),
+      businessAnalyticsRepositoryProvider.overrideWithValue(biFake),
     ],
   );
   addTearDown(container.dispose);
@@ -190,7 +202,7 @@ Future<_App> _pumpApp(
   );
   await tester.pumpAndSettle();
 
-  return _App(container, fake);
+  return _App(container, fake, biFake);
 }
 
 Future<void> _goToAnalytics(WidgetTester tester, _App app) async {
@@ -198,6 +210,17 @@ Future<void> _goToAnalytics(WidgetTester tester, _App app) async {
   await tester.pumpAndSettle();
 }
 
+/// The router now builds `AnalyticsDashboardScreen` (BI-04); the older
+/// daily-rollup `AnalyticsScreen` is no longer routed but still ships (its
+/// provider feeds the Followers card). Its own contract (totals, charts,
+/// empty/error states) is exercised by pushing it onto the REAL app's root
+/// navigator, so theme, l10n and providers are the production ones.
+Future<void> _openLegacyAnalytics(WidgetTester tester, _App app) async {
+  app.router.routerDelegate.navigatorKey.currentState!.push(
+    MaterialPageRoute<void>(builder: (_) => const AnalyticsScreen()),
+  );
+  await tester.pumpAndSettle();
+}
 Finder _inScreen(Finder matching) =>
     find.descendant(of: find.byType(AnalyticsScreen), matching: matching);
 
@@ -212,7 +235,8 @@ void main() {
 
         expect(app.path, RouteNames.businessAnalyticsPath);
         expect(find.byType(BusinessConsoleShell), findsOneWidget);
-        expect(find.byType(AnalyticsScreen), findsOneWidget);
+        expect(find.byType(AnalyticsDashboardScreen), findsOneWidget);
+        expect(find.byType(AnalyticsScreen), findsNothing);
         expect(
           find.descendant(
             of: find.byType(AppBar),
@@ -240,9 +264,25 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(app.path, RouteNames.businessAnalyticsPath);
-      expect(find.byType(AnalyticsScreen), findsOneWidget);
-      expect(app.analytics.calls, hasLength(1));
-      expect(app.analytics.calls.single.businessId, _profile.id);
+      expect(find.byType(AnalyticsDashboardScreen), findsOneWidget);
+      expect(find.byType(AnalyticsScreen), findsNothing);
+
+      // The Analytics dashboard (BI-04) asks the BI repository for the OWN
+      // business id.
+      expect(app.bi.overviewCalls, isNotEmpty);
+      expect(
+        app.bi.overviewCalls.every((call) => call.businessId == _profile.id),
+        isTrue,
+      );
+
+      // The old daily-rollup repository is still read, but only by the
+      // "Followers" card of ConsoleDashboardCards (P-115) above the Products
+      // tab, and it must also use the OWN business id.
+      expect(app.analytics.calls, isNotEmpty);
+      expect(
+        app.analytics.calls.every((call) => call.businessId == _profile.id),
+        isTrue,
+      );
     });
 
     testWidgets(
@@ -250,7 +290,7 @@ void main() {
       'rows), both charts, and the days-with-data line',
       (tester) async {
         final app = await _pumpApp(tester, user: _business);
-        await _goToAnalytics(tester, app);
+        await _openLegacyAnalytics(tester, app);
 
         // knownTrendStats(): followers 1+2+3, likes 2+4+6, comments 0+1+2,
         // story views 1+3+5.
@@ -319,7 +359,7 @@ void main() {
     testWidgets('only tracked metrics are labelled, and no product-views or '
         'placeholder content exists inside the screen', (tester) async {
       final app = await _pumpApp(tester, user: _business);
-      await _goToAnalytics(tester, app);
+      await _openLegacyAnalytics(tester, app);
 
       for (final label in _trackedLabels) {
         expect(
@@ -379,7 +419,7 @@ void main() {
       'a 14-day range for the same business',
       (tester) async {
         final app = await _pumpApp(tester, user: _business);
-        await _goToAnalytics(tester, app);
+        await _openLegacyAnalytics(tester, app);
 
         expect(app.analytics.calls, hasLength(1));
         final first = app.analytics.calls.single;
@@ -403,7 +443,7 @@ void main() {
           user: _business,
           analytics: FakeAnalyticsRepository(),
         );
-        await _goToAnalytics(tester, app);
+        await _openLegacyAnalytics(tester, app);
 
         expect(find.byKey(const Key('analytics-empty')), findsOneWidget);
         expect(
@@ -425,7 +465,7 @@ void main() {
           user: _business,
           analytics: FakeAnalyticsRepository(error: Exception('boom')),
         );
-        await _goToAnalytics(tester, app);
+        await _openLegacyAnalytics(tester, app);
 
         expect(find.byKey(const Key('analytics-error')), findsOneWidget);
         expect(find.byKey(const Key('analytics-retry-button')), findsOneWidget);

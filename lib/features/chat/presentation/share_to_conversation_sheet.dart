@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/error_messages.dart';
 import '../../../core/l10n/l10n_context.dart';
+import '../../../core/widgets/app_avatar.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../routing/route_names.dart';
 import '../data/conversation_repository.dart';
@@ -221,10 +222,10 @@ class _ConversationPickerSheetState
                           ),
                           enabled: _sendingId == null,
                           onTap: () => _send(conversation),
-                          leading: CircleAvatar(
-                            child: Text(
-                              name.isNotEmpty ? name[0].toUpperCase() : '?',
-                            ),
+                          leading: AppAvatar(
+                            imageUrl: conversation.otherParticipant?.avatarUrl,
+                            name: conversation.otherParticipant?.displayName,
+                            size: 40,
                           ),
                           title: Text(name),
                           trailing:

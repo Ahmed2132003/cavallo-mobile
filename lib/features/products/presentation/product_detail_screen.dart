@@ -290,7 +290,10 @@ class _ProductViewState extends ConsumerState<_ProductView> {
     try {
       final conversation = await ref
           .read(conversationRepositoryProvider)
-          .startConversationWithBusiness(businessId: widget.product.businessId);
+          .startConversationWithBusiness(
+            businessId: widget.product.businessId,
+            productId: widget.product.id,
+          );
       if (!mounted) return;
       setState(() => _isStartingConversation = false);
 

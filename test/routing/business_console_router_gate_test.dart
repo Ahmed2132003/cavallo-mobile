@@ -9,7 +9,7 @@ import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/login_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
 import 'package:social_commerce_app/features/business_console/data/analytics_repository.dart';
-import 'package:social_commerce_app/features/business_console/presentation/analytics_screen.dart';
+import 'package:social_commerce_app/features/business_console/presentation/analytics_dashboard_screen.dart';
 import 'package:social_commerce_app/features/business_console/presentation/business_console_shell.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_onboarding_screen.dart';
@@ -260,7 +260,9 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(app.path, RouteNames.businessAnalyticsPath);
-        expect(find.byType(AnalyticsScreen), findsOneWidget);
+        // BI-04: the Analytics route builds the dashboard; the older
+        // AnalyticsScreen is no longer routed.
+        expect(find.byType(AnalyticsDashboardScreen), findsOneWidget);
       },
     );
 
@@ -338,7 +340,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(app.path, RouteNames.businessAnalyticsPath);
-        expect(find.byType(AnalyticsScreen), findsOneWidget);
+        expect(find.byType(AnalyticsDashboardScreen), findsOneWidget);
 
         await tester.tap(
           find.byKey(const Key('business-console-nav-products')),

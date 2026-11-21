@@ -631,6 +631,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
             return MessageBubbleWidget(
               message: item.message,
               isMine: item.isMine,
+              customerName: widget.conversation.otherParticipant?.displayName,
               isFirstInGroup: _isGroupStart(items, index),
               isLastInGroup: _isGroupEnd(items, index),
             );

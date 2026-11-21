@@ -9,6 +9,56 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get hubEditMyProfile => 'Edit profile';
+
+  @override
+  String get editProfileTitle => 'Edit my profile';
+
+  @override
+  String get editProfileNameLabel => 'Display name';
+
+  @override
+  String get editProfileNameTooLong => 'Display name must be 80 characters or fewer.';
+
+  @override
+  String get editProfilePhotoSemantic => 'Profile photo. Tap to change.';
+
+  @override
+  String get editProfilePickFromGallery => 'Choose from gallery';
+
+  @override
+  String get editProfileRemovePhoto => 'Remove photo';
+
+  @override
+  String get editProfileSave => 'Save changes';
+
+  @override
+  String get editProfileNoChanges => 'No changes to save.';
+
+  @override
+  String get editProfileSaved => 'Profile updated.';
+
+  @override
+  String get editProfilePhotoUnsupported => 'Choose a JPEG, PNG or WebP image.';
+
+  @override
+  String editProfilePhotoTooLarge(int maxMb) {
+    return 'Photo is too large (max $maxMb MB).';
+  }
+
+  @override
+  String get editProfilePhotoPickFailed => 'Could not open the photo. Please try again.';
+
+  @override
+  String get editProfileAvatarRejected => 'The server could not accept this photo. Try a different one.';
+
+  @override
+  String get editProfileNameRejected => 'The server could not accept this display name.';
+
+  @override
+  String get editProfileLoadingLabel => 'Loading your profile';
+
+  @override
   String get appTitle => 'Social Commerce Discovery Platform';
 
   @override
@@ -1778,4 +1828,774 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authResetHidePassword => 'Hide password';
+
+  @override
+  String get ordersStatusPending => 'Pending';
+
+  @override
+  String get ordersStatusConfirmed => 'Confirmed';
+
+  @override
+  String get ordersStatusProcessing => 'Processing';
+
+  @override
+  String get ordersStatusShipped => 'Shipped';
+
+  @override
+  String get ordersStatusDelivered => 'Delivered';
+
+  @override
+  String get ordersStatusCancelled => 'Cancelled';
+
+  @override
+  String get ordersStatusUnknown => 'Unknown';
+
+  @override
+  String get ordersFilterAll => 'All';
+
+  @override
+  String get ordersTitle => 'Orders';
+
+  @override
+  String get consoleNavOrders => 'Orders';
+
+  @override
+  String get ordersOverviewTitle => 'Overview';
+
+  @override
+  String get ordersOverviewTotal => 'Total orders';
+
+  @override
+  String get ordersSearchHint => 'Search by order number';
+
+  @override
+  String get ordersSearchClear => 'Clear search';
+
+  @override
+  String get ordersEmptyTitle => 'No orders yet';
+
+  @override
+  String get ordersEmptyBody => 'Sales you record from chat will appear here.';
+
+  @override
+  String get ordersEmptyFilteredTitle => 'No orders with this status';
+
+  @override
+  String get ordersEmptySearchTitle => 'No order matches your search';
+
+  @override
+  String get ordersErrorLoad => 'Could not load orders.';
+
+  @override
+  String ordersTruncatedNote(int count) {
+    return 'Showing the latest $count orders only.';
+  }
+
+  @override
+  String get ordersCustomerLabel => 'Customer';
+
+  @override
+  String get ordersProductLabel => 'Product';
+
+  @override
+  String get ordersQuantityLabel => 'Quantity';
+
+  @override
+  String get ordersUnitPriceLabel => 'Agreed unit price';
+
+  @override
+  String get ordersTotalLabel => 'Total';
+
+  @override
+  String get ordersCurrencyLabel => 'Currency';
+
+  @override
+  String get ordersStatusLabel => 'Status';
+
+  @override
+  String ordersQuantityTimesPrice(int quantity, String price) {
+    return '$quantity × $price';
+  }
+
+  @override
+  String ordersCreatedAt(String date) {
+    return 'Created $date';
+  }
+
+  @override
+  String ordersConfirmedAt(String date) {
+    return 'Confirmed $date';
+  }
+
+  @override
+  String ordersCompletedAt(String date) {
+    return 'Delivered $date';
+  }
+
+  @override
+  String ordersCancelledAt(String date) {
+    return 'Cancelled $date';
+  }
+
+  @override
+  String get ordersTimelineTitle => 'Timeline';
+
+  @override
+  String get ordersTimelineCreated => 'Order recorded';
+
+  @override
+  String ordersTimelineStatusChanged(String from, String to) {
+    return 'Status changed from $from to $to';
+  }
+
+  @override
+  String get ordersNotesTitle => 'Notes';
+
+  @override
+  String get ordersNotesEmpty => 'No notes yet.';
+
+  @override
+  String get ordersCustomerNote => 'Customer note';
+
+  @override
+  String get ordersInternalNote => 'Internal note';
+
+  @override
+  String get ordersInternalBadge => 'Internal';
+
+  @override
+  String get ordersOpenConversation => 'Open conversation';
+
+  @override
+  String get ordersOpenDetails => 'Details';
+
+  @override
+  String get ordersUpdateStatus => 'Update status';
+
+  @override
+  String get ordersChangeStatusTitle => 'Change status';
+
+  @override
+  String get ordersStatusNoteHint => 'Note for the customer (optional)';
+
+  @override
+  String get ordersStatusNoTransitions => 'This order cannot change status anymore.';
+
+  @override
+  String get ordersStatusChanged => 'Status updated.';
+
+  @override
+  String get ordersAddNote => 'Add note';
+
+  @override
+  String get ordersNoteHint => 'Write a note';
+
+  @override
+  String get ordersNoteInternalToggle => 'Internal note (hidden from the customer)';
+
+  @override
+  String get ordersNoteAdded => 'Note added.';
+
+  @override
+  String get ordersNoteRequired => 'Write a note first.';
+
+  @override
+  String get ordersActionSave => 'Save';
+
+  @override
+  String get ordersActionCancel => 'Cancel';
+
+  @override
+  String get ordersRecordSale => 'Record Sale';
+
+  @override
+  String get ordersRecordSaleTitle => 'Record a sale';
+
+  @override
+  String get ordersFieldCustomerNote => 'Note for the customer';
+
+  @override
+  String get ordersFieldInternalNote => 'Internal note (only you)';
+
+  @override
+  String get ordersSummaryTitle => 'Summary';
+
+  @override
+  String ordersSummaryLine(int quantity, String price, String total) {
+    return '$quantity × $price = $total';
+  }
+
+  @override
+  String get ordersConfirmRecord => 'Confirm and record';
+
+  @override
+  String get ordersSubmitting => 'Recording…';
+
+  @override
+  String get ordersRetryRecord => 'Try again';
+
+  @override
+  String ordersRecordedSuccess(String orderNumber) {
+    return 'Sale recorded as $orderNumber.';
+  }
+
+  @override
+  String ordersAlreadyRecorded(String orderNumber) {
+    return 'This sale was already recorded as $orderNumber.';
+  }
+
+  @override
+  String get ordersCurrencyAutoNote => 'The currency of the product is applied automatically.';
+
+  @override
+  String get ordersValidationQuantity => 'Enter a whole number from 1 to 100000.';
+
+  @override
+  String get ordersValidationPrice => 'Enter a price above 0 with up to 2 decimals.';
+
+  @override
+  String get ordersErrorNetwork => 'No connection. Check your internet and try again.';
+
+  @override
+  String get ordersErrorGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get ordersErrorSafeRetry => 'Trying again will not create a duplicate order.';
+
+  @override
+  String ordersProductFallback(int id) {
+    return 'Product #$id';
+  }
+
+  @override
+  String get ordersDetailsTitle => 'Order details';
+
+  @override
+  String get ordersNotFound => 'Order not found.';
+
+  @override
+  String get ordersConversationUnavailable => 'Could not open the conversation.';
+
+  @override
+  String get analyticsContentEmpty => 'No posts or reels found for this period and filter.';
+
+  @override
+  String get analyticsContentExternalInDetails => 'External platform numbers are shown in the details.';
+
+  @override
+  String get analyticsContentExternalNote => 'Entered manually by you. These numbers are not synced with Instagram, Facebook or TikTok.';
+
+  @override
+  String get analyticsContentExternalTitle => 'External platforms (manual)';
+
+  @override
+  String get analyticsContentInAppNote => 'Counted inside the app only. In-app shares do not prove any external view.';
+
+  @override
+  String get analyticsContentInternalTitle => 'In-app numbers';
+
+  @override
+  String get analyticsContentLoadError => 'Could not load the analytics of this content. Try again.';
+
+  @override
+  String get analyticsContentMetricComments => 'Comments';
+
+  @override
+  String get analyticsContentMetricEngagementRate => 'Engagement rate';
+
+  @override
+  String get analyticsContentMetricInAppShares => 'In-app shares';
+
+  @override
+  String get analyticsContentMetricLikes => 'Likes';
+
+  @override
+  String get analyticsContentNoCaption => 'No caption';
+
+  @override
+  String get analyticsContentOpenDetails => 'View details';
+
+  @override
+  String get analyticsContentOrderHighestEngagement => 'Highest engagement';
+
+  @override
+  String get analyticsContentOrderMostLiked => 'Most liked';
+
+  @override
+  String get analyticsContentOrderMostSaved => 'Most saved';
+
+  @override
+  String get analyticsContentOrderMostShared => 'Most shared';
+
+  @override
+  String get analyticsContentOrderMostViewed => 'Most viewed';
+
+  @override
+  String get analyticsContentOrderNewest => 'Newest';
+
+  @override
+  String get analyticsContentTrendInteractions => 'Interactions';
+
+  @override
+  String get analyticsContentTypeAll => 'All';
+
+  @override
+  String get analyticsContentTypePost => 'Post';
+
+  @override
+  String get analyticsContentTypePosts => 'Posts';
+
+  @override
+  String get analyticsContentTypeReel => 'Reel';
+
+  @override
+  String get analyticsContentTypeReels => 'Reels';
+
+  @override
+  String get analyticsExternalAddUpdate => 'Add or update numbers';
+
+  @override
+  String get analyticsExternalBadgeManual => 'Manual';
+
+  @override
+  String get analyticsExternalBadgeSynced => 'Synced';
+
+  @override
+  String get analyticsExternalEmpty => 'No external numbers entered yet.';
+
+  @override
+  String get analyticsExternalFormMetric => 'Metric';
+
+  @override
+  String get analyticsExternalFormNote => 'Enter the number you see on the platform. It is saved as a manual entry.';
+
+  @override
+  String get analyticsExternalFormPlatform => 'Platform';
+
+  @override
+  String get analyticsExternalFormReference => 'Reference (optional)';
+
+  @override
+  String get analyticsExternalFormSave => 'Save';
+
+  @override
+  String get analyticsExternalFormTitle => 'Add external numbers';
+
+  @override
+  String get analyticsExternalFormValue => 'Value';
+
+  @override
+  String get analyticsExternalIntro => 'Numbers from Instagram, Facebook and TikTok that you enter yourself. Nothing is synced automatically.';
+
+  @override
+  String analyticsExternalLastUpdated(String date) {
+    return 'Updated $date';
+  }
+
+  @override
+  String get analyticsExternalLoadError => 'Could not load the external numbers. Try again.';
+
+  @override
+  String get analyticsExternalMetricLikes => 'Likes';
+
+  @override
+  String get analyticsExternalMetricSaves => 'Saves';
+
+  @override
+  String get analyticsExternalMetricShares => 'Shares';
+
+  @override
+  String get analyticsExternalMetricViews => 'Views';
+
+  @override
+  String get analyticsExternalPlatformFacebook => 'Facebook';
+
+  @override
+  String get analyticsExternalPlatformInstagram => 'Instagram';
+
+  @override
+  String get analyticsExternalPlatformTiktok => 'TikTok';
+
+  @override
+  String analyticsExternalReference(String reference) {
+    return 'Reference: $reference';
+  }
+
+  @override
+  String get analyticsExternalSaveError => 'Could not save. Please try again.';
+
+  @override
+  String get analyticsExternalSaved => 'Saved.';
+
+  @override
+  String get analyticsExternalSourceManual => 'Source: entered manually';
+
+  @override
+  String get analyticsExternalSourceSynced => 'Source: synced from the platform';
+
+  @override
+  String get analyticsExternalValueInvalid => 'Enter a whole number, 0 or more.';
+
+  @override
+  String get analyticsProdEmpty => 'No products with analytics in this period.';
+
+  @override
+  String get analyticsProdFunnelTitle => 'Conversion funnel';
+
+  @override
+  String get analyticsProdInactive => 'Inactive product';
+
+  @override
+  String analyticsProdLabelValue(String label, String value) {
+    return '$label: $value';
+  }
+
+  @override
+  String get analyticsProdLoadError => 'Could not load the analytics of this product. Try again.';
+
+  @override
+  String get analyticsProdLoadMore => 'Load more';
+
+  @override
+  String get analyticsProdMetricAverageOrderValue => 'Average order value';
+
+  @override
+  String get analyticsProdMetricConversion => 'Conversion';
+
+  @override
+  String get analyticsProdMetricInterests => 'Interests';
+
+  @override
+  String get analyticsProdMetricOrders => 'Orders';
+
+  @override
+  String get analyticsProdMetricSales => 'Sales';
+
+  @override
+  String get analyticsProdMetricSaves => 'Saves';
+
+  @override
+  String get analyticsProdMetricSoldOrders => 'Sold orders';
+
+  @override
+  String get analyticsProdMetricUniqueViews => 'Unique views';
+
+  @override
+  String get analyticsProdMetricUnits => 'Units';
+
+  @override
+  String get analyticsProdMetricViews => 'Views';
+
+  @override
+  String get analyticsProdNoBusiness => 'No business profile found for this account.';
+
+  @override
+  String get analyticsProdNoSales => 'No sales in this period.';
+
+  @override
+  String get analyticsProdOpenOrders => 'Open orders';
+
+  @override
+  String get analyticsProdOrderBestSelling => 'Best selling';
+
+  @override
+  String get analyticsProdOrderHighestConversion => 'Highest conversion';
+
+  @override
+  String get analyticsProdOrderLowestConversion => 'Lowest conversion';
+
+  @override
+  String get analyticsProdOrderMostInterested => 'Most interested';
+
+  @override
+  String get analyticsProdOrderMostOrdered => 'Most ordered';
+
+  @override
+  String get analyticsProdOrderMostViewed => 'Most viewed';
+
+  @override
+  String get analyticsProdOrdersLinkNote => 'Opens all your orders. Filtering orders by product is not available.';
+
+  @override
+  String analyticsProdOrdersUpdatedAt(String date) {
+    return 'Orders updated $date';
+  }
+
+  @override
+  String analyticsProdRateValue(String rate) {
+    return '$rate%';
+  }
+
+  @override
+  String analyticsProdSalesLine(String orders, String units) {
+    return 'Sold orders: $orders · Units: $units';
+  }
+
+  @override
+  String get analyticsProdSalesTitle => 'Sales by currency';
+
+  @override
+  String get analyticsProdTotalsTitle => 'Totals';
+
+  @override
+  String get analyticsProdTrendNoData => 'No trend data for this period.';
+
+  @override
+  String get analyticsProdTrendsTitle => 'Daily trends';
+
+  @override
+  String analyticsProdUpdatedAt(String date) {
+    return 'Data updated $date';
+  }
+
+  @override
+  String get analyticsProdViewsIncomplete => 'Views are not complete for this period, so rates that depend on views are not shown.';
+
+  @override
+  String get analyticsProdViewsUnavailable => 'View data is not available for this period.';
+
+  @override
+  String biChartSemantics(String title, int days) {
+    return '$title, period in days: $days';
+  }
+
+  @override
+  String get biComparedWithPrevious => 'Compared with the previous period';
+
+  @override
+  String get biDataNeverUpdated => 'Data has not been updated yet.';
+
+  @override
+  String biDataUpdatedAt(String date) {
+    return 'Data updated $date';
+  }
+
+  @override
+  String get biErrorNetwork => 'No connection. Check your internet and try again.';
+
+  @override
+  String get biFunnelCompleted => 'Completed';
+
+  @override
+  String get biFunnelConfirmed => 'Confirmed';
+
+  @override
+  String biFunnelConversion(String rate) {
+    return '$rate conversion';
+  }
+
+  @override
+  String biFunnelDrop(String rate) {
+    return '$rate lost';
+  }
+
+  @override
+  String get biFunnelInterests => 'Interests';
+
+  @override
+  String get biFunnelOrders => 'Orders';
+
+  @override
+  String biFunnelOverall(String rate) {
+    return 'Overall conversion: $rate';
+  }
+
+  @override
+  String get biFunnelTitle => 'Conversion funnel';
+
+  @override
+  String get biFunnelUnitsNote => 'Views are unique views. Interests, orders, confirmed and completed count each customer once.';
+
+  @override
+  String get biFunnelViews => 'Views';
+
+  @override
+  String get biGroupContent => 'Content';
+
+  @override
+  String get biGroupOrders => 'Orders';
+
+  @override
+  String get biGroupProducts => 'Products';
+
+  @override
+  String get biKpiAov => 'Average order value';
+
+  @override
+  String get biKpiComments => 'Comments';
+
+  @override
+  String get biKpiCompleted => 'Completed orders';
+
+  @override
+  String get biKpiConfirmed => 'Confirmed orders';
+
+  @override
+  String get biKpiContentViews => 'Content views';
+
+  @override
+  String get biKpiInterests => 'Interests';
+
+  @override
+  String get biKpiLikes => 'Likes';
+
+  @override
+  String get biKpiOrders => 'Orders';
+
+  @override
+  String get biKpiProductUniqueViews => 'Product unique views';
+
+  @override
+  String get biKpiProductViews => 'Product views';
+
+  @override
+  String get biKpiSales => 'Sales';
+
+  @override
+  String get biKpiSaves => 'Saves';
+
+  @override
+  String get biKpiShares => 'In-app shares';
+
+  @override
+  String get biLoadFailed => 'Could not load the analytics. Try again.';
+
+  @override
+  String get biNoBusiness => 'No business profile found for this account.';
+
+  @override
+  String get biNoPreviousData => 'No previous data';
+
+  @override
+  String get biNoSalesInPeriod => 'No sales in this period.';
+
+  @override
+  String get biOrdersByStatusTitle => 'Orders by status';
+
+  @override
+  String get biOrdersEmpty => 'No orders in this period.';
+
+  @override
+  String get biOrdersOverTimeTitle => 'Orders over time';
+
+  @override
+  String get biOrdersTotal => 'Total orders';
+
+  @override
+  String biOrdersUpdatedAt(String date) {
+    return 'Orders updated $date';
+  }
+
+  @override
+  String get biPeriodNote => 'Dates are in UTC. Today is not included because it has no daily rollup yet.';
+
+  @override
+  String biPeriodRange(String start, String end) {
+    return '$start to $end';
+  }
+
+  @override
+  String get biPresetCustom => 'Custom';
+
+  @override
+  String get biPresetLast14 => '14 days';
+
+  @override
+  String get biPresetLast30 => '30 days';
+
+  @override
+  String get biPresetLast7 => '7 days';
+
+  @override
+  String get biPresetLast90 => '90 days';
+
+  @override
+  String get biPresetPreviousMonth => 'Previous month';
+
+  @override
+  String get biPresetThisMonth => 'This month';
+
+  @override
+  String biRangeTooLong(int days) {
+    return 'The range can be at most $days days.';
+  }
+
+  @override
+  String get biRefresh => 'Refresh';
+
+  @override
+  String biRevenueOverTimeTitle(String currency) {
+    return 'Sales over time ($currency)';
+  }
+
+  @override
+  String get biSalesDefinition => 'Sales value = confirmed, processing, shipped and delivered orders. Pending and cancelled orders are not counted.';
+
+  @override
+  String get biSalesDisclaimer => 'These are sales you recorded, not collected payments.';
+
+  @override
+  String get biSeriesOrders => 'Orders';
+
+  @override
+  String get biSeriesSoldOrders => 'Sold orders';
+
+  @override
+  String get biStatusCancelled => 'Cancelled';
+
+  @override
+  String get biStatusConfirmed => 'Confirmed';
+
+  @override
+  String get biStatusDelivered => 'Delivered';
+
+  @override
+  String get biStatusPending => 'Pending';
+
+  @override
+  String get biStatusProcessing => 'Processing';
+
+  @override
+  String get biStatusShipped => 'Shipped';
+
+  @override
+  String get biStatusUnknown => 'Unknown';
+
+  @override
+  String get biTabContent => 'Content';
+
+  @override
+  String get biTabExternal => 'External';
+
+  @override
+  String get biTabOrders => 'Orders & sales';
+
+  @override
+  String get biTabOverview => 'Overview';
+
+  @override
+  String get biTabProducts => 'Products';
+
+  @override
+  String biTopProductSub(String orders, String units) {
+    return 'Sold orders: $orders · Units: $units';
+  }
+
+  @override
+  String get biTopProductsEmpty => 'No sold products in this period.';
+
+  @override
+  String get biTopProductsTitle => 'Top products';
+
+  @override
+  String get biTotalSales => 'Total sales';
+
+  @override
+  String get biUnits => 'Units';
+
+  @override
+  String get biViewsIncomplete => 'Views are not complete for this period. Rates that depend on views and the previous-period comparison are not shown.';
+
+  @override
+  String get biViewsUnavailable => 'View data is not available for this period.';
 }
