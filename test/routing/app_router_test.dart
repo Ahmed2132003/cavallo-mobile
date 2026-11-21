@@ -12,7 +12,7 @@ import 'package:social_commerce_app/features/auth/presentation/login_screen.dart
 import 'package:social_commerce_app/features/auth/presentation/register_screen.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
 import 'package:social_commerce_app/features/business_console/data/analytics_repository.dart';
-import 'package:social_commerce_app/features/business_console/presentation/analytics_screen.dart';
+import 'package:social_commerce_app/features/business_console/presentation/analytics_dashboard_screen.dart';
 import 'package:social_commerce_app/features/business_console/presentation/business_console_shell.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_public_screen.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
@@ -799,7 +799,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byType(AnalyticsScreen), findsOneWidget);
+        // BI-04: the Analytics tab now builds the dashboard; the older
+        // AnalyticsScreen is no longer routed.
+        expect(find.byType(AnalyticsDashboardScreen), findsOneWidget);
         expect(
           router.routerDelegate.currentConfiguration.uri.toString(),
           RouteNames.businessAnalyticsPath,

@@ -11,6 +11,7 @@ import 'package:social_commerce_app/features/auth/data/auth_repository_impl.dart
 import 'package:social_commerce_app/features/auth/domain/auth_repository.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/register_screen.dart';
+import 'package:social_commerce_app/core/widgets/auth_logo_header.dart';
 import 'package:social_commerce_app/routing/route_names.dart';
 
 /// Hand-rolled fake, matching this project's existing test convention (no
@@ -91,6 +92,24 @@ class _FakeAuthRepository implements AuthRepository {
     fetchMeCallCount++;
     return _defaultUser;
   }
+
+  // The password-reset methods are not exercised by register_screen_test.dart.
+  @override
+  Future<void> requestPasswordReset({required String email}) =>
+      throw UnimplementedError('Not exercised by register_screen_test.dart');
+
+  @override
+  Future<String> verifyPasswordResetOtp({
+    required String email,
+    required String otp,
+  }) => throw UnimplementedError('Not exercised by register_screen_test.dart');
+
+  @override
+  Future<void> confirmPasswordReset({
+    required String email,
+    required String resetToken,
+    required String newPassword,
+  }) => throw UnimplementedError('Not exercised by register_screen_test.dart');
 }
 
 /// Plain [MaterialApp] harness — enough for every test that never expects
@@ -438,4 +457,32 @@ void main() {
       },
     );
   });
+
+group('RegisterScreen - logo header', () {
+  testWidgets('shows the logo header above the fields', (tester) async {
+    await tester.pumpWidget(_wrap(_FakeAuthRepository()));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AuthLogoHeader), findsOneWidget);
+  });
+
+  testWidgets('no overflow on 320x568, also with the keyboard open', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(_wrap(_FakeAuthRepository()));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+
+    tester.view.viewInsets = const FakeViewPadding(bottom: 280);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(AuthLogoHeader), findsOneWidget);
+  });
+});
 }

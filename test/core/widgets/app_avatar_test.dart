@@ -39,6 +39,26 @@ void main() {
       expect(find.byIcon(Icons.person), findsOneWidget);
     });
 
+    testWidgets(
+      'P-116B: a network URL builds an Image; an empty URL shows initials',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _wrap(
+            const AppAvatar(
+              imageUrl: 'https://cdn.example/a.png',
+              name: 'Ahmed Ibrahim',
+            ),
+          ),
+        );
+        expect(find.byType(Image), findsOneWidget);
+
+        await tester.pumpWidget(
+          _wrap(const AppAvatar(imageUrl: '', name: 'Ahmed Ibrahim')),
+        );
+        expect(find.byType(Image), findsNothing);
+        expect(find.text('AI'), findsOneWidget);
+      },
+    );
     testWidgets('no ring: size equals the photo size', (
       WidgetTester tester,
     ) async {

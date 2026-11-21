@@ -1,5 +1,29 @@
 {
   "@@locale": "en",
+  "hubEditMyProfile": "Edit profile",
+  "editProfileTitle": "Edit my profile",
+  "editProfileNameLabel": "Display name",
+  "editProfileNameTooLong": "Display name must be 80 characters or fewer.",
+  "editProfilePhotoSemantic": "Profile photo. Tap to change.",
+  "editProfilePickFromGallery": "Choose from gallery",
+  "editProfileRemovePhoto": "Remove photo",
+  "editProfileSave": "Save changes",
+  "editProfileNoChanges": "No changes to save.",
+  "editProfileSaved": "Profile updated.",
+  "editProfilePhotoUnsupported": "Choose a JPEG, PNG or WebP image.",
+  "editProfilePhotoTooLarge": "Photo is too large (max {maxMb} MB).",
+  "@editProfilePhotoTooLarge": {
+    "description": "Edit profile: snackbar when the chosen photo exceeds the size limit.",
+    "placeholders": {
+      "maxMb": {
+        "type": "int"
+      }
+    }
+  },
+  "editProfilePhotoPickFailed": "Could not open the photo. Please try again.",
+  "editProfileAvatarRejected": "The server could not accept this photo. Try a different one.",
+  "editProfileNameRejected": "The server could not accept this display name.",
+  "editProfileLoadingLabel": "Loading your profile",
   "appTitle": "Social Commerce Discovery Platform",
   "@appTitle": {
     "description": "Application title shown in the OS task switcher."
@@ -2203,5 +2227,501 @@
   "bizAvatarSemantic": "Business profile photo",
   "@bizAvatarSemantic": {
     "description": "Accessibility label of the business profile photo."
-  }
+  },
+  "authResetEmailTitle": "Forgot password",
+  "@authResetEmailTitle": {
+    "description": "Forgot-password step 1 (email): screen title."
+  },
+  "authResetEmailSubtitle": "Enter your account email and we will send you a verification code.",
+  "@authResetEmailSubtitle": {
+    "description": "Forgot-password step 1: explanatory text under the title."
+  },
+  "authResetEmailSubmit": "Send code",
+  "@authResetEmailSubmit": {
+    "description": "Forgot-password step 1: button that requests the verification code."
+  },
+  "authResetOtpTitle": "Verify your email",
+  "@authResetOtpTitle": {
+    "description": "Forgot-password step 2 (code): screen title."
+  },
+  "authResetOtpSubtitle": "Enter the 6-digit code we sent to {email}.",
+  "@authResetOtpSubtitle": {
+    "description": "Forgot-password step 2: explains where the code was sent. {email} is the address the user typed.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authResetOtpLabel": "Verification code",
+  "@authResetOtpLabel": {
+    "description": "Forgot-password step 2: label of the code field."
+  },
+  "authResetOtpSubmit": "Verify code",
+  "@authResetOtpSubmit": {
+    "description": "Forgot-password step 2: button that checks the code."
+  },
+  "authResetOtpRequired": "Enter the verification code.",
+  "@authResetOtpRequired": {
+    "description": "Forgot-password step 2: shown when the code field is empty."
+  },
+  "authResetOtpInvalid": "This code is invalid or has expired. Check it or request a new code.",
+  "@authResetOtpInvalid": {
+    "description": "Forgot-password step 2: shown when the server rejects the code (wrong, expired or too many tries; the server does not say which)."
+  },
+  "authResetResendButton": "Resend code",
+  "@authResetResendButton": {
+    "description": "Forgot-password step 2: button that asks for a new code once the wait is over."
+  },
+  "authResetResendCooldown": "Resend code in {seconds}s",
+  "@authResetResendCooldown": {
+    "description": "Forgot-password step 2: disabled resend button while the wait runs. {seconds} is the whole number of seconds left (Western digits).",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authResetResendSent": "A new code has been sent.",
+  "@authResetResendSent": {
+    "description": "Forgot-password step 2: confirmation after resending."
+  },
+  "authResetChangeEmail": "Use a different email",
+  "@authResetChangeEmail": {
+    "description": "Forgot-password step 2: link that goes back to step 1."
+  },
+  "authResetNewPasswordTitle": "Set a new password",
+  "@authResetNewPasswordTitle": {
+    "description": "Forgot-password step 3 (new password): screen title."
+  },
+  "authResetNewPasswordSubtitle": "Choose a new password for your account.",
+  "@authResetNewPasswordSubtitle": {
+    "description": "Forgot-password step 3: explanatory text under the title."
+  },
+  "authResetNewPasswordLabel": "New password",
+  "@authResetNewPasswordLabel": {
+    "description": "Forgot-password step 3: label of the new password field."
+  },
+  "authResetConfirmPasswordLabel": "Confirm new password",
+  "@authResetConfirmPasswordLabel": {
+    "description": "Forgot-password step 3: label of the confirmation field."
+  },
+  "authResetNewPasswordSubmit": "Reset password",
+  "@authResetNewPasswordSubmit": {
+    "description": "Forgot-password step 3: button that saves the new password."
+  },
+  "authResetPasswordRequired": "Enter a new password.",
+  "@authResetPasswordRequired": {
+    "description": "Forgot-password step 3: shown when the password field is empty."
+  },
+  "authResetPasswordsDoNotMatch": "Passwords do not match.",
+  "@authResetPasswordsDoNotMatch": {
+    "description": "Forgot-password step 3: shown when the two password fields differ."
+  },
+  "authResetPasswordWeak": "This password cannot be used. Choose a stronger one.",
+  "@authResetPasswordWeak": {
+    "description": "Forgot-password step 3: shown when the server rejects the password as too weak or common."
+  },
+  "authResetSessionExpired": "Your reset session has expired. Please start again.",
+  "@authResetSessionExpired": {
+    "description": "Forgot-password step 3: shown when the server says the reset token is wrong or expired; the flow restarts at step 1."
+  },
+  "authResetSuccessTitle": "Password updated",
+  "@authResetSuccessTitle": {
+    "description": "Forgot-password done state: title."
+  },
+  "authResetSuccessBody": "Your password has been changed. Log in with your new password.",
+  "@authResetSuccessBody": {
+    "description": "Forgot-password done state: explanatory text."
+  },
+  "authResetBackToLogin": "Back to log in",
+  "@authResetBackToLogin": {
+    "description": "Forgot-password done state: button that returns to the login screen."
+  },
+  "authResetThrottled": "Too many attempts. Please try again later.",
+  "@authResetThrottled": {
+    "description": "Forgot-password flow: shown when the server throttles a request (HTTP 429)."
+  },
+  "authForgotPasswordLink": "Forgot password?",
+  "@authForgotPasswordLink": {
+    "description": "Login screen: link to the forgot-password flow."
+  },
+  "authResetOtpNeutralHint": "If {email} is registered, a 6-digit code is on its way.",
+  "@authResetOtpNeutralHint": {
+    "description": "Forgot-password step 2: neutral text (the server answers the same for every address, so it does not say the code was sent). {email} is the address the user typed.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authResetOtpExpiry": "The code is valid for 5 minutes.",
+  "@authResetOtpExpiry": {
+    "description": "Forgot-password step 2: how long the code is valid (matches the backend OTP lifetime of 300 seconds)."
+  },
+  "authResetShowPassword": "Show password",
+  "@authResetShowPassword": {
+    "description": "Forgot-password step 3: tooltip of the button that reveals the typed password."
+  },
+  "authResetHidePassword": "Hide password",
+  "@authResetHidePassword": {
+    "description": "Forgot-password step 3: tooltip of the button that hides the typed password."
+  },
+  "ordersStatusPending": "Pending",
+  "ordersStatusConfirmed": "Confirmed",
+  "ordersStatusProcessing": "Processing",
+  "ordersStatusShipped": "Shipped",
+  "ordersStatusDelivered": "Delivered",
+  "ordersStatusCancelled": "Cancelled",
+  "ordersStatusUnknown": "Unknown",
+  "ordersFilterAll": "All",
+  "ordersTitle": "Orders",
+  "consoleNavOrders": "Orders",
+  "ordersOverviewTitle": "Overview",
+  "ordersOverviewTotal": "Total orders",
+  "ordersSearchHint": "Search by order number",
+  "ordersSearchClear": "Clear search",
+  "ordersEmptyTitle": "No orders yet",
+  "ordersEmptyBody": "Sales you record from chat will appear here.",
+  "ordersEmptyFilteredTitle": "No orders with this status",
+  "ordersEmptySearchTitle": "No order matches your search",
+  "ordersErrorLoad": "Could not load orders.",
+  "ordersTruncatedNote": "Showing the latest {count} orders only.",
+  "@ordersTruncatedNote": {
+    "description": "Orders list: shown when loading stopped at the page cap.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "ordersCustomerLabel": "Customer",
+  "ordersProductLabel": "Product",
+  "ordersQuantityLabel": "Quantity",
+  "ordersUnitPriceLabel": "Agreed unit price",
+  "ordersTotalLabel": "Total",
+  "ordersCurrencyLabel": "Currency",
+  "ordersStatusLabel": "Status",
+  "ordersQuantityTimesPrice": "{quantity} × {price}",
+  "@ordersQuantityTimesPrice": {
+    "description": "Order card: quantity times the agreed unit price.",
+    "placeholders": { "quantity": { "type": "int" }, "price": { "type": "String" } }
+  },
+  "ordersCreatedAt": "Created {date}",
+  "@ordersCreatedAt": {
+    "description": "Order: creation date.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "ordersConfirmedAt": "Confirmed {date}",
+  "@ordersConfirmedAt": {
+    "description": "Order: confirmation date.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "ordersCompletedAt": "Delivered {date}",
+  "@ordersCompletedAt": {
+    "description": "Order: delivery date.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "ordersCancelledAt": "Cancelled {date}",
+  "@ordersCancelledAt": {
+    "description": "Order: cancellation date.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "ordersTimelineTitle": "Timeline",
+  "ordersTimelineCreated": "Order recorded",
+  "ordersTimelineStatusChanged": "Status changed from {from} to {to}",
+  "@ordersTimelineStatusChanged": {
+    "description": "Order timeline entry for a status change.",
+    "placeholders": { "from": { "type": "String" }, "to": { "type": "String" } }
+  },
+  "ordersNotesTitle": "Notes",
+  "ordersNotesEmpty": "No notes yet.",
+  "ordersCustomerNote": "Customer note",
+  "ordersInternalNote": "Internal note",
+  "ordersInternalBadge": "Internal",
+  "ordersOpenConversation": "Open conversation",
+  "ordersOpenDetails": "Details",
+  "ordersUpdateStatus": "Update status",
+  "ordersChangeStatusTitle": "Change status",
+  "ordersStatusNoteHint": "Note for the customer (optional)",
+  "ordersStatusNoTransitions": "This order cannot change status anymore.",
+  "ordersStatusChanged": "Status updated.",
+  "ordersAddNote": "Add note",
+  "ordersNoteHint": "Write a note",
+  "ordersNoteInternalToggle": "Internal note (hidden from the customer)",
+  "ordersNoteAdded": "Note added.",
+  "ordersNoteRequired": "Write a note first.",
+  "ordersActionSave": "Save",
+  "ordersActionCancel": "Cancel",
+  "ordersRecordSale": "Record Sale",
+  "ordersRecordSaleTitle": "Record a sale",
+  "ordersFieldCustomerNote": "Note for the customer",
+  "ordersFieldInternalNote": "Internal note (only you)",
+  "ordersSummaryTitle": "Summary",
+  "ordersSummaryLine": "{quantity} × {price} = {total}",
+  "@ordersSummaryLine": {
+    "description": "Record Sale summary line.",
+    "placeholders": {
+      "quantity": { "type": "int" },
+      "price": { "type": "String" },
+      "total": { "type": "String" }
+    }
+  },
+  "ordersConfirmRecord": "Confirm and record",
+  "ordersSubmitting": "Recording…",
+  "ordersRetryRecord": "Try again",
+  "ordersRecordedSuccess": "Sale recorded as {orderNumber}.",
+  "@ordersRecordedSuccess": {
+    "description": "Snackbar after a sale was recorded.",
+    "placeholders": { "orderNumber": { "type": "String" } }
+  },
+  "ordersAlreadyRecorded": "This sale was already recorded as {orderNumber}.",
+  "@ordersAlreadyRecorded": {
+    "description": "Snackbar when the server returned the existing order.",
+    "placeholders": { "orderNumber": { "type": "String" } }
+  },
+  "ordersCurrencyAutoNote": "The currency of the product is applied automatically.",
+  "ordersValidationQuantity": "Enter a whole number from 1 to 100000.",
+  "ordersValidationPrice": "Enter a price above 0 with up to 2 decimals.",
+  "ordersErrorNetwork": "No connection. Check your internet and try again.",
+  "ordersErrorGeneric": "Something went wrong. Please try again.",
+  "ordersErrorSafeRetry": "Trying again will not create a duplicate order.",
+  "ordersProductFallback": "Product #{id}",
+  "@ordersProductFallback": {
+    "description": "Fallback product name when the real name is not loaded.",
+    "placeholders": { "id": { "type": "int" } }
+  },
+  "ordersDetailsTitle": "Order details",
+  "ordersNotFound": "Order not found.",
+  "ordersConversationUnavailable": "Could not open the conversation.",
+  "analyticsContentEmpty": "No posts or reels found for this period and filter.",
+  "analyticsContentExternalInDetails": "External platform numbers are shown in the details.",
+  "analyticsContentExternalNote": "Entered manually by you. These numbers are not synced with Instagram, Facebook or TikTok.",
+  "analyticsContentExternalTitle": "External platforms (manual)",
+  "analyticsContentInAppNote": "Counted inside the app only. In-app shares do not prove any external view.",
+  "analyticsContentInternalTitle": "In-app numbers",
+  "analyticsContentLoadError": "Could not load the analytics of this content. Try again.",
+  "analyticsContentMetricComments": "Comments",
+  "analyticsContentMetricEngagementRate": "Engagement rate",
+  "analyticsContentMetricInAppShares": "In-app shares",
+  "analyticsContentMetricLikes": "Likes",
+  "analyticsContentNoCaption": "No caption",
+  "analyticsContentOpenDetails": "View details",
+  "analyticsContentOrderHighestEngagement": "Highest engagement",
+  "analyticsContentOrderMostLiked": "Most liked",
+  "analyticsContentOrderMostSaved": "Most saved",
+  "analyticsContentOrderMostShared": "Most shared",
+  "analyticsContentOrderMostViewed": "Most viewed",
+  "analyticsContentOrderNewest": "Newest",
+  "analyticsContentTrendInteractions": "Interactions",
+  "analyticsContentTypeAll": "All",
+  "analyticsContentTypePost": "Post",
+  "analyticsContentTypePosts": "Posts",
+  "analyticsContentTypeReel": "Reel",
+  "analyticsContentTypeReels": "Reels",
+  "analyticsExternalAddUpdate": "Add or update numbers",
+  "analyticsExternalBadgeManual": "Manual",
+  "analyticsExternalBadgeSynced": "Synced",
+  "analyticsExternalEmpty": "No external numbers entered yet.",
+  "analyticsExternalFormMetric": "Metric",
+  "analyticsExternalFormNote": "Enter the number you see on the platform. It is saved as a manual entry.",
+  "analyticsExternalFormPlatform": "Platform",
+  "analyticsExternalFormReference": "Reference (optional)",
+  "analyticsExternalFormSave": "Save",
+  "analyticsExternalFormTitle": "Add external numbers",
+  "analyticsExternalFormValue": "Value",
+  "analyticsExternalIntro": "Numbers from Instagram, Facebook and TikTok that you enter yourself. Nothing is synced automatically.",
+  "analyticsExternalLastUpdated": "Updated {date}",
+  "@analyticsExternalLastUpdated": {
+    "description": "Last update time of one external metric.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "analyticsExternalLoadError": "Could not load the external numbers. Try again.",
+  "analyticsExternalMetricLikes": "Likes",
+  "analyticsExternalMetricSaves": "Saves",
+  "analyticsExternalMetricShares": "Shares",
+  "analyticsExternalMetricViews": "Views",
+  "analyticsExternalPlatformFacebook": "Facebook",
+  "analyticsExternalPlatformInstagram": "Instagram",
+  "analyticsExternalPlatformTiktok": "TikTok",
+  "analyticsExternalReference": "Reference: {reference}",
+  "@analyticsExternalReference": {
+    "description": "The optional reference the merchant typed for an external metric.",
+    "placeholders": { "reference": { "type": "String" } }
+  },
+  "analyticsExternalSaveError": "Could not save. Please try again.",
+  "analyticsExternalSaved": "Saved.",
+  "analyticsExternalSourceManual": "Source: entered manually",
+  "analyticsExternalSourceSynced": "Source: synced from the platform",
+  "analyticsExternalValueInvalid": "Enter a whole number, 0 or more.",
+  "analyticsProdEmpty": "No products with analytics in this period.",
+  "analyticsProdFunnelTitle": "Conversion funnel",
+  "analyticsProdInactive": "Inactive product",
+  "analyticsProdLabelValue": "{label}: {value}",
+  "@analyticsProdLabelValue": {
+    "description": "A metric label followed by its value.",
+    "placeholders": { "label": { "type": "String" }, "value": { "type": "String" } }
+  },
+  "analyticsProdLoadError": "Could not load the analytics of this product. Try again.",
+  "analyticsProdLoadMore": "Load more",
+  "analyticsProdMetricAverageOrderValue": "Average order value",
+  "analyticsProdMetricConversion": "Conversion",
+  "analyticsProdMetricInterests": "Interests",
+  "analyticsProdMetricOrders": "Orders",
+  "analyticsProdMetricSales": "Sales",
+  "analyticsProdMetricSaves": "Saves",
+  "analyticsProdMetricSoldOrders": "Sold orders",
+  "analyticsProdMetricUniqueViews": "Unique views",
+  "analyticsProdMetricUnits": "Units",
+  "analyticsProdMetricViews": "Views",
+  "analyticsProdNoBusiness": "No business profile found for this account.",
+  "analyticsProdNoSales": "No sales in this period.",
+  "analyticsProdOpenOrders": "Open orders",
+  "analyticsProdOrderBestSelling": "Best selling",
+  "analyticsProdOrderHighestConversion": "Highest conversion",
+  "analyticsProdOrderLowestConversion": "Lowest conversion",
+  "analyticsProdOrderMostInterested": "Most interested",
+  "analyticsProdOrderMostOrdered": "Most ordered",
+  "analyticsProdOrderMostViewed": "Most viewed",
+  "analyticsProdOrdersLinkNote": "Opens all your orders. Filtering orders by product is not available.",
+  "analyticsProdOrdersUpdatedAt": "Orders updated {date}",
+  "@analyticsProdOrdersUpdatedAt": {
+    "description": "When the orders data of a product was last updated.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "analyticsProdRateValue": "{rate}%",
+  "@analyticsProdRateValue": {
+    "description": "A rate as a percentage; the number is already formatted.",
+    "placeholders": { "rate": { "type": "String" } }
+  },
+  "analyticsProdSalesLine": "Sold orders: {orders} · Units: {units}",
+  "@analyticsProdSalesLine": {
+    "description": "Sales line of one currency for a product; both numbers are already formatted.",
+    "placeholders": {
+      "orders": { "type": "String" },
+      "units": { "type": "String" }
+    }
+  },
+  "analyticsProdSalesTitle": "Sales by currency",
+  "analyticsProdTotalsTitle": "Totals",
+  "analyticsProdTrendNoData": "No trend data for this period.",
+  "analyticsProdTrendsTitle": "Daily trends",
+  "analyticsProdUpdatedAt": "Data updated {date}",
+  "@analyticsProdUpdatedAt": {
+    "description": "When the analytics data was last updated.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "analyticsProdViewsIncomplete": "Views are not complete for this period, so rates that depend on views are not shown.",
+  "analyticsProdViewsUnavailable": "View data is not available for this period.",
+  "biChartSemantics": "{title}, period in days: {days}",
+  "@biChartSemantics": {
+    "description": "Screen-reader summary of a chart.",
+    "placeholders": { "title": { "type": "String" }, "days": { "type": "int" } }
+  },
+  "biComparedWithPrevious": "Compared with the previous period",
+  "biDataNeverUpdated": "Data has not been updated yet.",
+  "biDataUpdatedAt": "Data updated {date}",
+  "@biDataUpdatedAt": {
+    "description": "When the analytics data was last updated.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "biErrorNetwork": "No connection. Check your internet and try again.",
+  "biFunnelCompleted": "Completed",
+  "biFunnelConfirmed": "Confirmed",
+  "biFunnelConversion": "{rate} conversion",
+  "@biFunnelConversion": {
+    "description": "Conversion rate between two funnel stages; the percentage is already formatted.",
+    "placeholders": { "rate": { "type": "String" } }
+  },
+  "biFunnelDrop": "{rate} lost",
+  "@biFunnelDrop": {
+    "description": "Share lost between two funnel stages; the percentage is already formatted.",
+    "placeholders": { "rate": { "type": "String" } }
+  },
+  "biFunnelInterests": "Interests",
+  "biFunnelOrders": "Orders",
+  "biFunnelOverall": "Overall conversion: {rate}",
+  "@biFunnelOverall": {
+    "description": "Overall funnel conversion; the percentage is already formatted.",
+    "placeholders": { "rate": { "type": "String" } }
+  },
+  "biFunnelTitle": "Conversion funnel",
+  "biFunnelUnitsNote": "Views are unique views. Interests, orders, confirmed and completed count each customer once.",
+  "biFunnelViews": "Views",
+  "biGroupContent": "Content",
+  "biGroupOrders": "Orders",
+  "biGroupProducts": "Products",
+  "biKpiAov": "Average order value",
+  "biKpiComments": "Comments",
+  "biKpiCompleted": "Completed orders",
+  "biKpiConfirmed": "Confirmed orders",
+  "biKpiContentViews": "Content views",
+  "biKpiInterests": "Interests",
+  "biKpiLikes": "Likes",
+  "biKpiOrders": "Orders",
+  "biKpiProductUniqueViews": "Product unique views",
+  "biKpiProductViews": "Product views",
+  "biKpiSales": "Sales",
+  "biKpiSaves": "Saves",
+  "biKpiShares": "In-app shares",
+  "biLoadFailed": "Could not load the analytics. Try again.",
+  "biNoBusiness": "No business profile found for this account.",
+  "biNoPreviousData": "No previous data",
+  "biNoSalesInPeriod": "No sales in this period.",
+  "biOrdersByStatusTitle": "Orders by status",
+  "biOrdersEmpty": "No orders in this period.",
+  "biOrdersOverTimeTitle": "Orders over time",
+  "biOrdersTotal": "Total orders",
+  "biOrdersUpdatedAt": "Orders updated {date}",
+  "@biOrdersUpdatedAt": {
+    "description": "When the orders data was last updated.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "biPeriodNote": "Dates are in UTC. Today is not included because it has no daily rollup yet.",
+  "biPeriodRange": "{start} to {end}",
+  "@biPeriodRange": {
+    "description": "The selected period: first and last day, already formatted.",
+    "placeholders": { "start": { "type": "String" }, "end": { "type": "String" } }
+  },
+  "biPresetCustom": "Custom",
+  "biPresetLast14": "14 days",
+  "biPresetLast30": "30 days",
+  "biPresetLast7": "7 days",
+  "biPresetLast90": "90 days",
+  "biPresetPreviousMonth": "Previous month",
+  "biPresetThisMonth": "This month",
+  "biRangeTooLong": "The range can be at most {days} days.",
+  "@biRangeTooLong": {
+    "description": "Snackbar when the picked custom range is longer than the maximum.",
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "biRefresh": "Refresh",
+  "biRevenueOverTimeTitle": "Sales over time ({currency})",
+  "@biRevenueOverTimeTitle": {
+    "description": "Title of the sales chart of one currency.",
+    "placeholders": { "currency": { "type": "String" } }
+  },
+  "biSalesDefinition": "Sales value = confirmed, processing, shipped and delivered orders. Pending and cancelled orders are not counted.",
+  "biSalesDisclaimer": "These are sales you recorded, not collected payments.",
+  "biSeriesOrders": "Orders",
+  "biSeriesSoldOrders": "Sold orders",
+  "biStatusCancelled": "Cancelled",
+  "biStatusConfirmed": "Confirmed",
+  "biStatusDelivered": "Delivered",
+  "biStatusPending": "Pending",
+  "biStatusProcessing": "Processing",
+  "biStatusShipped": "Shipped",
+  "biStatusUnknown": "Unknown",
+  "biTabContent": "Content",
+  "biTabExternal": "External",
+  "biTabOrders": "Orders & sales",
+  "biTabOverview": "Overview",
+  "biTabProducts": "Products",
+  "biTopProductSub": "Sold orders: {orders} · Units: {units}",
+  "@biTopProductSub": {
+    "description": "Second line of a top product row; both numbers are already formatted.",
+    "placeholders": { "orders": { "type": "String" }, "units": { "type": "String" } }
+  },
+  "biTopProductsEmpty": "No sold products in this period.",
+  "biTopProductsTitle": "Top products",
+  "biTotalSales": "Total sales",
+  "biUnits": "Units",
+  "biViewsIncomplete": "Views are not complete for this period. Rates that depend on views and the previous-period comparison are not shown.",
+  "biViewsUnavailable": "View data is not available for this period."
 }

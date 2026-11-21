@@ -138,6 +138,10 @@ flutter:
   # Part P-112: run gen-l10n (see l10n.yaml) on `flutter pub get`.
   generate: true
 
+  # Part P-117: Cavallo logo image used by the auth screens.
+  assets:
+    - assets/images/
+
   # Part P-111: bundled typeface (IBM Plex Sans Arabic, SIL OFL 1.1 - license in
   # assets/fonts/OFL.txt). Bundled, not google_fonts, so the app works offline.
   fonts:

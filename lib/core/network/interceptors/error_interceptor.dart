@@ -115,12 +115,35 @@ class ErrorInterceptor extends Interceptor {
       );
     }
 
+    if (statusCode == 429) {
+      // Throttled (DRF `Throttled`, envelope code THROTTLED). Still an
+      // UnknownFailure so existing callers and tests are untouched; the
+      // code is guaranteed even if the body had no envelope, and the
+      // `Retry-After` header (whole seconds) is carried along when valid.
+      return UnknownFailure(
+        message: envelope?.message ?? 'Request was throttled.',
+        code: envelope?.code ?? ApiErrorCodes.throttled,
+        retryAfter: _parseRetryAfter(
+          err.response?.headers['retry-after']?.first,
+        ),
+      );
+    }
+
     return UnknownFailure(
       message:
           envelope?.message ??
           'An unexpected error occurred (status $statusCode).',
       code: envelope?.code,
     );
+  }
+
+  /// `Retry-After` as a whole number of seconds (what DRF sends). Anything
+  /// else (missing, negative, an HTTP-date) is ignored: no guess is made.
+  Duration? _parseRetryAfter(String? raw) {
+    if (raw == null) return null;
+    final seconds = int.tryParse(raw.trim());
+    if (seconds == null || seconds < 0) return null;
+    return Duration(seconds: seconds);
   }
 
   /// Parses the backend's `{"error": {"code","message","fields"}}` shape.

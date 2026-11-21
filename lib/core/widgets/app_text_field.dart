@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Part P-006 scope: the one text field every feature form should use
 /// instead of a raw [TextFormField], so field styling (and any future
@@ -26,6 +27,10 @@ class AppTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType,
     this.maxLines = 1,
+    this.inputFormatters,
+    this.suffixIcon,
+    this.textInputAction,
+    this.onChanged,
   });
 
   /// Field label, shown as the [InputDecoration.labelText].
@@ -48,6 +53,20 @@ class AppTextField extends StatelessWidget {
   /// than `1` for a multiline field - mirrors [TextFormField.maxLines].
   final int maxLines;
 
+  /// Optional input filters (for example digits only plus a length cap for a
+  /// verification code). Added with the forgot-password screens; `null`
+  /// (default) keeps every existing call site unchanged.
+  final List<TextInputFormatter>? inputFormatters;
+
+  /// Optional trailing widget inside the field, for example a show/hide
+  /// password button. Added with the forgot-password screens; `null`
+  /// (default) keeps every existing call site unchanged.
+  final Widget? suffixIcon;
+
+  final TextInputAction? textInputAction;
+
+  final ValueChanged<String>? onChanged;
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -56,7 +75,10 @@ class AppTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       maxLines: maxLines,
-      decoration: InputDecoration(labelText: label),
+      inputFormatters: inputFormatters,
+      textInputAction: textInputAction,
+      onChanged: onChanged,
+      decoration: InputDecoration(labelText: label, suffixIcon: suffixIcon),
     );
   }
 }

@@ -2,13 +2,19 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/l10n_context.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../business_profile/presentation/own_business_id_provider.dart';
+import '../../orders/domain/order_summary.dart';
+import '../../orders/presentation/orders_providers.dart';
+import '../../orders/presentation/record_sale_sheet.dart';
 import '../domain/message.dart';
 import '../domain/message_status.dart';
 import '../domain/shared_content.dart';
 import 'chat_video_viewer_screen.dart';
+import 'order_message_card.dart';
 import 'outbound_message_queue_provider.dart';
 import 'shared_content_card.dart';
 
@@ -110,10 +116,15 @@ class MessageBubbleWidget extends StatelessWidget {
     required this.isMine,
     this.isFirstInGroup = true,
     this.isLastInGroup = true,
+    this.customerName,
   });
 
   final Message message;
   final bool isMine;
+
+  /// Part BI-03. Display name of the other participant, used by the
+  /// "Record Sale" sheet. `null` when unknown.
+  final String? customerName;
 
   /// First message of a run from the same sender (full top corners).
   final bool isFirstInGroup;
@@ -128,6 +139,7 @@ class MessageBubbleWidget extends StatelessWidget {
       return _SharedContentBubble(
         message: message,
         shared: shared,
+        customerName: customerName,
         isMine: isMine,
         isFirstInGroup: isFirstInGroup,
         isLastInGroup: isLastInGroup,
@@ -175,15 +187,17 @@ Widget _deliveredFooter(Message message, bool isMine, _Tone tone) {
   );
 }
 
-class _SharedContentBubble extends StatelessWidget {
+class _SharedContentBubble extends ConsumerWidget {
   const _SharedContentBubble({
     required this.message,
     required this.shared,
     required this.isMine,
     required this.isFirstInGroup,
     required this.isLastInGroup,
+    this.customerName,
   });
 
+  final String? customerName;
   final Message message;
   final SharedContent shared;
   final bool isMine;
@@ -191,11 +205,28 @@ class _SharedContentBubble extends StatelessWidget {
   final bool isLastInGroup;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // Same 75%-of-screen rule as the text bubble, capped so a card is
     // never absurdly wide on a tablet.
     final cardWidth = math.min(MediaQuery.of(context).size.width * 0.75, 300.0);
     final bool hasText = message.text.isNotEmpty;
+
+    // Part BI-03. The order of this message: the one recorded in this
+    // session wins, else the one the server sent with the message. A
+    // business account is always the merchant of an order (the customer of
+    // an order is always a `customer` account), so `ownBusinessId != null`
+    // means merchant. "Record Sale" needs the product to be the user's own.
+    final int? ownBusinessId = ref.watch(ownBusinessIdProvider);
+    final OrderSummary? order =
+        ref.watch(recordedOrdersProvider.select((m) => m[message.id])) ??
+        message.order;
+    final bool isMerchant = ownBusinessId != null;
+    final bool canRecordSale =
+        order == null &&
+        isMerchant &&
+        shared.type == SharedContentType.product &&
+        shared.available &&
+        shared.businessId == ownBusinessId;
 
     return Column(
       crossAxisAlignment:
@@ -211,7 +242,29 @@ class _SharedContentBubble extends StatelessWidget {
           ),
           child: SizedBox(
             width: cardWidth,
-            child: SharedContentCard(sharedContent: shared),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SharedContentCard(sharedContent: shared),
+                if (order != null) ...[
+                  const SizedBox(height: 6),
+                  OrderMessageCard(summary: order, isMerchant: isMerchant),
+                ],
+                if (canRecordSale) ...[
+                  const SizedBox(height: 6),
+                  _RecordSaleButton(
+                    onPressed:
+                        () => showRecordSaleSheet(
+                          context,
+                          message: message,
+                          shared: shared,
+                          customerName: customerName,
+                        ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
         if (hasText)
@@ -233,6 +286,24 @@ class _SharedContentBubble extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// Part BI-03 — "Record Sale" under a Product card. Built only for the
+/// merchant who owns the product (see `_SharedContentBubble`).
+class _RecordSaleButton extends StatelessWidget {
+  const _RecordSaleButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton.tonalIcon(
+      key: const ValueKey<String>('recordSaleButton'),
+      onPressed: onPressed,
+      icon: const Icon(Icons.receipt_long_outlined, size: 18),
+      label: Text(context.l10n.ordersRecordSale),
     );
   }
 }
@@ -272,7 +343,8 @@ class OutboundMessageBubbleWidget extends StatelessWidget {
           isFailed
               ? onRetry
               : (canPreviewVideo
-                  ? () => openChatVideoViewer(context, localPath: localVideoPath)
+                  ? () =>
+                      openChatVideoViewer(context, localPath: localVideoPath)
                   : null),
       tapKey:
           isFailed

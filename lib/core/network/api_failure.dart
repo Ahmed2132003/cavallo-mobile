@@ -33,6 +33,10 @@ abstract final class ApiErrorCodes {
   static const String networkError = 'NETWORK_ERROR';
   static const String badCertificate = 'BAD_CERTIFICATE';
   static const String cancelled = 'CANCELLED';
+
+  /// Used for an HTTP 429 that came without a backend envelope; matches the
+  /// backend's own code for the same situation.
+  static const String throttled = 'THROTTLED';
 }
 
 /// Backend rejected the request due to invalid input (HTTP 400).
@@ -76,5 +80,24 @@ final class ServerFailure extends ApiFailure {
 /// code, a response body that isn't the expected error envelope shape, a
 /// cancelled request, etc.
 final class UnknownFailure extends ApiFailure {
-  const UnknownFailure({required super.message, super.code});
+  const UnknownFailure({required super.message, super.code, this.retryAfter});
+
+  /// A failure for an error that is not an [ApiFailure] at all (a bug or an
+  /// unexpected exception). The text is for developers only:
+  /// `localizedApiError` never shows [message] and maps this to
+  /// `errorUnknown`.
+  const UnknownFailure.unexpected()
+    : this(message: 'An unexpected error occurred.');
+
+  /// How long the server asked the client to wait (`Retry-After` header of
+  /// an HTTP 429). `null` for every other failure, and for a 429 whose
+  /// header was missing or not a plain number of seconds.
+  ///
+  /// A 429 is deliberately NOT a new [ApiFailure] subtype: it keeps arriving
+  /// as an [UnknownFailure] with `code == 'THROTTLED'` (pinned by
+  /// `error_interceptor_code_test.dart`), and `localizedApiError` already
+  /// turns that code into the localized "try again later" text. Adding a
+  /// sealed subtype would break every exhaustive `switch (failure)` in the
+  /// app. [retryAfter] is the only new piece of information.
+  final Duration? retryAfter;
 }

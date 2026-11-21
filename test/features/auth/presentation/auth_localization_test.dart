@@ -44,6 +44,26 @@ class _FailingRepository implements AuthRepository {
 
   @override
   Future<User> fetchMe() async => throw failure;
+
+  // The password-reset methods are not exercised by auth_localization_test.dart.
+  @override
+  Future<void> requestPasswordReset({required String email}) =>
+      throw UnimplementedError('Not exercised by auth_localization_test.dart');
+
+  @override
+  Future<String> verifyPasswordResetOtp({
+    required String email,
+    required String otp,
+  }) =>
+      throw UnimplementedError('Not exercised by auth_localization_test.dart');
+
+  @override
+  Future<void> confirmPasswordReset({
+    required String email,
+    required String resetToken,
+    required String newPassword,
+  }) =>
+      throw UnimplementedError('Not exercised by auth_localization_test.dart');
 }
 
 Widget _app(Widget home, Locale locale, {ApiFailure? failure}) {
@@ -101,10 +121,30 @@ void main() {
       await tester.pumpAndSettle();
 
       // The app bar title and the submit button read the same in Arabic.
-      expect(find.text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644'), findsNWidgets(2));
-      expect(find.text('\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a'), findsOneWidget);
-      expect(find.text('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631'), findsOneWidget);
-      expect(find.text('\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f \u0623\u0646\u0634\u0626 \u062d\u0633\u0627\u0628\u064b\u0627'), findsOneWidget);
+      expect(
+        find.text(
+          '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644',
+        ),
+        findsNWidgets(2),
+      );
+      expect(
+        find.text(
+          '\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          '\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f \u0623\u0646\u0634\u0626 \u062d\u0633\u0627\u0628\u064b\u0627',
+        ),
+        findsOneWidget,
+      );
       expect(_direction(tester, LoginScreen), TextDirection.rtl);
     });
 
@@ -115,13 +155,29 @@ void main() {
       await tester.tap(find.byType(AppButton));
       await tester.pumpAndSettle();
 
-      expect(find.text('\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u0645\u0637\u0644\u0648\u0628.'), findsOneWidget);
-      expect(find.text('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0645\u0637\u0644\u0648\u0628\u0629.'), findsOneWidget);
+      expect(
+        find.text(
+          '\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u0645\u0637\u0644\u0648\u0628.',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0645\u0637\u0644\u0648\u0628\u0629.',
+        ),
+        findsOneWidget,
+      );
     });
 
     for (final (Locale locale, String expected) in <(Locale, String)>[
-      (const Locale('en'), 'This email address cannot be used. Please check it or try another one.'),
-      (const Locale('ar'), '\u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0647\u0630\u0627 \u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a. \u062a\u062d\u0642\u0642 \u0645\u0646\u0647 \u0623\u0648 \u062c\u0631\u0651\u0628 \u0628\u0631\u064a\u062f\u064b\u0627 \u0622\u062e\u0631.'),
+      (
+        const Locale('en'),
+        'This email address cannot be used. Please check it or try another one.',
+      ),
+      (
+        const Locale('ar'),
+        '\u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0647\u0630\u0627 \u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a. \u062a\u062d\u0642\u0642 \u0645\u0646\u0647 \u0623\u0648 \u062c\u0631\u0651\u0628 \u0628\u0631\u064a\u062f\u064b\u0627 \u0622\u062e\u0631.',
+      ),
     ]) {
       testWidgets(
         '${locale.languageCode}: a backend field sentence is replaced by the '
@@ -153,7 +209,10 @@ void main() {
 
     for (final (Locale locale, String expected) in <(Locale, String)>[
       (const Locale('en'), 'Invalid email or password.'),
-      (const Locale('ar'), '\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u0623\u0648 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0635\u062d\u064a\u062d\u0629.'),
+      (
+        const Locale('ar'),
+        '\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u0623\u0648 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0635\u062d\u064a\u062d\u0629.',
+      ),
     ]) {
       testWidgets(
         '${locale.languageCode}: refused credentials show the localized '
@@ -181,9 +240,7 @@ void main() {
 
   group('RegisterScreen', () {
     testWidgets('English: texts and left-to-right', (tester) async {
-      await tester.pumpWidget(
-        _app(const RegisterScreen(), const Locale('en')),
-      );
+      await tester.pumpWidget(_app(const RegisterScreen(), const Locale('en')));
       await tester.pumpAndSettle();
 
       expect(find.text('Register'), findsOneWidget);
@@ -196,25 +253,45 @@ void main() {
     });
 
     testWidgets('Arabic: texts and right-to-left', (tester) async {
-      await tester.pumpWidget(
-        _app(const RegisterScreen(), const Locale('ar')),
-      );
+      await tester.pumpWidget(_app(const RegisterScreen(), const Locale('ar')));
       await tester.pumpAndSettle();
 
-      expect(find.text('\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628'), findsOneWidget);
-      expect(find.text('\u062a\u0623\u0643\u064a\u062f \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631'), findsOneWidget);
-      expect(find.text('\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628'), findsOneWidget);
+      expect(
+        find.text('\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628'),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          '\u062a\u0623\u0643\u064a\u062f \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text('\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628'),
+        findsOneWidget,
+      );
       expect(find.text('\u0639\u0645\u064a\u0644'), findsOneWidget);
-      expect(find.text('\u0646\u0634\u0627\u0637 \u062a\u062c\u0627\u0631\u064a'), findsOneWidget);
-      expect(find.text('\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u0633\u0627\u0628'), findsOneWidget);
-      expect(find.text('\u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628 \u0628\u0627\u0644\u0641\u0639\u0644\u061f \u0633\u062c\u0651\u0644 \u0627\u0644\u062f\u062e\u0648\u0644'), findsOneWidget);
+      expect(
+        find.text('\u0646\u0634\u0627\u0637 \u062a\u062c\u0627\u0631\u064a'),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          '\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u0633\u0627\u0628',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          '\u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628 \u0628\u0627\u0644\u0641\u0639\u0644\u061f \u0633\u062c\u0651\u0644 \u0627\u0644\u062f\u062e\u0648\u0644',
+        ),
+        findsOneWidget,
+      );
       expect(_direction(tester, RegisterScreen), TextDirection.rtl);
     });
 
     testWidgets('Arabic: the passwords-do-not-match message', (tester) async {
-      await tester.pumpWidget(
-        _app(const RegisterScreen(), const Locale('ar')),
-      );
+      await tester.pumpWidget(_app(const RegisterScreen(), const Locale('ar')));
       await tester.pumpAndSettle();
 
       await tester.enterText(
@@ -223,15 +300,31 @@ void main() {
       );
       await tester.enterText(find.byType(TextFormField).at(1), 'one-password');
       await tester.enterText(find.byType(TextFormField).at(2), 'two-password');
-      await tester.tap(find.widgetWithText(AppButton, '\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u0633\u0627\u0628'));
+      await tester.tap(
+        find.widgetWithText(
+          AppButton,
+          '\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u0633\u0627\u0628',
+        ),
+      );
       await tester.pumpAndSettle();
 
-      expect(find.text('\u0643\u0644\u0645\u062a\u0627 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u062a\u064a\u0646.'), findsOneWidget);
+      expect(
+        find.text(
+          '\u0643\u0644\u0645\u062a\u0627 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u062a\u064a\u0646.',
+        ),
+        findsOneWidget,
+      );
     });
 
     for (final (Locale locale, String expected) in <(Locale, String)>[
-      (const Locale('en'), 'Something went wrong on our end. Please try again later.'),
-      (const Locale('ar'), '\u062d\u062f\u062b \u062e\u0637\u0623 \u0645\u0646 \u062c\u0627\u0646\u0628\u0646\u0627. \u062d\u0627\u0648\u0644 \u0645\u0631\u0629 \u0623\u062e\u0631\u0649 \u0644\u0627\u062d\u0642\u064b\u0627.'),
+      (
+        const Locale('en'),
+        'Something went wrong on our end. Please try again later.',
+      ),
+      (
+        const Locale('ar'),
+        '\u062d\u062f\u062b \u062e\u0637\u0623 \u0645\u0646 \u062c\u0627\u0646\u0628\u0646\u0627. \u062d\u0627\u0648\u0644 \u0645\u0631\u0629 \u0623\u062e\u0631\u0649 \u0644\u0627\u062d\u0642\u064b\u0627.',
+      ),
     ]) {
       testWidgets(
         '${locale.languageCode}: a server failure shows the localized '
@@ -277,7 +370,12 @@ void main() {
       await tester.tap(find.byType(AppButton));
       await tester.pumpAndSettle();
 
-      expect(find.text('\u064a\u0631\u062c\u0649 \u0627\u062e\u062a\u064a\u0627\u0631 \u0646\u0648\u0639 \u062d\u0633\u0627\u0628 \u0635\u0627\u0644\u062d.'), findsOneWidget);
+      expect(
+        find.text(
+          '\u064a\u0631\u062c\u0649 \u0627\u062e\u062a\u064a\u0627\u0631 \u0646\u0648\u0639 \u062d\u0633\u0627\u0628 \u0635\u0627\u0644\u062d.',
+        ),
+        findsOneWidget,
+      );
       expect(find.text(_backendSentence), findsNothing);
     });
   });
@@ -287,9 +385,24 @@ void main() {
       await tester.pumpWidget(_app(const SplashScreen(), const Locale('ar')));
       await tester.pumpAndSettle();
 
-      expect(find.text('\u0645\u0646\u0635\u0629 \u0627\u0643\u062a\u0634\u0627\u0641 \u0627\u0644\u062a\u062c\u0627\u0631 \u0648\u0627\u0644\u0645\u0635\u0627\u0646\u0639'), findsOneWidget);
-      expect(find.text('\u062c\u0627\u0631\u064d \u0627\u0644\u062a\u062d\u0645\u064a\u0644...'), findsOneWidget);
-      expect(find.text('\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644'), findsOneWidget);
+      expect(
+        find.text(
+          '\u0645\u0646\u0635\u0629 \u0627\u0643\u062a\u0634\u0627\u0641 \u0627\u0644\u062a\u062c\u0627\u0631 \u0648\u0627\u0644\u0645\u0635\u0627\u0646\u0639',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          '\u062c\u0627\u0631\u064d \u0627\u0644\u062a\u062d\u0645\u064a\u0644...',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          '\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644',
+        ),
+        findsOneWidget,
+      );
       expect(_direction(tester, SplashScreen), TextDirection.rtl);
     });
   });

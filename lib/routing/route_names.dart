@@ -74,6 +74,12 @@ class RouteNames {
   static const String splash = 'splash';
   static const String login = 'login';
   static const String register = 'register';
+
+  /// Forgot-password flow (placeholder screens for now; the real screens
+  /// come next). Public, signed-out only, like [login] / [register].
+  static const String forgotPassword = 'forgotPassword';
+  static const String forgotPasswordVerify = 'forgotPasswordVerify';
+  static const String forgotPasswordNewPassword = 'forgotPasswordNewPassword';
   static const String home = 'home';
   static const String discover = 'discover';
   static const String search = 'search';
@@ -190,10 +196,40 @@ class RouteNames {
   /// in `app_router.dart`, this route stays as it is.
   static const String businessAnalytics = 'businessAnalytics';
 
+  /// Part BI-03 — the merchant's orders list (Business Console tab).
+  static const String ordersList = 'ordersList';
+
+  /// Part BI-03 — one order. Uses [idParam].
+  static const String orderDetail = 'orderDetail';
+
+  /// Part BI-04 — one product's analytics (nested under [businessAnalytics]).
+  /// Uses [idParam].
+  static const String businessAnalyticsProduct = 'businessAnalyticsProduct';
+
+  /// Part BI-04 — one post/reel's analytics (nested under
+  /// [businessAnalytics]). Uses [analyticsContentTypeParam] and [idParam].
+  static const String businessAnalyticsContent = 'businessAnalyticsContent';
+
+  /// Path parameter holding 'post' or 'reel' for [businessAnalyticsContent].
+  static const String analyticsContentTypeParam = 'type';
+
   // --- Route paths (used inside GoRoute(path: ...)) ---
   static const String splashPath = '/';
   static const String loginPath = '/login';
   static const String registerPath = '/register';
+
+  /// Forgot-password step 1 (email).
+  static const String forgotPasswordPath = '/forgot-password';
+
+  /// Forgot-password step 2 (code). Needs the flow state: opened without it
+  /// (cold start, deep link) the router sends the user back to
+  /// [forgotPasswordPath].
+  static const String forgotPasswordVerifyPath = '/forgot-password/verify';
+
+  /// Forgot-password step 3 (new password). Same guard as
+  /// [forgotPasswordVerifyPath].
+  static const String forgotPasswordNewPasswordPath =
+      '/forgot-password/new-password';
   static const String homePath = '/home';
   static const String discoverPath = '/discover';
   static const String searchPath = '/search';
@@ -294,6 +330,24 @@ class RouteNames {
   /// Part P-083 — see [businessAnalytics].
   static const String businessAnalyticsPath = '/business-console/analytics';
 
+  /// Part BI-03 — see [ordersList]. Under `/business-console`, so the
+  /// Business-only gate in the router covers it.
+  static const String ordersListPath = '/business-console/orders';
+
+  /// Part BI-03 — see [orderDetail].
+  static const String orderDetailPath = '/business-console/orders/:id';
+
+  /// Part BI-04 — see [businessAnalyticsProduct]. The router registers it as
+  /// the child path `product/:id` of [businessAnalyticsPath], so the full
+  /// location is this one. Under `/business-console`: Business-only gate.
+  static const String businessAnalyticsProductPath =
+      '/business-console/analytics/product/:id';
+
+  /// Part BI-04 — see [businessAnalyticsContent]. The router registers it as
+  /// the child path `content/:type/:id` of [businessAnalyticsPath].
+  static const String businessAnalyticsContentPath =
+      '/business-console/analytics/content/:type/:id';
+
   /// Part P-113: the Saved screen (Posts / Reels / Products tabs), tab 3 of
   /// the Customer bottom bar and a Profile hub row for every account type.
   /// The name and path are added in STEP 1 so the navigation manifest
@@ -305,7 +359,12 @@ class RouteNames {
   /// Same staging as [saved]: name and path now, GoRoute in STEP 2, real
   /// screen in STEP 3.
   static const String profile = 'profile';
+
+  /// Part P-116B: "Edit my profile" (display name + photo) for every account
+  /// type. Top-level (opens above the shell), reached from a Profile hub row.
   static const String profilePath = '/profile';
+  static const String editMyProfile = 'editMyProfile';
+  static const String editMyProfilePath = '/profile/edit';
 
   /// Path-parameter key shared by [businessProfilePath], [productDetailPath],
   /// [chatThreadPath], [postDetailPath], [reelDetailPath] and

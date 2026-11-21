@@ -4,17 +4,23 @@ import 'package:go_router/go_router.dart';
 
 import '../core/shell/app_shell.dart';
 import '../features/auth/domain/user_entity.dart';
+import '../features/auth/presentation/forgot_password_screens.dart';
+import '../features/auth/presentation/forgot_password_provider.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/auth/presentation/session_provider.dart';
 import '../features/auth/presentation/splash_screen.dart';
-import '../features/business_console/presentation/analytics_screen.dart';
+import '../features/business_console/presentation/analytics_dashboard_screen.dart';
 import '../features/business_console/presentation/business_console_shell.dart';
 import '../features/business_console/presentation/console_dashboard.dart';
+import '../features/business_console/presentation/product_analytics_detail_screen.dart';
+import '../features/business_console/presentation/content_analytics_detail_screen.dart';
 import '../features/business_profile/presentation/business_onboarding_screen.dart';
 import '../features/business_profile/presentation/business_profile_edit_screen.dart';
 import '../features/business_profile/presentation/business_profile_provider.dart';
 import '../features/business_profile/presentation/business_profile_public_screen.dart';
+import '../features/orders/presentation/order_details_screen.dart';
+import '../features/orders/presentation/orders_list_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_thread_screen.dart';
 import '../features/content/presentation/content_list_screen.dart';
@@ -30,6 +36,7 @@ import '../features/moderation/presentation/moderation_review_screen.dart';
 import '../features/notifications/presentation/notification_center_screen.dart';
 import '../features/notifications/presentation/notification_preferences_screen.dart';
 import '../features/profile_hub/presentation/profile_hub_screen.dart';
+import '../features/profile_hub/presentation/edit_my_profile_screen.dart';
 import '../features/saved/presentation/saved_screen.dart';
 import '../features/products/domain/product_entity.dart';
 import '../features/products/presentation/product_detail_screen.dart';
@@ -345,9 +352,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isPublicRoute = _publicRoutes.contains(location);
 
       if (!isLoggedIn) {
-        // Signed out: only /login and /register are reachable. Everything
+        // Signed out: only the public routes are reachable. Everything
         // else — every protected route AND splash — bounces to /login.
-        return isPublicRoute ? null : RouteNames.loginPath;
+        if (!isPublicRoute) {
+          return RouteNames.loginPath;
+        }
+        // Forgot-password steps 2 and 3 need the in-memory flow state. Opened
+        // without it (cold start, deep link, restored location) they go back
+        // to step 1. Only evaluated for signed-out users: a signed-in user
+        // never gets here, the public-route check further down sends them to
+        // /home.
+        return _forgotPasswordStepRedirect(ref, location);
       }
 
       // --- Part P-028C1: second, Business-account-specific gate ---
@@ -436,12 +451,35 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteNames.loginPath,
         name: RouteNames.login,
-        builder: (context, state) => const LoginScreen(),
+        builder:
+            (context, state) => LoginScreen(
+              initialEmail:
+                  state.extra is String ? state.extra as String : null,
+            ),
       ),
       GoRoute(
         path: RouteNames.registerPath,
         name: RouteNames.register,
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.forgotPasswordPath,
+        name: RouteNames.forgotPassword,
+        builder:
+            (context, state) => ForgotPasswordEmailScreen(
+              initialEmail:
+                  state.extra is String ? state.extra as String : null,
+            ),
+      ),
+      GoRoute(
+        path: RouteNames.forgotPasswordVerifyPath,
+        name: RouteNames.forgotPasswordVerify,
+        builder: (context, state) => const ForgotPasswordOtpScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.forgotPasswordNewPasswordPath,
+        name: RouteNames.forgotPasswordNewPassword,
+        builder: (context, state) => const ForgotPasswordNewPasswordScreen(),
       ),
       GoRoute(
         path: RouteNames.businessOnboardingPath,
@@ -545,6 +583,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteNames.notificationPreferencesPath,
         name: RouteNames.notificationPreferences,
         builder: (context, state) => const NotificationPreferencesScreen(),
+      ),
+      GoRoute(
+        // Part P-116B. Top-level, so it opens above the shell; reached from
+        // the Profile hub row. No guard of its own: signed-in users only,
+        // by the base gate.
+        path: RouteNames.editMyProfilePath,
+        name: RouteNames.editMyProfile,
+        builder: (context, state) => const EditMyProfileScreen(),
       ),
       StatefulShellRoute.indexedStack(
         // Part P-113 (STEP 2B). The app shell: one branch per tab
@@ -704,7 +750,69 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: RouteNames.businessAnalyticsPath,
                 name: RouteNames.businessAnalytics,
-                builder: (context, state) => const AnalyticsScreen(),
+                builder: (context, state) => const AnalyticsDashboardScreen(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    // Part BI-04. Product id is a path segment (no `extra`),
+                    // so the screen is valid after an app restart. A
+                    // non-numeric id goes back to the dashboard.
+                    path: 'product/:id',
+                    name: RouteNames.businessAnalyticsProduct,
+                    redirect:
+                        (context, state) =>
+                            int.tryParse(
+                                      state.pathParameters[RouteNames.idParam] ??
+                                          '',
+                                    ) ==
+                                    null
+                                ? RouteNames.businessAnalyticsPath
+                                : null,
+                    builder: (context, state) {
+                      final int id = int.parse(
+                        state.pathParameters[RouteNames.idParam]!,
+                      );
+                      return ProductAnalyticsDetailScreen(productId: id);
+                    },
+                  ),
+                  GoRoute(
+                    // Part BI-04. Type ('post' | 'reel') and id are path
+                    // segments, so the screen survives an app restart. A bad
+                    // type or id goes back to the dashboard.
+                    path: 'content/:type/:id',
+                    name: RouteNames.businessAnalyticsContent,
+                    redirect: (context, state) {
+                      final String? type =
+                          state.pathParameters[RouteNames
+                              .analyticsContentTypeParam];
+                      final int? id = int.tryParse(
+                        state.pathParameters[RouteNames.idParam] ?? '',
+                      );
+                      final bool valid =
+                          (type == 'post' || type == 'reel') && id != null;
+                      return valid ? null : RouteNames.businessAnalyticsPath;
+                    },
+                    builder:
+                        (context, state) => ContentAnalyticsDetailScreen(
+                          contentType:
+                              state.pathParameters[RouteNames
+                                  .analyticsContentTypeParam]!,
+                          contentId: int.parse(
+                            state.pathParameters[RouteNames.idParam]!,
+                          ),
+                        ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // Part BI-03. Appended LAST so the P-083 branch order (0..3) is
+          // untouched; Orders is branch 4.
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.ordersListPath,
+                name: RouteNames.ordersList,
+                builder: (context, state) => const OrdersListScreen(),
               ),
             ],
           ),
@@ -719,6 +827,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder:
             (context, state) =>
                 ProductFormScreen(existingProduct: state.extra as Product?),
+      ),
+      GoRoute(
+        // Part BI-03. Top-level like `productForm`, under the
+        // `/business-console` prefix so the Business-only gate covers it.
+        // The id is a path segment (no `extra`), so the route is still valid
+        // after an app restart.
+        path: RouteNames.orderDetailPath,
+        name: RouteNames.orderDetail,
+        builder: (context, state) {
+          final id = state.pathParameters[RouteNames.idParam]!;
+          return OrderDetailsScreen(orderId: id);
+        },
       ),
       GoRoute(
         // Part P-044. Create-only — no `extra:` to read, unlike
@@ -787,7 +907,33 @@ bool _isChatThreadLocation(String location) {
 /// Routes reachable only while signed out. Everything else in the route
 /// table is "protected" implicitly (see the `redirect` callback above) —
 /// there is no separate `_protectedRoutes` list to keep in sync.
-const _publicRoutes = <String>{RouteNames.loginPath, RouteNames.registerPath};
+const _publicRoutes = <String>{
+  RouteNames.loginPath,
+  RouteNames.registerPath,
+  RouteNames.forgotPasswordPath,
+  RouteNames.forgotPasswordVerifyPath,
+  RouteNames.forgotPasswordNewPasswordPath,
+};
+
+/// Step guard of the forgot-password flow. Returns the path to redirect to,
+/// or null to stay. Step 2 needs the flow to be at the code step; step 3 at
+/// the new-password step (or `done`, whose success state the real screen
+/// shows on that route). Reading the autoDispose provider here is safe: when
+/// no forgot-password screen is mounted it just builds a blank state (step
+/// email), which is exactly the "no state" answer.
+String? _forgotPasswordStepRedirect(Ref ref, String location) {
+  final step = ref.read(forgotPasswordProvider).step;
+  if (location == RouteNames.forgotPasswordVerifyPath &&
+      step != ForgotPasswordStep.otp) {
+    return RouteNames.forgotPasswordPath;
+  }
+  if (location == RouteNames.forgotPasswordNewPasswordPath &&
+      step != ForgotPasswordStep.newPassword &&
+      step != ForgotPasswordStep.done) {
+    return RouteNames.forgotPasswordPath;
+  }
+  return null;
+}
 
 /// Bridges [sessionProvider] — and, since Part P-028C1, conditionally
 /// [businessProfileProvider] — to `GoRouter`'s `refreshListenable`: the

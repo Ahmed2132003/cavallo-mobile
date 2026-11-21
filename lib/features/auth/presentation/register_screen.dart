@@ -7,6 +7,7 @@ import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/auth_logo_header.dart';
 import '../../../routing/route_names.dart';
 import '../domain/user_entity.dart';
 import 'session_provider.dart';
@@ -201,6 +202,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const AuthLogoHeader(size: 88),
+                  const SizedBox(height: 20),
                   AppTextField(
                     label: l10n.authEmailLabel,
                     controller: _emailController,

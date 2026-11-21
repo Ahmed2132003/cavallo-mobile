@@ -339,7 +339,16 @@ const List<NavDestination> kNavigationManifest = [
       NavAudience.staff: _prefsEntries,
     },
   ),
-
+  NavDestination(
+    id: RouteNames.editMyProfile,
+    routeName: RouteNames.editMyProfile,
+    allowedFor: _everyone,
+    entries: {
+      NavAudience.customer: _hubRow,
+      NavAudience.business: _hubRow,
+      NavAudience.staff: _hubRow,
+    },
+  ),
   // --- Settings actions that are not routes -------------------------------
   NavDestination(
     id: kNavAppearanceId,
@@ -413,6 +422,58 @@ const List<NavDestination> kNavigationManifest = [
     routeName: RouteNames.businessAnalytics,
     allowedFor: _businessOnly,
     entries: {NavAudience.business: _consoleHubAndHeader},
+  ),
+  NavDestination(
+    id: RouteNames.ordersList,
+    routeName: RouteNames.ordersList,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(
+          NavEntryKind.inContextLink,
+          'Business Console bottom bar, Orders tab',
+        ),
+      ],
+    },
+  ),
+  NavDestination(
+    id: RouteNames.orderDetail,
+    routeName: RouteNames.orderDetail,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(
+          NavEntryKind.inContextLink,
+          'Order row in the Orders list, and Details on the order card in chat',
+        ),
+      ],
+    },
+  ),
+  NavDestination(
+    id: RouteNames.businessAnalyticsProduct,
+    routeName: RouteNames.businessAnalyticsProduct,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(
+          NavEntryKind.inContextLink,
+          'Product card in the Analytics dashboard, Products section',
+        ),
+      ],
+    },
+  ),
+  NavDestination(
+    id: RouteNames.businessAnalyticsContent,
+    routeName: RouteNames.businessAnalyticsContent,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(
+          NavEntryKind.inContextLink,
+          'Content card in the Analytics dashboard, Content and External sections',
+        ),
+      ],
+    },
   ),
   NavDestination(
     id: RouteNames.productForm,
@@ -498,6 +559,30 @@ const List<NavDestination> kNavigationManifest = [
     entries: {},
     authFlowReason:
         'Signed-out entry, linked from the login screen. Signed-in users are redirected to /home.',
+  ),
+  NavDestination(
+    id: RouteNames.forgotPassword,
+    routeName: RouteNames.forgotPassword,
+    allowedFor: {},
+    entries: {},
+    authFlowReason:
+        'Signed-out forgot-password step 1 (email). Signed-in users are redirected to /home.',
+  ),
+  NavDestination(
+    id: RouteNames.forgotPasswordVerify,
+    routeName: RouteNames.forgotPasswordVerify,
+    allowedFor: {},
+    entries: {},
+    authFlowReason:
+        'Signed-out forgot-password step 2 (code). Without flow state the redirect sends it back to /forgot-password; signed-in users go to /home.',
+  ),
+  NavDestination(
+    id: RouteNames.forgotPasswordNewPassword,
+    routeName: RouteNames.forgotPasswordNewPassword,
+    allowedFor: {},
+    entries: {},
+    authFlowReason:
+        'Signed-out forgot-password step 3 (new password). Without flow state the redirect sends it back to /forgot-password; signed-in users go to /home.',
   ),
   NavDestination(
     id: RouteNames.businessOnboarding,

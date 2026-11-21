@@ -7,6 +7,7 @@ import '../../../core/l10n/l10n_context.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/auth_logo_header.dart';
 import '../../../routing/route_names.dart';
 import 'session_provider.dart';
 import '../../../core/widgets/cavallo_app_bar.dart';
@@ -31,7 +32,11 @@ import '../../../core/widgets/cavallo_app_bar.dart';
 /// the failure itself) and builds the text at build time in the active
 /// language, so the message also follows a live language change.
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.initialEmail});
+
+  /// Fills the email field on open: the address a finished password reset
+  /// was for (passed as the route's `extra`, so nothing is stored).
+  final String? initialEmail;
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -39,7 +44,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  late final TextEditingController _emailController;
   final _passwordController = TextEditingController();
 
   bool _isSubmitting = false;
@@ -62,6 +67,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   /// [ServerFailure], or an [UnknownFailure]). The text is built from it
   /// at build time.
   ApiFailure? _generalFailure;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController(text: widget.initialEmail ?? '');
+  }
 
   @override
   void dispose() {
@@ -130,6 +141,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  /// Opens the forgot-password flow. An address already typed here is
+  /// handed over (route `extra`, memory only) to fill step 1.
+  void _openForgotPassword() {
+    final typed = _emailController.text.trim();
+    context.goNamed(
+      RouteNames.forgotPassword,
+      extra: typed.isEmpty ? null : typed,
+    );
+  }
+
   /// On the login screen an [AuthFailure] means the credentials were
   /// refused, so it gets the specific text; everything else goes through the
   /// shared error-code mapping.
@@ -157,6 +178,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const AuthLogoHeader(size: 104),
+                  const SizedBox(height: 24),
                   AppTextField(
                     label: l10n.authEmailLabel,
                     controller: _emailController,
@@ -202,6 +225,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: _submit,
                   ),
                   const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: _isSubmitting ? null : _openForgotPassword,
+                    child: Text(l10n.authForgotPasswordLink),
+                  ),
                   TextButton(
                     onPressed:
                         _isSubmitting
