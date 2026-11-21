@@ -87,3 +87,57 @@
 - There is no customer "my orders" screen; the customer endpoint is used only by the chat card.
 - The Console now has 5 destinations; any older widget test that counts `NavigationDestination`s in the console shell must be checked in the full run.
 - Customer name in the sheet is the other participant's display name (correct only because a business is always the merchant).
+
+## PART BI-04 - Business Analytics dashboard (overview, products, orders & sales, content, external) - branch `part-116b-edit-profile` (2026-11-20)
+
+**Scope:** the Business Console Analytics tab becomes a five-section dashboard over one shared period, with a product detail and a post/reel detail, and manual entry of external platform numbers. Everything comes from `api_contract_BI02.md`; no endpoint or JSON outside it is used.
+
+**Screens:**
+- `AnalyticsDashboardScreen` (replaces the P-085 `AnalyticsScreen` in the router only): tabs Overview, Products, Orders & sales, Content, External, under one period bar (7 / 14 / 30 / 90 days, this month, previous month, custom). Every tab keeps its state and is cached by non auto-dispose providers, so switching tabs sends no request.
+- `ProductAnalyticsDetailScreen`: totals, sales per currency, funnel, daily trends, link to the orders list.
+- `ContentAnalyticsDetailScreen`: internal (in-app) block and external (platform) block kept separate, plus the manual-entry sheet.
+- The older daily-rollup screen, its providers and tests (P-085) are untouched.
+
+**Files:**
+- Data: `business_analytics_repository.dart` (`BusinessAnalyticsRepository` + Impl), DTOs `dto_parsing.dart`, `analytics_common_dto.dart`, `overview_dto.dart`, `products_dto.dart`, `content_dto.dart`, `orders_summary_dto.dart`.
+- Domain: `analytics_period.dart`, `analytics_common.dart`, `analytics_overview.dart`, `analytics_products.dart`, `analytics_content.dart`, `analytics_orders_summary.dart`.
+- Presentation: `analytics_dashboard_screen.dart`, `product_analytics_detail_screen.dart`, `content_analytics_detail_screen.dart`, `presentation/providers/`, `presentation/widgets/` (common, overview, orders, products, content, external).
+- Routing: `businessAnalyticsProduct` (`/business-console/analytics/product/:id`) and `businessAnalyticsContent` (`/business-console/analytics/content/:type/:id`), children of the analytics tab under the Business-only gate; `route_names.dart`, `app_router.dart`, `navigation_manifest.dart`.
+- `lib/features/analytics_tracking/` is part of this change set (added in parts 1-4). TODO: complete this line from its docstrings; it was not part of the material this entry was written from.
+- L10n: 163 keys in EN + AR (`analyticsContent*`, `analyticsExternal*`, `analyticsProd*`, `bi*`).
+
+**APIs used (all under `/api/v1/analytics/business/{id}/`, Bearer):** `overview/`, `products/`, `products/{product_id}/`, `content/`, `content/{type}/{id}/`, `content/{type}/{id}/external-metrics/` (GET and POST), `orders-summary/`. `business_id` is never sent in a query or body.
+
+**Rules implemented:**
+- Period: the app ALWAYS sends `date_from` + `date_to` (the server accepts `period=` only for 7d / 30d / 90d). Rolling presets end YESTERDAY in UTC (today has no rollup yet); "today" is the UTC date of the injected clock, never the device date (Cairo is UTC+2/+3). Custom ranges use the picked year/month/day as UTC dates. Maximum 366 days; `from > to` is rejected before any request. `orders-summary` defaults `date_to` to the server's today, so it is always sent.
+- Missing data is null and shown as a dash, never 0; real counts (orders, interests) keep their 0.
+- Money is a String; sales are listed per currency and never summed.
+- The funnel is shown exactly as the backend returned it; nothing is recomputed on the client.
+- Comparison: only the backend's `change_pct` is read. A null `previous_period`, a metric without a delta (sales, AOV) and a null `change_pct` all show "No previous data".
+- No "live" label: the screens show `data_updated_at` and `orders_data_updated_at`; views unavailable / incomplete are explained.
+- Lists are page based (`page`, `page_size` max 100, `ordering`). "Lowest conversion" is `ordering=conversion` (ascending); there is no separate key.
+- Sales Value = confirmed + processing + shipped + delivered; pending and cancelled are not counted; these are merchant-recorded sales, not collected payments.
+
+**External integration constraints:**
+- No sync integration exists (`providers_registered` is `[]`): every external number is manual. Anything that is not explicitly `source: synced` is labelled Manual, never live.
+- Platforms: instagram, facebook, tiktok. Metric types: views, likes, shares, saves. There is NO "engagement" external type, and "reach" does not exist (no reliable source), so it is not shown.
+- POST body: `platform`, `metric_type`, `metric_value` (int >= 0), optional `captured_at` (not in the future) and `external_reference`. `source` can never be sent. The POST is NOT idempotent, so the app does not auto-retry it.
+- Internal and external numbers are never added together; in-app shares do not prove any external view.
+
+**Tests (new):** `test/features/business_console/`: `bi_fixtures.dart`, `fake_business_analytics_repository.dart`, `data/business_analytics_dtos_test.dart` (parsing, null vs 0, funnel as sent, money, UTC timestamps, ordering keys), `data/business_analytics_repository_test.dart` (paths, exact query params, ordering, pagination, error mapping), `domain/analytics_period_test.dart` (every preset, UTC / Cairo edge, month boundaries, 366 limit), `domain/metric_comparison_test.dart`, `presentation/bi_test_harness.dart`, `presentation/analytics_dashboard_screen_test.dart` (loading / error / empty, dash for null, no reload on tab change, shared period, sorting, pagination, AR / EN, Light / Dark), `presentation/product_analytics_detail_screen_test.dart`, `presentation/content_analytics_detail_screen_test.dart`, `presentation/analytics_navigation_test.dart`; `test/routing/analytics_routes_test.dart`. No old test was removed. `arb_parity_test` and `no_hardcoded_strings_test` must keep passing.
+
+**Verification (fill in with the REAL output of your run):**
+- flutter gen-l10n: ?
+- flutter analyze: ?
+- Targeted tests (test/features/business_console, test/l10n, test/routing): ?
+- flutter test (FULL): ?
+
+**Not verified:** nothing was run against the real backend; the contract is taken from `api_contract_BI02.md` only. The widget tests were written without the full presentation sources and assume: the period chips change the shared period, "Load more" is visible while `hasMore`, ordering and type filters are visible chips, a null number renders as `—`, a missing business shows `biNoBusiness`, a product row or content card opens its detail by route name, and "Open orders" goes to `ordersList`. Manual walk-through on the emulator (Arabic / RTL, Dark, a custom range, use between 00:00 and 02:00 in Cairo, manual external entry) is still to do.
+
+**Remaining gaps:**
+- The products list row has no image, no price, no conversations count and no separate confirmed / completed counts (contract gaps); image and name come from the products feature by `product_id`. The content list has no thumbnail and no external numbers.
+- No per-product orders filter exists (marked UNVERIFIED in `api_contract_BI01.md`), so "Open orders" opens all orders and says so.
+- The external-entry form submit is covered only at repository level; its widget flow is not tested.
+- The real `app_router.dart` registration and the Business-only gate for the new routes are not covered by a router-level test; `analytics_routes_test.dart` checks the constants and an equivalent route table.
+- No provider-level unit tests (the provider sources were not available when the tests were written).
+- Rollups are computed by Celery: days not yet rolled up are null, so very recent days can show a dash.

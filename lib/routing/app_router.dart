@@ -10,9 +10,11 @@ import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/auth/presentation/session_provider.dart';
 import '../features/auth/presentation/splash_screen.dart';
-import '../features/business_console/presentation/analytics_screen.dart';
+import '../features/business_console/presentation/analytics_dashboard_screen.dart';
 import '../features/business_console/presentation/business_console_shell.dart';
 import '../features/business_console/presentation/console_dashboard.dart';
+import '../features/business_console/presentation/product_analytics_detail_screen.dart';
+import '../features/business_console/presentation/content_analytics_detail_screen.dart';
 import '../features/business_profile/presentation/business_onboarding_screen.dart';
 import '../features/business_profile/presentation/business_profile_edit_screen.dart';
 import '../features/business_profile/presentation/business_profile_provider.dart';
@@ -748,7 +750,58 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: RouteNames.businessAnalyticsPath,
                 name: RouteNames.businessAnalytics,
-                builder: (context, state) => const AnalyticsScreen(),
+                builder: (context, state) => const AnalyticsDashboardScreen(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    // Part BI-04. Product id is a path segment (no `extra`),
+                    // so the screen is valid after an app restart. A
+                    // non-numeric id goes back to the dashboard.
+                    path: 'product/:id',
+                    name: RouteNames.businessAnalyticsProduct,
+                    redirect:
+                        (context, state) =>
+                            int.tryParse(
+                                      state.pathParameters[RouteNames.idParam] ??
+                                          '',
+                                    ) ==
+                                    null
+                                ? RouteNames.businessAnalyticsPath
+                                : null,
+                    builder: (context, state) {
+                      final int id = int.parse(
+                        state.pathParameters[RouteNames.idParam]!,
+                      );
+                      return ProductAnalyticsDetailScreen(productId: id);
+                    },
+                  ),
+                  GoRoute(
+                    // Part BI-04. Type ('post' | 'reel') and id are path
+                    // segments, so the screen survives an app restart. A bad
+                    // type or id goes back to the dashboard.
+                    path: 'content/:type/:id',
+                    name: RouteNames.businessAnalyticsContent,
+                    redirect: (context, state) {
+                      final String? type =
+                          state.pathParameters[RouteNames
+                              .analyticsContentTypeParam];
+                      final int? id = int.tryParse(
+                        state.pathParameters[RouteNames.idParam] ?? '',
+                      );
+                      final bool valid =
+                          (type == 'post' || type == 'reel') && id != null;
+                      return valid ? null : RouteNames.businessAnalyticsPath;
+                    },
+                    builder:
+                        (context, state) => ContentAnalyticsDetailScreen(
+                          contentType:
+                              state.pathParameters[RouteNames
+                                  .analyticsContentTypeParam]!,
+                          contentId: int.parse(
+                            state.pathParameters[RouteNames.idParam]!,
+                          ),
+                        ),
+                  ),
+                ],
               ),
             ],
           ),

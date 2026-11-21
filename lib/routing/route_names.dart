@@ -202,6 +202,17 @@ class RouteNames {
   /// Part BI-03 — one order. Uses [idParam].
   static const String orderDetail = 'orderDetail';
 
+  /// Part BI-04 — one product's analytics (nested under [businessAnalytics]).
+  /// Uses [idParam].
+  static const String businessAnalyticsProduct = 'businessAnalyticsProduct';
+
+  /// Part BI-04 — one post/reel's analytics (nested under
+  /// [businessAnalytics]). Uses [analyticsContentTypeParam] and [idParam].
+  static const String businessAnalyticsContent = 'businessAnalyticsContent';
+
+  /// Path parameter holding 'post' or 'reel' for [businessAnalyticsContent].
+  static const String analyticsContentTypeParam = 'type';
+
   // --- Route paths (used inside GoRoute(path: ...)) ---
   static const String splashPath = '/';
   static const String loginPath = '/login';
@@ -325,6 +336,17 @@ class RouteNames {
 
   /// Part BI-03 — see [orderDetail].
   static const String orderDetailPath = '/business-console/orders/:id';
+
+  /// Part BI-04 — see [businessAnalyticsProduct]. The router registers it as
+  /// the child path `product/:id` of [businessAnalyticsPath], so the full
+  /// location is this one. Under `/business-console`: Business-only gate.
+  static const String businessAnalyticsProductPath =
+      '/business-console/analytics/product/:id';
+
+  /// Part BI-04 — see [businessAnalyticsContent]. The router registers it as
+  /// the child path `content/:type/:id` of [businessAnalyticsPath].
+  static const String businessAnalyticsContentPath =
+      '/business-console/analytics/content/:type/:id';
 
   /// Part P-113: the Saved screen (Posts / Reels / Products tabs), tab 3 of
   /// the Customer bottom bar and a Profile hub row for every account type.

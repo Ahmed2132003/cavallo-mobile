@@ -10,7 +10,7 @@ import 'package:social_commerce_app/core/network/paginated_response.dart';
 import 'package:social_commerce_app/features/auth/domain/user_entity.dart';
 import 'package:social_commerce_app/features/auth/presentation/session_provider.dart';
 import 'package:social_commerce_app/features/business_console/data/analytics_repository.dart';
-import 'package:social_commerce_app/features/business_console/presentation/analytics_screen.dart';
+import 'package:social_commerce_app/features/business_console/presentation/analytics_dashboard_screen.dart';
 import 'package:social_commerce_app/features/business_console/presentation/business_console_shell.dart';
 import 'package:social_commerce_app/features/business_profile/domain/business_profile_entity.dart';
 import 'package:social_commerce_app/features/business_profile/presentation/business_profile_provider.dart';
@@ -333,7 +333,9 @@ const _destinations = <_Destination>[
     navKey: _navAnalytics,
     index: 3,
     path: RouteNames.businessAnalyticsPath,
-    screen: AnalyticsScreen,
+    // BI-04: the Analytics tab builds the dashboard; the older
+    // AnalyticsScreen is no longer routed.
+    screen: AnalyticsDashboardScreen,
     appBarTitle: 'Analytics',
   ),
 ];
@@ -417,20 +419,18 @@ void main() {
         );
 
         await _openTab(tester, _navAnalytics);
-        expect(find.byType(AnalyticsScreen), findsOneWidget);
+        expect(find.byType(AnalyticsDashboardScreen), findsOneWidget);
         expect(
           find.byKey(const ValueKey('business-analytics-placeholder')),
           findsNothing,
         );
         expect(find.text('Analytics coming soon'), findsNothing);
-        // Real data from the fake: the totals are the sum of the three
-        // known rows (followers 1+2+3).
+        // BI-04: the tab is the dashboard, whose tab bar is always built, so
+        // it proves the real screen rendered. The legacy AnalyticsScreen
+        // totals (the sum of the three known rows) are covered in
+        // analytics_integration_test.dart.
         expect(
-          find.descendant(
-            of: find.byKey(const Key('analytics-total-new-followers')),
-            matching: find.text('6'),
-            matchRoot: true,
-          ),
+          find.byKey(const ValueKey<String>('bi-tab-overview')),
           findsOneWidget,
         );
       },

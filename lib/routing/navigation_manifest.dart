@@ -450,6 +450,32 @@ const List<NavDestination> kNavigationManifest = [
     },
   ),
   NavDestination(
+    id: RouteNames.businessAnalyticsProduct,
+    routeName: RouteNames.businessAnalyticsProduct,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(
+          NavEntryKind.inContextLink,
+          'Product card in the Analytics dashboard, Products section',
+        ),
+      ],
+    },
+  ),
+  NavDestination(
+    id: RouteNames.businessAnalyticsContent,
+    routeName: RouteNames.businessAnalyticsContent,
+    allowedFor: _businessOnly,
+    entries: {
+      NavAudience.business: [
+        NavEntry(
+          NavEntryKind.inContextLink,
+          'Content card in the Analytics dashboard, Content and External sections',
+        ),
+      ],
+    },
+  ),
+  NavDestination(
     id: RouteNames.productForm,
     routeName: RouteNames.productForm,
     allowedFor: _businessOnly,

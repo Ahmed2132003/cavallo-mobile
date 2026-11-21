@@ -3718,6 +3718,984 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not open the conversation.'**
   String get ordersConversationUnavailable;
+
+  /// No description provided for @analyticsContentEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No posts or reels found for this period and filter.'**
+  String get analyticsContentEmpty;
+
+  /// No description provided for @analyticsContentExternalInDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'External platform numbers are shown in the details.'**
+  String get analyticsContentExternalInDetails;
+
+  /// No description provided for @analyticsContentExternalNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Entered manually by you. These numbers are not synced with Instagram, Facebook or TikTok.'**
+  String get analyticsContentExternalNote;
+
+  /// No description provided for @analyticsContentExternalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'External platforms (manual)'**
+  String get analyticsContentExternalTitle;
+
+  /// No description provided for @analyticsContentInAppNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted inside the app only. In-app shares do not prove any external view.'**
+  String get analyticsContentInAppNote;
+
+  /// No description provided for @analyticsContentInternalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'In-app numbers'**
+  String get analyticsContentInternalTitle;
+
+  /// No description provided for @analyticsContentLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the analytics of this content. Try again.'**
+  String get analyticsContentLoadError;
+
+  /// No description provided for @analyticsContentMetricComments.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get analyticsContentMetricComments;
+
+  /// No description provided for @analyticsContentMetricEngagementRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Engagement rate'**
+  String get analyticsContentMetricEngagementRate;
+
+  /// No description provided for @analyticsContentMetricInAppShares.
+  ///
+  /// In en, this message translates to:
+  /// **'In-app shares'**
+  String get analyticsContentMetricInAppShares;
+
+  /// No description provided for @analyticsContentMetricLikes.
+  ///
+  /// In en, this message translates to:
+  /// **'Likes'**
+  String get analyticsContentMetricLikes;
+
+  /// No description provided for @analyticsContentNoCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'No caption'**
+  String get analyticsContentNoCaption;
+
+  /// No description provided for @analyticsContentOpenDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View details'**
+  String get analyticsContentOpenDetails;
+
+  /// No description provided for @analyticsContentOrderHighestEngagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest engagement'**
+  String get analyticsContentOrderHighestEngagement;
+
+  /// No description provided for @analyticsContentOrderMostLiked.
+  ///
+  /// In en, this message translates to:
+  /// **'Most liked'**
+  String get analyticsContentOrderMostLiked;
+
+  /// No description provided for @analyticsContentOrderMostSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Most saved'**
+  String get analyticsContentOrderMostSaved;
+
+  /// No description provided for @analyticsContentOrderMostShared.
+  ///
+  /// In en, this message translates to:
+  /// **'Most shared'**
+  String get analyticsContentOrderMostShared;
+
+  /// No description provided for @analyticsContentOrderMostViewed.
+  ///
+  /// In en, this message translates to:
+  /// **'Most viewed'**
+  String get analyticsContentOrderMostViewed;
+
+  /// No description provided for @analyticsContentOrderNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get analyticsContentOrderNewest;
+
+  /// No description provided for @analyticsContentTrendInteractions.
+  ///
+  /// In en, this message translates to:
+  /// **'Interactions'**
+  String get analyticsContentTrendInteractions;
+
+  /// No description provided for @analyticsContentTypeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get analyticsContentTypeAll;
+
+  /// No description provided for @analyticsContentTypePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get analyticsContentTypePost;
+
+  /// No description provided for @analyticsContentTypePosts.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts'**
+  String get analyticsContentTypePosts;
+
+  /// No description provided for @analyticsContentTypeReel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reel'**
+  String get analyticsContentTypeReel;
+
+  /// No description provided for @analyticsContentTypeReels.
+  ///
+  /// In en, this message translates to:
+  /// **'Reels'**
+  String get analyticsContentTypeReels;
+
+  /// No description provided for @analyticsExternalAddUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Add or update numbers'**
+  String get analyticsExternalAddUpdate;
+
+  /// No description provided for @analyticsExternalBadgeManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get analyticsExternalBadgeManual;
+
+  /// No description provided for @analyticsExternalBadgeSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced'**
+  String get analyticsExternalBadgeSynced;
+
+  /// No description provided for @analyticsExternalEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No external numbers entered yet.'**
+  String get analyticsExternalEmpty;
+
+  /// No description provided for @analyticsExternalFormMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Metric'**
+  String get analyticsExternalFormMetric;
+
+  /// No description provided for @analyticsExternalFormNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the number you see on the platform. It is saved as a manual entry.'**
+  String get analyticsExternalFormNote;
+
+  /// No description provided for @analyticsExternalFormPlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'Platform'**
+  String get analyticsExternalFormPlatform;
+
+  /// No description provided for @analyticsExternalFormReference.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference (optional)'**
+  String get analyticsExternalFormReference;
+
+  /// No description provided for @analyticsExternalFormSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get analyticsExternalFormSave;
+
+  /// No description provided for @analyticsExternalFormTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add external numbers'**
+  String get analyticsExternalFormTitle;
+
+  /// No description provided for @analyticsExternalFormValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get analyticsExternalFormValue;
+
+  /// No description provided for @analyticsExternalIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Numbers from Instagram, Facebook and TikTok that you enter yourself. Nothing is synced automatically.'**
+  String get analyticsExternalIntro;
+
+  /// Last update time of one external metric.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {date}'**
+  String analyticsExternalLastUpdated(String date);
+
+  /// No description provided for @analyticsExternalLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the external numbers. Try again.'**
+  String get analyticsExternalLoadError;
+
+  /// No description provided for @analyticsExternalMetricLikes.
+  ///
+  /// In en, this message translates to:
+  /// **'Likes'**
+  String get analyticsExternalMetricLikes;
+
+  /// No description provided for @analyticsExternalMetricSaves.
+  ///
+  /// In en, this message translates to:
+  /// **'Saves'**
+  String get analyticsExternalMetricSaves;
+
+  /// No description provided for @analyticsExternalMetricShares.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares'**
+  String get analyticsExternalMetricShares;
+
+  /// No description provided for @analyticsExternalMetricViews.
+  ///
+  /// In en, this message translates to:
+  /// **'Views'**
+  String get analyticsExternalMetricViews;
+
+  /// No description provided for @analyticsExternalPlatformFacebook.
+  ///
+  /// In en, this message translates to:
+  /// **'Facebook'**
+  String get analyticsExternalPlatformFacebook;
+
+  /// No description provided for @analyticsExternalPlatformInstagram.
+  ///
+  /// In en, this message translates to:
+  /// **'Instagram'**
+  String get analyticsExternalPlatformInstagram;
+
+  /// No description provided for @analyticsExternalPlatformTiktok.
+  ///
+  /// In en, this message translates to:
+  /// **'TikTok'**
+  String get analyticsExternalPlatformTiktok;
+
+  /// The optional reference the merchant typed for an external metric.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference: {reference}'**
+  String analyticsExternalReference(String reference);
+
+  /// No description provided for @analyticsExternalSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save. Please try again.'**
+  String get analyticsExternalSaveError;
+
+  /// No description provided for @analyticsExternalSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved.'**
+  String get analyticsExternalSaved;
+
+  /// No description provided for @analyticsExternalSourceManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Source: entered manually'**
+  String get analyticsExternalSourceManual;
+
+  /// No description provided for @analyticsExternalSourceSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Source: synced from the platform'**
+  String get analyticsExternalSourceSynced;
+
+  /// No description provided for @analyticsExternalValueInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a whole number, 0 or more.'**
+  String get analyticsExternalValueInvalid;
+
+  /// No description provided for @analyticsProdEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No products with analytics in this period.'**
+  String get analyticsProdEmpty;
+
+  /// No description provided for @analyticsProdFunnelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversion funnel'**
+  String get analyticsProdFunnelTitle;
+
+  /// No description provided for @analyticsProdInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive product'**
+  String get analyticsProdInactive;
+
+  /// A metric label followed by its value.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {value}'**
+  String analyticsProdLabelValue(String label, String value);
+
+  /// No description provided for @analyticsProdLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the analytics of this product. Try again.'**
+  String get analyticsProdLoadError;
+
+  /// No description provided for @analyticsProdLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get analyticsProdLoadMore;
+
+  /// No description provided for @analyticsProdMetricAverageOrderValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Average order value'**
+  String get analyticsProdMetricAverageOrderValue;
+
+  /// No description provided for @analyticsProdMetricConversion.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversion'**
+  String get analyticsProdMetricConversion;
+
+  /// No description provided for @analyticsProdMetricInterests.
+  ///
+  /// In en, this message translates to:
+  /// **'Interests'**
+  String get analyticsProdMetricInterests;
+
+  /// No description provided for @analyticsProdMetricOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get analyticsProdMetricOrders;
+
+  /// No description provided for @analyticsProdMetricSales.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales'**
+  String get analyticsProdMetricSales;
+
+  /// No description provided for @analyticsProdMetricSaves.
+  ///
+  /// In en, this message translates to:
+  /// **'Saves'**
+  String get analyticsProdMetricSaves;
+
+  /// No description provided for @analyticsProdMetricSoldOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold orders'**
+  String get analyticsProdMetricSoldOrders;
+
+  /// No description provided for @analyticsProdMetricUniqueViews.
+  ///
+  /// In en, this message translates to:
+  /// **'Unique views'**
+  String get analyticsProdMetricUniqueViews;
+
+  /// No description provided for @analyticsProdMetricUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Units'**
+  String get analyticsProdMetricUnits;
+
+  /// No description provided for @analyticsProdMetricViews.
+  ///
+  /// In en, this message translates to:
+  /// **'Views'**
+  String get analyticsProdMetricViews;
+
+  /// No description provided for @analyticsProdNoBusiness.
+  ///
+  /// In en, this message translates to:
+  /// **'No business profile found for this account.'**
+  String get analyticsProdNoBusiness;
+
+  /// No description provided for @analyticsProdNoSales.
+  ///
+  /// In en, this message translates to:
+  /// **'No sales in this period.'**
+  String get analyticsProdNoSales;
+
+  /// No description provided for @analyticsProdOpenOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Open orders'**
+  String get analyticsProdOpenOrders;
+
+  /// No description provided for @analyticsProdOrderBestSelling.
+  ///
+  /// In en, this message translates to:
+  /// **'Best selling'**
+  String get analyticsProdOrderBestSelling;
+
+  /// No description provided for @analyticsProdOrderHighestConversion.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest conversion'**
+  String get analyticsProdOrderHighestConversion;
+
+  /// No description provided for @analyticsProdOrderLowestConversion.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest conversion'**
+  String get analyticsProdOrderLowestConversion;
+
+  /// No description provided for @analyticsProdOrderMostInterested.
+  ///
+  /// In en, this message translates to:
+  /// **'Most interested'**
+  String get analyticsProdOrderMostInterested;
+
+  /// No description provided for @analyticsProdOrderMostOrdered.
+  ///
+  /// In en, this message translates to:
+  /// **'Most ordered'**
+  String get analyticsProdOrderMostOrdered;
+
+  /// No description provided for @analyticsProdOrderMostViewed.
+  ///
+  /// In en, this message translates to:
+  /// **'Most viewed'**
+  String get analyticsProdOrderMostViewed;
+
+  /// No description provided for @analyticsProdOrdersLinkNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens all your orders. Filtering orders by product is not available.'**
+  String get analyticsProdOrdersLinkNote;
+
+  /// When the orders data of a product was last updated.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders updated {date}'**
+  String analyticsProdOrdersUpdatedAt(String date);
+
+  /// A rate as a percentage; the number is already formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'{rate}%'**
+  String analyticsProdRateValue(String rate);
+
+  /// Sales line of one currency for a product; both numbers are already formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold orders: {orders} · Units: {units}'**
+  String analyticsProdSalesLine(String orders, String units);
+
+  /// No description provided for @analyticsProdSalesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales by currency'**
+  String get analyticsProdSalesTitle;
+
+  /// No description provided for @analyticsProdTotalsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Totals'**
+  String get analyticsProdTotalsTitle;
+
+  /// No description provided for @analyticsProdTrendNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No trend data for this period.'**
+  String get analyticsProdTrendNoData;
+
+  /// No description provided for @analyticsProdTrendsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily trends'**
+  String get analyticsProdTrendsTitle;
+
+  /// When the analytics data was last updated.
+  ///
+  /// In en, this message translates to:
+  /// **'Data updated {date}'**
+  String analyticsProdUpdatedAt(String date);
+
+  /// No description provided for @analyticsProdViewsIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Views are not complete for this period, so rates that depend on views are not shown.'**
+  String get analyticsProdViewsIncomplete;
+
+  /// No description provided for @analyticsProdViewsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'View data is not available for this period.'**
+  String get analyticsProdViewsUnavailable;
+
+  /// Screen-reader summary of a chart.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}, period in days: {days}'**
+  String biChartSemantics(String title, int days);
+
+  /// No description provided for @biComparedWithPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Compared with the previous period'**
+  String get biComparedWithPrevious;
+
+  /// No description provided for @biDataNeverUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Data has not been updated yet.'**
+  String get biDataNeverUpdated;
+
+  /// When the analytics data was last updated.
+  ///
+  /// In en, this message translates to:
+  /// **'Data updated {date}'**
+  String biDataUpdatedAt(String date);
+
+  /// No description provided for @biErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check your internet and try again.'**
+  String get biErrorNetwork;
+
+  /// No description provided for @biFunnelCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get biFunnelCompleted;
+
+  /// No description provided for @biFunnelConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get biFunnelConfirmed;
+
+  /// Conversion rate between two funnel stages; the percentage is already formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'{rate} conversion'**
+  String biFunnelConversion(String rate);
+
+  /// Share lost between two funnel stages; the percentage is already formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'{rate} lost'**
+  String biFunnelDrop(String rate);
+
+  /// No description provided for @biFunnelInterests.
+  ///
+  /// In en, this message translates to:
+  /// **'Interests'**
+  String get biFunnelInterests;
+
+  /// No description provided for @biFunnelOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get biFunnelOrders;
+
+  /// Overall funnel conversion; the percentage is already formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall conversion: {rate}'**
+  String biFunnelOverall(String rate);
+
+  /// No description provided for @biFunnelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversion funnel'**
+  String get biFunnelTitle;
+
+  /// No description provided for @biFunnelUnitsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Views are unique views. Interests, orders, confirmed and completed count each customer once.'**
+  String get biFunnelUnitsNote;
+
+  /// No description provided for @biFunnelViews.
+  ///
+  /// In en, this message translates to:
+  /// **'Views'**
+  String get biFunnelViews;
+
+  /// No description provided for @biGroupContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get biGroupContent;
+
+  /// No description provided for @biGroupOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get biGroupOrders;
+
+  /// No description provided for @biGroupProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get biGroupProducts;
+
+  /// No description provided for @biKpiAov.
+  ///
+  /// In en, this message translates to:
+  /// **'Average order value'**
+  String get biKpiAov;
+
+  /// No description provided for @biKpiComments.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get biKpiComments;
+
+  /// No description provided for @biKpiCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed orders'**
+  String get biKpiCompleted;
+
+  /// No description provided for @biKpiConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed orders'**
+  String get biKpiConfirmed;
+
+  /// No description provided for @biKpiContentViews.
+  ///
+  /// In en, this message translates to:
+  /// **'Content views'**
+  String get biKpiContentViews;
+
+  /// No description provided for @biKpiInterests.
+  ///
+  /// In en, this message translates to:
+  /// **'Interests'**
+  String get biKpiInterests;
+
+  /// No description provided for @biKpiLikes.
+  ///
+  /// In en, this message translates to:
+  /// **'Likes'**
+  String get biKpiLikes;
+
+  /// No description provided for @biKpiOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get biKpiOrders;
+
+  /// No description provided for @biKpiProductUniqueViews.
+  ///
+  /// In en, this message translates to:
+  /// **'Product unique views'**
+  String get biKpiProductUniqueViews;
+
+  /// No description provided for @biKpiProductViews.
+  ///
+  /// In en, this message translates to:
+  /// **'Product views'**
+  String get biKpiProductViews;
+
+  /// No description provided for @biKpiSales.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales'**
+  String get biKpiSales;
+
+  /// No description provided for @biKpiSaves.
+  ///
+  /// In en, this message translates to:
+  /// **'Saves'**
+  String get biKpiSaves;
+
+  /// No description provided for @biKpiShares.
+  ///
+  /// In en, this message translates to:
+  /// **'In-app shares'**
+  String get biKpiShares;
+
+  /// No description provided for @biLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the analytics. Try again.'**
+  String get biLoadFailed;
+
+  /// No description provided for @biNoBusiness.
+  ///
+  /// In en, this message translates to:
+  /// **'No business profile found for this account.'**
+  String get biNoBusiness;
+
+  /// No description provided for @biNoPreviousData.
+  ///
+  /// In en, this message translates to:
+  /// **'No previous data'**
+  String get biNoPreviousData;
+
+  /// No description provided for @biNoSalesInPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'No sales in this period.'**
+  String get biNoSalesInPeriod;
+
+  /// No description provided for @biOrdersByStatusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders by status'**
+  String get biOrdersByStatusTitle;
+
+  /// No description provided for @biOrdersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No orders in this period.'**
+  String get biOrdersEmpty;
+
+  /// No description provided for @biOrdersOverTimeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders over time'**
+  String get biOrdersOverTimeTitle;
+
+  /// No description provided for @biOrdersTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total orders'**
+  String get biOrdersTotal;
+
+  /// When the orders data was last updated.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders updated {date}'**
+  String biOrdersUpdatedAt(String date);
+
+  /// No description provided for @biPeriodNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Dates are in UTC. Today is not included because it has no daily rollup yet.'**
+  String get biPeriodNote;
+
+  /// The selected period: first and last day, already formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'{start} to {end}'**
+  String biPeriodRange(String start, String end);
+
+  /// No description provided for @biPresetCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get biPresetCustom;
+
+  /// No description provided for @biPresetLast14.
+  ///
+  /// In en, this message translates to:
+  /// **'14 days'**
+  String get biPresetLast14;
+
+  /// No description provided for @biPresetLast30.
+  ///
+  /// In en, this message translates to:
+  /// **'30 days'**
+  String get biPresetLast30;
+
+  /// No description provided for @biPresetLast7.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days'**
+  String get biPresetLast7;
+
+  /// No description provided for @biPresetLast90.
+  ///
+  /// In en, this message translates to:
+  /// **'90 days'**
+  String get biPresetLast90;
+
+  /// No description provided for @biPresetPreviousMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get biPresetPreviousMonth;
+
+  /// No description provided for @biPresetThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get biPresetThisMonth;
+
+  /// Snackbar when the picked custom range is longer than the maximum.
+  ///
+  /// In en, this message translates to:
+  /// **'The range can be at most {days} days.'**
+  String biRangeTooLong(int days);
+
+  /// No description provided for @biRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get biRefresh;
+
+  /// Title of the sales chart of one currency.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales over time ({currency})'**
+  String biRevenueOverTimeTitle(String currency);
+
+  /// No description provided for @biSalesDefinition.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales value = confirmed, processing, shipped and delivered orders. Pending and cancelled orders are not counted.'**
+  String get biSalesDefinition;
+
+  /// No description provided for @biSalesDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'These are sales you recorded, not collected payments.'**
+  String get biSalesDisclaimer;
+
+  /// No description provided for @biSeriesOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get biSeriesOrders;
+
+  /// No description provided for @biSeriesSoldOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold orders'**
+  String get biSeriesSoldOrders;
+
+  /// No description provided for @biStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get biStatusCancelled;
+
+  /// No description provided for @biStatusConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get biStatusConfirmed;
+
+  /// No description provided for @biStatusDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered'**
+  String get biStatusDelivered;
+
+  /// No description provided for @biStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get biStatusPending;
+
+  /// No description provided for @biStatusProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing'**
+  String get biStatusProcessing;
+
+  /// No description provided for @biStatusShipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipped'**
+  String get biStatusShipped;
+
+  /// No description provided for @biStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get biStatusUnknown;
+
+  /// No description provided for @biTabContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get biTabContent;
+
+  /// No description provided for @biTabExternal.
+  ///
+  /// In en, this message translates to:
+  /// **'External'**
+  String get biTabExternal;
+
+  /// No description provided for @biTabOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders & sales'**
+  String get biTabOrders;
+
+  /// No description provided for @biTabOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get biTabOverview;
+
+  /// No description provided for @biTabProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get biTabProducts;
+
+  /// Second line of a top product row; both numbers are already formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold orders: {orders} · Units: {units}'**
+  String biTopProductSub(String orders, String units);
+
+  /// No description provided for @biTopProductsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No sold products in this period.'**
+  String get biTopProductsEmpty;
+
+  /// No description provided for @biTopProductsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Top products'**
+  String get biTopProductsTitle;
+
+  /// No description provided for @biTotalSales.
+  ///
+  /// In en, this message translates to:
+  /// **'Total sales'**
+  String get biTotalSales;
+
+  /// No description provided for @biUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Units'**
+  String get biUnits;
+
+  /// No description provided for @biViewsIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Views are not complete for this period. Rates that depend on views and the previous-period comparison are not shown.'**
+  String get biViewsIncomplete;
+
+  /// No description provided for @biViewsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'View data is not available for this period.'**
+  String get biViewsUnavailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

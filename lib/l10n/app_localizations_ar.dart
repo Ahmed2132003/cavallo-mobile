@@ -2135,4 +2135,527 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get ordersConversationUnavailable => 'تعذّر فتح المحادثة.';
+
+  @override
+  String get analyticsContentEmpty => 'لا توجد منشورات أو ريلز في هذه الفترة بهذا الفلتر.';
+
+  @override
+  String get analyticsContentExternalInDetails => 'أرقام المنصات الخارجية تظهر في صفحة التفاصيل.';
+
+  @override
+  String get analyticsContentExternalNote => 'أدخلتها أنت يدويًا. هذه الأرقام غير مرتبطة تلقائيًا بإنستجرام أو فيسبوك أو تيك توك.';
+
+  @override
+  String get analyticsContentExternalTitle => 'المنصات الخارجية (يدوي)';
+
+  @override
+  String get analyticsContentInAppNote => 'تُحسب داخل التطبيق فقط. المشاركات داخل التطبيق لا تثبت أي مشاهدة خارجه.';
+
+  @override
+  String get analyticsContentInternalTitle => 'أرقام داخل التطبيق';
+
+  @override
+  String get analyticsContentLoadError => 'تعذّر تحميل تحليلات هذا المحتوى. حاول مرة أخرى.';
+
+  @override
+  String get analyticsContentMetricComments => 'التعليقات';
+
+  @override
+  String get analyticsContentMetricEngagementRate => 'معدل التفاعل';
+
+  @override
+  String get analyticsContentMetricInAppShares => 'المشاركات داخل التطبيق';
+
+  @override
+  String get analyticsContentMetricLikes => 'الإعجابات';
+
+  @override
+  String get analyticsContentNoCaption => 'بدون وصف';
+
+  @override
+  String get analyticsContentOpenDetails => 'عرض التفاصيل';
+
+  @override
+  String get analyticsContentOrderHighestEngagement => 'الأعلى تفاعلًا';
+
+  @override
+  String get analyticsContentOrderMostLiked => 'الأكثر إعجابًا';
+
+  @override
+  String get analyticsContentOrderMostSaved => 'الأكثر حفظًا';
+
+  @override
+  String get analyticsContentOrderMostShared => 'الأكثر مشاركة';
+
+  @override
+  String get analyticsContentOrderMostViewed => 'الأكثر مشاهدة';
+
+  @override
+  String get analyticsContentOrderNewest => 'الأحدث';
+
+  @override
+  String get analyticsContentTrendInteractions => 'التفاعلات';
+
+  @override
+  String get analyticsContentTypeAll => 'الكل';
+
+  @override
+  String get analyticsContentTypePost => 'منشور';
+
+  @override
+  String get analyticsContentTypePosts => 'المنشورات';
+
+  @override
+  String get analyticsContentTypeReel => 'ريل';
+
+  @override
+  String get analyticsContentTypeReels => 'الريلز';
+
+  @override
+  String get analyticsExternalAddUpdate => 'إضافة أو تحديث الأرقام';
+
+  @override
+  String get analyticsExternalBadgeManual => 'يدوي';
+
+  @override
+  String get analyticsExternalBadgeSynced => 'متزامن';
+
+  @override
+  String get analyticsExternalEmpty => 'لم تُدخل أي أرقام خارجية بعد.';
+
+  @override
+  String get analyticsExternalFormMetric => 'المقياس';
+
+  @override
+  String get analyticsExternalFormNote => 'اكتب الرقم الذي تراه على المنصة. يُحفظ كإدخال يدوي.';
+
+  @override
+  String get analyticsExternalFormPlatform => 'المنصة';
+
+  @override
+  String get analyticsExternalFormReference => 'مرجع (اختياري)';
+
+  @override
+  String get analyticsExternalFormSave => 'حفظ';
+
+  @override
+  String get analyticsExternalFormTitle => 'إضافة أرقام خارجية';
+
+  @override
+  String get analyticsExternalFormValue => 'القيمة';
+
+  @override
+  String get analyticsExternalIntro => 'أرقام من إنستجرام وفيسبوك وتيك توك تدخلها بنفسك. لا شيء يتزامن تلقائيًا.';
+
+  @override
+  String analyticsExternalLastUpdated(String date) {
+    return 'آخر تحديث: $date';
+  }
+
+  @override
+  String get analyticsExternalLoadError => 'تعذّر تحميل الأرقام الخارجية. حاول مرة أخرى.';
+
+  @override
+  String get analyticsExternalMetricLikes => 'الإعجابات';
+
+  @override
+  String get analyticsExternalMetricSaves => 'مرات الحفظ';
+
+  @override
+  String get analyticsExternalMetricShares => 'المشاركات';
+
+  @override
+  String get analyticsExternalMetricViews => 'المشاهدات';
+
+  @override
+  String get analyticsExternalPlatformFacebook => 'فيسبوك';
+
+  @override
+  String get analyticsExternalPlatformInstagram => 'إنستجرام';
+
+  @override
+  String get analyticsExternalPlatformTiktok => 'تيك توك';
+
+  @override
+  String analyticsExternalReference(String reference) {
+    return 'المرجع: $reference';
+  }
+
+  @override
+  String get analyticsExternalSaveError => 'تعذّر الحفظ. حاول مرة أخرى.';
+
+  @override
+  String get analyticsExternalSaved => 'تم الحفظ.';
+
+  @override
+  String get analyticsExternalSourceManual => 'المصدر: إدخال يدوي';
+
+  @override
+  String get analyticsExternalSourceSynced => 'المصدر: مزامنة من المنصة';
+
+  @override
+  String get analyticsExternalValueInvalid => 'أدخل رقمًا صحيحًا 0 أو أكثر.';
+
+  @override
+  String get analyticsProdEmpty => 'لا توجد منتجات بها تحليلات في هذه الفترة.';
+
+  @override
+  String get analyticsProdFunnelTitle => 'مسار التحويل';
+
+  @override
+  String get analyticsProdInactive => 'منتج غير نشط';
+
+  @override
+  String analyticsProdLabelValue(String label, String value) {
+    return '$label: $value';
+  }
+
+  @override
+  String get analyticsProdLoadError => 'تعذّر تحميل تحليلات هذا المنتج. حاول مرة أخرى.';
+
+  @override
+  String get analyticsProdLoadMore => 'عرض المزيد';
+
+  @override
+  String get analyticsProdMetricAverageOrderValue => 'متوسط قيمة الأوردر';
+
+  @override
+  String get analyticsProdMetricConversion => 'معدل التحويل';
+
+  @override
+  String get analyticsProdMetricInterests => 'الاهتمامات';
+
+  @override
+  String get analyticsProdMetricOrders => 'الأوردرات';
+
+  @override
+  String get analyticsProdMetricSales => 'المبيعات';
+
+  @override
+  String get analyticsProdMetricSaves => 'مرات الحفظ';
+
+  @override
+  String get analyticsProdMetricSoldOrders => 'أوردرات تم بيعها';
+
+  @override
+  String get analyticsProdMetricUniqueViews => 'المشاهدات الفريدة';
+
+  @override
+  String get analyticsProdMetricUnits => 'الوحدات';
+
+  @override
+  String get analyticsProdMetricViews => 'المشاهدات';
+
+  @override
+  String get analyticsProdNoBusiness => 'لا يوجد بروفايل نشاط تجاري لهذا الحساب.';
+
+  @override
+  String get analyticsProdNoSales => 'لا توجد مبيعات في هذه الفترة.';
+
+  @override
+  String get analyticsProdOpenOrders => 'فتح الأوردرات';
+
+  @override
+  String get analyticsProdOrderBestSelling => 'الأكثر مبيعًا';
+
+  @override
+  String get analyticsProdOrderHighestConversion => 'أعلى معدل تحويل';
+
+  @override
+  String get analyticsProdOrderLowestConversion => 'أقل معدل تحويل';
+
+  @override
+  String get analyticsProdOrderMostInterested => 'الأكثر اهتمامًا';
+
+  @override
+  String get analyticsProdOrderMostOrdered => 'الأكثر طلبًا';
+
+  @override
+  String get analyticsProdOrderMostViewed => 'الأكثر مشاهدة';
+
+  @override
+  String get analyticsProdOrdersLinkNote => 'يفتح كل أوردراتك. الفلترة حسب المنتج غير متاحة.';
+
+  @override
+  String analyticsProdOrdersUpdatedAt(String date) {
+    return 'تحديث الأوردرات: $date';
+  }
+
+  @override
+  String analyticsProdRateValue(String rate) {
+    return '$rate%';
+  }
+
+  @override
+  String analyticsProdSalesLine(String orders, String units) {
+    return 'أوردرات تم بيعها: $orders · وحدات: $units';
+  }
+
+  @override
+  String get analyticsProdSalesTitle => 'المبيعات حسب العملة';
+
+  @override
+  String get analyticsProdTotalsTitle => 'الإجماليات';
+
+  @override
+  String get analyticsProdTrendNoData => 'لا توجد بيانات اتجاه في هذه الفترة.';
+
+  @override
+  String get analyticsProdTrendsTitle => 'الاتجاهات اليومية';
+
+  @override
+  String analyticsProdUpdatedAt(String date) {
+    return 'تحديث البيانات: $date';
+  }
+
+  @override
+  String get analyticsProdViewsIncomplete => 'المشاهدات غير مكتملة في هذه الفترة، لذلك لا تظهر المعدلات المعتمدة عليها.';
+
+  @override
+  String get analyticsProdViewsUnavailable => 'بيانات المشاهدات غير متاحة لهذه الفترة.';
+
+  @override
+  String biChartSemantics(String title, int days) {
+    return '$title، الفترة بالأيام: $days';
+  }
+
+  @override
+  String get biComparedWithPrevious => 'مقارنة بالفترة السابقة';
+
+  @override
+  String get biDataNeverUpdated => 'لم تُحدَّث البيانات بعد.';
+
+  @override
+  String biDataUpdatedAt(String date) {
+    return 'تحديث البيانات: $date';
+  }
+
+  @override
+  String get biErrorNetwork => 'لا يوجد اتصال. تحقق من الإنترنت وحاول مرة أخرى.';
+
+  @override
+  String get biFunnelCompleted => 'مكتملة';
+
+  @override
+  String get biFunnelConfirmed => 'مؤكدة';
+
+  @override
+  String biFunnelConversion(String rate) {
+    return 'تحويل $rate';
+  }
+
+  @override
+  String biFunnelDrop(String rate) {
+    return 'فقد $rate';
+  }
+
+  @override
+  String get biFunnelInterests => 'الاهتمامات';
+
+  @override
+  String get biFunnelOrders => 'الأوردرات';
+
+  @override
+  String biFunnelOverall(String rate) {
+    return 'التحويل الإجمالي: $rate';
+  }
+
+  @override
+  String get biFunnelTitle => 'مسار التحويل';
+
+  @override
+  String get biFunnelUnitsNote => 'المشاهدات هي مشاهدات فريدة. الاهتمامات والأوردرات والمؤكدة والمكتملة تُحسب لكل عميل مرة واحدة.';
+
+  @override
+  String get biFunnelViews => 'المشاهدات';
+
+  @override
+  String get biGroupContent => 'المحتوى';
+
+  @override
+  String get biGroupOrders => 'الأوردرات';
+
+  @override
+  String get biGroupProducts => 'المنتجات';
+
+  @override
+  String get biKpiAov => 'متوسط قيمة الأوردر';
+
+  @override
+  String get biKpiComments => 'التعليقات';
+
+  @override
+  String get biKpiCompleted => 'أوردرات مكتملة';
+
+  @override
+  String get biKpiConfirmed => 'أوردرات مؤكدة';
+
+  @override
+  String get biKpiContentViews => 'مشاهدات المحتوى';
+
+  @override
+  String get biKpiInterests => 'الاهتمامات';
+
+  @override
+  String get biKpiLikes => 'الإعجابات';
+
+  @override
+  String get biKpiOrders => 'الأوردرات';
+
+  @override
+  String get biKpiProductUniqueViews => 'المشاهدات الفريدة للمنتجات';
+
+  @override
+  String get biKpiProductViews => 'مشاهدات المنتجات';
+
+  @override
+  String get biKpiSales => 'المبيعات';
+
+  @override
+  String get biKpiSaves => 'مرات الحفظ';
+
+  @override
+  String get biKpiShares => 'المشاركات داخل التطبيق';
+
+  @override
+  String get biLoadFailed => 'تعذّر تحميل التحليلات. حاول مرة أخرى.';
+
+  @override
+  String get biNoBusiness => 'لا يوجد بروفايل نشاط تجاري لهذا الحساب.';
+
+  @override
+  String get biNoPreviousData => 'لا توجد بيانات سابقة';
+
+  @override
+  String get biNoSalesInPeriod => 'لا توجد مبيعات في هذه الفترة.';
+
+  @override
+  String get biOrdersByStatusTitle => 'الأوردرات حسب الحالة';
+
+  @override
+  String get biOrdersEmpty => 'لا توجد أوردرات في هذه الفترة.';
+
+  @override
+  String get biOrdersOverTimeTitle => 'الأوردرات عبر الزمن';
+
+  @override
+  String get biOrdersTotal => 'إجمالي الأوردرات';
+
+  @override
+  String biOrdersUpdatedAt(String date) {
+    return 'تحديث الأوردرات: $date';
+  }
+
+  @override
+  String get biPeriodNote => 'التواريخ بتوقيت UTC. اليوم الحالي غير مشمول لأنه لم يُحسب بعد.';
+
+  @override
+  String biPeriodRange(String start, String end) {
+    return 'من $start إلى $end';
+  }
+
+  @override
+  String get biPresetCustom => 'مخصص';
+
+  @override
+  String get biPresetLast14 => '14 يوم';
+
+  @override
+  String get biPresetLast30 => '30 يوم';
+
+  @override
+  String get biPresetLast7 => '7 أيام';
+
+  @override
+  String get biPresetLast90 => '90 يوم';
+
+  @override
+  String get biPresetPreviousMonth => 'الشهر الماضي';
+
+  @override
+  String get biPresetThisMonth => 'هذا الشهر';
+
+  @override
+  String biRangeTooLong(int days) {
+    return 'أقصى مدة مسموحة $days يوم.';
+  }
+
+  @override
+  String get biRefresh => 'تحديث';
+
+  @override
+  String biRevenueOverTimeTitle(String currency) {
+    return 'المبيعات عبر الزمن ($currency)';
+  }
+
+  @override
+  String get biSalesDefinition => 'قيمة المبيعات = الأوردرات المؤكدة وقيد التجهيز والمشحونة والمُسلَّمة. الأوردرات المعلّقة والملغاة لا تُحتسب.';
+
+  @override
+  String get biSalesDisclaimer => 'هذه مبيعات سجّلتها أنت، وليست مدفوعات تم تحصيلها.';
+
+  @override
+  String get biSeriesOrders => 'الأوردرات';
+
+  @override
+  String get biSeriesSoldOrders => 'الأوردرات المباعة';
+
+  @override
+  String get biStatusCancelled => 'ملغي';
+
+  @override
+  String get biStatusConfirmed => 'مؤكد';
+
+  @override
+  String get biStatusDelivered => 'تم التسليم';
+
+  @override
+  String get biStatusPending => 'قيد الانتظار';
+
+  @override
+  String get biStatusProcessing => 'قيد التجهيز';
+
+  @override
+  String get biStatusShipped => 'تم الشحن';
+
+  @override
+  String get biStatusUnknown => 'غير معروف';
+
+  @override
+  String get biTabContent => 'المحتوى';
+
+  @override
+  String get biTabExternal => 'خارجي';
+
+  @override
+  String get biTabOrders => 'الأوردرات والمبيعات';
+
+  @override
+  String get biTabOverview => 'نظرة عامة';
+
+  @override
+  String get biTabProducts => 'المنتجات';
+
+  @override
+  String biTopProductSub(String orders, String units) {
+    return 'أوردرات تم بيعها: $orders · وحدات: $units';
+  }
+
+  @override
+  String get biTopProductsEmpty => 'لا توجد منتجات مباعة في هذه الفترة.';
+
+  @override
+  String get biTopProductsTitle => 'أفضل المنتجات';
+
+  @override
+  String get biTotalSales => 'إجمالي المبيعات';
+
+  @override
+  String get biUnits => 'الوحدات';
+
+  @override
+  String get biViewsIncomplete => 'المشاهدات غير مكتملة في هذه الفترة. المعدلات المعتمدة على المشاهدات والمقارنة بالفترة السابقة لا تظهر.';
+
+  @override
+  String get biViewsUnavailable => 'بيانات المشاهدات غير متاحة لهذه الفترة.';
 }
