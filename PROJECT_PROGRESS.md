@@ -141,3 +141,45 @@
 - The real `app_router.dart` registration and the Business-only gate for the new routes are not covered by a router-level test; `analytics_routes_test.dart` checks the constants and an equivalent route table.
 - No provider-level unit tests (the provider sources were not available when the tests were written).
 - Rollups are computed by Celery: days not yet rolled up are null, so very recent days can show a dash.
+
+## PART BI-04 — Business Analytics dashboard (Part 5/5: l10n + tests)
+
+Branch: part-116b-edit-profile, commit 2d4cb49.
+
+### Screens
+- Analytics dashboard (Overview, Products, Content, External, Orders summary) with a period/date filter.
+- Product analytics detail (nested route `product/:id` under the Analytics route).
+- Content analytics detail (nested route `content/:type/:id`, type is `post` or `reel`).
+- A bad id or type redirects back to the dashboard.
+
+### Files
+- data: `business_analytics_repository.dart`, `dtos/` (analytics_common, overview, products, content, orders_summary, dto_parsing).
+- domain: `analytics_common`, `analytics_period`, `analytics_overview`, `analytics_products`, `analytics_content`, `analytics_orders_summary`.
+- presentation: `analytics_dashboard_screen`, `product_analytics_detail_screen`, `content_analytics_detail_screen`, `providers/`, `widgets/`.
+- routing: `route_names.dart`, `navigation_manifest.dart`, `app_router.dart`.
+- l10n: 163 new keys in `app_en.arb` and `app_ar.arb` (generated l10n files committed).
+
+### APIs
+- Endpoints and JSON come only from `api_contract_BI02.md` (overview, products, product detail, content, content detail, external metrics, orders summary).
+- date_from and date_to are always sent; `period=` only for 7d/30d/90d; max 366 days; orders summary always sends date_to.
+- Page-based pagination (`page`, `page_size`); products "lowest conversion" uses `ordering=conversion`.
+- Null is shown as "—", never 0. Money is a String and never summed across currencies. The funnel is shown exactly as sent.
+
+### External-integration constraints
+- External metrics are manual entry only (`providers_registered` is empty).
+- POST is not idempotent; no "engagement" external type; no reach metric.
+- No "live" label: the screens show `data_updated_at` / `orders_data_updated_at`.
+
+### Tests
+- `test/features/business_console/data/`: DTO parsing and repository (query params, UTC date conversion, error mapping) against a fake/mock adapter.
+- `test/features/business_console/domain/`: period logic and metric comparison (previous_period null, change_pct null).
+- `test/features/business_console/presentation/`: dashboard, product detail, content detail, navigation (loading/error/empty, sorting, pagination, no reload on tab change, AR/EN, Light/Dark).
+- `test/routing/analytics_routes_test.dart`; existing routing tests updated, none deleted.
+- Support: `bi_fixtures.dart`, `fake_business_analytics_repository.dart`, `bi_test_harness.dart`.
+
+### Verification (reported by the project owner, not re-run by Claude)
+- All tests pass except 64 old golden tests that were already failing before BI-04 (not caused by this part).
+- `flutter analyze`: one unused-variable warning in `analytics_dashboard_screen_test.dart` was fixed afterwards.
+
+### Open items
+- `lib/features/analytics_tracking/` is still untracked and not part of this commit.
