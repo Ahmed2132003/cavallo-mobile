@@ -85,10 +85,7 @@ void main() {
     test('under a minute, and the future, read just now', () {
       expect(en.relativeTime(ago(Duration.zero)), 'just now');
       expect(en.relativeTime(ago(const Duration(seconds: 59))), 'just now');
-      expect(
-        en.relativeTime(_now.add(const Duration(minutes: 5))),
-        'just now',
-      );
+      expect(en.relativeTime(_now.add(const Duration(minutes: 5))), 'just now');
       expect(
         ar.relativeTime(ago(Duration.zero)),
         ar.relativeTime(_now.add(const Duration(hours: 1))),
@@ -144,9 +141,8 @@ void main() {
     });
 
     test('a UTC timestamp is compared as the same instant', () {
-      final DateTime fiveMinutesAgoUtc = _now
-          .subtract(const Duration(minutes: 5))
-          .toUtc();
+      final DateTime fiveMinutesAgoUtc =
+          _now.subtract(const Duration(minutes: 5)).toUtc();
       expect(en.relativeTime(fiveMinutesAgoUtc), '5 minutes ago');
     });
 
@@ -258,8 +254,10 @@ void main() {
     });
 
     test('the amount string is used as is, never through a double', () {
-      expect(en.price('12345678901234567890.12', 'EGP'),
-          '12,345,678,901,234,567,890.12 EGP');
+      expect(
+        en.price('12345678901234567890.12', 'EGP'),
+        '12,345,678,901,234,567,890.12 EGP',
+      );
     });
 
     test('negative, padded and non-numeric input is handled', () {

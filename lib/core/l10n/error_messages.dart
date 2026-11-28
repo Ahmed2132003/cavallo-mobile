@@ -21,7 +21,10 @@ String localizedApiError(AppLocalizations l10n, Object? error) {
     return l10n.errorUnknown;
   }
 
-  switch (failure.code) {
+  // Most backend codes are UPPER_CASE, but the subscription lifecycle ones
+  // (downgrade_*) are lower_case: compare case-insensitively. The client-side
+  // ApiErrorCodes are all upper-case, so they keep matching.
+  switch (failure.code?.toUpperCase()) {
     case 'AUTHENTICATION_FAILED':
       return l10n.errorAuthentication;
     case 'PERMISSION_DENIED':
@@ -39,6 +42,14 @@ String localizedApiError(AppLocalizations l10n, Object? error) {
       return l10n.errorConflict;
     case 'SERVICE_UNAVAILABLE':
       return l10n.errorServiceUnavailable;
+    case 'SUBSCRIPTION_REQUIRED':
+      return l10n.errorSubscriptionRequired;
+    case 'STORAGE_QUOTA_EXCEEDED':
+      return l10n.errorStorageQuotaExceeded;
+    case 'DOWNGRADE_BLOCKED_USAGE':
+      return l10n.errorDowngradeBlockedUsage;
+    case 'DOWNGRADE_ALREADY_PENDING':
+      return l10n.errorDowngradeAlreadyPending;
     case 'VALIDATION_ERROR':
       return l10n.errorValidation;
     case 'SERVER_ERROR':

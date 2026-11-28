@@ -57,7 +57,11 @@ void main() {
 
   test('the raw backend message is never returned', () {
     final List<ApiFailure> failures = <ApiFailure>[
-      const ValidationFailure(message: _raw, fields: {}, code: 'VALIDATION_ERROR'),
+      const ValidationFailure(
+        message: _raw,
+        fields: {},
+        code: 'VALIDATION_ERROR',
+      ),
       const AuthFailure(message: _raw, code: 'AUTHENTICATION_FAILED'),
       const ServerFailure(message: _raw),
       const NetworkFailure(message: _raw),
@@ -132,28 +136,31 @@ void main() {
     );
   });
 
-  test('every error text is really translated (Arabic differs from English)', () {
-    final List<String Function(AppLocalizations)> getters =
-        <String Function(AppLocalizations)>[
-          (l) => l.errorNetwork,
-          (l) => l.errorSecureConnection,
-          (l) => l.errorServer,
-          (l) => l.errorAuthentication,
-          (l) => l.errorNotAuthorized,
-          (l) => l.errorPermissionDenied,
-          (l) => l.errorNotFound,
-          (l) => l.errorBadRequest,
-          (l) => l.errorValidation,
-          (l) => l.errorThrottled,
-          (l) => l.errorConflict,
-          (l) => l.errorServiceUnavailable,
-          (l) => l.errorCancelled,
-          (l) => l.errorUnknown,
-        ];
-    final RegExp arabicLetters = RegExp('[\u0600-\u06FF]');
-    for (final String Function(AppLocalizations) getter in getters) {
-      expect(getter(ar), isNot(getter(en)));
-      expect(arabicLetters.hasMatch(getter(ar)), isTrue, reason: getter(ar));
-    }
-  });
+  test(
+    'every error text is really translated (Arabic differs from English)',
+    () {
+      final List<String Function(AppLocalizations)> getters =
+          <String Function(AppLocalizations)>[
+            (l) => l.errorNetwork,
+            (l) => l.errorSecureConnection,
+            (l) => l.errorServer,
+            (l) => l.errorAuthentication,
+            (l) => l.errorNotAuthorized,
+            (l) => l.errorPermissionDenied,
+            (l) => l.errorNotFound,
+            (l) => l.errorBadRequest,
+            (l) => l.errorValidation,
+            (l) => l.errorThrottled,
+            (l) => l.errorConflict,
+            (l) => l.errorServiceUnavailable,
+            (l) => l.errorCancelled,
+            (l) => l.errorUnknown,
+          ];
+      final RegExp arabicLetters = RegExp('[\u0600-\u06FF]');
+      for (final String Function(AppLocalizations) getter in getters) {
+        expect(getter(ar), isNot(getter(en)));
+        expect(arabicLetters.hasMatch(getter(ar)), isTrue, reason: getter(ar));
+      }
+    },
+  );
 }

@@ -131,6 +131,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorConflict => 'This item has already changed. Refresh and try again.';
 
   @override
+  String get errorSubscriptionRequired => 'Your subscription has ended. Renew your plan to continue.';
+
+  @override
+  String get errorStorageQuotaExceeded => 'You have used all of your storage. Upgrade your plan or delete some files to continue.';
+
+  @override
+  String get errorDowngradeBlockedUsage => 'You are using more storage than this plan includes. Free up space before switching to it.';
+
+  @override
+  String get errorDowngradeAlreadyPending => 'A plan change is already scheduled for the end of your current period.';
+
+  @override
   String get errorServiceUnavailable => 'This service is not available right now. Please try again later.';
 
   @override

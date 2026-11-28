@@ -287,6 +287,30 @@ abstract class AppLocalizations {
   /// **'This item has already changed. Refresh and try again.'**
   String get errorConflict;
 
+  /// Backend code SUBSCRIPTION_REQUIRED (HTTP 403): the business is locked or has no active subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription has ended. Renew your plan to continue.'**
+  String get errorSubscriptionRequired;
+
+  /// Backend code STORAGE_QUOTA_EXCEEDED (HTTP 403) when an upload would exceed the plan's storage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have used all of your storage. Upgrade your plan or delete some files to continue.'**
+  String get errorStorageQuotaExceeded;
+
+  /// Backend code downgrade_blocked_usage (HTTP 409): current usage is above the target plan's quota.
+  ///
+  /// In en, this message translates to:
+  /// **'You are using more storage than this plan includes. Free up space before switching to it.'**
+  String get errorDowngradeBlockedUsage;
+
+  /// Backend code downgrade_already_pending (HTTP 409): a downgrade is already scheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'A plan change is already scheduled for the end of your current period.'**
+  String get errorDowngradeAlreadyPending;
+
   /// Backend code SERVICE_UNAVAILABLE.
   ///
   /// In en, this message translates to:

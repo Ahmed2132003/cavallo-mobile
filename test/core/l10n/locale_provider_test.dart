@@ -122,7 +122,9 @@ void main() {
     test('starts from initialLocaleProvider', () {
       SharedPreferences.setMockInitialValues(<String, Object>{});
       final ProviderContainer container = ProviderContainer(
-        overrides: [initialLocaleProvider.overrideWithValue(const Locale('en'))],
+        overrides: [
+          initialLocaleProvider.overrideWithValue(const Locale('en')),
+        ],
       );
       addTearDown(container.dispose);
       expect(container.read(localeProvider), const Locale('en'));
@@ -133,11 +135,15 @@ void main() {
       final ProviderContainer container = ProviderContainer();
       addTearDown(container.dispose);
 
-      await container.read(localeProvider.notifier).setLocale(const Locale('ar'));
+      await container
+          .read(localeProvider.notifier)
+          .setLocale(const Locale('ar'));
       expect(container.read(localeProvider), const Locale('ar'));
       expect(await preloadLocale(), const Locale('ar'));
 
-      await container.read(localeProvider.notifier).setLocale(const Locale('en'));
+      await container
+          .read(localeProvider.notifier)
+          .setLocale(const Locale('en'));
       expect(container.read(localeProvider), const Locale('en'));
       expect(await preloadLocale(), const Locale('en'));
     });
@@ -147,7 +153,9 @@ void main() {
         localeCacheKey: '"ar"',
       });
       final ProviderContainer container = ProviderContainer(
-        overrides: [initialLocaleProvider.overrideWithValue(const Locale('ar'))],
+        overrides: [
+          initialLocaleProvider.overrideWithValue(const Locale('ar')),
+        ],
       );
       addTearDown(container.dispose);
 
@@ -161,7 +169,9 @@ void main() {
       final ProviderContainer container = ProviderContainer();
       addTearDown(container.dispose);
 
-      await container.read(localeProvider.notifier).setLocale(const Locale('fr'));
+      await container
+          .read(localeProvider.notifier)
+          .setLocale(const Locale('fr'));
       expect(container.read(localeProvider), isNull);
     });
   });
@@ -187,7 +197,9 @@ void main() {
     });
 
     test('follows an English device', () {
-      final ProviderContainer c = build(device: const <Locale>[Locale('en', 'GB')]);
+      final ProviderContainer c = build(
+        device: const <Locale>[Locale('en', 'GB')],
+      );
       expect(c.read(activeLanguageCodeGetterProvider)(), 'en');
     });
 
@@ -199,7 +211,9 @@ void main() {
     test('changes live when the user switches language', () async {
       SharedPreferences.setMockInitialValues(<String, Object>{});
       final ProviderContainer c = build(device: const <Locale>[Locale('fr')]);
-      final ActiveLanguageCodeGetter getter = c.read(activeLanguageCodeGetterProvider);
+      final ActiveLanguageCodeGetter getter = c.read(
+        activeLanguageCodeGetterProvider,
+      );
       expect(getter(), 'ar');
       await c.read(localeProvider.notifier).setLocale(const Locale('en'));
       expect(getter(), 'en');

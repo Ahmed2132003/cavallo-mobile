@@ -46,6 +46,9 @@ void main() {
 
     await pump(const Locale('ar'));
     await tester.pumpAndSettle();
-    expect(retry, '\u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629');
+    expect(
+      retry,
+      '\u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629',
+    );
   });
 }

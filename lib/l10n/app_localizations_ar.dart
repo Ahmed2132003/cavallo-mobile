@@ -143,6 +143,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorConflict => 'تغيّرت حالة هذا العنصر بالفعل. حدّث الصفحة وحاول مرة أخرى.';
 
   @override
+  String get errorSubscriptionRequired => 'انتهى اشتراكك. جدّد باقتك للمتابعة.';
+
+  @override
+  String get errorStorageQuotaExceeded => 'استهلكت كامل مساحة التخزين. رقِّ باقتك أو احذف بعض الملفات للمتابعة.';
+
+  @override
+  String get errorDowngradeBlockedUsage => 'المساحة المستخدمة أكبر من مساحة هذه الباقة. أخلِ بعض المساحة قبل التحويل إليها.';
+
+  @override
+  String get errorDowngradeAlreadyPending => 'يوجد تغيير باقة مجدول بالفعل عند نهاية فترتك الحالية.';
+
+  @override
   String get errorServiceUnavailable => 'هذه الخدمة غير متاحة حاليًا. حاول مرة أخرى لاحقًا.';
 
   @override

@@ -78,13 +78,21 @@ void main() {
 
   testWidgets('Arabic device: Arabic text, right-to-left', (tester) async {
     await pumpApp(tester, device: const <Locale>[Locale('ar', 'EG')]);
-    expect(_textOf(tester, _textKey), '\u0645\u0646\u0630 \u062f\u0642\u064a\u0642\u062a\u064a\u0646');
+    expect(
+      _textOf(tester, _textKey),
+      '\u0645\u0646\u0630 \u062f\u0642\u064a\u0642\u062a\u064a\u0646',
+    );
     expect(_textOf(tester, _directionKey), 'TextDirection.rtl');
   });
 
-  testWidgets('French device falls back to Arabic (default rule)', (tester) async {
+  testWidgets('French device falls back to Arabic (default rule)', (
+    tester,
+  ) async {
     await pumpApp(tester, device: const <Locale>[Locale('fr')]);
-    expect(_textOf(tester, _textKey), '\u0645\u0646\u0630 \u062f\u0642\u064a\u0642\u062a\u064a\u0646');
+    expect(
+      _textOf(tester, _textKey),
+      '\u0645\u0646\u0630 \u062f\u0642\u064a\u0642\u062a\u064a\u0646',
+    );
     expect(_textOf(tester, _directionKey), 'TextDirection.rtl');
   });
 
@@ -97,7 +105,9 @@ void main() {
     expect(_textOf(tester, _directionKey), 'TextDirection.rtl');
   });
 
-  testWidgets('switching language flips text and direction live', (tester) async {
+  testWidgets('switching language flips text and direction live', (
+    tester,
+  ) async {
     final ProviderContainer container = await pumpApp(
       tester,
       device: const <Locale>[Locale('en')],
@@ -105,14 +115,19 @@ void main() {
     expect(_textOf(tester, _directionKey), 'TextDirection.ltr');
 
     await tester.runAsync(
-      () => container.read(localeProvider.notifier).setLocale(const Locale('ar')),
+      () =>
+          container.read(localeProvider.notifier).setLocale(const Locale('ar')),
     );
     await tester.pumpAndSettle();
-    expect(_textOf(tester, _textKey), '\u0645\u0646\u0630 \u062f\u0642\u064a\u0642\u062a\u064a\u0646');
+    expect(
+      _textOf(tester, _textKey),
+      '\u0645\u0646\u0630 \u062f\u0642\u064a\u0642\u062a\u064a\u0646',
+    );
     expect(_textOf(tester, _directionKey), 'TextDirection.rtl');
 
     await tester.runAsync(
-      () => container.read(localeProvider.notifier).setLocale(const Locale('en')),
+      () =>
+          container.read(localeProvider.notifier).setLocale(const Locale('en')),
     );
     await tester.pumpAndSettle();
     expect(_textOf(tester, _textKey), '2 minutes ago');
